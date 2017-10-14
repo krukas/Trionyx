@@ -1,0 +1,7 @@
+django-extensions
+Werkzeug
+flake8
+pydocstyle
+ipython
+Sphinx
+sphinx_rtd_theme
