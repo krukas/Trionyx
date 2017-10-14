@@ -7,19 +7,16 @@ def readme():
 
 setup(
 	name = 'Trionyx',
-	packages = find_packages(),
-	package_data={
-        'trionyx': ['*.txt', '*.py']
-    },
-	scripts=['bin/trionyx'],
+	packages = find_packages(exclude=['app']),
+	include_package_data=True,
+	scripts=['trionyx/bin/trionyx'],
 	version = '0.0.1',
 	description = 'Trionyx is an application framework for managing data and processes',
 	long_description=readme(),
 	classifiers=[
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Programming Language :: Python :: 3',
-        'Framework :: Trionyx',
-        'Topic :: Framework :: Trionyx',
+        'Framework :: Django',
         'Topic :: Office/Business :: Groupware',
 
       ],
