@@ -19,6 +19,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django.contrib.humanize',
+
+    'compressor',
 ]
 
 # Internationalization
@@ -67,6 +69,8 @@ MIDDLEWARE_CLASSES = (
 # ==============================================================================
 # Auth / security
 # ==============================================================================
+AUTH_USER_MODEL = 'core.User'
+
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 LOGIN_EXEMPT_URLS = [
@@ -97,10 +101,22 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'APP_DIRS': True,
+        'OPTIONS': {
+			'context_processors': [
+				'django.contrib.auth.context_processors.auth',
+				'django.template.context_processors.debug',
+				'django.template.context_processors.i18n',
+				'django.template.context_processors.media',
+				'django.template.context_processors.static',
+				'django.template.context_processors.tz',
+				'django.template.context_processors.request',
+				'django.contrib.messages.context_processors.messages',
+
+				'django.contrib.messages.context_processors.messages',
+			],
+		}
     },
 ]
-
-STATIC_URL = '/static/'
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
