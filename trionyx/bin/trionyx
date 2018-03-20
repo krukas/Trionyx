@@ -1,0 +1,71 @@
+#!/usr/bin/env python3
+"""
+trionyx
+~~~~~~~
+
+Trionyx commandline tool
+
+:copyright: 2017 by Maikel Martens
+:license: GPLv3
+"""
+import os
+import sys
+import argparse
+
+try:
+    from trionyx.quickstart import Quickstart
+except ImportError:
+    # try to import based on file
+    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(os.path.realpath(__file__)))))
+    try:
+        from trionyx.quickstart import Quickstart
+    except ImportError:
+        print('Could not import trionyx')
+        sys.exit(1)
+
+
+class TrionyxCommand:
+    """Trionyx commandline tool"""
+
+    def __init__(self):
+        """Init command parser"""
+        parser = argparse.ArgumentParser(
+            description='Trionyx',
+            usage='''trionyx <command> [<args>]
+
+Available commands are:
+   create_project   Creates a new Trionyx project
+        ''')
+        parser.add_argument('command', help='Subcommand to run')
+
+        args = parser.parse_args(sys.argv[1:2])
+
+        if not hasattr(self, args.command):
+            print('Unrecognized command')
+            parser.print_help()
+            exit(1)
+            # use dispatch pattern to invoke method with same name
+        getattr(self, args.command)(sys.argv[2:])
+
+    def create_project(self, argv):
+        """Create new Trionyx project"""
+        parser = argparse.ArgumentParser(description='Create a Trionyx project')
+        parser.add_argument('name', help='Name of project (folder name)')
+
+        args = parser.parse_args(argv)
+
+        try:
+            quickstart = Quickstart()
+            quickstart.create_project(os.path.join(os.getcwd(), args.name))
+        except FileExistsError as e:
+            print(e)
+            print("Could not create project because a folder ({}) already exists".format(args.name))
+            sys.exit(1)
+        except Exception as e:
+            print(e)
+            print("Could not create project")
+            sys.exit(1)
+
+
+if __name__ == '__main__':
+    TrionyxCommand()

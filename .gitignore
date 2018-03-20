@@ -1,0 +1,16 @@
+__pycache__/
+env/
+*.py[cod]
+.coverage
+
+docs/_build/
+build/
+dist/
+*.egg-info/
+*.swp
+*.iml
+
+development.sqlite3
+.idea
+
+

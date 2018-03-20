@@ -1,0 +1,17 @@
+language: python
+
+dist: trusty
+
+python:
+  - "3.5"
+  - "3.6"
+
+install:
+  - make setup
+  - pip install codecov
+
+script:
+  - make test
+
+after_success:
+  - codecov
