@@ -2,6 +2,7 @@ __pycache__/
 env/
 *.py[cod]
 .coverage
+media/
 
 docs/_build/
 build/

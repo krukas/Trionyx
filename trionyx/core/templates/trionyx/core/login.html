@@ -2,13 +2,14 @@
 {% load i18n static %}
 
 {% block body_class %}login-page{% endblock %}
+{% block title %}Sign In{% endblock %}
 
 {% block body %}
     <div class="login-box">
         {% block logo %}
         <div class="login-logo">
             {# Mirrors block names used in _main_header.html #}
-            <a href="{% block logo_href %}/{% endblock %}">{% block logo_text %}<b>Admin</b>LTE{% endblock %}</a>
+            {% block logo_text %}<b>{{ TX_LOGO_NAME_START }}</b>{{ TX_LOGO_NAME_END }}{% endblock %}
         </div>
         {% endblock %}
         <!-- /.login-logo -->

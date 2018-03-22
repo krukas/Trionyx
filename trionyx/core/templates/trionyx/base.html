@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
-    <title>{% block title %}{% endblock %}{% block title_suffix %} | {{ site.name }}{% endblock %}</title>
+    <title>{% block title %}{% endblock %}{% block title_suffix %} | {{ TX_APP_NAME }}{% endblock %}</title>
 
     {% compress css %}
         <link rel="stylesheet" type="text/css" href="{% static "css/bootstrap.min.css" %}">
@@ -30,11 +30,43 @@
     <![endif]-->
 
     <!-- Google Font -->
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 </head>
-<body class="hold-transition skin-blue sidebar-mini {% block body_class %}{% endblock %}">
+<body class="hold-transition skin-blue sidebar-mini fixed {% block body_class %}{% endblock %}">
 
-{% block body %}{% endblock %}
+{% block body %}
+    <div class="wrapper">
+        {% block header %}
+            {% include 'trionyx/base/header.html' %}
+        {% endblock %}
+
+        {% block main_sidebar %}
+            {% include 'trionyx/base/main_sidebar.html' %}
+        {% endblock %}
+
+        <div class="content-wrapper">
+            <section class="content-header">
+                <h1>
+                    {% block page_title %}{% endblock %}
+                    <small>{% block page_subtitle %}{% endblock %}</small>
+                </h1>
+                <ol class="breadcrumb">
+                    {% for crumb in breadcrumbs %}
+                        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
+                        <li><a href="#">Examples</a></li>
+                        <li class="active">Blank page</li>
+                    {% endfor %}
+                </ol>
+            </section>
+
+            <section class="content">
+                {% block content %}{% endblock %}
+            </section>
+        </div>
+
+    </div>
+{% endblock %}
 
 {% compress js %}
     <script src="{% static "js/jquery.min.js" %}"></script>
@@ -45,9 +77,9 @@
     <script src="{% static "js/trionyx.js" %}"></script>
 
     <script>
-      $(document).ready(function () {
-        $('.sidebar-menu').tree()
-      })
+        $(document).ready(function () {
+            $('.sidebar-menu').tree()
+        })
     </script>
 
     {% block extra_js %}{% endblock %}

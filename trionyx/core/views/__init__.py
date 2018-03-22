@@ -1,1 +1,1 @@
-from .accounts import LoginView, logout
+from .accounts import LoginView, logout, UpdateUserAccountView

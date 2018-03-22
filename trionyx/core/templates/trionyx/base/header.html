@@ -1,0 +1,52 @@
+{% load static %}
+<header class="main-header">
+
+    <a href="/" class="logo">
+        <span class="logo-mini"><b>{{ TX_LOGO_NAME_SMALL_START }}</b>{{ TX_LOGO_NAME_SMALL_END }}</span>
+        <span class="logo-lg"><b>{{ TX_LOGO_NAME_START }}</b>{{ TX_LOGO_NAME_END }}</span>
+    </a>
+
+    <nav class="navbar navbar-static-top">
+        <!-- Sidebar toggle button-->
+        <a href="#" class="sidebar-toggle" data-toggle="push-menu" role="button">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+        </a>
+
+        <div class="navbar-custom-menu">
+            <ul class="nav navbar-nav">
+
+                <!-- User Account: style can be found in dropdown.less -->
+                <li class="dropdown user user-menu">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown">
+                        <img src="{%if user.avatar %}{{ MEDIA_URL }}{{ user.avatar }}{% else %}{% static 'img/avatar.png'%}{% endif %}" class="user-image" alt="User Image">
+                        <span class="hidden-xs">{{ user.first_name }} {{ user.last_name }}</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <!-- User image -->
+                        <li class="user-header">
+                            <img src="{%if user.avatar %}{{ MEDIA_URL }}{{ user.avatar }}{% else %}{% static 'img/avatar.png'%}{% endif %}" class="img-circle" alt="User Image">
+
+                            <p>
+                                {{ user.first_name }} {{ user.last_name }}
+                                <small>Member since {{ user.date_joined|date:"M: Y" }}</small>
+                            </p>
+                        </li>
+                        <!-- Menu Footer-->
+                        <li class="user-footer">
+                            <div class="pull-left">
+                                <a href="#" class="btn btn-default btn-flat">Profile</a>
+                            </div>
+                            <div class="pull-right">
+                                <a href="{% url 'trionyx:logout' %}" class="btn btn-default btn-flat">Sign
+                                    out</a>
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</header>

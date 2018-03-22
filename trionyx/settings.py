@@ -20,6 +20,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
 
+	'crispy_forms',
     'compressor',
 ]
 
@@ -113,6 +114,7 @@ TEMPLATES = [
 				'django.contrib.messages.context_processors.messages',
 
 				'django.contrib.messages.context_processors.messages',
+				'trionyx.core.context_processors.trionyx',
 			],
 		}
     },
@@ -147,3 +149,12 @@ CORS_ORIGIN_WHITELIST = [
     'localhost:8000',
     'localhost:4200',
 ]
+
+# ==============================================================================
+# Trionyx settings
+# ==============================================================================
+TX_APP_NAME = 'Trionyx'
+TX_LOGO_NAME_START = 'Tri'
+TX_LOGO_NAME_END = 'onyx'
+TX_LOGO_NAME_SMALL_START = 'T'
+TX_LOGO_NAME_SMALL_END = 'X'
