@@ -13,6 +13,8 @@ INSTALLED_APPS += [
     # Extra apps
 ]
 
+ROOT_URLCONF = 'config.urls'
+
 ALLOWED_HOSTS = []
 
 # Local settings
