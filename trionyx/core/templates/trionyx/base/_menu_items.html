@@ -1,0 +1,30 @@
+{% load trionyx %}
+
+{% if item.childs %}
+    <li class="treeview {% active_menu_item request item %}">
+            <a href="#">
+                {% if item.icon and item.depth == 2 %}
+                    <i class="{{ item.icon }}"></i>
+                {% else %}
+                    <i class="fa fa-circle-o"></i>
+                {% endif %}
+                <span>{{ item.name }}</span>
+                <span class="pull-right-container">
+          <i class="fa fa-angle-left pull-right"></i>
+        </span>
+            </a>
+            <ul class="treeview-menu">
+                {% for child in item.childs %}
+                    {% with item=child template_name="trionyx/base/_menu_items.html" %}
+                        {% include template_name %}
+                    {% endwith %}
+                {% endfor %}
+            </ul>
+        </li>
+{% else %}
+    <li class="{% active_menu_item request item %}">
+        <a href="{{ item.url }}">
+            <i class="fa fa-circle-o"></i> {{ item.name }}</a>
+    </li>
+{% endif %}
+

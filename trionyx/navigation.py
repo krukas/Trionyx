@@ -5,6 +5,7 @@ trionyx.navigation
 :copyright: 2017 by Maikel Martens
 :license: GPLv3
 """
+import re
 
 
 class Menu:
@@ -13,7 +14,7 @@ class Menu:
     _root_item = None
 
     @classmethod
-    def add_item(cls, path, name, icon=None, url=None, order=None, permission=None):
+    def add_item(cls, path, name, icon=None, url=None, order=None, permission=None, active_regex=None):
         """
         Add new menu item to menu
 
@@ -41,7 +42,7 @@ class Menu:
                 root_item.add_child(new_root)
             root_item = new_root
 
-        new_item = MenuItem(path, name, icon, url, order, permission)
+        new_item = MenuItem(path, name, icon, url, order, permission, active_regex)
 
         current_item = root_item.child_by_code(path.split('/')[-1])
         if current_item:
@@ -60,7 +61,7 @@ class Menu:
 class MenuItem:
     """Menu item that holds all menu item data"""
 
-    def __init__(self, path, name, icon=None, url=None, order=None, permission=None):
+    def __init__(self, path, name, icon=None, url=None, order=None, permission=None, active_regex=None):
         """
         Init menu item
 
@@ -77,8 +78,9 @@ class MenuItem:
         self.url = url
         self.order = order
         self.permission = permission
+        self.active_regex = active_regex
 
-        self.depth = 1
+        self.depth = 0
         self.childs = []
 
     def merge(self, item):
@@ -122,3 +124,15 @@ class MenuItem:
             if child.path.split('/')[-1] == code:
                 return child
         return None
+
+    def is_active(self, path):
+        if self.url and path.startswith(self.url):
+            return True
+
+        if self.active_regex and re.compile(self.active_regex).match(path):
+            return True
+
+        for child in self.childs:
+            if child.is_active(path):
+                return True
+        return False
