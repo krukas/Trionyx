@@ -15,6 +15,7 @@
         <link rel="stylesheet" type="text/css" href="{% static "css/ionicons.min.css" %}">
         <link rel="stylesheet" type="text/css" href="{% static "css/AdminLTE.min.css" %}">
         <link rel="stylesheet" type="text/css" href="{% static "css/skins/skin-blue.min.css" %}">
+        <link rel="stylesheet" type="text/css" href="{% static "css/trionyx.css" %}">
 
         {% block extra_css %}{% endblock %}
 
@@ -46,23 +47,34 @@
         {% endblock %}
 
         <div class="content-wrapper">
-            <section class="content-header">
-                <h1>
-                    {% block page_title %}{% endblock %}
-                    <small>{% block page_subtitle %}{% endblock %}</small>
-                </h1>
-                <ol class="breadcrumb">
-                    {% for crumb in breadcrumbs %}
-                        <li><a href="#"><i class="fa fa-dashboard"></i> Home</a></li>
-                        <li><a href="#">Examples</a></li>
-                        <li class="active">Blank page</li>
-                    {% endfor %}
-                </ol>
-            </section>
+            {% block content_top %}{% endblock %}
 
-            <section class="content">
+            <div class="content-header-wrapper" data-spy="affix">
+                <section class="content-header" >
+                    <h1 class="pull-left">
+                        {% block page_title %}{% endblock %}
+                        <small>{% block page_subtitle %}{% endblock %}</small>
+                    </h1>
+                    <div class='btn-toolbar pull-right'>
+                        <div class="btn-group">
+                            {# Bug where content align is different when there is no items #}
+                            <a href="#" class="btn" style="visibility: hidden">hidden</a>
+
+                            {% block header_buttons %}
+
+                            {% endblock %}
+
+                        </div>
+                    </div>
+                <div class="clearfix"></div>
+                </section>
+            </div>
+
+            <section class="content" style="margin-top: 49px">
                 {% block content %}{% endblock %}
             </section>
+
+            {% block content_bottom %}{% endblock %}
         </div>
 
     </div>

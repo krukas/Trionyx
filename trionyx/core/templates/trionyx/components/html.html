@@ -1,0 +1,11 @@
+{% if component.tag %}
+    {% if component.html %}
+        <{{ component.tag }} {{ component.get_attr_text|safe }}>
+            {{ html }}
+        </{{ component.tag }}
+    {% else %}
+        <{{ component.tag }} {{ component.get_attr_text|safe }}/>
+    {% endif %}
+{% else %}
+    {{ component.html }}
+{% endif %}

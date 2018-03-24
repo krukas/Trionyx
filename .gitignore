@@ -10,6 +10,7 @@ dist/
 *.egg-info/
 *.swp
 *.iml
+static/CACHE/
 
 development.sqlite3
 .idea

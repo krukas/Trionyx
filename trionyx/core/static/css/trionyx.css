@@ -1,0 +1,16 @@
+.content-header-wrapper {
+    z-index: 999;
+    background-color: #ecf0f5;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    right: 0;
+    left: 230px;
+    transition: left .3s ease-in-out;
+}
+
+.detail-tab-view-tabs ul.nav {
+    border-top: 1px solid #ddd;
+    border-bottom: 1px solid #ddd;
+    margin-bottom: 15px;
+    background-color: #eee;
+}

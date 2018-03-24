@@ -1,0 +1,105 @@
+{% extends "trionyx/base.html" %}
+{% load i18n static %}
+
+{% block title %}Profile{% endblock %}
+{% block page_title %}Profile{% endblock %}
+
+{% block header_buttons %}
+
+{% endblock %}
+
+{% block content %}
+    <div class="row detail-tab-view-tabs">
+        <ul class="nav nav-pills">
+            {% for item in page_detail_tabs %}
+                <li {% if item.code == active_tab %}class="active"{% endif %}>
+                    <a href="#{{ item.code }}" data-toggle="tab" class="trionyx-detail-tab" id="detail-tab-link-{{ item.code }}">{{ item.name }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    <div class="tab-content">
+	{% for item in page_detail_tabs %}
+		<div class="tab-pane fade in {% if item.code == active_tab %}active{% endif %}" id="{{ item.code }}">
+			<div class="row tab-content" style="padding:0px" id="trionyx-tab-{{ item.code }}">
+				<div style="margin: 0 auto; width: 150px; margin-top: 5%; text-align: center;">
+                    {{ item.code }}
+					<img  src='{% static 'img/grid-loader.svg' %}' />
+				</div>
+			</div>
+		</div>
+	{% endfor %}
+	<div style="clear: both;"></div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script type="text/javascript">
+        var trionyx_model_alias = '{{ model_alias }}';
+        var trionyx_tab_url = '{% url 'trionyx:model-tab' app_label model_name object.id %}';
+        var trionyx_loaded_tabs = {};
+        var trionyx_current_tab = '{{ active_tab }}';
+
+        function trionyx_load_tab(tab_id, show_tab) {
+            tab_id = tab_id || trionyx_current_tab;
+            show_tab = show_tab || true;
+
+            if (tab_id in trionyx_loaded_tabs) {
+                return;
+            }
+
+            trionyx_loaded_tabs[tab_id] = true;
+            var tab_content = $('#trionyx-tab-' + tab_id);
+
+            $.ajax({
+                url: trionyx_tab_url,
+                data: {
+                    tab: tab_id,
+                    model_alias: trionyx_model_alias,
+                },
+                success: function(data) {
+                    if(data.status == 'success'){
+                        $(tab_content).html(data.data);
+                    } else {
+                        $(tab_content).html('<div class="alert alert-danger">Could not load tab</div>');
+                        delete trionyx_loaded_tabs[tab_id];
+                    }
+
+                    if(show_tab){
+				        $('#detail-tab-link-' + tab_id).tab('show');
+			        }
+                },
+            });
+        };
+
+        function trionyx_reload_tab(tab_id, show_tab) {
+            tab_id = tab_id || trionyx_current_tab;
+            show_tab = show_tab || false;
+
+            if(tab_id in loaded_tabs){
+			    delete loaded_tabs[tab_id];
+		    }
+
+		    trionyx_load_tab(tab_id, show_tab);
+        };
+
+        $(function () {
+            var tab_id = window.location.hash.substr(1);
+            if ($('#trionyx-tab-' + tab_id).length) {
+                trionyx_current_tab = tab_id;
+            }
+
+            $('a.trionyx-detail-tab').on('shown.bs.tab', function (e) {
+                var target = $(e.target).attr("href");
+                trionyx_current_tab = target.substr(1);
+                window.location.hash = trionyx_current_tab;
+                window.scrollTo(0,0); // BUG where large content is show in middle
+                trionyx_load_tab();
+            });
+
+            trionyx_load_tab(trionyx_current_tab, true);
+        });
+    </script>
+
+{% endblock %}

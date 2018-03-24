@@ -1,0 +1,6 @@
+{% load trionyx %}
+<{{ component.tag }} {{ component.get_attr_text|safe }}>
+    {% for child in component.components %}
+        {% render_component child %}
+    {% endfor %}
+</{{ component.tag }}>

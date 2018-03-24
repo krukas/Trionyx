@@ -6,6 +6,7 @@ trionyx.navigation
 :license: GPLv3
 """
 import re
+from collections import defaultdict
 
 
 class Menu:
@@ -136,3 +137,107 @@ class MenuItem:
             if child.is_active(path):
                 return True
         return False
+
+
+class Tab:
+    _tabs = defaultdict(list)
+
+    @classmethod
+    def get_tabs(cls, model_alias, object):
+        for item in cls._tabs[model_alias]:
+            if item.display_filter(object):
+                yield item
+    @classmethod
+    def get_tab(cls, model_alias, object, tab_code):
+        for item in cls._tabs[model_alias]:
+            if item.code == tab_code and item.display_filter(object):
+                return item
+        raise Exception('Given tab does not exits or is filtered')
+
+    @classmethod
+    def register(cls, model_alias, code='general', name=None, order=None, display_filter=None):
+        """
+        Register new tab
+
+        :param model_alias:
+        :param code:
+        :param name:
+        :param order:
+        :return:
+        """
+        def wrapper(create_layout):
+            item = TabItem(
+                code=code,
+                create_layout=create_layout,
+                name=name,
+                order=order,
+                display_filter=display_filter
+            )
+
+            if item in cls._tabs[model_alias]:
+                raise Exception("Tab {} already registered for model {}".format(code, model_alias))
+
+            cls._tabs[model_alias].append(item)
+            cls._tabs[model_alias] = sorted(cls._tabs[model_alias], key=lambda item: item.code if item.code else 999)
+
+            return create_layout
+        return wrapper
+
+    @classmethod
+    def register_update(cls, model_alias, code):
+        def wrapper(update_layout):
+            for item in cls._tabs[model_alias]:
+                if item.code == code:
+                    item.layout_updates.append(update_layout)
+            return  update_layout
+        return wrapper
+
+    @classmethod
+    def update(cls, model_alias, code='general', name=None, order=None, display_filter=None):
+        for item in cls._tabs[model_alias]:
+            if item.code != code:
+                continue
+            if name:
+                item.name = name
+            if order:
+                item.order =order
+            if display_filter:
+                item.display_filter = display_filter
+            break
+        cls._tabs[model_alias] = sorted(cls._tabs[model_alias], key=lambda item: item.code if item.code else 999)
+
+
+class TabItem:
+
+    def __init__(self, code, create_layout, name=None, order=None, display_filter=None):
+        self.code = code
+        self.create_layout = create_layout
+        self.name = name
+        self.order = order
+        self.display_filter = display_filter if display_filter else lambda object: True
+        self.layout_updates = []
+
+    @property
+    def name(self):
+        if hasattr(self, '_name') and self._name:
+            return self._name
+        return self.code.replace('_', ' ').capitalize()
+
+    @name.setter
+    def name(self, name):
+        self._name = name
+
+    def get_layout(self, object):
+        layout = self.create_layout(object)
+        for update_layout in self.layout_updates:
+            update_layout(layout, object)
+        layout.set_object(object)
+        return layout
+
+    def __str__(self):
+        if not self.name:
+            return self.name.capitalize()
+        return self.name
+
+    def __eq__(self, other):
+        return self.code == other.code

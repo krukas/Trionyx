@@ -3,7 +3,7 @@
 {% if item.childs %}
     <li class="treeview {% active_menu_item request item %}">
             <a href="#">
-                {% if item.icon and item.depth == 2 %}
+                {% if item.icon and item.depth == 1 %}
                     <i class="{{ item.icon }}"></i>
                 {% else %}
                     <i class="fa fa-circle-o"></i>
