@@ -1,6 +1,7 @@
 from django.apps import apps
 from django.views.generic import DetailView, UpdateView as DjangoUpdateView
 from django.core.exceptions import PermissionDenied
+from django.http import Http404
 from django_jsend import JsendView
 
 from crispy_forms.helper import FormHelper
@@ -23,14 +24,42 @@ class DetailTabView(DetailView):
     model_alias = None
     """Model identifier, default is '<model app name>.<model name>'."""
 
+    title = None
+    """Page title if not set object __str__ is used"""
+
+    def get_queryset(self):
+        """
+        Get queryset based on url params(<app>, <mode>) if model is not set on class
+        """
+        if self.queryset is None and not self.model:
+            try:
+                ModelClass = apps.get_model(self.kwargs.get('app'), self.kwargs.get('model'))
+                return ModelClass._default_manager.all()
+            except LookupError:
+                raise Http404()
+        return super().get_queryset()
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['page_detail_tabs'] = self.get_active_tabs()
-        context['active_tab'] = context['page_detail_tabs'][0].code
-        context['app_label'] = self.get_app_label()
-        context['model_name'] = self.get_model_name()
-        context['model_alias'] = self.model_alias
+        tabs = self.get_active_tabs()
+        context.update({
+            'page_detail_tabs': tabs,
+            'active_tab': tabs[0].code if tabs else '',
+            'app_label': self.get_app_label(),
+            'model_name': self.get_model_name(),
+            'model_alias': self.model_alias,
+            'model_verbose_name': self.object._meta.verbose_name.title(),
+            'back_url': self.get_back_url(),
+            'edit_url': self.get_edit_url(),
+            'title': self.title,
+        })
         return context
+
+    def get_back_url(self):
+        return ''
+
+    def get_edit_url(self):
+        return ''
 
     def get_app_label(self):
         return self.object._meta.app_label
@@ -95,9 +124,12 @@ class UpdateView(DjangoUpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['title'] = self.title
-        context['submit_value'] = self.submit_value
-        context['cancel_url'] = self.cancel_url
+        context.update({
+            'title': self.title,
+            'submit_value': self.submit_value,
+            'cancel_url': self.cancel_url,
+        })
+
         return context
 
     def dispatch(self, request, *args, **kwargs):

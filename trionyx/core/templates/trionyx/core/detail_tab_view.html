@@ -1,37 +1,48 @@
 {% extends "trionyx/base.html" %}
 {% load i18n static %}
 
-{% block title %}Profile{% endblock %}
-{% block page_title %}Profile{% endblock %}
+{% block title %}{% if title %}{{ title }}{% else %}{{ object }} | {{ model_verbose_name }}{% endif %}{% endblock %}
+{% block page_title %}{% if title %}{{ title }}{% else %}{{ object }}{% endif %}{% endblock %}
 
 {% block header_buttons %}
-
+    {% if back_url %}
+        <a href="{{ back_url }}" class="btn btn-default">Back</a>
+    {% endif %}
+    {% if edit_url %}
+        <a href="{{ edit_url }}" class="btn btn-default">Edit</a>
+    {% endif %}
 {% endblock %}
 
 {% block content %}
-    <div class="row detail-tab-view-tabs">
-        <ul class="nav nav-pills">
-            {% for item in page_detail_tabs %}
-                <li {% if item.code == active_tab %}class="active"{% endif %}>
-                    <a href="#{{ item.code }}" data-toggle="tab" class="trionyx-detail-tab" id="detail-tab-link-{{ item.code }}">{{ item.name }}</a>
-                </li>
-            {% endfor %}
-        </ul>
-    </div>
+    {% if page_detail_tabs %}
+        <div class="row detail-tab-view-tabs">
+            <ul class="nav nav-pills">
+                {% for item in page_detail_tabs %}
+                    <li {% if item.code == active_tab %}class="active"{% endif %}>
+                        <a href="#{{ item.code }}" data-toggle="tab" class="trionyx-detail-tab" id="detail-tab-link-{{ item.code }}">{{ item.name }}</a>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
 
-    <div class="tab-content">
-	{% for item in page_detail_tabs %}
-		<div class="tab-pane fade in {% if item.code == active_tab %}active{% endif %}" id="{{ item.code }}">
-			<div class="row tab-content" style="padding:0px" id="trionyx-tab-{{ item.code }}">
-				<div style="margin: 0 auto; width: 150px; margin-top: 5%; text-align: center;">
-                    {{ item.code }}
-					<img  src='{% static 'img/grid-loader.svg' %}' />
-				</div>
-			</div>
-		</div>
-	{% endfor %}
-	<div style="clear: both;"></div>
-    </div>
+        <div class="tab-content">
+        {% for item in page_detail_tabs %}
+            <div class="tab-pane fade in {% if item.code == active_tab %}active{% endif %}" id="{{ item.code }}">
+                <div class="row tab-content" style="padding:0px" id="trionyx-tab-{{ item.code }}">
+                    <div style="margin: 0 auto; width: 150px; margin-top: 5%; text-align: center;">
+                        {{ item.code }}
+                        <img  src='{% static 'img/grid-loader.svg' %}' />
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        <div class="clearfix"></div>
+        </div>
+    {% else %}
+        <p class="alert alert-warning">
+            There are no layouts registered for {{ object }}.
+        </p>
+    {% endif %}
 {% endblock %}
 
 {% block extra_js %}

@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^account/edit$', views.accounts.UpdateUserAccountView.as_view(), name='edit-account'),
     url(r'^account/view$', views.accounts.ViewUserAccountView.as_view(), name='view-account'),
 
-    # Generic views
+    # Generic model views
+    url(r'^model/(?P<app>[\w]+)/(?P<model>[\w]+)/(?P<pk>[0-9]+)/$', views.DetailTabView.as_view(), name='model-view'),
     url(r'^model/(?P<app>[\w]+)/(?P<model>[\w]+)/(?P<pk>[0-9]+)/tab/$', views.DetailTabJsendView.as_view(), name='model-tab'),
 ]

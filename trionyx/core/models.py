@@ -46,7 +46,7 @@ class BaseModel(models.Model):
         model_name = type(self).__name__
         # TODO: get from model config 
         # return self.verbose_name.format(model_name=model_name, app_label=app_label, **self.__dict__)
-        return self.id
+        return str(self.id)
 
 
 class UserManager(BaseUserManager, BaseManager):
