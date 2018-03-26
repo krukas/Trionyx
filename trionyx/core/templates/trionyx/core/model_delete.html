@@ -1,0 +1,46 @@
+{% extends "trionyx/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}
+    {% if title %}
+        {{ title }}
+    {% else %}
+        Delete {{ object }}
+    {% endif %}
+{% endblock %}
+
+{% block page_title %}
+    {% if title %}
+        {{ title }}
+    {% else %}
+        {{ object }}
+    {% endif %}
+{% endblock %}
+
+{% block content_top %}
+    <form role="form" action="" method="post" enctype="multipart/form-data" novalidate style="display: inline">
+{% endblock %}
+
+
+{% block header_buttons %}
+    {% if cancel_url %}
+        <a href="{% url cancel_url %}" class="btn btn-default">Cancel</a>
+    {% else %}
+        <a href="{{ object.get_absolute_url }}" class="btn btn-default">Cancel</a>
+    {% endif %}
+    <input type="submit" value="{% if submit_value %}{{ submit_value }}{% else %}Delete{% endif %}" class="btn btn-primary"/>
+{% endblock %}
+
+
+{% block content %}
+    {% csrf_token %}
+    <p class="alert alert-danger">Are you sure you want to delete ({{object}})</p>
+{% endblock %}
+
+
+{% block content_bottom %}
+    </form>
+{% endblock %}
+
+
+

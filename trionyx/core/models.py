@@ -10,6 +10,9 @@ Core models
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.db import models
 from django.utils import timezone
+from django.urls import reverse
+
+from trionyx.config import models_config
 
 
 class BaseManager(models.Manager):
@@ -40,13 +43,29 @@ class BaseModel(models.Model):
         abstract = True
         default_permissions = ('read', 'add', 'change', 'delete')
 
+    @classmethod
+    def get_fields(cls, inlcude_base=False, include_id=False):
+        for field in cls._meta.fields:
+            if not include_id and field.name == 'id':
+                continue
+            if not inlcude_base and field.name in ['created_at', 'updated_at', 'deleted']:
+                continue
+            yield field
+
     def __str__(self):
         """Give verbose name of object"""
         app_label = self._meta.app_label
         model_name = type(self).__name__
-        # TODO: get from model config 
-        # return self.verbose_name.format(model_name=model_name, app_label=app_label, **self.__dict__)
-        return str(self.id)
+        verbose_name = models_config.get_config(self).verbose_name
+        return verbose_name.format(model_name=model_name, app_label=app_label, **self.__dict__)
+
+
+    def get_absolute_url(self):
+        return reverse('trionyx:model-view', kwargs={
+            'app': self._meta.app_label,
+            'model': self._meta.model_name,
+            'pk': self.id
+        })
 
 
 class UserManager(BaseUserManager, BaseManager):

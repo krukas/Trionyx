@@ -1,5 +1,5 @@
 Django >= 1.11.0, < 1.12
 django-crispy-forms >= 1.7.2, < 1.8
 django_compressor >= 2.2.0, < 2.3
-Pillow=5.0.0
-django_jsend=0.3
+Pillow==5.0.0
+django_jsend==0.3

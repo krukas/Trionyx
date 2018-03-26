@@ -71,6 +71,19 @@
             </div>
 
             <section class="content" style="margin-top: 49px">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-dismissable
+                            {% if message.tags %}{{ message.tags }}{% endif %}
+                            {% if message.level == DEFAULT_MESSAGE_LEVELS.INFO %}alert-info{% endif %}
+                            {% if message.level == DEFAULT_MESSAGE_LEVELS.SUCCESS %}alert-success{% endif %}
+                            {% if message.level == DEFAULT_MESSAGE_LEVELS.WARNING %}alert-warning{% endif %}
+                            {% if message.level == DEFAULT_MESSAGE_LEVELS.ERROR %}alert-danger{% endif %}
+                        "><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
                 {% block content %}{% endblock %}
             </section>
 

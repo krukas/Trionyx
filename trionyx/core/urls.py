@@ -10,6 +10,11 @@ urlpatterns = [
     url(r'^account/view$', views.accounts.ViewUserAccountView.as_view(), name='view-account'),
 
     # Generic model views
+    url(r'^model/(?P<app>[\w]+)/(?P<model>[\w]+)/create/$', views.CreateView.as_view(), name='model-create'),
+
     url(r'^model/(?P<app>[\w]+)/(?P<model>[\w]+)/(?P<pk>[0-9]+)/$', views.DetailTabView.as_view(), name='model-view'),
     url(r'^model/(?P<app>[\w]+)/(?P<model>[\w]+)/(?P<pk>[0-9]+)/tab/$', views.DetailTabJsendView.as_view(), name='model-tab'),
+
+    url(r'^model/(?P<app>[\w]+)/(?P<model>[\w]+)/(?P<pk>[0-9]+)/edit/$', views.UpdateView.as_view(), name='model-edit'),
+    url(r'^model/(?P<app>[\w]+)/(?P<model>[\w]+)/(?P<pk>[0-9]+)/delete/$', views.DeleteView.as_view(), name='model-delete'),
 ]

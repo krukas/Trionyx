@@ -12,9 +12,12 @@ from importlib import import_module
 from django.apps import AppConfig
 from django.apps import apps
 
+from trionyx.config import models_config
+
 
 class BaseConfig(AppConfig):
-	pass
+    def get_model_config(self):
+        pass
 
 class Config(BaseConfig):
     """Django core config app"""
@@ -28,3 +31,5 @@ class Config(BaseConfig):
                 import_module('{}.{}'.format(app.module.__package__, 'layouts'))
             except ImportError:
                 pass
+
+        models_config.auto_load_configs()

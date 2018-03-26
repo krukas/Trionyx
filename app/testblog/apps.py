@@ -1,13 +1,15 @@
-from django.apps import AppConfig
+from trionyx.core.apps import BaseConfig
 
 from trionyx.navigation import Menu
 
 
-class BlogConfig(AppConfig):
+class BlogConfig(BaseConfig):
     """Django core config app"""
 
     name = 'app.testblog'
     verbose_name = 'Blog'
+
+    menu_icon = 'fa-rss-square'
 
     def ready(self):
 
@@ -21,3 +23,7 @@ class BlogConfig(AppConfig):
         Menu.add_item('multilevel/level1/categories', 'Categories', '', None, 10)
         Menu.add_item('multilevel/level1/level2/posts', 'Posts', '', None, 20)
         Menu.add_item('multilevel/level1/level2/level3/tags', 'Tags', '', None, 30)
+
+
+    class Category:
+        verbose_name = '{name}'
