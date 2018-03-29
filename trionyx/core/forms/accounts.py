@@ -4,7 +4,6 @@ from django.contrib.auth import password_validation
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Div
 
-
 from trionyx.core.models import User
 
 

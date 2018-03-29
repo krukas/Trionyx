@@ -40,34 +40,34 @@ class ModelConfig:
 
     create_form = None
     """
-    String of form class that is used for create, default will create form based on model. 
+    String of form class that is used for create, default will create form based on model.
     Form is rendered with crispy forms
     """
 
     create_form_minimal = None
     """
-    String of form class that is used for minimal create, default is form with all required fields. 
+    String of form class that is used for minimal create, default is form with all required fields.
     Form is rendered with crispy forms.
     """
 
     edit_form = None
     """
-    String of form class that is used for edit, default will create form based on model. 
+    String of form class that is used for edit, default will create form based on model.
     Form is rendered with crispy forms.
     """
 
     list_fields = None
     """
     Customise the available fields for model list view, default all model fields are available.
-    
+
     list_fields is an array of dict with the field description, the following options are available:
-    
+
     - **field**: Model field name (is used for sort and getting value if no renderer is supplied)
     - **label**: Column name in list view, if not set verbose_name of model field is used
     - **renderer**: function(model, field) that returns a JSON serializable date, when not set model field is used.
-    
+
     .. code-block:: python
-    
+
          list_fields = [
             {
                 'field': 'first_name',
@@ -107,7 +107,7 @@ class ModelConfig:
     def __getattr__(self, item):
         try:
             return super().__getattr__(item)
-        except:
+        except AttributeError:
             return None
 
     def get_create_form(self):
@@ -167,6 +167,7 @@ class ModelConfig:
             return field.default == NOT_PROVIDED
 
         return modelform_factory(self.model, fields=[f.name for f in self.model.get_fields() if use_field(f)])
+
 
 class Models:
 

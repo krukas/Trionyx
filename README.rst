@@ -12,6 +12,8 @@
     
 **PRE PRE ALPHA, still in active development**
 
+**TODO:** Cleanup lint errors
+
 
 Trionyx
 =======

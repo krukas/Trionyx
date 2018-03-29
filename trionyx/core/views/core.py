@@ -15,7 +15,7 @@ from django.core.paginator import Paginator
 from functools import reduce
 from django.db.models import Q
 import operator
-from django.contrib import messages # TODO add success message to create/edit/delete
+from django.contrib import messages  # noqa F401 TODO add success message to create/edit/delete
 
 from crispy_forms.helper import FormHelper
 
@@ -83,7 +83,7 @@ class ListJsendView(JsendView):
         model = apps.get_model(app, model)
         paginator = self.get_paginator(model)
         # Call search first, it will reset page if search is changed
-        search= self.get_search()
+        search = self.get_search()
         page = self.get_page(paginator)
         items = self.get_items(model, paginator, page)
         return {
@@ -192,7 +192,6 @@ class ListJsendView(JsendView):
             else:
                 return "%s__icontains" % field_name
 
-
         search = self.get_search()
         if config.list_search_fields and search:
             orm_lookups = [construct_search(field) for field in config.list_search_fields]
@@ -221,7 +220,6 @@ class ListJsendView(JsendView):
         self.request.session[session_name] = value
         setattr(self, name, value)
         return value
-
 
 
 class DetailTabView(DetailView, SingleUrlObjectMixin):
@@ -301,7 +299,7 @@ class DetailTabView(DetailView, SingleUrlObjectMixin):
             return list(Tab.get_tabs('{}.{}'.format(self.get_app_label(), self.get_model_name()), self.object))
 
     def dispatch(self, request, *args, **kwargs):
-        if False: # TODO do permission check based on Model
+        if False:  # TODO do permission check based on Model
             raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)
 
@@ -379,7 +377,7 @@ class UpdateView(DjangoUpdateView, SingleUrlObjectMixin):
         return context
 
     def dispatch(self, request, *args, **kwargs):
-        if False: # TODO do permission check based on Model
+        if False:  # TODO do permission check based on Model
             raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)
 
@@ -481,7 +479,7 @@ class DeleteView(DjangoDeleteView):
     def get_success_url(self):
         if self.success_url:
             return reverse(self.success_url)
-        return '/' # TODO go to list view
+        return '/'  # TODO go to list view
 
     def dispatch(self, request, *args, **kwargs):
         if False:  # TODO do permission check based on Model
