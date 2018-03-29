@@ -11,6 +11,7 @@ from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, Permis
 from django.db import models
 from django.utils import timezone
 from django.urls import reverse
+from jsonfield import JSONField
 
 from trionyx.config import models_config
 
@@ -46,9 +47,11 @@ class BaseModel(models.Model):
     @classmethod
     def get_fields(cls, inlcude_base=False, include_id=False):
         for field in cls._meta.fields:
+            if field.name == 'deleted':
+                continue
             if not include_id and field.name == 'id':
                 continue
-            if not inlcude_base and field.name in ['created_at', 'updated_at', 'deleted']:
+            if not inlcude_base and field.name in ['created_at', 'updated_at']:
                 continue
             yield field
 
@@ -120,3 +123,30 @@ class User(BaseModel, AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
+
+
+class UserAttributeManager(models.Manager):
+
+    def set_attribute(self, code, value):
+        attr, _ = self.get_or_create(code=code)
+        attr.value = value
+        attr.save()
+
+    def get_attribute(self, code, default=None):
+        try:
+            return self.get(code=code).value
+        except models.ObjectDoesNotExist:
+            return default
+
+class UserAttribute(models.Model):
+    user = models.ForeignKey(User, related_name='attributes')
+    code = models.CharField(max_length=128, null=False)
+    value = JSONField()
+
+    objects = UserAttributeManager()
+
+    class Meta:
+        unique_together = ('user', 'code')
+
+    def __str__(self):
+        return self.code

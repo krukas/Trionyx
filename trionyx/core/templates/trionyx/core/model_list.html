@@ -1,0 +1,228 @@
+{% extends "trionyx/base.html" %}
+
+{% block title %}
+    {{ title }}
+{% endblock %}
+{% block page_title %}
+    {{ title }}
+{% endblock %}
+
+{% block header_buttons %}
+    <a href="{{ create_url }}" class="btn btn-default">Create</a>
+{% endblock %}
+
+
+{% block content %}
+    <div class="box" id="app-model-list" v-cloak>
+        <div class="box-header">
+            <div class="input-group input-group-sm" style="width: 150px;">
+                <input type="text" name="table_search" class="form-control pull-right" placeholder="Search" v-model="search" v-on:keyup="searchLoad()">
+                <div class="input-group-btn">
+                    <button type="submit" class="btn btn-default" v-on:click="searchLoad()"><i class="fa fa-search"></i></button>
+                </div>
+            </div>
+            <div class="box-tools">
+
+            </div>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body no-padding table-responsive">
+            <div class="alert alert-info" v-if="items.length == 0" style="margin-bottom: 0px">
+                There are no {{ title }}
+            </div>
+            <table class="table table-striped" v-if="items.length > 0">
+                <thead>
+                    <tr>
+                        <th style="width: 10px">#</th>
+                        <th v-for="header in headers" v-on:click="clickSort(header.field)">
+                            [[ header.label ]]
+
+                            <i class="fa fa-sort pull-right" v-if="header.sort == 'sort'"></i>
+                            <i class="fa fa-sort-amount-asc pull-right" v-if="header.sort == 'asc'"></i>
+                            <i class="fa fa-sort-amount-desc pull-right" v-if="header.sort == 'desc'"></i>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="item in items" v-on:click="clickItem(item)">
+                        <td v-for="column in item.row_data">
+                            [[ column ]]
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="box-footer clearfix" v-if="items.length > 0">
+            <ul class="pagination pagination-sm no-margin pull-right">
+                <li v-if="previousPage > 0"><a v-on:click="toPage(previousPage)">«</a></li>
+                <li v-for="page in pages" v-bind:class="{ active: page == current_page }">
+                    <a v-on:click="toPage(page)">[[page]]</a>
+                </li>
+
+                <li v-if="nextPage > 0"><a v-on:click="toPage(nextPage)">»</a></li>
+              </ul>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script type="text/javascript">
+    Vue.config.devtools = true;
+    function TrionyxList(ajaxUrl){
+        var self = this;
+        self.ajaxUrl = ajaxUrl;
+        self.app = new Vue({
+            el: '#app-model-list',
+            delimiters: ['[[', ']]'],
+            data: {
+                loading: true,
+                headers: [{'label': 'test \\e155'}, {'label': 'test2'}],
+                items: [],
+                search: '',
+
+                current_page: 1,
+                pages: [],
+                nextPage: 0,
+                previousPage: 0,
+            },
+            methods: {
+                clickSort: function (field) {
+                    if (self.sort == field){
+                        self.sort = '-' + field;
+                    } else {
+                        self.sort = field;
+                    };
+
+                    self.load();
+                },
+                toPage: function (page) {
+                    self.page = page;
+                    self.load();
+                },
+                clickItem: function(item) {
+                    window.location.href = item.url;
+                },
+                searchLoad: function() {
+                    self.load();
+                }
+            }
+        });
+
+        self.page = 1;
+        self.page_size = 10;
+        self.num_pages = 1;
+        self.sort = '-pk';
+        self.current_fields = [];
+
+        self.ajax = null;
+        self.load = function(initial) {
+            initial = typeof initial !== 'undefined' ? initial : false;
+            var data = {
+                page: self.page,
+                page_size: self.pageSize,
+                sort: self.sort,
+                selected_fields: self.current_fields,
+                search: self.app.search,
+            };
+
+            if (self.ajax) {
+                self.ajax.abort();
+            }
+
+            self.ajax = $.ajax({
+                type: 'POST',
+                url: self.ajaxUrl,
+                data: initial ? {} : data,
+            }).done(function(response){
+                if(response.status != 'success') {
+                    return;
+                }
+
+                self.page = response.data.page;
+                self.pageSize = response.data.page_size;
+                self.numPages = response.data.num_pages;
+                self.sort = response.data.sort;
+
+                if (initial) {
+                   self.app.search = response.data.search;
+                }
+
+                self.setHeaders(response.data);
+                self.setItems(response.data);
+                self.updatePagination();
+
+            }).fail(function () {
+                console.log('error');
+            }).always(function () {
+                self.ajax = null;
+            });
+        };
+
+        self.setHeaders = function(data) {
+            var headers = [];
+            self.current_fields = data.current_fields;
+
+            $.each(data.current_fields, function (index, field) {
+                var sort = 'sort';
+                if (self.sort == field) {
+                    sort = 'asc';
+                } else if(self.sort == '-' + field){
+                    sort = 'desc';
+                }
+
+                headers.push({
+                    field: field,
+                    label: data.fields[field].label,
+                    sort: sort,
+                });
+            });
+
+            self.app.headers = headers;
+        };
+
+        self.setItems = function(data){
+            var items = [];
+            var counter = (data.page - 1) * data.page_size + 1;
+
+            $.each(data.items, function (index, item) {
+                item.row_data.splice(0, 0, counter);
+                counter++;
+                items.push(item);
+            });
+
+            self.app.items = items;
+        };
+
+        self.updatePagination = function () {
+            var paginatePages = 3;
+
+            var startPage = self.page - paginatePages;
+            if (startPage < 1) {
+                startPage = 1;
+            }
+
+            var endPage = self.page + paginatePages;
+            if (endPage > self.numPages) {
+                endPage = self.numPages;
+            }
+
+            var pages = [];
+            for (var i = startPage; i <= endPage; i++) {
+                pages.push(i);
+            }
+
+            self.app.current_page = self.page;
+            self.app.pages = pages;
+            self.app.nextPage = self.page < self.numPages ? self.page + 1 : 0;
+            self.app.previousPage = self.page > 1 ? self.page -1 : 0;
+        };
+
+
+        self.load(true);
+    }
+
+    $(function () {
+        var trionyxList = new TrionyxList("{{ ajax_url }}");
+    });
+    </script>
+{% endblock %}

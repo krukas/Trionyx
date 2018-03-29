@@ -16,6 +16,25 @@
 }
 
 /*****************************************************************************/
+[v-cloak] { display: none; }
+
 dl {
     margin-bottom: 0px;
+}
+
+
+#app-model-list {
+    margin-top: 20px;
+}
+
+#app-model-list thead tr {
+    border-top: 2px solid #f4f4f4;
+}
+
+#app-model-list tr {
+    cursor: pointer;
+}
+
+#app-model-list tbody tr:hover {
+    background-color: #f0f0f0;
 }

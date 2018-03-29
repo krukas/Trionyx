@@ -27,3 +27,13 @@ class BlogConfig(BaseConfig):
 
     class Category:
         verbose_name = '{name}'
+
+        list_fields = [
+            {
+                'field': 'name',
+                'renderer': lambda model, field: model.name.upper()
+            }
+        ]
+
+        list_default_fields = ['id', 'created_at', 'name']
+        list_search_fields = ['name', 'description']

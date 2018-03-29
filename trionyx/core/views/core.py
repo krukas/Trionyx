@@ -1,9 +1,20 @@
 from django.apps import apps
-from django.views.generic import DetailView, UpdateView as DjangoUpdateView, CreateView as DjangoCreateView, DeleteView as DjangoDeleteView
+from django.views.generic import (
+    TemplateView,
+    DetailView,
+    UpdateView as
+    DjangoUpdateView,
+    CreateView as DjangoCreateView,
+    DeleteView as DjangoDeleteView
+)
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django_jsend import JsendView
 from django.urls import reverse
+from django.core.paginator import Paginator
+from functools import reduce
+from django.db.models import Q
+import operator
 from django.contrib import messages # TODO add success message to create/edit/delete
 
 from crispy_forms.helper import FormHelper
@@ -21,6 +32,196 @@ class SingleUrlObjectMixin:
             return self.object.__class__
         else:
             return self.get_queryset().model
+
+
+class ListView(TemplateView):
+    template_name = "trionyx/core/model_list.html"
+
+    model = None
+    title = None
+    ajax_url = None
+
+    def get_model_class(self):
+        if not self.model:
+            self.model = apps.get_model(self.kwargs.get('app'), self.kwargs.get('model'))
+        return self.model
+
+    def get_title(self):
+        if self.title:
+            return self.title
+        return self.get_model_class()._meta.verbose_name_plural
+
+    def get_ajax_url(self):
+        if self.ajax_url:
+            return self.ajax_url
+        return reverse('trionyx:model-list-ajax', kwargs=self.kwargs)
+
+    def get_create_url(self):
+        return reverse('trionyx:model-create', kwargs=self.kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context.update({
+            'title': self.get_title(),
+            'ajax_url': self.get_ajax_url(),
+            'create_url': self.get_create_url(),
+        })
+        return context
+
+
+class ListJsendView(JsendView):
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.page = None
+        self.page_size = None
+        self.sort = None
+        self.current_fields = None
+        self.fields = None
+
+    def handle_request(self, request, app, model):
+        model = apps.get_model(app, model)
+        paginator = self.get_paginator(model)
+        # Call search first, it will reset page if search is changed
+        search= self.get_search()
+        page = self.get_page(paginator)
+        items = self.get_items(model, paginator, page)
+        return {
+            'search': search,
+            'page': page,
+            'page_size': self.get_page_size(),
+            'num_pages': paginator.num_pages,
+            'sort': self.get_sort(),
+            'current_fields': self.get_current_fields(),
+            'fields': self.get_all_fields(model),
+
+            'items': items,
+        }
+
+    def get_page(self, paginator):
+        page = int(self.get_and_save_value('page', 1))
+        if page < 1:
+            return self.save_value('page', 1)
+
+        if page > paginator.num_pages:
+            return self.save_value('page', paginator.num_pages)
+        return page
+
+    def get_page_size(self):
+        return self.get_and_save_value('page_size', 10)
+
+    def get_sort(self):
+        return self.get_and_save_value('sort', '-id')
+
+    def get_search(self):
+        old_search = self.get_session_value('search', '')
+        search = self.get_and_save_value('search', '')
+        if old_search != search:
+            self.page = 1
+            self.get_session_value('page', self.page)
+        return search
+
+    def get_all_fields(self, model):
+        config = models_config.get_config(model)
+        return {
+            name: {
+                'label': field['label'],
+            }
+            for name, field in config.get_list_fields().items()
+        }
+
+    def get_current_fields(self):
+        if self.current_fields:
+            return self.current_fields
+
+        field_attribute = 'list_{}_{}_fields'.format(self.kwargs.get('app'), self.kwargs.get('model'))
+        current_fields = self.request.user.attributes.get_attribute(field_attribute, [])
+        request_fields = self.request.POST.get('selected_fields', None)
+
+        if request_fields and ','.join(current_fields) != request_fields:
+            # TODO validate fields
+            current_fields = request_fields.split(',')
+            self.request.user.attributes.set_attribute(field_attribute, current_fields)
+
+        if not current_fields:
+            current_fields = ['created_at', 'id']
+
+        self.current_fields = current_fields
+        return current_fields
+
+    def get_items(self, model, paginator, current_page):
+        config = models_config.get_config(model)
+        fields = config.get_list_fields()
+
+        page = paginator.page(current_page)
+
+        items = []
+        for item in page:
+            items.append({
+                'id': item.id,
+                'url': item.get_absolute_url(),
+                'row_data': [
+                    fields[field]['renderer'](item, field)
+                    for field in self.get_current_fields()
+                ]
+            })
+        return items
+
+    def get_paginator(self, model):
+        query = self.search_queryset(model)
+        # TODO Apply filters
+        query = query.order_by(self.get_sort())
+
+        return Paginator(query, self.get_page_size())
+
+    def search_queryset(self, model):
+        config = models_config.get_config(model)
+        queryset = model.objects.get_queryset()
+
+        if config.list_select_related:
+            queryset = queryset.select_related(*config.list_select_related)
+
+        # get search field config
+        def construct_search(field_name):
+            if field_name.startswith('^'):
+                return "%s__istartswith" % field_name[1:]
+            elif field_name.startswith('='):
+                return "%s__iexact" % field_name[1:]
+            elif field_name.startswith('@'):
+                return "%s__search" % field_name[1:]
+            else:
+                return "%s__icontains" % field_name
+
+
+        search = self.get_search()
+        if config.list_search_fields and search:
+            orm_lookups = [construct_search(field) for field in config.list_search_fields]
+
+            for bit in search.split():
+                or_queries = [Q(**{orm_lookup: bit}) for orm_lookup in orm_lookups]
+                queryset = queryset.filter(reduce(operator.or_, or_queries))
+
+        return queryset
+
+    def get_and_save_value(self, name, default=None):
+        if getattr(self, name, None):
+            return getattr(self, name)
+
+        value = self.get_session_value(name, default)
+        value = self.request.POST.get(name, value)
+        self.save_value(name, value)
+        return value
+
+    def get_session_value(self, name, default=None):
+        session_name = 'list_{}_{}_{}'.format(self.kwargs.get('app'), self.kwargs.get('model'), name)
+        return self.request.session.get(session_name, default)
+
+    def save_value(self, name, value):
+        session_name = 'list_{}_{}_{}'.format(self.kwargs.get('app'), self.kwargs.get('model'), name)
+        self.request.session[session_name] = value
+        setattr(self, name, value)
+        return value
+
 
 
 class DetailTabView(DetailView, SingleUrlObjectMixin):
