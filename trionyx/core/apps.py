@@ -13,6 +13,7 @@ from django.apps import AppConfig
 from django.apps import apps
 
 from trionyx.config import models_config
+from trionyx.navigation import Menu
 
 
 class BaseConfig(AppConfig):
@@ -25,11 +26,15 @@ class Config(BaseConfig):
     name = 'trionyx.core'
     verbose_name = 'Core'
 
+    no_menu = True
+
     def ready(self):
+        models_config.auto_load_configs()
+
         for app in apps.get_app_configs():
             try:
                 import_module('{}.{}'.format(app.module.__package__, 'layouts'))
             except ImportError:
                 pass
 
-        models_config.auto_load_configs()
+        Menu.auto_load_model_menu()

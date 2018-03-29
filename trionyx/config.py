@@ -28,6 +28,14 @@ class ModelConfig:
                 list_search_fields = ['name', 'description']
 
     """
+    menu_name = None
+    """Menu name, default is model verbose_name_plural"""
+
+    menu_order = None
+    """Menu order"""
+
+    menu_exclude = False
+    """Exclude model from menu"""
 
     create_form = None
     """

@@ -8,11 +8,54 @@ trionyx.navigation
 import re
 from collections import defaultdict
 
+from django.apps import apps
+from django.urls import reverse
+
+from trionyx.config import models_config
+
 
 class Menu:
     """Meu class that hold the root tree item"""
 
     _root_item = None
+
+    @classmethod
+    def auto_load_model_menu(cls):
+        from trionyx.core.apps import BaseConfig
+
+        order = 0
+        for app in apps.get_app_configs():
+            if not isinstance(app, BaseConfig) or getattr(app, 'no_menu', False):
+                continue
+
+            order += 10
+            app_path = app.name.split('.')[-1]
+            cls.add_item(
+                path=app_path,
+                name=getattr(app, 'menu_name', app.verbose_name),
+                icon=getattr(app, 'menu_icon', None),
+                order=getattr(app, 'menu_order', order),
+            )
+
+            model_order = 0
+            for model in app.get_models():
+                config = models_config.get_config(model)
+                if config.menu_exclude:
+                    continue
+
+                model_order += 10
+                cls.add_item(
+                    path='{}/{}'.format(app_path, model.__name__.lower()),
+                    name=config.menu_name if config.menu_name else model._meta.verbose_name_plural.capitalize(),
+                    order=config.menu_order if config.menu_order else model_order,
+                    url=reverse(
+                        "trionyx:model-list",
+                        kwargs={
+                            'app': model._meta.app_label,
+                            'model': model._meta.model_name,
+                        }
+                    )
+                )
 
     @classmethod
     def add_item(cls, path, name, icon=None, url=None, order=None, permission=None, active_regex=None):
@@ -102,17 +145,9 @@ class MenuItem:
 
     def add_child(self, item):
         """Add child to menu item"""
-        index = 0
-        if item.order is not None:
-            for child in self.childs:
-                if child.order is None or item.order < child.order:
-                    break
-                index += 1
-        else:
-            index = len(self.childs)
-
         item.depth = self.depth + 1
-        self.childs = self.childs[:index] + [item] + self.childs[index:]
+        self.childs.append(item)
+        self.childs = sorted(self.childs, key=lambda item: item.order if item.order else 999)
 
     def child_by_code(self, code):
         """
@@ -178,7 +213,7 @@ class Tab:
                 raise Exception("Tab {} already registered for model {}".format(code, model_alias))
 
             cls._tabs[model_alias].append(item)
-            cls._tabs[model_alias] = sorted(cls._tabs[model_alias], key=lambda item: item.code if item.code else 999)
+            cls._tabs[model_alias] = sorted(cls._tabs[model_alias], key=lambda item: item.order if item.order else 999)
 
             return create_layout
         return wrapper
