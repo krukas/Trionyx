@@ -16,8 +16,9 @@ class ModelConfig:
     Model configs are auto loaded from the apps config file.
     In the apps config class create a class with same name as model and set appropriate config as class attribute.
 
-    .. code-block: python
+    .. code-block:: python
 
+        # apps.blog.apps.py
         class BlogConfig(BaseConfig):
             ...
 
@@ -65,7 +66,7 @@ class ModelConfig:
     - **label**: Column name in list view, if not set verbose_name of model field is used
     - **renderer**: function(model, field) that returns a JSON serializable date, when not set model field is used.
     
-    .. code-block: python
+    .. code-block:: python
     
          list_fields = [
             {
