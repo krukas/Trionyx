@@ -3,6 +3,7 @@ env/
 *.py[cod]
 .coverage
 media/
+static/
 
 docs/_build/
 build/
