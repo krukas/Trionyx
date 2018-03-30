@@ -1,12 +1,3 @@
-"""
-trionyx.core.view.core
-~~~~~~~~~~~~~~~~~~~~~~
-
-Core models
-
-:copyright: 2017 by Maikel Martens
-:license: GPLv3
-"""
 from django.apps import apps
 from django.views.generic import (
     TemplateView,
@@ -124,7 +115,7 @@ class ListJsendView(JsendView):
             'page_size': self.get_page_size(),
             'num_pages': paginator.num_pages,
             'sort': self.get_sort(),
-            'current_fields': self.get_current_fields(),
+            'current_fields': self.get_current_fields(model),
             'fields': self.get_all_fields(model),
 
             'items': items,
@@ -167,7 +158,7 @@ class ListJsendView(JsendView):
             for name, field in config.get_list_fields().items()
         }
 
-    def get_current_fields(self):
+    def get_current_fields(self, model):
         """Get current list to be used"""
         if self.current_fields:
             return self.current_fields
@@ -182,7 +173,8 @@ class ListJsendView(JsendView):
             self.request.user.attributes.set_attribute(field_attribute, current_fields)
 
         if not current_fields:
-            current_fields = ['created_at', 'id']
+            config = models_config.get_config(model)
+            current_fields = config.list_default_fields if config.list_default_fields else ['created_at', 'id']
 
         self.current_fields = current_fields
         return current_fields
@@ -201,7 +193,7 @@ class ListJsendView(JsendView):
                 'url': item.get_absolute_url(),
                 'row_data': [
                     fields[field]['renderer'](item, field)
-                    for field in self.get_current_fields()
+                    for field in self.get_current_fields(model)
                 ]
             })
         return items
