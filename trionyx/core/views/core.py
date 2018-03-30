@@ -312,7 +312,10 @@ class DetailTabView(DetailView, SingleUrlObjectMixin):
 
     def get_back_url(self):
         """Get back url"""
-        return ''
+        return reverse('trionyx:model-list', kwargs={
+            'app': self.get_app_label(),
+            'model': self.get_model_name(),
+        })
 
     def get_delete_url(self):
         """Get model object delete url"""

@@ -11,6 +11,11 @@ class BlogConfig(BaseConfig):
     menu_icon = 'fa fa-rss-square'
     menu_order = 500
 
+    class Post:
+        verbose_name = '{title}'
+        list_default_fields = ['id', 'publish_date', 'title']
+        list_search_fields = ['title', 'content']
+
     class Category:
         verbose_name = '{name}'
 
