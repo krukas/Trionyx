@@ -1,7 +1,8 @@
 from trionyx.navigation import Tab
-from trionyx.layout import Layout, Html, Container, Row, Column10, Column2, Panel, DescriptionList, Img
+from trionyx.layout import Layout, Container, Row, Column10, Column2, Panel, DescriptionList, Img
 
 from django.conf import settings
+
 
 @Tab.register('core.profile')
 def account_overview(object):

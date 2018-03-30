@@ -4,7 +4,7 @@ from trionyx.core import views
 
 urlpatterns = [
     url(r'^login/$', views.accounts.LoginView.as_view(), name='login'),
-	url(r'^logout/$', views.accounts.logout, name='logout'),
+    url(r'^logout/$', views.accounts.logout, name='logout'),
 
     url(r'^account/edit$', views.accounts.UpdateUserAccountView.as_view(), name='edit-account'),
     url(r'^account/view$', views.accounts.ViewUserAccountView.as_view(), name='view-account'),

@@ -182,6 +182,7 @@ class Tab:
         for item in cls._tabs[model_alias]:
             if item.display_filter(object):
                 yield item
+
     @classmethod
     def get_tab(cls, model_alias, object, tab_code):
         for item in cls._tabs[model_alias]:
@@ -224,7 +225,7 @@ class Tab:
             for item in cls._tabs[model_alias]:
                 if item.code == code:
                     item.layout_updates.append(update_layout)
-            return  update_layout
+            return update_layout
         return wrapper
 
     @classmethod
@@ -235,7 +236,7 @@ class Tab:
             if name:
                 item.name = name
             if order:
-                item.order =order
+                item.order = order
             if display_filter:
                 item.display_filter = display_filter
             break

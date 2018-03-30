@@ -22,7 +22,7 @@ class BaseManager(models.Manager):
     def get_queryset(self):
         """Give qeuryset where deleted items are filtered"""
         return super().get_queryset().filter(deleted=False)
-        
+
 
 class BaseModel(models.Model):
     """Base model for all Trionyx models"""
@@ -61,7 +61,6 @@ class BaseModel(models.Model):
         model_name = type(self).__name__
         verbose_name = models_config.get_config(self).verbose_name
         return verbose_name.format(model_name=model_name, app_label=app_label, **self.__dict__)
-
 
     def get_absolute_url(self):
         return reverse('trionyx:model-view', kwargs={
@@ -137,6 +136,7 @@ class UserAttributeManager(models.Manager):
             return self.get(code=code).value
         except models.ObjectDoesNotExist:
             return default
+
 
 class UserAttribute(models.Model):
     user = models.ForeignKey(User, related_name='attributes')

@@ -20,7 +20,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
 
-	'crispy_forms',
+    'crispy_forms',
     'compressor',
 ]
 
@@ -47,25 +47,23 @@ MEDIA_URL = '/media/'
 
 WSGI_APPLICATION = 'wsgi.application'
 
-
 # ==============================================================================
 # Middleware
 # ==============================================================================
 MIDDLEWARE_CLASSES = (
-	'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
 
-    #'corsheaders.middleware.CorsMiddleware',
-	'django.middleware.common.CommonMiddleware',
-	'django.middleware.csrf.CsrfViewMiddleware',
+    # 'corsheaders.middleware.CorsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
 
-	'django.contrib.auth.middleware.AuthenticationMiddleware',
-	'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 
-	'django.contrib.messages.middleware.MessageMiddleware',
-	'django.middleware.clickjacking.XFrameOptionsMiddleware',
-	'trionyx.core.middleware.LoginRequiredMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'trionyx.core.middleware.LoginRequiredMiddleware',
 )
-
 
 # ==============================================================================
 # Auth / security
@@ -75,7 +73,7 @@ AUTH_USER_MODEL = 'core.User'
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 LOGIN_EXEMPT_URLS = [
-	'static',
+    'static',
 ]
 
 AUTH_PASSWORD_VALIDATORS = [
@@ -93,7 +91,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # ==============================================================================
 # Templates
 # ==============================================================================
@@ -103,51 +100,48 @@ TEMPLATES = [
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'APP_DIRS': True,
         'OPTIONS': {
-			'context_processors': [
-				'django.contrib.auth.context_processors.auth',
-				'django.template.context_processors.debug',
-				'django.template.context_processors.i18n',
-				'django.template.context_processors.media',
-				'django.template.context_processors.static',
-				'django.template.context_processors.tz',
-				'django.template.context_processors.request',
-				'django.contrib.messages.context_processors.messages',
+            'context_processors': [
+                'django.contrib.auth.context_processors.auth',
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'django.template.context_processors.request',
+                'django.contrib.messages.context_processors.messages',
 
-				'django.contrib.messages.context_processors.messages',
-				'trionyx.core.context_processors.trionyx',
-			],
-		}
+                'django.contrib.messages.context_processors.messages',
+                'trionyx.core.context_processors.trionyx',
+            ],
+        }
     },
 ]
 
 CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
-
 # ==============================================================================
 # Compressor
 # ==============================================================================
 STATICFILES_FINDERS = [
-	'django.contrib.staticfiles.finders.FileSystemFinder',
-	'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-	'compressor.finders.CompressorFinder',
+    'django.contrib.staticfiles.finders.FileSystemFinder',
+    'django.contrib.staticfiles.finders.AppDirectoriesFinder',
+    'compressor.finders.CompressorFinder',
 ]
 
 COMPRESS_ENABLED = True
-
 
 # ==============================================================================
 # Cache backend
 # ==============================================================================
 CACHES = {
-	'default': {
-		'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
-		'LOCATION': 'django_cache',
-	}
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'django_cache',
+    }
 }
 
 CORS_ORIGIN_WHITELIST = [
     'localhost:8000',
-    'localhost:4200',
 ]
 
 # ==============================================================================

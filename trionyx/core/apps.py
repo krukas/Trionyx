@@ -17,8 +17,9 @@ from trionyx.navigation import Menu
 
 
 class BaseConfig(AppConfig):
-    def get_model_config(self):
-        pass
+    def get_model_config(self, model):
+        return models_config.get_config(model)
+
 
 class Config(BaseConfig):
     """Django core config app"""

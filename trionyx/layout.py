@@ -112,10 +112,10 @@ class Component:
         context['component'] = self
         return render_to_string(self.template_name, context, request)
 
+
 # =============================================================================
 # Simple HTML tags
 # =============================================================================
-
 class HtmlTagWrapper(Component):
     template_name = 'trionyx/components/html_tag.html'
     tag = 'div'
@@ -131,6 +131,7 @@ class HtmlTagWrapper(Component):
             for key, value in self.attr.items()
         ])
 
+
 class Html(HtmlTagWrapper):
     template_name = 'trionyx/components/html.html'
     tag = None
@@ -143,12 +144,14 @@ class Html(HtmlTagWrapper):
             if key in self.valid_attr:
                 self.attr[key] = value
 
+
 class Img(Html):
     tag = 'img'
     valid_attr = ['src', 'width']
     attr = {
         'width': '100%',
     }
+
 
 # =============================================================================
 # Bootstrap grid system
@@ -167,11 +170,12 @@ class Row(HtmlTagWrapper):
 
 class Column(HtmlTagWrapper):
     size = 'md'
-    columns='1'
+    columns = 1
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.attr['class'] = '-'.join(x for x in ['col', str(self.size), str(self.columns)] if x)
+
 
 class Column2(Column):
     columns = 2

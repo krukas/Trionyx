@@ -7,6 +7,7 @@ from .core import UpdateView, DetailTabView
 from trionyx.core.models import User
 from trionyx.core.forms.accounts import UserUpdateForm
 
+
 class LoginView(DjangoLoginView):
     template_name = 'trionyx/core/login.html'
 

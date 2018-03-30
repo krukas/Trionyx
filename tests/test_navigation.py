@@ -82,7 +82,7 @@ class UtilsTestCase(TestCase):
         items = Menu.get_menu_items()
 
         self.assertEquals(len(items), 1)
-        
+
         # Test first item
         self.assertEquals(items[0].name, 'Test')
         self.assertEquals(items[0].path, '/test')
