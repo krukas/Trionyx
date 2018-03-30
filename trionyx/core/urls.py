@@ -1,3 +1,10 @@
+"""
+trionyx.url
+~~~~~~~~~~~
+
+:copyright: 2017 by Maikel Martens
+:license: GPLv3
+"""
 from django.conf.urls import url
 
 from trionyx.core import views

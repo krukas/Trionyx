@@ -1,8 +1,6 @@
 """
 trionyx.core.models
-~~~~~~~~~~~~~~~~
-
-Core models
+~~~~~~~~~~~~~~~~~~~
 
 :copyright: 2017 by Maikel Martens
 :license: GPLv3
@@ -46,6 +44,7 @@ class BaseModel(models.Model):
 
     @classmethod
     def get_fields(cls, inlcude_base=False, include_id=False):
+        """Get model fields"""
         for field in cls._meta.fields:
             if field.name == 'deleted':
                 continue
@@ -63,6 +62,7 @@ class BaseModel(models.Model):
         return verbose_name.format(model_name=model_name, app_label=app_label, **self.__dict__)
 
     def get_absolute_url(self):
+        """Get model url"""
         return reverse('trionyx:model-view', kwargs={
             'app': self._meta.app_label,
             'model': self._meta.model_name,
@@ -71,7 +71,10 @@ class BaseModel(models.Model):
 
 
 class UserManager(BaseUserManager, BaseManager):
+    """Manager for user"""
+
     def _create_user(self, email, password, is_superuser, **extra_fields):
+        """Create new user"""
         now = timezone.now()
         if not email:
             raise ValueError('The given email must be set')
@@ -89,16 +92,21 @@ class UserManager(BaseUserManager, BaseManager):
         return user
 
     def create_user(self, email, password=None, **extra_fields):
+        """Create standard user"""
         return self._create_user(email, password, False, **extra_fields)
 
     def create_superuser(self, email, password=None, **extra_fields):
+        """Create super user"""
         return self._create_user(email, password, True, **extra_fields)
 
     def get_queryset(self):
+        """Get queryset default filter inactive users"""
         return super().get_queryset().filter(is_active=True)
 
 
 class User(BaseModel, AbstractBaseUser, PermissionsMixin):
+    """User model"""
+
     email = models.EmailField(max_length=255, unique=True)
     first_name = models.CharField(max_length=64, blank=True, default='')
     last_name = models.CharField(max_length=64, blank=True, default='')
@@ -111,27 +119,33 @@ class User(BaseModel, AbstractBaseUser, PermissionsMixin):
     objects = UserManager()
 
     def get_full_name(self):
+        """Get full username if no name is set email is given"""
         if self.first_name and self.last_name:
             return "{} {}".format(self.first_name, self.last_name)
         return self.email
 
     def get_short_name(self):
+        """Get short name if no name is set email is given"""
         if self.first_name:
             return self.first_name
         return self.email
 
     def __str__(self):
+        """User representation"""
         return self.email
 
 
 class UserAttributeManager(models.Manager):
+    """User attribute manager"""
 
     def set_attribute(self, code, value):
+        """Set attribute for user"""
         attr, _ = self.get_or_create(code=code)
         attr.value = value
         attr.save()
 
     def get_attribute(self, code, default=None):
+        """Get attribute for user"""
         try:
             return self.get(code=code).value
         except models.ObjectDoesNotExist:
@@ -139,6 +153,8 @@ class UserAttributeManager(models.Manager):
 
 
 class UserAttribute(models.Model):
+    """User attribute to store system values for user"""
+
     user = models.ForeignKey(User, related_name='attributes')
     code = models.CharField(max_length=128, null=False)
     value = JSONField()
@@ -146,7 +162,10 @@ class UserAttribute(models.Model):
     objects = UserAttributeManager()
 
     class Meta:
+        """Model meta description"""
+
         unique_together = ('user', 'code')
 
     def __str__(self):
+        """User Attribute representation"""
         return self.code

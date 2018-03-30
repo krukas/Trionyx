@@ -1,3 +1,10 @@
+"""
+trionyx.config
+~~~~~~~~~~~~~~
+
+:copyright: 2017 by Maikel Martens
+:license: GPLv3
+"""
 import inspect
 from datetime import datetime
 
@@ -29,6 +36,7 @@ class ModelConfig:
                 list_search_fields = ['name', 'description']
 
     """
+
     menu_name = None
     """Menu name, default is model verbose_name_plural"""
 
@@ -96,6 +104,7 @@ class ModelConfig:
     """
 
     def __init__(self, model, MetaConfig=None):
+        """Init config"""
         self.model = model
 
         if MetaConfig:
@@ -105,21 +114,26 @@ class ModelConfig:
                 setattr(self, key, value)
 
     def __getattr__(self, item):
+        """Get attribute and returns null if not set"""
         try:
             return super().__getattr__(item)
         except AttributeError:
             return None
 
     def get_create_form(self):
+        """Return create form"""
         return self._get_form('create_form')
 
     def get_create_minimal_form(self):
+        """Return minimal form"""
         return self._get_form('create_form_minimal', True)
 
     def get_edit_form(self):
+        """Return edit form"""
         return self._get_form('edit_form')
 
     def get_list_fields(self):
+        """Get all list fields"""
         model_fields = {f.name: f for f in self.model.get_fields(True, True)}
 
         def create_list_fields(config_fields, list_fields=None):
@@ -158,6 +172,7 @@ class ModelConfig:
         return list_fields
 
     def _get_form(self, config_name, only_required=False):
+        """Get form for given config else create form"""
         if getattr(self, config_name, None):
             return import_object_by_string(getattr(self, config_name))
 
@@ -170,22 +185,27 @@ class ModelConfig:
 
 
 class Models:
+    """Holds all model configs"""
 
     def __init__(self):
+        """Init models"""
         self.configs = {}
 
     def auto_load_configs(self):
+        """Auto load all configs from app configs"""
         for app in apps.get_app_configs():
             for model in app.get_models():
                 config = ModelConfig(model, getattr(app, model.__name__, None))
                 self.configs[self.get_model_name(model)] = config
 
     def get_config(self, model):
+        """Get config for given model"""
         if not inspect.isclass(model):
             model = model.__class__
         return self.configs.get(self.get_model_name(model))
 
     def get_model_name(self, model):
+        """Get model name for given model"""
         return '{}.{}'.format(model.__module__, model.__name__)
 
 

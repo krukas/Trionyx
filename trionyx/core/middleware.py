@@ -1,3 +1,10 @@
+"""
+trionyx.core.middleware
+~~~~~~~~~~~~~~~~~~~~~~~
+
+:copyright: 2017 by Maikel Martens
+:license: GPLv3
+"""
 from re import compile
 
 from django.core.urlresolvers import reverse
@@ -23,6 +30,7 @@ class LoginRequiredMiddleware:
     """
 
     def process_request(self, request):
+        """Check if user is logged in"""
         assert hasattr(request, 'user')
         if not request.user.is_authenticated():
             path = request.path_info.lstrip('/')

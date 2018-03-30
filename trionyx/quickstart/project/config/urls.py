@@ -1,3 +1,4 @@
+"""Project urls"""
 from trionyx.urls import urlpatterns
 
 urlpatterns += [

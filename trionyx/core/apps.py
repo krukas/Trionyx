@@ -17,7 +17,10 @@ from trionyx.navigation import Menu
 
 
 class BaseConfig(AppConfig):
+    """Base app config"""
+
     def get_model_config(self, model):
+        """Get model config for given model"""
         return models_config.get_config(model)
 
 
@@ -30,6 +33,7 @@ class Config(BaseConfig):
     no_menu = True
 
     def ready(self):
+        """Auto load Trionyx"""
         models_config.auto_load_configs()
 
         for app in apps.get_app_configs():

@@ -1,3 +1,12 @@
+"""
+trionyx.core.view.core
+~~~~~~~~~~~~~~~~~~~~~~
+
+Core models
+
+:copyright: 2017 by Maikel Martens
+:license: GPLv3
+"""
 from django.apps import apps
 from django.views.generic import (
     TemplateView,
@@ -24,8 +33,10 @@ from trionyx.config import models_config
 
 
 class SingleUrlObjectMixin:
+    """Mixen for getting model class"""
 
     def get_model_class(self):
+        """Get model class"""
         if getattr(self, 'model', None):
             return self.model
         elif getattr(self, 'object', None):
@@ -35,31 +46,43 @@ class SingleUrlObjectMixin:
 
 
 class ListView(TemplateView):
+    """List view for showing model"""
+
     template_name = "trionyx/core/model_list.html"
 
     model = None
+    """Model class default will try get model based on url kwargs app, model"""
+
     title = None
+    """Title of page default is model verbose_name_plural"""
+
     ajax_url = None
+    """Ajax url used to get model list data"""
 
     def get_model_class(self):
+        """Get model class when no model is set use url kwargs app, model"""
         if not self.model:
             self.model = apps.get_model(self.kwargs.get('app'), self.kwargs.get('model'))
         return self.model
 
     def get_title(self):
+        """Get page title"""
         if self.title:
             return self.title
         return self.get_model_class()._meta.verbose_name_plural
 
     def get_ajax_url(self):
+        """Get ajax url"""
         if self.ajax_url:
             return self.ajax_url
         return reverse('trionyx:model-list-ajax', kwargs=self.kwargs)
 
     def get_create_url(self):
+        """Get create url"""
         return reverse('trionyx:model-create', kwargs=self.kwargs)
 
     def get_context_data(self, **kwargs):
+        """Add context data to view"""
         context = super().get_context_data(**kwargs)
         context.update({
             'title': self.get_title(),
@@ -68,10 +91,18 @@ class ListView(TemplateView):
         })
         return context
 
+    def dispatch(self, request, *args, **kwargs):
+        """Validate if user can use view"""
+        if False:  # TODO do permission check based on Model
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
+
 
 class ListJsendView(JsendView):
+    """Ajax list view"""
 
     def __init__(self, *args, **kwargs):
+        """Init ListJsendView"""
         super().__init__(*args, **kwargs)
         self.page = None
         self.page_size = None
@@ -80,6 +111,7 @@ class ListJsendView(JsendView):
         self.fields = None
 
     def handle_request(self, request, app, model):
+        """Give back list items + config"""
         model = apps.get_model(app, model)
         paginator = self.get_paginator(model)
         # Call search first, it will reset page if search is changed
@@ -99,6 +131,7 @@ class ListJsendView(JsendView):
         }
 
     def get_page(self, paginator):
+        """Get current page or page in session"""
         page = int(self.get_and_save_value('page', 1))
         if page < 1:
             return self.save_value('page', 1)
@@ -108,12 +141,15 @@ class ListJsendView(JsendView):
         return page
 
     def get_page_size(self):
+        """Get current page size or page size in session"""
         return self.get_and_save_value('page_size', 10)
 
     def get_sort(self):
+        """Get current sort or sort in session"""
         return self.get_and_save_value('sort', '-id')
 
     def get_search(self):
+        """Get current search or search from session, reset page if search is changed"""
         old_search = self.get_session_value('search', '')
         search = self.get_and_save_value('search', '')
         if old_search != search:
@@ -122,6 +158,7 @@ class ListJsendView(JsendView):
         return search
 
     def get_all_fields(self, model):
+        """Get all aviable fields"""
         config = models_config.get_config(model)
         return {
             name: {
@@ -131,6 +168,7 @@ class ListJsendView(JsendView):
         }
 
     def get_current_fields(self):
+        """Get current list to be used"""
         if self.current_fields:
             return self.current_fields
 
@@ -150,6 +188,7 @@ class ListJsendView(JsendView):
         return current_fields
 
     def get_items(self, model, paginator, current_page):
+        """Get list items for current page"""
         config = models_config.get_config(model)
         fields = config.get_list_fields()
 
@@ -168,6 +207,7 @@ class ListJsendView(JsendView):
         return items
 
     def get_paginator(self, model):
+        """Get paginator"""
         query = self.search_queryset(model)
         # TODO Apply filters
         query = query.order_by(self.get_sort())
@@ -175,11 +215,14 @@ class ListJsendView(JsendView):
         return Paginator(query, self.get_page_size())
 
     def search_queryset(self, model):
+        """Get search query set"""
         config = models_config.get_config(model)
         queryset = model.objects.get_queryset()
 
         if config.list_select_related:
             queryset = queryset.select_related(*config.list_select_related)
+
+        # TODO use watson search when set
 
         # get search field config
         def construct_search(field_name):
@@ -203,6 +246,7 @@ class ListJsendView(JsendView):
         return queryset
 
     def get_and_save_value(self, name, default=None):
+        """Get value from request/session and save value to session"""
         if getattr(self, name, None):
             return getattr(self, name)
 
@@ -212,20 +256,26 @@ class ListJsendView(JsendView):
         return value
 
     def get_session_value(self, name, default=None):
+        """Get value from session"""
         session_name = 'list_{}_{}_{}'.format(self.kwargs.get('app'), self.kwargs.get('model'), name)
         return self.request.session.get(session_name, default)
 
     def save_value(self, name, value):
+        """Save value to session"""
         session_name = 'list_{}_{}_{}'.format(self.kwargs.get('app'), self.kwargs.get('model'), name)
         self.request.session[session_name] = value
         setattr(self, name, value)
         return value
 
+    def dispatch(self, request, *args, **kwargs):
+        """Validate if user can use view"""
+        if False:  # TODO do permission check based on Model
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
+
 
 class DetailTabView(DetailView, SingleUrlObjectMixin):
-    """
-    Detail tab view, shows model details in tab view
-    """
+    """Detail tab view, shows model details in tab view"""
 
     template_name = "trionyx/core/model_view.html"
     """Template name for rendering the view, default is 'trionyx/core/detail_tab_view.html'
@@ -241,9 +291,7 @@ class DetailTabView(DetailView, SingleUrlObjectMixin):
     """Page title if not set object __str__ is used"""
 
     def get_queryset(self):
-        """
-        Get queryset based on url params(<app>, <mode>) if model is not set on class
-        """
+        """Get queryset based on url params(<app>, <mode>) if model is not set on class"""
         if self.queryset is None and not self.model:
             try:
                 ModelClass = apps.get_model(self.kwargs.get('app'), self.kwargs.get('model'))
@@ -253,6 +301,7 @@ class DetailTabView(DetailView, SingleUrlObjectMixin):
         return super().get_queryset()
 
     def get_context_data(self, **kwargs):
+        """Add context data to view"""
         context = super().get_context_data(**kwargs)
         tabs = self.get_active_tabs()
         context.update({
@@ -270,9 +319,11 @@ class DetailTabView(DetailView, SingleUrlObjectMixin):
         return context
 
     def get_back_url(self):
+        """Get back url"""
         return ''
 
     def get_delete_url(self):
+        """Get model object delete url"""
         return reverse('trionyx:model-delete', kwargs={
             'app': self.get_app_label(),
             'model': self.get_model_name(),
@@ -280,6 +331,7 @@ class DetailTabView(DetailView, SingleUrlObjectMixin):
         })
 
     def get_edit_url(self):
+        """Get model object edit url"""
         return reverse('trionyx:model-edit', kwargs={
             'app': self.get_app_label(),
             'model': self.get_model_name(),
@@ -287,29 +339,32 @@ class DetailTabView(DetailView, SingleUrlObjectMixin):
         })
 
     def get_app_label(self):
+        """Get model app label"""
         return self.object._meta.app_label
 
     def get_model_name(self):
+        """Get model name"""
         return self.object._meta.model_name
 
     def get_active_tabs(self):
+        """Get all active tabs"""
         if self.model_alias:
             return list(Tab.get_tabs(self.model_alias, self.object))
         else:
             return list(Tab.get_tabs('{}.{}'.format(self.get_app_label(), self.get_model_name()), self.object))
 
     def dispatch(self, request, *args, **kwargs):
+        """Validate if user can use view"""
         if False:  # TODO do permission check based on Model
             raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)
 
 
 class DetailTabJsendView(JsendView):
-    """
-    View for getting tab view with ajax
-    """
+    """View for getting tab view with ajax"""
 
     def handle_request(self, request, app, model, pk):
+        """Render and return tab"""
         ModelClass = apps.get_model(app, model)
         object = ModelClass.objects.get(id=pk)
 
@@ -322,6 +377,12 @@ class DetailTabJsendView(JsendView):
         item = Tab.get_tab(model_alias, object, tab_code)
 
         return item.get_layout(object).render(request)
+
+    def dispatch(self, request, *args, **kwargs):
+        """Validate if user can use view"""
+        if False:  # TODO do permission check based on Model
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
 
 
 class UpdateView(DjangoUpdateView, SingleUrlObjectMixin):
@@ -339,9 +400,7 @@ class UpdateView(DjangoUpdateView, SingleUrlObjectMixin):
     """Url code for cancel button, when not set object.get_absolute_url is used"""
 
     def get_queryset(self):
-        """
-        Get queryset based on url params(<app>, <mode>) if model is not set on class
-        """
+        """Get queryset based on url params(<app>, <mode>) if model is not set on class"""
         if self.queryset is None and not self.model:
             try:
                 ModelClass = apps.get_model(self.kwargs.get('app'), self.kwargs.get('model'))
@@ -351,12 +410,14 @@ class UpdateView(DjangoUpdateView, SingleUrlObjectMixin):
         return super().get_queryset()
 
     def get_form_class(self):
+        """Get form class for model"""
         if self.form_class:
             return self.form_class
         config = models_config.get_config(self.get_model_class())
         return config.get_edit_form()
 
     def get_form(self, form_class=None):
+        """Get form for model"""
         form = super().get_form(form_class)
 
         if not getattr(form, 'helper', None):
@@ -367,6 +428,7 @@ class UpdateView(DjangoUpdateView, SingleUrlObjectMixin):
         return form
 
     def get_context_data(self, **kwargs):
+        """Add context data to view"""
         context = super().get_context_data(**kwargs)
         context.update({
             'title': self.title,
@@ -377,6 +439,7 @@ class UpdateView(DjangoUpdateView, SingleUrlObjectMixin):
         return context
 
     def dispatch(self, request, *args, **kwargs):
+        """Validate if user can use view"""
         if False:  # TODO do permission check based on Model
             raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)
@@ -397,9 +460,7 @@ class CreateView(DjangoCreateView, SingleUrlObjectMixin):
     """Url code for cancel button, when not set model list view is used"""
 
     def get_queryset(self):
-        """
-        Get queryset based on url params(<app>, <mode>) if model is not set on class
-        """
+        """Get queryset based on url params(<app>, <mode>) if model is not set on class"""
         if self.queryset is None and not self.model:
             try:
                 ModelClass = apps.get_model(self.kwargs.get('app'), self.kwargs.get('model'))
@@ -409,12 +470,14 @@ class CreateView(DjangoCreateView, SingleUrlObjectMixin):
         return super().get_queryset()
 
     def get_form_class(self):
+        """Get form class for model"""
         if self.form_class:
             return self.form_class
         config = models_config.get_config(self.get_model_class())
         return config.get_create_form()
 
     def get_form(self, form_class=None):
+        """Get form for model"""
         form = super().get_form(form_class)
 
         if not getattr(form, 'helper', None):
@@ -425,6 +488,7 @@ class CreateView(DjangoCreateView, SingleUrlObjectMixin):
         return form
 
     def get_context_data(self, **kwargs):
+        """Add context data to view"""
         context = super().get_context_data(**kwargs)
         context.update({
             'title': self.title,
@@ -436,6 +500,7 @@ class CreateView(DjangoCreateView, SingleUrlObjectMixin):
         return context
 
     def dispatch(self, request, *args, **kwargs):
+        """Validate if user can use view"""
         if False:  # TODO do permission check based on Model
             raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)
@@ -456,9 +521,7 @@ class DeleteView(DjangoDeleteView):
     """Url code for cancel button, when not set model list view is used"""
 
     def get_queryset(self):
-        """
-        Get queryset based on url params(<app>, <mode>) if model is not set on class
-        """
+        """Get queryset based on url params(<app>, <mode>) if model is not set on class"""
         if self.queryset is None and not self.model:
             try:
                 ModelClass = apps.get_model(self.kwargs.get('app'), self.kwargs.get('model'))
@@ -468,6 +531,7 @@ class DeleteView(DjangoDeleteView):
         return super().get_queryset()
 
     def get_context_data(self, **kwargs):
+        """Add context data to view"""
         context = super().get_context_data(**kwargs)
         context.update({
             'title': self.title,
@@ -477,11 +541,13 @@ class DeleteView(DjangoDeleteView):
         return context
 
     def get_success_url(self):
+        """Get success url"""
         if self.success_url:
             return reverse(self.success_url)
         return '/'  # TODO go to list view
 
     def dispatch(self, request, *args, **kwargs):
+        """Validate if user can use view"""
         if False:  # TODO do permission check based on Model
             raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)

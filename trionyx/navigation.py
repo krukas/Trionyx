@@ -21,6 +21,13 @@ class Menu:
 
     @classmethod
     def auto_load_model_menu(cls):
+        """
+        Auto load model menu entries, can be configured in `trionyx.config.ModelConfig`:
+
+        - menu_name
+        - menu_icon
+        - menu_order
+        """
         from trionyx.core.apps import BaseConfig
 
         order = 0
@@ -162,6 +169,7 @@ class MenuItem:
         return None
 
     def is_active(self, path):
+        """Check if given path is active for current item"""
         if self.url and path.startswith(self.url):
             return True
 
@@ -175,16 +183,33 @@ class MenuItem:
 
 
 class Tab:
+    """Class where tab layout can be registered"""
+
     _tabs = defaultdict(list)
 
     @classmethod
     def get_tabs(cls, model_alias, object):
+        """
+        Get all active tabs for given model
+
+        :param model_alias:
+        :param object: Object used to filter tabs
+        :return:
+        """
         for item in cls._tabs[model_alias]:
             if item.display_filter(object):
                 yield item
 
     @classmethod
     def get_tab(cls, model_alias, object, tab_code):
+        """
+        Get tab for given object and tab code
+
+        :param model_alias:
+        :param object: Object used to render tab
+        :param tab_code: Tab code to use
+        :return:
+        """
         for item in cls._tabs[model_alias]:
             if item.code == tab_code and item.display_filter(object):
                 return item
@@ -221,6 +246,13 @@ class Tab:
 
     @classmethod
     def register_update(cls, model_alias, code):
+        """
+        Register tab update function, function is being called with (layout, object)
+
+        :param model_alias:
+        :param code:
+        :return:
+        """
         def wrapper(update_layout):
             for item in cls._tabs[model_alias]:
                 if item.code == code:
@@ -230,6 +262,16 @@ class Tab:
 
     @classmethod
     def update(cls, model_alias, code='general', name=None, order=None, display_filter=None):
+        """
+        Update given tab
+
+        :param model_alias:
+        :param code:
+        :param name:
+        :param order:
+        :param display_filter:
+        :return:
+        """
         for item in cls._tabs[model_alias]:
             if item.code != code:
                 continue
@@ -244,8 +286,11 @@ class Tab:
 
 
 class TabItem:
+    """Tab item that holds the tab data and renders the layout"""
 
     def __init__(self, code, create_layout, name=None, order=None, display_filter=None):
+        """Init TabItem"""
+        self._name = None
         self.code = code
         self.create_layout = create_layout
         self.name = name
@@ -255,15 +300,18 @@ class TabItem:
 
     @property
     def name(self):
-        if hasattr(self, '_name') and self._name:
+        """Give back tab name if is set else generate name by code"""
+        if self._name:
             return self._name
         return self.code.replace('_', ' ').capitalize()
 
     @name.setter
     def name(self, name):
+        """Set name"""
         self._name = name
 
     def get_layout(self, object):
+        """Get complete layout for given object"""
         layout = self.create_layout(object)
         for update_layout in self.layout_updates:
             update_layout(layout, object)
@@ -271,9 +319,11 @@ class TabItem:
         return layout
 
     def __str__(self):
+        """Tab string representation"""
         if not self.name:
             return self.name.capitalize()
         return self.name
 
     def __eq__(self, other):
+        """Compare tab based on code"""
         return self.code == other.code

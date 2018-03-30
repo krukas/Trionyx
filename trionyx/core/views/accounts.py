@@ -1,3 +1,12 @@
+"""
+trionyx.core.view.accounts
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Core models
+
+:copyright: 2017 by Maikel Martens
+:license: GPLv3
+"""
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.auth import logout as django_logout
 from django.shortcuts import redirect
@@ -9,40 +18,51 @@ from trionyx.core.forms.accounts import UserUpdateForm
 
 
 class LoginView(DjangoLoginView):
+    """Trionyx login view"""
+
     template_name = 'trionyx/core/login.html'
 
 
 def logout(request):
+    """Trionyx logout view"""
     django_logout(request)
     return redirect('/')
 
 
 class UpdateUserAccountView(UpdateView):
+    """Update user view"""
+
     model = User
     form_class = UserUpdateForm
     title = 'Update account'
 
     def get(self, request, *args, **kwargs):
+        """Add user id to kwargs"""
         kwargs['pk'] = request.user.id
         self.kwargs['pk'] = request.user.id
         return super().get(request, *args, **kwargs)
 
     def post(self, request, *args, **kwargs):
+        """Add user id to kwargs"""
         kwargs['pk'] = request.user.id
         self.kwargs['pk'] = request.user.id
         return super().post(request, *args, **kwargs)
 
 
 class ViewUserAccountView(DetailTabView):
+    """View user"""
+
     model_alias = 'core.profile'
     model = User
 
     title = 'Profile'
 
     def get(self, request, *args, **kwargs):
+        """Add user id to kwargs"""
         kwargs['pk'] = request.user.id
         self.kwargs['pk'] = request.user.id
         return super().get(request, *args, **kwargs)
 
     def get_edit_url(self):
+        """Get user edit url"""
         return reverse('trionyx:edit-account')

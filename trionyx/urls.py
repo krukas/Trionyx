@@ -1,3 +1,10 @@
+"""
+trionyx.urls
+~~~~~~~~~~~~
+
+:copyright: 2017 by Maikel Martens
+:license: GPLv3
+"""
 from django.conf import settings
 from django.conf.urls import url, include
 import django.views.static

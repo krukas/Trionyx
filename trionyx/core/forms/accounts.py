@@ -1,3 +1,10 @@
+"""
+trionyx.core.froms.accounts
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:copyright: 2017 by Maikel Martens
+:license: GPLv3
+"""
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import password_validation
@@ -8,6 +15,8 @@ from trionyx.core.models import User
 
 
 class UserUpdateForm(forms.ModelForm):
+    """User update form"""
+
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
     }
@@ -26,6 +35,7 @@ class UserUpdateForm(forms.ModelForm):
     )
 
     def __init__(self, *args, **kwargs):
+        """Init user form"""
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.layout = Layout(
@@ -51,10 +61,13 @@ class UserUpdateForm(forms.ModelForm):
         )
 
     class Meta:
+        """Meta description for form"""
+
         model = User
         fields = ['new_password1', 'new_password2', 'email', 'first_name', 'last_name', 'avatar']
 
     def clean_new_password2(self):
+        """Validate password when set"""
         password1 = self.cleaned_data.get('new_password1')
         password2 = self.cleaned_data.get('new_password2')
         if password1 or password2:
@@ -67,6 +80,7 @@ class UserUpdateForm(forms.ModelForm):
         return password2
 
     def save(self, commit=True):
+        """Save user"""
         user = super().save(commit=False)
 
         password = self.cleaned_data["new_password1"]
