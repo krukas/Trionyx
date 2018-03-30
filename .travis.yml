@@ -11,7 +11,10 @@ install:
   - pip install codecov
 
 script:
-  - make test
+  - env/bin/flake8 trionyx
+  - env/bin/pydocstyle trionyx
+  - env/bin/flake8 tests
+  - env/bin/coverage run manage.py test tests
 
 after_success:
   - codecov
