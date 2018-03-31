@@ -16,7 +16,7 @@
     {% endif %}
 {% endblock %}
 
-{% block content %}
+{% block content_before_messages %}
     {% if page_detail_tabs %}
         <div class="row detail-tab-view-tabs" style="margin-top: -16px">
             <ul class="nav nav-pills">
@@ -27,7 +27,11 @@
                 {% endfor %}
             </ul>
         </div>
+    {% endif %}
+{% endblock %}
 
+{% block content %}
+    {% if page_detail_tabs %}
         <div class="tab-content">
         {% for item in page_detail_tabs %}
             <div class="tab-pane fade in {% if item.code == active_tab %}active{% endif %}" id="{{ item.code }}">

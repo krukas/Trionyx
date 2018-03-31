@@ -35,6 +35,7 @@ class UpdateUserAccountView(UpdateView):
     model = User
     form_class = UserUpdateForm
     title = 'Update account'
+    cancel_url = 'trionyx:view-account'
 
     def get(self, request, *args, **kwargs):
         """Add user id to kwargs"""
@@ -47,6 +48,9 @@ class UpdateUserAccountView(UpdateView):
         kwargs['pk'] = request.user.id
         self.kwargs['pk'] = request.user.id
         return super().post(request, *args, **kwargs)
+
+    def get_success_url(self):
+        return reverse('trionyx:view-account')
 
 
 class ViewUserAccountView(DetailTabView):
@@ -66,3 +70,11 @@ class ViewUserAccountView(DetailTabView):
     def get_edit_url(self):
         """Get user edit url"""
         return reverse('trionyx:edit-account')
+
+    def get_delete_url(self):
+        """Hide delete url"""
+        return None
+
+    def get_back_url(self):
+        """Hide back url"""
+        return None
