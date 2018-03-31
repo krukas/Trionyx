@@ -23,11 +23,7 @@
 
 
 {% block header_buttons %}
-    {% if cancel_url %}
-        <a href="{% url cancel_url %}" class="btn btn-default">Cancel</a>
-    {% else %}
-        <a href="{{ object.get_absolute_url }}" class="btn btn-default">Cancel</a>
-    {% endif %}
+    <a href="{{ cancel_url }}" class="btn btn-default">Cancel</a>
     <input type="submit" value="{% if submit_value %}{{ submit_value }}{% else %}Create{% endif %}" class="btn btn-primary"/>
 {% endblock %}
 

@@ -419,6 +419,12 @@ class UpdateView(DjangoUpdateView, SingleUrlObjectMixin):
 
         return context
 
+    def form_valid(self, form):
+        """Add success message"""
+        response = super().form_valid(form)
+        messages.success(self.request, "Successfully saved ({})".format(self.object))
+        return response
+
     def dispatch(self, request, *args, **kwargs):
         """Validate if user can use view"""
         if False:  # TODO do permission check based on Model
@@ -468,17 +474,34 @@ class CreateView(DjangoCreateView, SingleUrlObjectMixin):
             form.helper.form_tag = False
         return form
 
+    def get_cancel_url(self):
+        """Get cancel url"""
+        if self.cancel_url:
+            return self.cancel_url
+
+        ModelClass = self.get_model_class()
+        return reverse('trionyx:model-list', kwargs={
+            'app': ModelClass._meta.app_label,
+            'model': ModelClass._meta.model_name,
+        })
+
     def get_context_data(self, **kwargs):
         """Add context data to view"""
         context = super().get_context_data(**kwargs)
         context.update({
             'title': self.title,
             'submit_value': self.submit_value,
-            'cancel_url': self.cancel_url,
+            'cancel_url': self.get_cancel_url(),
             'model_verbose_name': self.get_model_class()._meta.verbose_name
         })
 
         return context
+
+    def form_valid(self, form):
+        """Add success message"""
+        response = super().form_valid(form)
+        messages.success(self.request, "Successfully created ({})".format(self.object))
+        return response
 
     def dispatch(self, request, *args, **kwargs):
         """Validate if user can use view"""
@@ -523,6 +546,7 @@ class DeleteView(DjangoDeleteView):
 
     def get_success_url(self):
         """Get success url"""
+        messages.success(self.request, "Successfully deleted ({})".format(self.object))
         if self.success_url:
             return reverse(self.success_url)
         return '/'  # TODO go to list view
