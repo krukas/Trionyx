@@ -18,7 +18,7 @@
 
 {% block content %}
     {% if page_detail_tabs %}
-        <div class="row detail-tab-view-tabs">
+        <div class="row detail-tab-view-tabs" style="margin-top: -16px">
             <ul class="nav nav-pills">
                 {% for item in page_detail_tabs %}
                     <li {% if item.code == active_tab %}class="active"{% endif %}>

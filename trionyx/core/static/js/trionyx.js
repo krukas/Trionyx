@@ -13,7 +13,7 @@ $(function(){
             sideBarSize = open ? '230px' : '0px';
         }
 
-        $('.content-header-wrapper').css('left', leftSize);
+        $('.content-header-affix').css('left', leftSize);
     }
     fixHeader();
 

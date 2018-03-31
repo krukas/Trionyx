@@ -1,4 +1,7 @@
 .content-header-wrapper {
+    min-height: 65px;
+}
+.content-header-affix {
     z-index: 999;
     background-color: #ecf0f5;
     padding-bottom: 15px;
@@ -22,10 +25,6 @@ dl {
     margin-bottom: 0px;
 }
 
-
-#app-model-list {
-    margin-top: 20px;
-}
 
 #app-model-list thead tr {
     border-top: 2px solid #f4f4f4;
