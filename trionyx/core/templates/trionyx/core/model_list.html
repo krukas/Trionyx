@@ -1,4 +1,5 @@
 {% extends "trionyx/base.html" %}
+{% load static %}
 
 {% block title %}
     {{ title }}
@@ -18,12 +19,15 @@
             <div class="input-group input-group-sm" style="width: 150px;">
                 <input type="text" name="table_search" class="form-control pull-right" placeholder="Search" v-model="search" v-on:keyup="searchLoad()">
                 <div class="input-group-btn">
-                    <button type="submit" class="btn btn-default" v-on:click="searchLoad()"><i class="fa fa-search"></i></button>
+                    <button type="submit" class="btn btn-default btn-flat" v-on:click="searchLoad()"><i class="fa fa-search"></i></button>
                 </div>
             </div>
             <div class="box-tools">
 
             </div>
+            <button id="fields-popover" type="button" class="btn btn-default pull-right hidden-xs" data-placement="bottom" data-toggle="popover" title="Fields" >
+                <i class="fa fa-columns" style="font-size: 16px"></i>
+            </button>
         </div>
         <!-- /.box-header -->
         <div class="box-body no-padding table-responsive">
@@ -33,9 +37,12 @@
             <table class="table table-striped" v-if="items.length > 0">
                 <thead>
                     <tr>
-                        <th style="width: 10px">#</th>
-                        <th v-for="header in headers" v-on:click="clickSort(header.field)">
+                        <th style="width: 10px" data-header="NR">#<span class="dragtable-drag-handle"></span></th>
+                        <th v-for="header in headers" v-on:click="clickSort(header.field)" v-bind:data-header="header.field">
                             [[ header.label ]]
+                            <span class="dragtable-drag-handle">
+                                <i class="fa fa-arrows"></i>
+                            </span>
 
                             <i class="fa fa-sort pull-right" v-if="header.sort == 'sort'"></i>
                             <i class="fa fa-sort-amount-asc pull-right" v-if="header.sort == 'asc'"></i>
@@ -62,10 +69,25 @@
                 <li v-if="nextPage > 0"><a v-on:click="toPage(nextPage)">»</a></li>
               </ul>
         </div>
+
+        <div id="fields-popover-content" class="hidden">
+            <div style="max-height: 250px; overflow-y: scroll">
+                <div v-for="field in fields" class="col-md-6">
+                    <label v-on:click="clickTest()">
+                        <input v-bind:checked="field.checked" v-model="field.checked" v-bind:name="field.name" type="checkbox">
+                        [[field.label]]
+                    </label>
+                </div>
+            </div>
+        </div>
     </div>
+
 {% endblock %}
 
 {% block extra_js %}
+    <script src="{% static "js/jquery-ui.min.js" %}"></script>
+    <script src="{% static "js/jquery.dragtable.js" %}"></script>
+
     <script type="text/javascript">
     Vue.config.devtools = true;
     function TrionyxList(ajaxUrl){
@@ -76,9 +98,10 @@
             delimiters: ['[[', ']]'],
             data: {
                 loading: true,
-                headers: [{'label': 'test \\e155'}, {'label': 'test2'}],
+                headers: [],
                 items: [],
                 search: '',
+                fields: [],
 
                 current_page: 1,
                 pages: [],
@@ -105,6 +128,66 @@
                 searchLoad: function() {
                     self.load();
                 }
+            },
+            mounted(){
+                $('#fields-popover').popover({
+                    html: true,
+                    content(){
+                        // TODO render this with vuejs?
+                        var content = $($('#fields-popover-content').html());
+                        content.find('input').each(function () {
+                            var input = $(this);
+                            var field = input.attr('name');
+                            if (self.current_fields.indexOf(field) >= 0) {
+                                input.attr('checked', true);
+                            }
+
+                            input.click(function(){
+                                if (this.checked) {
+                                    self.current_fields.push(field);
+                                    self.current_fields = $.arrayUnique(self.current_fields);
+                                    self.load();
+                                } else {
+                                    var index = self.current_fields.indexOf(field);
+                                    if (index >= 0) {
+                                        self.current_fields.splice(index, 1);
+                                        self.load();
+                                    }
+                                }
+                            });
+                        });
+                        return content;
+                    },
+                }).on("show.bs.popover", function(){
+                    $(this).data("bs.popover").tip().css("max-width", "700px");
+                });
+            },
+            updated: function () {
+                $('#app-model-list table').dragtable({
+                    start(e){
+                        e.preventDefault();
+                    },
+                    stop(){
+                        var current_fields = ['NR'];
+                        $.each(self.current_fields, function(index, value){
+                           current_fields.push(value);
+                        });
+                        var changed_fields = $(this).dragtable('order');
+
+                        if (!$.arrayCompare(current_fields, changed_fields)) {
+                            changed_fields.shift();
+                            self.current_fields = changed_fields;
+                            self.load();
+                        }
+                    }
+                });
+
+                // Update DragTable
+                var current_fields = ['NR'];
+                $.each(self.current_fields, function(index, value){
+                   current_fields.push(value);
+                });
+                $('#app-model-list table').dragtable('order', current_fields);
             }
         });
 
@@ -121,7 +204,7 @@
                 page: self.page,
                 page_size: self.pageSize,
                 sort: self.sort,
-                selected_fields: self.current_fields,
+                selected_fields: self.current_fields.join(','),
                 search: self.app.search,
             };
 
@@ -146,10 +229,10 @@
                 if (initial) {
                    self.app.search = response.data.search;
                 }
-
                 self.setHeaders(response.data);
                 self.setItems(response.data);
                 self.updatePagination();
+                self.setFields(response.data);
 
             }).fail(function () {
                 console.log('error');
@@ -217,6 +300,19 @@
             self.app.previousPage = self.page > 1 ? self.page -1 : 0;
         };
 
+        self.setFields = function(data){
+            var fields = [];
+            for (var key in data.fields) {
+                var field = data.fields[key];
+                field.checked = data.current_fields.indexOf(key) >= 0;
+                fields.push(field);
+            }
+
+            fields.sort(function (a, b) {
+                return a.label.localeCompare(b.label);
+            });
+            self.app.fields = fields;
+        };
 
         self.load(true);
     }

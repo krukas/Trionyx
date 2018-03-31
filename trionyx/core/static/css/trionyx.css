@@ -1,3 +1,7 @@
+body {
+    background-color: #ecf0f5;;
+}
+
 .content-header-wrapper {
     min-height: 65px;
 }
@@ -36,4 +40,66 @@ dl {
 
 #app-model-list tbody tr:hover {
     background-color: #f0f0f0;
+}
+
+th i.fa {
+    margin-top: 3px;
+}
+
+#fields-popover {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+}
+
+#app-model-list .box-tools {
+    right: 80px;
+}
+
+/* DragTable */
+/*****************************************************************************/
+/* https://github.com/jebaird/dragtable/blob/master/src/css/dragtable-default.css */
+
+.dragtable-drag-wrapper{
+	position: absolute;
+    z-index: 1000;
+}
+ /*
+  * this gets applied to the table copy of the col that we are dragging
+  */
+.dragtable-drag-wrapper .dragtable-drag-col{
+    opacity: 0.7;
+    filter: alpha(opacity=70);
+    cursor:move;
+}
+
+/*
+	placeholder is just a name for the real table col
+*/
+.dragtable-col-placeholder {
+    border-left: 1px dotted black;
+    border-right: 1px dotted black;
+    color:#EFEFEF;
+    background: #EFEFEF !important;
+    visibility: visible !important;
+}
+table .dragtable-col-placeholder:first {
+	border-top:1px dotted black;
+}
+
+
+.dragtable-col-placeholder * {
+    opacity: 0.0;
+    visibility: hidden;
+}
+
+.dragtable-drag-handle {
+    display: none;
+    position: absolute;
+    padding: 10px;
+    margin-top: -10px;
+}
+
+th:hover .dragtable-drag-handle {
+    display: inline;
 }

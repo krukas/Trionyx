@@ -161,12 +161,15 @@ class ModelConfig:
 
         def create_list_fields(config_fields, list_fields=None):
             list_fields = list_fields if list_fields else {}
+            from trionyx.core.models import BaseModel
 
             def default_renderer(model, field):
                 value = getattr(model, field, '')
 
                 if isinstance(value, datetime):
                     value = formats.date_format(value, "SHORT_DATETIME_FORMAT")
+                if isinstance(value, BaseModel):
+                    value = str(value)
                 return value
 
             for field in config_fields:

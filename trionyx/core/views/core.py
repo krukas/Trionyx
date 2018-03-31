@@ -160,6 +160,7 @@ class ListJsendView(JsendView):
         config = models_config.get_config(model)
         return {
             name: {
+                'name': name,
                 'label': field['label'],
             }
             for name, field in config.get_list_fields().items()
@@ -178,6 +179,8 @@ class ListJsendView(JsendView):
             # TODO validate fields
             current_fields = request_fields.split(',')
             self.request.user.attributes.set_attribute(field_attribute, current_fields)
+        elif request_fields:
+            current_fields = request_fields.split(',')
 
         if not current_fields:
             config = models_config.get_config(model)
