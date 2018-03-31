@@ -56,6 +56,10 @@ th i.fa {
     right: 80px;
 }
 
+ul.pagination a {
+    cursor: pointer;
+}
+
 /* DragTable */
 /*****************************************************************************/
 /* https://github.com/jebaird/dragtable/blob/master/src/css/dragtable-default.css */
