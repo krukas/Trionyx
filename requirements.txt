@@ -4,3 +4,4 @@ django_compressor >= 2.2.0, < 2.3
 Pillow==5.0.0
 django_jsend==0.3
 jsonfield==2.0.2
+django-watson >= 1.5.0, < 1.6

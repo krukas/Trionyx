@@ -46,6 +46,30 @@ class ModelConfig:
     menu_exclude = False
     """Exclude model from menu"""
 
+    global_search = True
+    """Enable global search for model"""
+
+    disable_search_index = False
+    """Disable search index, use full for model with no list view but with allot of records"""
+
+    search_fields = ()
+    """Fields to use for searching, default is all CharField and TextField"""
+
+    search_exclude_fields = ()
+    """Fields you don't want to use for search"""
+
+    search_title = None
+    """
+    Search title of model works the same as `verbose_name`, defaults to __str__.
+    Is given high priority in search and is used in global search
+    """
+
+    search_description = None
+    """
+    Search description of model works the same as `verbose_name`, default is empty,
+    Is given medium priority and is used in global search page
+    """
+
     create_form = None
     """
     String of form class that is used for create, default will create form based on model.
@@ -87,9 +111,6 @@ class ModelConfig:
 
     list_default_fields = None
     """Array of fields that default is used in form list"""
-
-    list_search_fields = None
-    """Array of fields to use with search can also be foreignkey relation like user__first_name"""
 
     list_select_related = None
     """Array of fields to add foreign-key relationships to query, use this for relations that are used in search or renderer"""
@@ -203,6 +224,16 @@ class Models:
         if not inspect.isclass(model):
             model = model.__class__
         return self.configs.get(self.get_model_name(model))
+
+    def get_all_configs(self, trionyx_models_only=True):
+        """Get all model configs"""
+        from trionyx.core.models import BaseModel
+
+        for index, config in self.configs.items():
+            if not isinstance(config.model(), BaseModel):
+                continue
+
+            yield config
 
     def get_model_name(self, model):
         """Get model name for given model"""

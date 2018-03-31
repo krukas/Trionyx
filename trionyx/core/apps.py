@@ -14,6 +14,7 @@ from django.apps import apps
 
 from trionyx.config import models_config
 from trionyx.navigation import Menu
+from trionyx.core.search import auto_register_search_models
 
 
 class BaseConfig(AppConfig):
@@ -43,3 +44,5 @@ class Config(BaseConfig):
                 pass
 
         Menu.auto_load_model_menu()
+
+        auto_register_search_models()

@@ -1,3 +1,12 @@
+"""
+trionyx.core.views.core
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Add search and global search to models
+
+:copyright: 2017 by Maikel Martens
+:license: GPLv3
+"""
 from django.apps import apps
 from django.views.generic import (
     TemplateView,
@@ -12,9 +21,7 @@ from django.http import Http404
 from django_jsend import JsendView
 from django.urls import reverse
 from django.core.paginator import Paginator
-from functools import reduce
-from django.db.models import Q
-import operator
+from watson import search as watson
 from django.contrib import messages  # noqa F401 TODO add success message to create/edit/delete
 
 from crispy_forms.helper import FormHelper
@@ -214,28 +221,7 @@ class ListJsendView(JsendView):
         if config.list_select_related:
             queryset = queryset.select_related(*config.list_select_related)
 
-        # TODO use watson search when set
-
-        # get search field config
-        def construct_search(field_name):
-            if field_name.startswith('^'):
-                return "%s__istartswith" % field_name[1:]
-            elif field_name.startswith('='):
-                return "%s__iexact" % field_name[1:]
-            elif field_name.startswith('@'):
-                return "%s__search" % field_name[1:]
-            else:
-                return "%s__icontains" % field_name
-
-        search = self.get_search()
-        if config.list_search_fields and search:
-            orm_lookups = [construct_search(field) for field in config.list_search_fields]
-
-            for bit in search.split():
-                or_queries = [Q(**{orm_lookup: bit}) for orm_lookup in orm_lookups]
-                queryset = queryset.filter(reduce(operator.or_, or_queries))
-
-        return queryset
+        return watson.filter(queryset, self.get_search(), ranking=False)
 
     def get_and_save_value(self, name, default=None):
         """Get value from request/session and save value to session"""

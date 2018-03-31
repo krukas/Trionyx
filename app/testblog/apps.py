@@ -14,7 +14,6 @@ class BlogConfig(BaseConfig):
     class Post:
         verbose_name = '{title}'
         list_default_fields = ['id', 'publish_date', 'title']
-        list_search_fields = ['title', 'content']
 
     class Category:
         verbose_name = '{name}'
@@ -27,7 +26,6 @@ class BlogConfig(BaseConfig):
         ]
 
         list_default_fields = ['id', 'created_at', 'name']
-        list_search_fields = ['name', 'description']
 
     class Tag:
         menu_exclude = True
