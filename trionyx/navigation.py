@@ -12,6 +12,7 @@ from django.apps import apps
 from django.urls import reverse
 
 from trionyx.config import models_config
+from trionyx.layout import Layout, Column12, Panel, DescriptionList
 
 
 class Menu:
@@ -283,6 +284,22 @@ class Tab:
                 item.display_filter = display_filter
             break
         cls._tabs[model_alias] = sorted(cls._tabs[model_alias], key=lambda item: item.code if item.code else 999)
+
+    @classmethod
+    def auto_generate_missing_tabs(cls):
+        """Auto generate tabs for models with no tabs"""
+        for config in models_config.get_all_configs():
+            model_alias = '{}.{}'.format(config.app_label, config.model_name)
+            if model_alias not in cls._tabs:
+                @cls.register(model_alias)
+                def general_layout(obj):
+                    return Layout(
+                        Column12(
+                            Panel(
+                                DescriptionList(fields=[f.name for f in obj.get_fields()])
+                            )
+                        )
+                    )
 
 
 class TabItem:

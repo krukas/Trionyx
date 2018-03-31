@@ -127,6 +127,8 @@ class ModelConfig:
     def __init__(self, model, MetaConfig=None):
         """Init config"""
         self.model = model
+        self.app_label = model._meta.app_label
+        self.model_name = model._meta.model_name
 
         if MetaConfig:
             for key, value in MetaConfig.__dict__.items():

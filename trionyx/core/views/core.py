@@ -287,7 +287,7 @@ class DetailTabView(DetailView, SingleUrlObjectMixin):
             'active_tab': tabs[0].code if tabs else '',
             'app_label': self.get_app_label(),
             'model_name': self.get_model_name(),
-            'model_alias': self.model_alias,
+            'model_alias': self.get_model_alias(),
             'model_verbose_name': self.object._meta.verbose_name.title(),
             'back_url': self.get_back_url(),
             'edit_url': self.get_edit_url(),
@@ -319,6 +319,12 @@ class DetailTabView(DetailView, SingleUrlObjectMixin):
             'pk': self.object.id
         })
 
+    def get_model_alias(self):
+        """Get model alias"""
+        if self.model_alias:
+            return self.model_alias
+        return '{}.{}'.format(self.get_app_label(), self.get_model_name())
+
     def get_app_label(self):
         """Get model app label"""
         return self.object._meta.app_label
@@ -329,10 +335,7 @@ class DetailTabView(DetailView, SingleUrlObjectMixin):
 
     def get_active_tabs(self):
         """Get all active tabs"""
-        if self.model_alias:
-            return list(Tab.get_tabs(self.model_alias, self.object))
-        else:
-            return list(Tab.get_tabs('{}.{}'.format(self.get_app_label(), self.get_model_name()), self.object))
+        return list(Tab.get_tabs(self.get_model_alias(), self.object))
 
     def dispatch(self, request, *args, **kwargs):
         """Validate if user can use view"""

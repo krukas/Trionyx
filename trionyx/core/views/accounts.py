@@ -50,6 +50,7 @@ class UpdateUserAccountView(UpdateView):
         return super().post(request, *args, **kwargs)
 
     def get_success_url(self):
+        """Set success url to account page"""
         return reverse('trionyx:view-account')
 
 
