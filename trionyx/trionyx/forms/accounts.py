@@ -1,5 +1,5 @@
 """
-trionyx.trionyx.froms.accounts
+trionyx.trionyx.forms.accounts
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :copyright: 2018 by Maikel Martens

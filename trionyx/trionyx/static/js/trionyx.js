@@ -1,3 +1,7 @@
+function trionyxInitialize() {
+    $('.timepicker').timepicker();
+};
+
 $(function(){
     function fixHeader(transiton){
         var leftSize = '0px';
@@ -36,6 +40,8 @@ $(function(){
             }
         }
     });
+
+    trionyxInitialize();
 });
 
 function getCookie(name) {

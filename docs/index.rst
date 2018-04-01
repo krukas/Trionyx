@@ -13,6 +13,8 @@ Welcome to Trionyx's documentation!
    01-introduction
    02-installation
    03-config
+   04-components
+   05-forms
 
 
 

@@ -46,6 +46,12 @@ class ModelConfig:
     menu_exclude = False
     """Exclude model from menu"""
 
+    menu_root = False
+    """Add menu item to root instead of under the app menu"""
+
+    menu_icon = None
+    """Menu css icon, is ony used when root menu item"""
+
     global_search = True
     """Enable global search for model"""
 

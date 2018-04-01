@@ -7,6 +7,10 @@ import sys
 import os
 
 sys.path.insert(0, os.path.abspath('..'))
+os.environ['DJANGO_SETTINGS_MODULE'] = 'app.settings'
+
+import django
+django.setup()
 
 # -- General configuration ------------------------------------------------
 # Add any Sphinx extension module names here, as strings. They can be
