@@ -6,7 +6,7 @@ trionyx.core.context_processors
 :license: GPLv3
 """
 from django.conf import settings
-from trionyx.navigation import Menu
+from trionyx.navigation import app_menu
 
 
 def trionyx(request):
@@ -18,5 +18,5 @@ def trionyx(request):
         'TX_LOGO_NAME_SMALL_START': settings.TX_LOGO_NAME_SMALL_START,
         'TX_LOGO_NAME_SMALL_END': settings.TX_LOGO_NAME_SMALL_END,
 
-        'trionyx_menu_items': Menu.get_menu_items(),
+        'trionyx_menu_items': app_menu.get_menu_items(),
     }

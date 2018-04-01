@@ -5,13 +5,13 @@ trionyx.core.layouts
 :copyright: 2017 by Maikel Martens
 :license: GPLv3
 """
-from trionyx.navigation import Tab
+from trionyx.navigation import tabs
 from trionyx.layout import Layout, Container, Row, Column10, Column2, Panel, DescriptionList, Img
 
 from django.conf import settings
 
 
-@Tab.register('core.profile')
+@tabs.register('core.profile')
 def account_overview(object):
     """Create layout for user profile"""
     return Layout(

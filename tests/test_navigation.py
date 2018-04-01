@@ -4,8 +4,6 @@ from trionyx.navigation import Menu, MenuItem
 
 
 class UtilsTestCase(TestCase):
-    def setUp(self):
-        Menu._root_item = None
 
     def test_merge_menu_item(self):
         item1 = MenuItem(
@@ -56,15 +54,17 @@ class UtilsTestCase(TestCase):
         self.assertEquals(item1.permission, 'item2')
 
     def test_add_menu_item(self):
-        Menu.add_item('/test', 'test')
-        items = Menu.get_menu_items()
+        menu = Menu()
+        menu.add_item('/test', 'test')
+        items = menu.get_menu_items()
 
         self.assertEquals(len(items), 1)
         self.assertEquals(items[0].name, 'test')
 
     def test_add_sub_menu_path(self):
-        Menu.add_item('/test/sub', 'sub')
-        items = Menu.get_menu_items()
+        menu = Menu()
+        menu.add_item('/test/sub', 'sub')
+        items = menu.get_menu_items()
 
         # Test first item
         self.assertEquals(len(items), 1)
@@ -77,9 +77,10 @@ class UtilsTestCase(TestCase):
         self.assertEquals(items[0].childs[0].path, '/test/sub')
 
     def test_add_same_menu_sub_path(self):
-        Menu.add_item('/test/sub', 'sub')
-        Menu.add_item('/test/sub2', 'sub2')
-        items = Menu.get_menu_items()
+        menu = Menu()
+        menu.add_item('/test/sub', 'sub')
+        menu.add_item('/test/sub2', 'sub2')
+        items = menu.get_menu_items()
 
         self.assertEquals(len(items), 1)
 
@@ -97,9 +98,10 @@ class UtilsTestCase(TestCase):
         self.assertEquals(items[0].childs[1].path, '/test/sub2')
 
     def test_add_menu_merge(self):
-        Menu.add_item('/test', 'test')
-        Menu.add_item('/test', 'New name', order=10)
-        items = Menu.get_menu_items()
+        menu = Menu()
+        menu.add_item('/test', 'test')
+        menu.add_item('/test', 'New name', order=10)
+        items = menu.get_menu_items()
 
         self.assertEquals(len(items), 1)
         self.assertEquals(items[0].name, 'New name')
@@ -107,10 +109,11 @@ class UtilsTestCase(TestCase):
         self.assertEquals(items[0].order, 10)
 
     def test_add_menu_item_order(self):
-        Menu.add_item('/first', 'first', order=10)
-        Menu.add_item('/third', 'third')
-        Menu.add_item('/second', 'second', order=20)
-        items = Menu.get_menu_items()
+        menu = Menu()
+        menu.add_item('/first', 'first', order=10)
+        menu.add_item('/third', 'third')
+        menu.add_item('/second', 'second', order=20)
+        items = menu.get_menu_items()
 
         self.assertEquals(len(items), 3)
         self.assertEquals(items[0].name, 'first')

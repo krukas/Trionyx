@@ -18,10 +18,11 @@ from trionyx.layout import Layout, Column12, Panel, DescriptionList
 class Menu:
     """Meu class that hold the root tree item"""
 
-    _root_item = None
+    def __init__(self, root_item=None):
+        """Init Menu"""
+        self.root_item = root_item
 
-    @classmethod
-    def auto_load_model_menu(cls):
+    def auto_load_model_menu(self):
         """
         Auto load model menu entries, can be configured in `trionyx.config.ModelConfig`:
 
@@ -38,7 +39,7 @@ class Menu:
 
             order += 10
             app_path = app.name.split('.')[-1]
-            cls.add_item(
+            self.add_item(
                 path=app_path,
                 name=getattr(app, 'menu_name', app.verbose_name),
                 icon=getattr(app, 'menu_icon', None),
@@ -52,7 +53,7 @@ class Menu:
                     continue
 
                 model_order += 10
-                cls.add_item(
+                self.add_item(
                     path='{}/{}'.format(app_path, model.__name__.lower()),
                     name=config.menu_name if config.menu_name else model._meta.verbose_name_plural.capitalize(),
                     order=config.menu_order if config.menu_order else model_order,
@@ -65,8 +66,7 @@ class Menu:
                     )
                 )
 
-    @classmethod
-    def add_item(cls, path, name, icon=None, url=None, order=None, permission=None, active_regex=None):
+    def add_item(self, path, name, icon=None, url=None, order=None, permission=None, active_regex=None):
         """
         Add new menu item to menu
 
@@ -78,10 +78,10 @@ class Menu:
         :param permission:
         :return:
         """
-        if cls._root_item is None:
-            cls._root_item = MenuItem('ROOT', 'ROOT')
+        if self.root_item is None:
+            self.root_item = MenuItem('ROOT', 'ROOT')
 
-        root_item = cls._root_item
+        root_item = self.root_item
         current_path = ''
         for node in path.split('/')[:-1]:
             if not node:
@@ -102,12 +102,11 @@ class Menu:
         else:
             root_item.add_child(new_item)
 
-    @classmethod
-    def get_menu_items(cls):
+    def get_menu_items(self):
         """Get menu items"""
-        if not cls._root_item:
-            return[]
-        return cls._root_item.childs
+        if not self.root_item:
+            return []
+        return self.root_item.childs
 
 
 class MenuItem:
@@ -183,13 +182,14 @@ class MenuItem:
         return False
 
 
-class Tab:
+class TabRegister:
     """Class where tab layout can be registered"""
 
-    _tabs = defaultdict(list)
+    def __init__(self):
+        """Init Tabs"""
+        self.tabs = defaultdict(list)
 
-    @classmethod
-    def get_tabs(cls, model_alias, object):
+    def get_tabs(self, model_alias, object):
         """
         Get all active tabs for given model
 
@@ -197,12 +197,11 @@ class Tab:
         :param object: Object used to filter tabs
         :return:
         """
-        for item in cls._tabs[model_alias]:
+        for item in self.tabs[model_alias]:
             if item.display_filter(object):
                 yield item
 
-    @classmethod
-    def get_tab(cls, model_alias, object, tab_code):
+    def get_tab(self, model_alias, object, tab_code):
         """
         Get tab for given object and tab code
 
@@ -211,13 +210,12 @@ class Tab:
         :param tab_code: Tab code to use
         :return:
         """
-        for item in cls._tabs[model_alias]:
+        for item in self.tabs[model_alias]:
             if item.code == tab_code and item.display_filter(object):
                 return item
         raise Exception('Given tab does not exits or is filtered')
 
-    @classmethod
-    def register(cls, model_alias, code='general', name=None, order=None, display_filter=None):
+    def register(self, model_alias, code='general', name=None, order=None, display_filter=None):
         """
         Register new tab
 
@@ -236,17 +234,16 @@ class Tab:
                 display_filter=display_filter
             )
 
-            if item in cls._tabs[model_alias]:
+            if item in self.tabs[model_alias]:
                 raise Exception("Tab {} already registered for model {}".format(code, model_alias))
 
-            cls._tabs[model_alias].append(item)
-            cls._tabs[model_alias] = sorted(cls._tabs[model_alias], key=lambda item: item.order if item.order else 999)
+            self.tabs[model_alias].append(item)
+            self.tabs[model_alias] = sorted(self.tabs[model_alias], key=lambda item: item.order if item.order else 999)
 
             return create_layout
         return wrapper
 
-    @classmethod
-    def register_update(cls, model_alias, code):
+    def register_update(self, model_alias, code):
         """
         Register tab update function, function is being called with (layout, object)
 
@@ -255,14 +252,13 @@ class Tab:
         :return:
         """
         def wrapper(update_layout):
-            for item in cls._tabs[model_alias]:
+            for item in self.tabs[model_alias]:
                 if item.code == code:
                     item.layout_updates.append(update_layout)
             return update_layout
         return wrapper
 
-    @classmethod
-    def update(cls, model_alias, code='general', name=None, order=None, display_filter=None):
+    def update(self, model_alias, code='general', name=None, order=None, display_filter=None):
         """
         Update given tab
 
@@ -273,7 +269,7 @@ class Tab:
         :param display_filter:
         :return:
         """
-        for item in cls._tabs[model_alias]:
+        for item in self.tabs[model_alias]:
             if item.code != code:
                 continue
             if name:
@@ -283,15 +279,14 @@ class Tab:
             if display_filter:
                 item.display_filter = display_filter
             break
-        cls._tabs[model_alias] = sorted(cls._tabs[model_alias], key=lambda item: item.code if item.code else 999)
+        self.tabs[model_alias] = sorted(self.tabs[model_alias], key=lambda item: item.code if item.code else 999)
 
-    @classmethod
-    def auto_generate_missing_tabs(cls):
+    def auto_generate_missing_tabs(self):
         """Auto generate tabs for models with no tabs"""
         for config in models_config.get_all_configs():
             model_alias = '{}.{}'.format(config.app_label, config.model_name)
-            if model_alias not in cls._tabs:
-                @cls.register(model_alias)
+            if model_alias not in self.tabs:
+                @self.register(model_alias)
                 def general_layout(obj):
                     return Layout(
                         Column12(
@@ -344,3 +339,7 @@ class TabItem:
     def __eq__(self, other):
         """Compare tab based on code"""
         return self.code == other.code
+
+
+tabs = TabRegister()
+app_menu = Menu()

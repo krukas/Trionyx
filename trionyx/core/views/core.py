@@ -26,7 +26,7 @@ from django.contrib import messages  # noqa F401 TODO add success message to cre
 
 from crispy_forms.helper import FormHelper
 
-from trionyx.navigation import Tab
+from trionyx.navigation import tabs
 from trionyx.config import models_config
 
 
@@ -338,7 +338,7 @@ class DetailTabView(DetailView, SingleUrlObjectMixin):
 
     def get_active_tabs(self):
         """Get all active tabs"""
-        return list(Tab.get_tabs(self.get_model_alias(), self.object))
+        return list(tabs.get_tabs(self.get_model_alias(), self.object))
 
     def dispatch(self, request, *args, **kwargs):
         """Validate if user can use view"""
@@ -361,7 +361,7 @@ class DetailTabJsendView(JsendView):
 
         # TODO permission check
 
-        item = Tab.get_tab(model_alias, object, tab_code)
+        item = tabs.get_tab(model_alias, object, tab_code)
 
         return item.get_layout(object).render(request)
 

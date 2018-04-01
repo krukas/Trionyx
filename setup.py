@@ -25,8 +25,18 @@ setup(
 	license='GPL3',
 	url = 'https://github.com/krukas/Trionyx',
 	download_url = 'https://github.com/krukas/Trionyx/releases/tag/0.0.1',
-	keywords = ['Django', 'Trionyx', 'framework', 'admin', 'data', 'processes', 'application'],
+	keywords = ['Django', 'Trionyx', 'framework', 'admin', 'data', 'processes', 'application', 'stack'],
 	install_requires=[
         "Django >= 1.11.0, < 1.12",
+
+		# Django apps
+		'django-crispy-forms >= 1.7.2, < 1.8',
+		'django_compressor >= 2.2.0, < 2.3',
+		'django_jsend==0.3',
+		'jsonfield==2.0.2',
+		'django-watson >= 1.5.0, < 1.6',
+
+		'Pillow==5.0.0',
     ],
 )
+
