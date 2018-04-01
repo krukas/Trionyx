@@ -24,6 +24,9 @@ class Quickstart:
         self.project_path = os.path.join(os.path.dirname(quickstart_path), 'project')
         """Path to project template files"""
 
+        self.app_path = os.path.join(os.path.dirname(quickstart_path), 'app')
+        """Path to app template files"""
+
     def create_project(self, project_path):
         """
         Create Trionyx project in given path
@@ -39,6 +42,27 @@ class Quickstart:
 
         self.update_file(project_path, 'config/local_settings.py', {
             'secret_key': utils.random_string(32)
+        })
+
+    def create_app(self, apps_path, name):
+        """
+        Create Trionyx app in given path
+
+        :param str path: path to create app in.
+        :param str name: name of app
+        :raises FileExistsError:
+        """
+        app_path = os.path.join(apps_path, name.lower())
+
+        shutil.copytree(self.app_path, app_path)
+
+        self.update_file(app_path, '__init__.py', {
+            'name': name.lower()
+        })
+
+        self.update_file(app_path, 'apps.py', {
+            'name': name.lower(),
+            'verbose_name': name.capitalize()
         })
 
     def update_file(self, project_path, file_path, variables):
