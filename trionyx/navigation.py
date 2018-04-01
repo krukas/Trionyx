@@ -37,26 +37,29 @@ class Menu:
             if not isinstance(app, BaseConfig) or getattr(app, 'no_menu', False):
                 continue
 
-            order += 10
             app_path = app.name.split('.')[-1]
-            self.add_item(
-                path=app_path,
-                name=getattr(app, 'menu_name', app.verbose_name),
-                icon=getattr(app, 'menu_icon', None),
-                order=getattr(app, 'menu_order', order),
-            )
-
             model_order = 0
             for model in app.get_models():
                 config = models_config.get_config(model)
                 if config.menu_exclude:
                     continue
 
-                model_order += 10
+                menu_icon = None
+                menu_path = '{}/{}'.format(app_path, config.model_name)
+                if config.menu_root:
+                    order += 10
+                    menu_order = order
+                    menu_icon = config.menu_icon
+                    menu_path = config.model_name
+                else:
+                    model_order += 10
+                    menu_order = model_order
+
                 self.add_item(
-                    path='{}/{}'.format(app_path, model.__name__.lower()),
+                    path=menu_path,
                     name=config.menu_name if config.menu_name else model._meta.verbose_name_plural.capitalize(),
-                    order=config.menu_order if config.menu_order else model_order,
+                    order=config.menu_order if config.menu_order else menu_order,
+                    icon=menu_icon,
                     url=reverse(
                         "trionyx:model-list",
                         kwargs={
@@ -64,6 +67,15 @@ class Menu:
                             'model': model._meta.model_name,
                         }
                     )
+                )
+
+            if model_order > 0:
+                order += 10
+                self.add_item(
+                    path=app_path,
+                    name=getattr(app, 'menu_name', app.verbose_name),
+                    icon=getattr(app, 'menu_icon', None),
+                    order=getattr(app, 'menu_order', order),
                 )
 
     def add_item(self, path, name, icon=None, url=None, order=None, permission=None, active_regex=None):
