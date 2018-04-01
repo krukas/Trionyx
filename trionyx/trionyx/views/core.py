@@ -1,10 +1,8 @@
 """
-trionyx.core.views.core
-~~~~~~~~~~~~~~~~~~~~~~~
+trionyx.trionyx.views.core
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Add search and global search to models
-
-:copyright: 2017 by Maikel Martens
+:copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
 from django.apps import apps

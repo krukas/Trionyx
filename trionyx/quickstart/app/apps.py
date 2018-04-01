@@ -1,5 +1,5 @@
 """[[verbose_name]] app configuration"""
-from trionyx.core.apps import BaseConfig
+from trionyx.trionyx.apps import BaseConfig
 
 
 class Config(BaseConfig):

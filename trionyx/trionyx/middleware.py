@@ -1,8 +1,8 @@
 """
-trionyx.core.middleware
-~~~~~~~~~~~~~~~~~~~~~~~
+trionyx.trionyx.middleware
+~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:copyright: 2017 by Maikel Martens
+:copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
 from re import compile

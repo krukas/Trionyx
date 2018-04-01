@@ -161,7 +161,7 @@ class ModelConfig:
 
         def create_list_fields(config_fields, list_fields=None):
             list_fields = list_fields if list_fields else {}
-            from trionyx.core.models import BaseModel
+            from trionyx.trionyx.models import BaseModel
 
             def default_renderer(model, field):
                 value = getattr(model, field, '')
@@ -232,7 +232,7 @@ class Models:
 
     def get_all_configs(self, trionyx_models_only=True):
         """Get all model configs"""
-        from trionyx.core.models import BaseModel
+        from trionyx.trionyx.models import BaseModel
 
         for index, config in self.configs.items():
             if not isinstance(config.model(), BaseModel):

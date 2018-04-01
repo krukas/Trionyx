@@ -10,7 +10,7 @@ from django.conf.urls import url, include
 import django.views.static
 
 urlpatterns = [
-    url(r'^', include('trionyx.core.urls', namespace='trionyx')),
+    url(r'^', include('trionyx.trionyx.urls', namespace='trionyx')),
 ]
 
 if settings.DEBUG:

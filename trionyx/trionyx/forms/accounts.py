@@ -1,8 +1,8 @@
 """
-trionyx.core.froms.accounts
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+trionyx.trionyx.froms.accounts
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:copyright: 2017 by Maikel Martens
+:copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
 from django import forms
@@ -11,7 +11,7 @@ from django.contrib.auth import password_validation
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Div
 
-from trionyx.core.models import User
+from trionyx.trionyx.models import User
 
 
 class UserUpdateForm(forms.ModelForm):

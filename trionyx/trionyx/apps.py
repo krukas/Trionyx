@@ -1,10 +1,10 @@
 """
-trionyx.core.apps
-~~~~~~~~~~~~~~~~~
+trionyx.trionyx.apps
+~~~~~~~~~~~~~~~~~~~~
 
 Core apps package containing Appconfig
 
-:copyright: 2017 by Maikel Martens
+:copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
 from importlib import import_module
@@ -14,7 +14,7 @@ from django.apps import apps
 
 from trionyx.config import models_config
 from trionyx.navigation import app_menu, tabs
-from trionyx.core.search import auto_register_search_models
+from trionyx.trionyx.search import auto_register_search_models
 
 
 class BaseConfig(AppConfig):
@@ -26,10 +26,10 @@ class BaseConfig(AppConfig):
 
 
 class Config(BaseConfig):
-    """Django core config app"""
+    """Trionyx core config app"""
 
-    name = 'trionyx.core'
-    verbose_name = 'Core'
+    name = 'trionyx.trionyx'
+    verbose_name = 'Trionyx'
 
     no_menu = True
 

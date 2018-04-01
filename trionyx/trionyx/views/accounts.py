@@ -1,10 +1,8 @@
 """
-trionyx.core.view.accounts
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+trionyx.trionyx.view.accounts
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Core models
-
-:copyright: 2017 by Maikel Martens
+:copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
 from django.contrib.auth.views import LoginView as DjangoLoginView
@@ -13,8 +11,8 @@ from django.shortcuts import redirect
 from django.urls import reverse
 from .core import UpdateView, DetailTabView
 
-from trionyx.core.models import User
-from trionyx.core.forms.accounts import UserUpdateForm
+from trionyx.trionyx.models import User
+from trionyx.trionyx.forms.accounts import UserUpdateForm
 
 
 class LoginView(DjangoLoginView):
@@ -57,7 +55,7 @@ class UpdateUserAccountView(UpdateView):
 class ViewUserAccountView(DetailTabView):
     """View user"""
 
-    model_alias = 'core.profile'
+    model_alias = 'trionyx.profile'
     model = User
 
     title = 'Profile'

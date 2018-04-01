@@ -1,6 +1,6 @@
 """
-trionyx.core.management.commands.create_app
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+trionyx.trionyx.management.commands.create_app
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :copyright: 2018 by Maikel Martens
 :license: GPLv3

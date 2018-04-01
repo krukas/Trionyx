@@ -1,4 +1,4 @@
-from trionyx.core.models import BaseModel, models
+from trionyx.trionyx.models import BaseModel, models
 
 class Category(BaseModel):
     name = models.CharField(max_length=255)

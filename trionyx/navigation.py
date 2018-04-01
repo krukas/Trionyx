@@ -30,7 +30,7 @@ class Menu:
         - menu_icon
         - menu_order
         """
-        from trionyx.core.apps import BaseConfig
+        from trionyx.trionyx.apps import BaseConfig
 
         order = 0
         for app in apps.get_app_configs():

@@ -1,8 +1,8 @@
 """
-trionyx.core.models
-~~~~~~~~~~~~~~~~~~~
+trionyx.trionyx.models
+~~~~~~~~~~~~~~~~~~~~~~
 
-:copyright: 2017 by Maikel Martens
+:copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin

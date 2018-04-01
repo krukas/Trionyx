@@ -1,13 +1,13 @@
 """
-trionyx.url
-~~~~~~~~~~~
+trionyx.trionyx.url
+~~~~~~~~~~~~~~~~~~~
 
-:copyright: 2017 by Maikel Martens
+:copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
 from django.conf.urls import url
 
-from trionyx.core import views
+from trionyx.trionyx import views
 
 urlpatterns = [
     url(r'^login/$', views.accounts.LoginView.as_view(), name='login'),

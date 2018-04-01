@@ -1,10 +1,8 @@
 """
-trionyx.core.views
-~~~~~~~~~~~~~~~~~~
+trionyx.trionyx.views
+~~~~~~~~~~~~~~~~~~~~~
 
-Core models
-
-:copyright: 2017 by Maikel Martens
+:copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
 from .core import ListView, ListJsendView, DetailTabView, DetailTabJsendView, UpdateView, CreateView, DeleteView

@@ -1,8 +1,8 @@
 """
-trionyx.core.context_processors
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+trionyx.trionyx.context_processors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:copyright: 2017 by Maikel Martens
+:copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
 from django.conf import settings

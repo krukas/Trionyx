@@ -10,7 +10,7 @@ All Trionyx base settings
 
 INSTALLED_APPS = [
     # Trionyx apps
-    'trionyx.core',
+    'trionyx.trionyx',
 
     # Django apps
     'django.contrib.auth',
@@ -63,13 +63,13 @@ MIDDLEWARE_CLASSES = (
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'trionyx.core.middleware.LoginRequiredMiddleware',
+    'trionyx.trionyx.middleware.LoginRequiredMiddleware',
 )
 
 # ==============================================================================
 # Auth / security
 # ==============================================================================
-AUTH_USER_MODEL = 'core.User'
+AUTH_USER_MODEL = 'trionyx.User'
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -112,7 +112,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
 
                 'django.contrib.messages.context_processors.messages',
-                'trionyx.core.context_processors.trionyx',
+                'trionyx.trionyx.context_processors.trionyx',
             ],
         }
     },

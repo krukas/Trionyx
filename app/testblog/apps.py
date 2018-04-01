@@ -1,4 +1,4 @@
-from trionyx.core.apps import BaseConfig
+from trionyx.trionyx.apps import BaseConfig
 
 
 class BlogConfig(BaseConfig):

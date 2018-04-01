@@ -2,7 +2,7 @@
 trionyx.core.forms
 ~~~~~~~~~~~~~~~~~~
 
-:copyright: 2017 by Maikel Martens
+:copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
 from .accounts import UserUpdateForm

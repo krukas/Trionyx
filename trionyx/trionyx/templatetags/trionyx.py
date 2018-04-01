@@ -1,8 +1,8 @@
 """
-trionyx.core.templatetags.trionyx
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+trionyx.trionyx.templatetags.trionyx
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-:copyright: 2017 by Maikel Martens
+:copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
 from django import template
