@@ -89,7 +89,6 @@
     <script src="{% static "js/jquery.dragtable.js" %}"></script>
 
     <script type="text/javascript">
-    Vue.config.devtools = true;
     function TrionyxList(ajaxUrl){
         var self = this;
         self.ajaxUrl = ajaxUrl;
@@ -159,7 +158,7 @@
                         return content;
                     },
                 }).on("show.bs.popover", function(){
-                    $(this).data("bs.popover").tip().css("max-width", "700px");
+                    $(this).data("bs.popover").tip().css("max-width", "100%").css("min-width", "400px");
                 });
             },
             updated: function () {
