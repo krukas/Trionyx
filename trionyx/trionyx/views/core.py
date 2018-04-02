@@ -553,7 +553,14 @@ class DeleteView(DjangoDeleteView):
         messages.success(self.request, "Successfully deleted ({})".format(self.object))
         if self.success_url:
             return reverse(self.success_url)
-        return '/'  # TODO go to list view
+
+        if 'app' in self.kwargs and 'model' in self.kwargs:
+            return reverse('trionyx:model-list', kwargs={
+                'app': self.kwargs.get('app'),
+                'model': self.kwargs.get('model'),
+            })
+
+        return '/'
 
     def dispatch(self, request, *args, **kwargs):
         """Validate if user can use view"""
