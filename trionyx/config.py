@@ -7,6 +7,7 @@ trionyx.config
 """
 import inspect
 from datetime import datetime
+from decimal import Decimal
 
 from django.apps import apps
 from django.forms.models import modelform_factory
@@ -176,6 +177,8 @@ class ModelConfig:
                     value = formats.date_format(value, "SHORT_DATETIME_FORMAT")
                 if isinstance(value, BaseModel):
                     value = str(value)
+                if isinstance(value, Decimal):
+                    value = str(round(value, 2))
                 return value
 
             for field in config_fields:
