@@ -26,4 +26,9 @@ urlpatterns = [
 
     url(r'^model/(?P<app>[\w]+)/(?P<model>[\w]+)/(?P<pk>[0-9]+)/edit/$', views.UpdateView.as_view(), name='model-edit'),
     url(r'^model/(?P<app>[\w]+)/(?P<model>[\w]+)/(?P<pk>[0-9]+)/delete/$', views.DeleteView.as_view(), name='model-delete'),
+
+    # Generic Dialog views
+    url(r'^dialog/model/(?P<app>[\w]+)/(?P<model>[\w]+)/create/$', views.CreateDialog.as_view(), name='model-dialog-create'),
+    url(r'^dialog/model/(?P<app>[\w]+)/(?P<model>[\w]+)/(?P<pk>[0-9]+)/edit/$', views.UpdateDialog.as_view(), name='model-dialog-edit'),
+
 ]

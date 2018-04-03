@@ -7,6 +7,7 @@ trionyx.trionyx.views.core
 """
 from django.apps import apps
 from django.views.generic import (
+    View,
     TemplateView,
     DetailView,
     UpdateView as
@@ -14,14 +15,16 @@ from django.views.generic import (
     CreateView as DjangoCreateView,
     DeleteView as DjangoDeleteView
 )
+from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
 from django.http import Http404
 from django_jsend import JsendView
 from django.urls import reverse
 from django.core.paginator import Paginator
-from watson import search as watson
 from django.contrib import messages  # noqa F401 TODO add success message to create/edit/delete
+from django.template.loader import render_to_string
 
+from watson import search as watson
 from crispy_forms.helper import FormHelper
 
 from trionyx.navigation import tabs
@@ -567,3 +570,227 @@ class DeleteView(DjangoDeleteView):
         if False:  # TODO do permission check based on Model
             raise PermissionDenied
         return super().dispatch(request, *args, **kwargs)
+
+
+# =============================================================================
+# Dialog views
+# =============================================================================
+class DialogView(View):
+    """
+    Dialog view used for showing dialog popup with ajax.
+
+    **Example**
+
+    .. code-block:: python
+
+        # apps/your_app/views.py
+
+        class HelloWorldDialogView(DialogView):
+
+            def display_dialog(self):
+                return {
+                    "title": "Hello world",
+                    "content": self.render_to_string('your_app/dialog/hello_world.html'),
+                }
+
+    **Calling in frontend**
+
+    .. code-block:: django
+
+        <button class="btn btn-primary btn-block"
+            onClick="openDialog('{% url 'hello:world' %}', {/* dialog options */})">
+            Hello World
+        </button>
+    """
+
+    permission = None
+    """Permission of dialog, when not set and model is set model view permission is used"""
+
+    model_permission = 'read'
+    """When no permission is set will use this for model permission"""
+
+    model = None
+    """
+    Model that will be auto loaded, when set the url mus contain a `pk` parameter.
+    Model can also be set with the url with the `app` and `model` parameter.
+
+    Loaded model object is available as self.object and self.<object name lowercase>
+    """
+
+    def get(self, request, *args, **kwargs):
+        """Handle get request"""
+        try:
+            kwargs = self.load_object(kwargs)
+        except Exception as e:
+            return self.render_te_response({
+                'title': str(e),
+            })
+
+        if not self.has_permission(request):
+            return self.render_te_response({
+                'title': 'No access',
+            })
+        return self.render_te_response(self.display_dialog(*args, **kwargs))
+
+    def post(self, request, *args, **kwargs):
+        """Handle post request"""
+        try:
+            kwargs = self.load_object(kwargs)
+        except Exception as e:
+            return self.render_te_response({
+                'title': str(e),
+            })
+
+        if not self.has_permission(request):
+            return self.render_te_response({
+                'title': 'No access',
+            })
+        return self.render_te_response(self.handle_dialog(*args, **kwargs))
+
+    def get_model_class(self, kwargs):
+        """Get model class, uses model when set else try to get model class from url params"""
+        if not self.model and 'app' in kwargs and 'model' in kwargs:
+            self.model = apps.get_model(kwargs.pop('app'), kwargs.pop('model'))
+        return self.model
+
+    def load_object(self, kwargs):
+        """Load object and model config and remove pk from kwargs"""
+        self.object = None
+        self.config = None
+        model = self.get_model_class(kwargs)
+
+        if model and kwargs.get('pk', False):
+            try:
+                self.object = model.objects.get(pk=kwargs.pop('pk'))
+            except Exception:
+                raise Exception("Could not load {}".format(model.__name__.lower()))
+            setattr(self, model.__name__.lower(), self.object)
+
+        if model:
+            self.config = models_config.get_config(self.model)
+
+        return kwargs
+
+    def has_permission(self, request):
+        """Check if user has permission"""
+        if not self.object and not self.permission:
+            return True
+
+        if not self.permission:
+            return request.user.has_perm('{}_{}'.format(
+                self.model_permission,
+                self.object.__class__.__name__.lower()), self.object
+            )
+
+        return request.user.has_perm(self.permission)
+
+    def render_to_string(self, template_file, context):
+        """Render given template to string and add object to context"""
+        context = context if context else {}
+        if self.object:
+            context['object'] = self.object
+            context[self.object.__class__.__name__.lower()] = self.object
+        return render_to_string(template_file, context, self.request)
+
+    def display_dialog(self, *args, **kwargs):
+        """
+        Override this function to display a dialog popup. Url params are given as function params.
+
+        The function must return a dict that can contain the following data:
+
+        - **title**: Title of the dialog
+        - **content**: Html content to display in dialog, shortcut function :class:`trionyx.trionyx.views.core.DialogView.render_to_string`
+        - **url (optional)**: Post url for dialog form, must be a link to a DialogView.
+        - **submit_label (optional)**: Label of the submit button, when empty submit button is not shown.
+        - **redirect_url (optional)**: Redirect page to given url.
+        - **close (optional)**: Close dialog.
+        """
+        return {}
+
+    def handle_dialog(self, *args, **kwargs):
+        """
+        Override this function to handle and display popup. Url params are given as function params.
+        This function must return the same dict structure as :class:`trionyx.trionyx.views.core.DialogView.display_dialog`
+
+        Post data can be retrieved with *self.request.POST*
+        """
+        return {}
+
+    def render_te_response(self, data):
+        """Render data to JsonResponse"""
+        if 'submit_label' in data and 'url' not in data:
+            data['url'] = self.request.get_full_path()
+
+        return JsonResponse(data)
+
+
+class UpdateDialog(DialogView):
+    """Update dialog view for updating a model"""
+
+    template = 'trionyx/dialog/model_form.html'
+    """Template for dialog content"""
+
+    title = "Update {model_name}: {object}"
+    """Dialog title model_name and object, variable are given"""
+
+    submit_label = 'save'
+    """Dialog submit label value"""
+
+    success_message = '{model_name} ({object}) is successfully updated'
+    """Success message on successfully form saved"""
+
+    def get_form_class(self):
+        """Get form class for dialog, default will get form from model config"""
+        # TODO get form from url param
+        return self.config.get_edit_form()
+
+    def display_dialog(self, *args, **kwargs):
+        """Display form and success message when set"""
+        form = kwargs.pop('form_instance', None)
+        success_message = kwargs.pop('success_message', None)
+
+        if not form:
+            form = self.get_form_class()(initial=kwargs, instance=self.object)
+
+        if not hasattr(form, "helper"):
+            form.helper = FormHelper()
+        form.helper.form_tag = False
+
+        return {
+            'title': self.title.format(
+                model_name=self.config.model_name,
+                object=str(self.object) if self.object else '',
+            ),
+            'content': self.render_to_string(self.template, {
+                'form': form,
+                'success_message': success_message,
+            }),
+            'submit_label': self.submit_label,
+            'success': bool(success_message),
+        }
+
+    def handle_dialog(self, *args, **kwargs):
+        """Handle form and save and set success message on valid form"""
+        form = self.get_form_class()(self.request.POST, initial=kwargs, instance=self.object)
+
+        success_message = None
+        if form.is_valid():
+            obj = form.save()
+            success_message = self.success_message.format(
+                model_name=self.config.model_name.capitalize(),
+                object=str(obj),
+            )
+        return self.display_dialog(*args, form_instance=form, success_message=success_message, **kwargs)
+
+
+class CreateDialog(UpdateDialog):
+    """Dialog view for creating a model"""
+
+    title = "Create {model_name}"
+    submit_label = 'create'
+    success_message = '{model_name} ({object}) is successfully created'
+
+    def get_form_class(self):
+        """Get create form class"""
+        # TODO get form from url param
+        return self.config.get_create_form()

@@ -1,0 +1,10 @@
+{% load crispy_forms_tags %}
+
+{% if success_message %}
+    <div class="alert alert-dismissable alert-success">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        {{ success_message }}
+    </div>
+{% endif %}
+
+{% crispy form %}

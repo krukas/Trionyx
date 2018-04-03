@@ -87,3 +87,127 @@ jQuery.extend({
         }, []);
     }
 });
+
+/* Dialog */
+function openDialog(url, options) {
+    new TrionyxDialog(url, options);
+    return false;
+};
+
+function TrionyxDialog(url, options) {
+    var self = this;
+    options = typeof options !== 'undefined' ? options : {};
+    var dialog = $('<div class="modal fade" data-backdrop="static" data-keyboard="false">');
+    var form = $('<form method="POST" enctype="multipart/form-data" novalidate>');
+    var title = $('<h4 class="modal-title">');
+    var body = $('<div class="modal-body">');
+    var footer = $('<div class="modal-footer">');
+
+    $(dialog).on('hidden.bs.modal', function () {
+        dialog.remove();
+    });
+
+    self.close = function(){
+        dialog.modal('hide');
+    };
+
+    form.submit(function (event) {
+        event.preventDefault();
+        footer.find('img').css('display', 'inline-block');
+
+        $.ajax({
+            url: $(this).attr('action'),
+            data: new FormData(form[0]),
+            processData: false,
+            contentType: false,
+            type: "POST",
+        }).done(function(data){
+            self.processResponse(data);
+        });
+    });
+
+    self.processResponse = function(data){
+        /* Set default values when not set */
+        data.title = 'title' in data ? data.title : '';
+        data.content = 'content' in data ? data.content : '';
+        data.submit_label = 'submit_label' in data ? data.submit_label : '';
+        data.redirect_url=  'redirect_url' in data ? data.redirect_url : '';
+        data.url = 'url' in data ? data.url : '';
+        data.close = 'close' in data ? data.close : false;
+
+
+        if(data.close){
+            dialog.modal('hide');
+        } else if(data.redirect_url != '') {
+            window.location.href = data.redirect_url;
+        } else {
+            if (data.url) {
+                form.attr('action', data.url);
+            }
+
+            self.setTitle(data);
+            self.setBody(data);
+            self.setFooter(data);
+            trionyxInitialize();
+
+            if ('callback' in options) {
+                options.callback(data, self);
+            }
+        }
+    };
+
+    self.setTitle = function(data) {
+        title.html(data.title);
+    };
+
+    self.setBody = function(data){
+        body.html(data.content);
+    };
+
+    self.setFooter = function(data){
+        footer.html('');
+        footer.append(
+            $('<button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>')
+        ).append(
+            $('<img src="/static/img/spinners/spinner2.gif" style="display:none; margin-right: 10px" />')
+        );
+
+        if (data.submit_label) {
+            footer.append(
+                $('<input type="submit" class="btn btn-success" value="' + data.submit_label + '"/>')
+            );
+        }
+    };
+
+    // Build dialog
+    dialog.append(
+        $('<div class="modal-dialog">').append(
+            $('<div class="modal-content">').append(
+                form.append(
+                    $('<div class="modal-header">').append(
+                        $('<button type="button" class="close" data-dismiss="modal" aria-label="Close">').append(
+                            $('<span aria-hidden="true">&times;</span>')
+                        )
+                    ).append(
+                        title
+                    )
+                ).append(
+                    body.append(
+                        $("<img src='/static/img/grid-loader.svg' style='position:relative;left: 50%;margin-left: -20px;padding: 20px 0px; width: 40px' />")
+                    )
+                ).append(
+                    footer
+                )
+            )
+        )
+    );
+
+    // Append dialog
+    $('body').append(dialog);
+    $(dialog).modal('show');
+
+    // Load dialog
+    $.get(url, function(response){
+        self.processResponse(response);
+    });
+};
