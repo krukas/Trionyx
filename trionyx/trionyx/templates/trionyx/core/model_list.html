@@ -81,7 +81,6 @@
             </div>
         </div>
     </div>
-
 {% endblock %}
 
 {% block extra_js %}
@@ -315,9 +314,15 @@
 
         self.load(true);
     }
+    </script>
+{% endblock %}
 
-    $(function () {
-        var trionyxList = new TrionyxList("{{ ajax_url }}");
-    });
+{% block extra_foot %}
+    <script type="text/javascript">
+        $(function(){
+           $(function () {
+                var trionyxList = new TrionyxList("{{ ajax_url }}");
+            });
+        });
     </script>
 {% endblock %}

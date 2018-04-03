@@ -52,7 +52,7 @@
     {% endif %}
 {% endblock %}
 
-{% block extra_js %}
+{% block extra_foot %}
     <script type="text/javascript">
         var trionyx_model_alias = '{{ model_alias }}';
         var trionyx_tab_url = '{% url 'trionyx:model-tab' app_label model_name object.id %}';
