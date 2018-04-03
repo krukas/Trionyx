@@ -1,17 +1,24 @@
-#Trionyx TODO
+# TODO
 
-- Model popup
--- Generic create model
--- Generic view model (uses layout)
--- Generic edit model
--- Generic Delete model
-- Add list filtering
-- Add list page size
+- Model dialog
+  - Generic create model
+  - Generic view model (uses layout)
+  - Generic edit model
+  - Generic Delete model
+- Model list view
+  - ~~Add and sort columns~~
+  - Add list filtering
+  - Add list page size
+  - Add diferent layouts
+    - Layout include filters, sort, columns
+    - System layouts
+      - system layout can lock filter, sort, columns
+    - User layouts
 - Add permission check for generic views
 - User management
--- Edit users
---- Change permission (Tree) and groups
--- Edit Groups
--- Default admin group with always every permission (pre_save)
+  - CRUD users
+    - Change permission (as Tree view) and groups
+  - CRUD Groups
+    - Default admin group with always every permission (cant be deleted, or remove permission)
 - Dashboard
--- Widgets
+  - Determine basic widgets
