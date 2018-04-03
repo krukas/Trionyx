@@ -182,6 +182,11 @@ class MenuItem:
 
     def is_active(self, path):
         """Check if given path is active for current item"""
+        if self.url == '/' and self.url == path:
+            return True
+        elif self.url == '/':
+            return False
+
         if self.url and path.startswith(self.url):
             return True
 

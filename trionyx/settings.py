@@ -130,6 +130,7 @@ STATICFILES_FINDERS = [
 ]
 
 COMPRESS_ENABLED = True
+COMPRESS_OFFLINE = True
 
 # ==============================================================================
 # Cache backend
