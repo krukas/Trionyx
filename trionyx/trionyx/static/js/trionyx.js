@@ -1,5 +1,7 @@
 function trionyxInitialize() {
     $('.timepicker').timepicker();
+    $('.select').select2();
+    $('.selectmultiple').select2();
 };
 
 $(function(){
@@ -105,6 +107,10 @@ function TrionyxDialog(url, options) {
 
     $(dialog).on('hidden.bs.modal', function () {
         dialog.remove();
+    });
+
+    $(dialog).on('shown.bs.modal', function () {
+        trionyxInitialize();
     });
 
     self.close = function(){
