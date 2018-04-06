@@ -6,13 +6,14 @@ trionyx.navigation
 :license: GPLv3
 """
 import re
+import inspect
 from collections import defaultdict
 
 from django.apps import apps
 from django.urls import reverse
 
 from trionyx.config import models_config
-from trionyx.layout import Layout, Column12, Panel, DescriptionList
+from trionyx.layout import Layout, Column12, Panel, DescriptionList, Component
 
 
 class Menu:
@@ -214,6 +215,7 @@ class TabRegister:
         :param object: Object used to filter tabs
         :return:
         """
+        model_alias = self.get_model_alias(model_alias)
         for item in self.tabs[model_alias]:
             if item.display_filter(object):
                 yield item
@@ -227,6 +229,7 @@ class TabRegister:
         :param tab_code: Tab code to use
         :return:
         """
+        model_alias = self.get_model_alias(model_alias)
         for item in self.tabs[model_alias]:
             if item.code == tab_code and item.display_filter(object):
                 return item
@@ -242,6 +245,7 @@ class TabRegister:
         :param order:
         :return:
         """
+        model_alias = self.get_model_alias(model_alias)
         def wrapper(create_layout):
             item = TabItem(
                 code=code,
@@ -268,6 +272,7 @@ class TabRegister:
         :param code:
         :return:
         """
+        model_alias = self.get_model_alias(model_alias)
         def wrapper(update_layout):
             for item in self.tabs[model_alias]:
                 if item.code == code:
@@ -286,6 +291,7 @@ class TabRegister:
         :param display_filter:
         :return:
         """
+        model_alias = self.get_model_alias(model_alias)
         for item in self.tabs[model_alias]:
             if item.code != code:
                 continue
@@ -297,6 +303,14 @@ class TabRegister:
                 item.display_filter = display_filter
             break
         self.tabs[model_alias] = sorted(self.tabs[model_alias], key=lambda item: item.code if item.code else 999)
+
+    def get_model_alias(self, model_alias):
+        """Get model alias if class then convert to alias string"""
+        from trionyx.trionyx.models import BaseModel
+        if inspect.isclass(model_alias) and issubclass(model_alias, BaseModel):
+            config = models_config.get_config(model_alias)
+            return '{}.{}'.format(config.app_label, config.model_name)
+        return model_alias
 
     def auto_generate_missing_tabs(self):
         """Auto generate tabs for models with no tabs"""
@@ -342,6 +356,12 @@ class TabItem:
     def get_layout(self, object):
         """Get complete layout for given object"""
         layout = self.create_layout(object)
+        if isinstance(layout, Component):
+            layout = Layout(layout)
+
+        if isinstance(layout, list):
+            layout = Layout(*layout)
+
         for update_layout in self.layout_updates:
             update_layout(layout, object)
         layout.set_object(object)

@@ -1,0 +1,20 @@
+<table class="table table-condensed">
+    <thead>
+        <tr>
+            {% for field in component.rendered_fields %}
+                <th {% if field.width %}style="width: {{ field.width }};"{% endif %}>
+                    {{ field.title }}
+                </th>
+            {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+        {% for row in component.rendered_items %}
+            <tr>
+                {% for column in row %}
+                   <td>{{ column }}</td>
+                {% endfor %}
+            </tr>
+        {% endfor %}
+  </tbody>
+</table>

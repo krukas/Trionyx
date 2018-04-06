@@ -19,21 +19,19 @@ def account_overview(object):
             Row(
                 Column2(
                     Panel(
+                        'Avatar',
                         Img(src="{}{}".format(settings.MEDIA_URL, object.avatar)),
-                        title='Avatar',
                         collapse=True,
                     ),
                 ),
                 Column10(
                     Panel(
+                        'Account information',
                         DescriptionList(
-                            fields=[
-                                'email',
-                                'first_name',
-                                'last_name',
-                            ]
+                            'email',
+                            'first_name',
+                            'last_name',
                         ),
-                        title='Account information',
                     )
                 ),
             )

@@ -8,6 +8,7 @@ trionyx.layout
 from django import template
 from django.utils.functional import cached_property
 from django.template.loader import render_to_string
+from django.db.models import QuerySet
 
 from trionyx import utils
 
@@ -19,7 +20,7 @@ class Layout:
 
     def __init__(self, *components, **options):
         """Initialize Layout"""
-        self.object = None
+        self.object = False
         self.components = list(components)
         self.options = options
 
@@ -50,11 +51,12 @@ class Layout:
         :param object:
         :return:
         """
-        self.object = object
+        if self.object is False:
+            self.object = object
 
         # Pass object along to child components for rendering
         for component in self.components:
-            component.set_object(object)
+            component.set_object(self.object)
 
     def add_component(self, component, after=None, before=None):
         """
@@ -103,7 +105,7 @@ class Component:
         """Initialize Component"""
         self.id = options.get('id')
         self.components = list(components)
-        self.object = None
+        self.object = False
 
         # set options on object
         for key, value in options.items():
@@ -121,7 +123,8 @@ class Component:
         :param object:
         :return:
         """
-        self.object = object
+        if self.object is False:
+            self.object = object
 
         # Pass object along to child components for rendering
         for component in self.components:
@@ -301,46 +304,123 @@ class Panel(Component):
 
     template_name = 'trionyx/components/panel.html'
 
+    collapse = True
+
+    def __init__(self, title, *components, **options):
+        """Init Panel"""
+        super().__init__(*components, **options)
+        self.title = title
+
 
 class DescriptionList(Component):
     """
-    Bootstrap description available options
+    Bootstrap description, fields are the params. available options
 
     - horizontal
-    - fields: list of fields to render
 
     .. code-block:: python
 
         # fields example's
-        ['first_name', 'last_name']
+        DescriptionList(
+            'first_name',
+            'last_name'
+        )
 
-        [
+        DescriptionList(
             'first_name',
             {
                 'label': 'Real last name',
                 'value': object.last_name
             }
-
-        ]
+        )
 
 
     """
 
     template_name = 'trionyx/components/description_list.html'
     horizontal = True
+    no_data_message = "There is no data"
+
+    def __init__(self, *fields, **options):
+        """Init panel"""
+        super().__init__(**options)
+        self.fields = fields
 
     @property
     def fields(self):
         """Give back fields"""
-        for field in getattr(self, '_fields', []):
-            if isinstance(field, str):
-                field = {
-                    'label': self.object._meta.get_field(field).verbose_name,
-                    'value': getattr(self.object, field)
-                }
-            yield field
+        if not self.object:
+            return []
+        return [
+            {
+                'label': self.object._meta.get_field(field).verbose_name,
+                'value': getattr(self.object, field)
+            } if isinstance(field, str) else field
+            for field in getattr(self, '_fields', [])
+        ]
 
     @fields.setter
     def fields(self, fields):
         """Set fields"""
         setattr(self, '_fields', fields)
+
+
+class Table(Component):
+    template_name = 'trionyx/components/table.html'
+
+    def __init__(self, items, *fields, **options):
+        """Init Table"""
+        super().__init__(**options)
+
+        self.items = items
+        """Can be string with field name relation, Queryset or list"""
+
+        self.fields = fields
+
+    @cached_property
+    def rendered_items(self):
+        items = self.items
+
+        if isinstance(items, list):
+            return items
+
+        if isinstance(items, str):
+            items = getattr(self.object, items).all()
+
+        fields = [f['field'] for f in self.rendered_fields]
+        # get items from QuerySet
+        return [
+            [
+                getattr(item, field)
+                for field in fields
+            ]
+            for item in items
+        ]
+
+    @cached_property
+    def rendered_fields(self):
+        model = None
+        if isinstance(self.items, str):
+            items = getattr(self.object, self.items)
+            model = items.model if items else None
+
+        if not model and isinstance(self.items, QuerySet):
+            model = self.items.model
+
+        if not model:
+            return [
+                {
+                    'title': field.split(':')[0],
+                    'width': field.split(':')[1] if ':' in field else None
+                } if isinstance(field, str) else field
+                for field in self.fields
+            ]
+
+        return [
+            {
+                'title': model._meta.get_field(field.split(':')[0]).verbose_name,
+                'field': field.split(':')[0],
+                'width': field.split(':')[1] if ':' in field else None
+            } if isinstance(field, str) else field
+            for field in self.fields
+        ]
