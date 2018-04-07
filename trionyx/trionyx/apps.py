@@ -37,13 +37,18 @@ class Config(BaseConfig):
         """Auto load Trionyx"""
         models_config.auto_load_configs()
 
-        for app in apps.get_app_configs():
-            try:
-                import_module('{}.{}'.format(app.module.__package__, 'layouts'))
-            except ImportError:
-                pass
+        self.auto_load_app_modules(['layouts', 'signals'])
 
         app_menu.auto_load_model_menu()
 
         auto_register_search_models()
         tabs.auto_generate_missing_tabs()
+
+    def auto_load_app_modules(self, modules):
+        """Auto load app modules"""
+        for app in apps.get_app_configs():
+            for module in modules:
+                try:
+                    import_module('{}.{}'.format(app.module.__package__, module))
+                except ImportError:
+                    pass
