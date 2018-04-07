@@ -23,7 +23,17 @@
                 </div>
             </div>
             <div class="box-tools">
-
+                <form method="post" v-bind:action="downloadUrl">
+                    <input type="hidden" name="csrfmiddlewaretoken" v-model="csrfmiddlewaretoken">
+                    <input type="hidden" name="page" v-model="page">
+                    <input type="hidden" name="page_size" v-model="page_size">
+                    <input type="hidden" name="selected_fields" v-model="selected_fields">
+                    <input type="hidden" name="sort" v-model="sort">
+                    <input type="hidden" name="search" v-model="search">
+                    <button type="submit" class="btn btn-default hidden-xs" v-if="downloadUrl != ''">
+                        <i class="fa fa-download"></i>
+                    </button>
+                </form>
             </div>
             <button id="fields-popover" type="button" class="btn btn-default pull-right hidden-xs" data-placement="bottom" data-toggle="popover" title="Fields" >
                 <i class="fa fa-columns" style="font-size: 16px"></i>
@@ -88,9 +98,10 @@
     <script src="{% static "js/jquery.dragtable.js" %}"></script>
 
     <script type="text/javascript">
-    function TrionyxList(ajaxUrl){
+    function TrionyxList(ajaxUrl, downloadUrl){
         var self = this;
         self.ajaxUrl = ajaxUrl;
+        self.downloadUrl = downloadUrl;
         self.app = new Vue({
             el: '#app-model-list',
             delimiters: ['[[', ']]'],
@@ -98,8 +109,16 @@
                 loading: true,
                 headers: [],
                 items: [],
-                search: '',
                 fields: [],
+
+                // Download Form data
+                downloadUrl: self.downloadUrl,
+                csrfmiddlewaretoken: getCookie('csrftoken'),
+                page: 1,
+                page_size: 10,
+                sort: '',
+                selected_fields: '',
+                search: '',
 
                 current_page: 1,
                 pages: [],
@@ -125,6 +144,9 @@
                 },
                 searchLoad: function() {
                     self.load();
+                },
+                clickDownload: function() {
+                    console.log("download");
                 }
             },
             mounted(){
@@ -227,6 +249,7 @@
                 if (initial) {
                    self.app.search = response.data.search;
                 }
+                self.setFormData(response.data);
                 self.setHeaders(response.data);
                 self.setItems(response.data);
                 self.updatePagination();
@@ -237,6 +260,14 @@
             }).always(function () {
                 self.ajax = null;
             });
+        };
+
+        self.setFormData = function(data) {
+            self.app.page = data.page;
+            self.app.page_size = data.page_size;
+            self.app.sort = data.sort;
+            self.app.selected_fields = data.current_fields.join(',');
+            self.app.search = data.search;
         };
 
         self.setHeaders = function(data) {
@@ -321,7 +352,7 @@
     <script type="text/javascript">
         $(function(){
            $(function () {
-                var trionyxList = new TrionyxList("{{ ajax_url }}");
+                var trionyxList = new TrionyxList("{{ ajax_url }}", "{{ download_url }}");
             });
         });
     </script>

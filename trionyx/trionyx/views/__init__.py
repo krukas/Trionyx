@@ -6,12 +6,12 @@ trionyx.trionyx.views
 :license: GPLv3
 """
 from .core import (
-    ListView, ListJsendView, DetailTabView, DetailTabJsendView, UpdateView, CreateView, DeleteView,
+    ListView, ListJsendView, ListExportView, DetailTabView, DetailTabJsendView, UpdateView, CreateView, DeleteView,
     DialogView, CreateDialog, UpdateDialog
 )
 from . import accounts
 
 __all__ = [
-    'ListView', 'ListJsendView', 'DetailTabView', 'DetailTabJsendView', 'UpdateView',
+    'ListView', 'ListJsendView', 'ListExportView', 'DetailTabView', 'DetailTabJsendView', 'UpdateView',
     'CreateView', 'DeleteView', 'accounts', 'DialogView', 'CreateDialog', 'UpdateDialog',
 ]

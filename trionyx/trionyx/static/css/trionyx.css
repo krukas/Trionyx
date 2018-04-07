@@ -53,11 +53,15 @@ th i.fa {
 }
 
 #app-model-list .box-tools {
-    right: 80px;
+    right: 54px;
 }
 
 ul.pagination a {
     cursor: pointer;
+}
+
+.box-tools .fa {
+    font-size: 16px;
 }
 
 /* DragTable */

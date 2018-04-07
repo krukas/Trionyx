@@ -5,6 +5,10 @@ trionyx.trionyx.views.core
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
+import csv
+import io
+from collections import OrderedDict
+
 from django.apps import apps
 from django.views.generic import (
     View,
@@ -17,7 +21,7 @@ from django.views.generic import (
 )
 from django.http import JsonResponse
 from django.core.exceptions import PermissionDenied
-from django.http import Http404
+from django.http import Http404, StreamingHttpResponse
 from django_jsend import JsendView
 from django.urls import reverse
 from django.core.paginator import Paginator
@@ -31,7 +35,7 @@ from trionyx.navigation import tabs
 from trionyx.config import models_config
 
 
-class SingleUrlObjectMixin:
+class ModelClassMixin:
     """Mixen for getting model class"""
 
     def get_model_class(self):
@@ -40,11 +44,55 @@ class SingleUrlObjectMixin:
             return self.model
         elif getattr(self, 'object', None):
             return self.object.__class__
-        else:
+        elif 'app' in self.kwargs and 'model' in self.kwargs:
+            return apps.get_model(self.kwargs.get('app'), self.kwargs.get('model'))
+        elif hasattr(self, 'get_queryset'):
             return self.get_queryset().model
+        else:
+            return None
+
+    def get_model_config(self):
+        if not hasattr(self, '__config'):
+            setattr(self, '__config', models_config.get_config(self.get_model_class()))
+        return getattr(self, '__config', None)
 
 
-class ListView(TemplateView):
+class ModelPermission:
+    def dispatch(self, request, *args, **kwargs):
+        """Validate if user can use view"""
+        if False:  # TODO do permission check based on Model
+            raise PermissionDenied
+        return super().dispatch(request, *args, **kwargs)
+
+
+class SessionValueMixin:
+    def get_and_save_value(self, name, default=None):
+        """Get value from request/session and save value to session"""
+        if getattr(self, name, None):
+            return getattr(self, name)
+
+        value = self.get_session_value(name, default)
+        value = self.request.POST.get(name, value)
+        self.save_value(name, value)
+        return value
+
+    def get_session_value(self, name, default=None):
+        """Get value from session"""
+        session_name = 'list_{}_{}_{}'.format(self.kwargs.get('app'), self.kwargs.get('model'), name)
+        return self.request.session.get(session_name, default)
+
+    def save_value(self, name, value):
+        """Save value to session"""
+        session_name = 'list_{}_{}_{}'.format(self.kwargs.get('app'), self.kwargs.get('model'), name)
+        self.request.session[session_name] = value
+        setattr(self, name, value)
+        return value
+
+
+# =============================================================================
+# List view
+# =============================================================================
+class ListView(TemplateView, ModelClassMixin):
     """List view for showing model"""
 
     template_name = "trionyx/core/model_list.html"
@@ -58,11 +106,8 @@ class ListView(TemplateView):
     ajax_url = None
     """Ajax url used to get model list data"""
 
-    def get_model_class(self):
-        """Get model class when no model is set use url kwargs app, model"""
-        if not self.model:
-            self.model = apps.get_model(self.kwargs.get('app'), self.kwargs.get('model'))
-        return self.model
+    download_url = None
+    """Download url used to get model list data"""
 
     def get_title(self):
         """Get page title"""
@@ -76,6 +121,12 @@ class ListView(TemplateView):
             return self.ajax_url
         return reverse('trionyx:model-list-ajax', kwargs=self.kwargs)
 
+    def get_download_url(self):
+        """Get ajax url"""
+        if self.download_url:
+            return self.download_url
+        return reverse('trionyx:model-list-download', kwargs=self.kwargs)
+
     def get_create_url(self):
         """Get create url"""
         return reverse('trionyx:model-create', kwargs=self.kwargs)
@@ -86,49 +137,13 @@ class ListView(TemplateView):
         context.update({
             'title': self.get_title(),
             'ajax_url': self.get_ajax_url(),
+            'download_url': self.get_download_url(),
             'create_url': self.get_create_url(),
         })
         return context
 
-    def dispatch(self, request, *args, **kwargs):
-        """Validate if user can use view"""
-        if False:  # TODO do permission check based on Model
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
 
-
-class ListJsendView(JsendView):
-    """Ajax list view"""
-
-    def __init__(self, *args, **kwargs):
-        """Init ListJsendView"""
-        super().__init__(*args, **kwargs)
-        self.page = None
-        self.page_size = None
-        self.sort = None
-        self.current_fields = None
-        self.fields = None
-
-    def handle_request(self, request, app, model):
-        """Give back list items + config"""
-        model = apps.get_model(app, model)
-        paginator = self.get_paginator(model)
-        # Call search first, it will reset page if search is changed
-        search = self.get_search()
-        page = self.get_page(paginator)
-        items = self.get_items(model, paginator, page)
-        return {
-            'search': search,
-            'page': page,
-            'page_size': self.get_page_size(),
-            'num_pages': paginator.num_pages,
-            'sort': self.get_sort(),
-            'current_fields': self.get_current_fields(model),
-            'fields': self.get_all_fields(model),
-
-            'items': items,
-        }
-
+class ModelListMixin(ModelClassMixin, SessionValueMixin):
     def get_page(self, paginator):
         """Get current page or page in session"""
         page = int(self.get_and_save_value('page', 1))
@@ -156,20 +171,19 @@ class ListJsendView(JsendView):
             self.get_session_value('page', self.page)
         return search
 
-    def get_all_fields(self, model):
+    def get_all_fields(self):
         """Get all aviable fields"""
-        config = models_config.get_config(model)
         return {
             name: {
                 'name': name,
                 'label': field['label'],
             }
-            for name, field in config.get_list_fields().items()
+            for name, field in self.get_model_config().get_list_fields().items()
         }
 
-    def get_current_fields(self, model):
+    def get_current_fields(self):
         """Get current list to be used"""
-        if self.current_fields:
+        if hasattr(self, 'current_fields') and self.current_fields:
             return self.current_fields
 
         field_attribute = 'list_{}_{}_fields'.format(self.kwargs.get('app'), self.kwargs.get('model'))
@@ -184,16 +198,65 @@ class ListJsendView(JsendView):
             current_fields = request_fields.split(',')
 
         if not current_fields:
-            config = models_config.get_config(model)
+            config = self.get_model_config()
             current_fields = config.list_default_fields if config.list_default_fields else ['created_at', 'id']
 
         self.current_fields = current_fields
         return current_fields
 
-    def get_items(self, model, paginator, current_page):
+    def get_paginator(self):
+        """Get paginator"""
+        return Paginator(self.get_queryset(), self.get_page_size())
+
+    def get_queryset(self):
+        """Get qeuryset for model"""
+        query = self.search_queryset()
+        # TODO Apply filters
+        return query.order_by(self.get_sort())
+
+    def search_queryset(self):
+        """Get search query set"""
+        queryset = self.get_model_class().objects.get_queryset()
+
+        if self.get_model_config().list_select_related:
+            queryset = queryset.select_related(*self.get_model_config().list_select_related)
+
+        return watson.filter(queryset, self.get_search(), ranking=False)
+
+
+class ListJsendView(JsendView, ModelListMixin):
+    """Ajax list view"""
+
+    def __init__(self, *args, **kwargs):
+        """Init ListJsendView"""
+        super().__init__(*args, **kwargs)
+        self.page = None
+        self.page_size = None
+        self.sort = None
+        self.fields = None
+
+    def handle_request(self, request, *args, **kwargs):
+        """Give back list items + config"""
+        paginator = self.get_paginator()
+        # Call search first, it will reset page if search is changed
+        search = self.get_search()
+        page = self.get_page(paginator)
+        items = self.get_items(paginator, page)
+        return {
+            'search': search,
+            'page': page,
+            'page_size': self.get_page_size(),
+            'num_pages': paginator.num_pages,
+            'sort': self.get_sort(),
+            'current_fields': self.get_current_fields(),
+            'fields': self.get_all_fields(),
+
+            'items': items,
+        }
+
+    def get_items(self, paginator, current_page):
         """Get list items for current page"""
-        config = models_config.get_config(model)
-        fields = config.get_list_fields()
+        fields = self.get_model_config().get_list_fields()
 
         page = paginator.page(current_page)
 
@@ -204,59 +267,58 @@ class ListJsendView(JsendView):
                 'url': item.get_absolute_url(),
                 'row_data': [
                     fields[field]['renderer'](item, field)
-                    for field in self.get_current_fields(model)
+                    for field in self.get_current_fields()
                 ]
             })
         return items
 
-    def get_paginator(self, model):
-        """Get paginator"""
-        query = self.search_queryset(model)
-        # TODO Apply filters
-        query = query.order_by(self.get_sort())
 
-        return Paginator(query, self.get_page_size())
+class ListExportView(View, ModelListMixin):
 
-    def search_queryset(self, model):
-        """Get search query set"""
-        config = models_config.get_config(model)
-        queryset = model.objects.get_queryset()
+    def post(self, request, app, model, **kwargs):
+        return self.csv_response()
 
-        if config.list_select_related:
-            queryset = queryset.select_related(*config.list_select_related)
+    def items(self):
+        query = self.get_queryset()
+        fields = self.get_model_config().get_list_fields()
 
-        return watson.filter(queryset, self.get_search(), ranking=False)
+        for item in query.iterator():
+            row = OrderedDict()
+            for field_name in self.get_current_fields():
+                field = fields.get(field_name)
+                if not field_name:
+                    row[field_name] = ''
 
-    def get_and_save_value(self, name, default=None):
-        """Get value from request/session and save value to session"""
-        if getattr(self, name, None):
-            return getattr(self, name)
+                if hasattr(item, field['field']):
+                    row[field_name] = getattr(item, field['field'])
+                else:
+                    row[field_name] = '' # TODO Maybe render field ans strip html?
+            yield row
 
-        value = self.get_session_value(name, default)
-        value = self.request.POST.get(name, value)
-        self.save_value(name, value)
-        return value
+    def csv_response(self):
+        def stream():
+            stream_file = io.StringIO()
+            csvwriter = csv.writer(stream_file, delimiter=',', quotechar='"')
 
-    def get_session_value(self, name, default=None):
-        """Get value from session"""
-        session_name = 'list_{}_{}_{}'.format(self.kwargs.get('app'), self.kwargs.get('model'), name)
-        return self.request.session.get(session_name, default)
+            csvwriter.writerow(self.get_current_fields())
 
-    def save_value(self, name, value):
-        """Save value to session"""
-        session_name = 'list_{}_{}_{}'.format(self.kwargs.get('app'), self.kwargs.get('model'), name)
-        self.request.session[session_name] = value
-        setattr(self, name, value)
-        return value
+            for index, item in enumerate(self.items()):
+                csvwriter.writerow([value for index, value in item.items()])
+                stream_file.seek(0)
+                data = stream_file.read()
+                stream_file.seek(0)
+                stream_file.truncate()
+                yield data
 
-    def dispatch(self, request, *args, **kwargs):
-        """Validate if user can use view"""
-        if False:  # TODO do permission check based on Model
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
+        response = StreamingHttpResponse(stream(), content_type="text/csv")
+        response["Content-Disposition"] = "attachment; filename={}.csv".format(self.get_model_config().model_name.lower())
+        return response
 
 
-class DetailTabView(DetailView, SingleUrlObjectMixin):
+# =============================================================================
+# Detail tab views
+# =============================================================================
+class DetailTabView(DetailView, ModelClassMixin):
     """Detail tab view, shows model details in tab view"""
 
     template_name = "trionyx/core/model_view.html"
@@ -348,12 +410,12 @@ class DetailTabView(DetailView, SingleUrlObjectMixin):
         return super().dispatch(request, *args, **kwargs)
 
 
-class DetailTabJsendView(JsendView):
+class DetailTabJsendView(JsendView, ModelClassMixin):
     """View for getting tab view with ajax"""
 
     def handle_request(self, request, app, model, pk):
         """Render and return tab"""
-        ModelClass = apps.get_model(app, model)
+        ModelClass = self.get_model_class()
         object = ModelClass.objects.get(id=pk)
 
         tab_code = request.GET.get('tab')
@@ -366,14 +428,11 @@ class DetailTabJsendView(JsendView):
 
         return item.get_layout(object).render(request)
 
-    def dispatch(self, request, *args, **kwargs):
-        """Validate if user can use view"""
-        if False:  # TODO do permission check based on Model
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
 
-
-class UpdateView(DjangoUpdateView, SingleUrlObjectMixin):
+# =============================================================================
+# Update/Create/Delete view
+# =============================================================================
+class UpdateView(DjangoUpdateView, ModelClassMixin):
     """Update view that renders view with crispy-forms"""
 
     template_name = 'trionyx/core/model_update.html'
@@ -391,8 +450,7 @@ class UpdateView(DjangoUpdateView, SingleUrlObjectMixin):
         """Get queryset based on url params(<app>, <mode>) if model is not set on class"""
         if self.queryset is None and not self.model:
             try:
-                ModelClass = apps.get_model(self.kwargs.get('app'), self.kwargs.get('model'))
-                return ModelClass._default_manager.all()
+                return self.get_model_class()._default_manager.all()
             except LookupError:
                 raise Http404()
         return super().get_queryset()
@@ -401,8 +459,7 @@ class UpdateView(DjangoUpdateView, SingleUrlObjectMixin):
         """Get form class for model"""
         if self.form_class:
             return self.form_class
-        config = models_config.get_config(self.get_model_class())
-        return config.get_edit_form()
+        return self.get_model_config().get_edit_form()
 
     def get_form(self, form_class=None):
         """Get form for model"""
@@ -432,14 +489,8 @@ class UpdateView(DjangoUpdateView, SingleUrlObjectMixin):
         messages.success(self.request, "Successfully saved ({})".format(self.object))
         return response
 
-    def dispatch(self, request, *args, **kwargs):
-        """Validate if user can use view"""
-        if False:  # TODO do permission check based on Model
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
 
-
-class CreateView(DjangoCreateView, SingleUrlObjectMixin):
+class CreateView(DjangoCreateView, ModelClassMixin):
     """Create view that renders view with crispy-forms"""
 
     template_name = 'trionyx/core/model_create.html'
@@ -457,8 +508,7 @@ class CreateView(DjangoCreateView, SingleUrlObjectMixin):
         """Get queryset based on url params(<app>, <mode>) if model is not set on class"""
         if self.queryset is None and not self.model:
             try:
-                ModelClass = apps.get_model(self.kwargs.get('app'), self.kwargs.get('model'))
-                return ModelClass._default_manager.all()
+                return self.get_model_class()._default_manager.all()
             except LookupError:
                 raise Http404()
         return super().get_queryset()
@@ -467,8 +517,7 @@ class CreateView(DjangoCreateView, SingleUrlObjectMixin):
         """Get form class for model"""
         if self.form_class:
             return self.form_class
-        config = models_config.get_config(self.get_model_class())
-        return config.get_create_form()
+        return self.get_model_config().get_create_form()
 
     def get_form(self, form_class=None):
         """Get form for model"""
@@ -510,14 +559,8 @@ class CreateView(DjangoCreateView, SingleUrlObjectMixin):
         messages.success(self.request, "Successfully created ({})".format(self.object))
         return response
 
-    def dispatch(self, request, *args, **kwargs):
-        """Validate if user can use view"""
-        if False:  # TODO do permission check based on Model
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
 
-
-class DeleteView(DjangoDeleteView):
+class DeleteView(DjangoDeleteView, ModelClassMixin):
     """Delete view"""
 
     template_name = 'trionyx/core/model_delete.html'
@@ -535,8 +578,7 @@ class DeleteView(DjangoDeleteView):
         """Get queryset based on url params(<app>, <mode>) if model is not set on class"""
         if self.queryset is None and not self.model:
             try:
-                ModelClass = apps.get_model(self.kwargs.get('app'), self.kwargs.get('model'))
-                return ModelClass._default_manager.all()
+                return self.get_model_class()._default_manager.all()
             except LookupError:
                 raise Http404()
         return super().get_queryset()
@@ -565,17 +607,11 @@ class DeleteView(DjangoDeleteView):
 
         return '/'
 
-    def dispatch(self, request, *args, **kwargs):
-        """Validate if user can use view"""
-        if False:  # TODO do permission check based on Model
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
-
 
 # =============================================================================
 # Dialog views
 # =============================================================================
-class DialogView(View):
+class DialogView(View, ModelClassMixin):
     """
     Dialog view used for showing dialog popup with ajax.
 
@@ -647,27 +683,20 @@ class DialogView(View):
             })
         return self.render_te_response(self.handle_dialog(*args, **kwargs))
 
-    def get_model_class(self, kwargs):
-        """Get model class, uses model when set else try to get model class from url params"""
-        if not self.model and 'app' in kwargs and 'model' in kwargs:
-            self.model = apps.get_model(kwargs.pop('app'), kwargs.pop('model'))
-        return self.model
-
     def load_object(self, kwargs):
         """Load object and model config and remove pk from kwargs"""
         self.object = None
         self.config = None
-        model = self.get_model_class(kwargs)
+        self.model = self.get_model_class()
+        kwargs.pop('app', None)
+        kwargs.pop('model', None)
 
-        if model and kwargs.get('pk', False):
+        if self.model and kwargs.get('pk', False):
             try:
-                self.object = model.objects.get(pk=kwargs.pop('pk'))
+                self.object = self.model.objects.get(pk=kwargs.pop('pk'))
             except Exception:
-                raise Exception("Could not load {}".format(model.__name__.lower()))
-            setattr(self, model.__name__.lower(), self.object)
-
-        if model:
-            self.config = models_config.get_config(self.model)
+                raise Exception("Could not load {}".format(self.model.__name__.lower()))
+            setattr(self, self.model.__name__.lower(), self.object)
 
         return kwargs
 
@@ -742,7 +771,7 @@ class UpdateDialog(DialogView):
     def get_form_class(self):
         """Get form class for dialog, default will get form from model config"""
         # TODO get form from url param
-        return self.config.get_edit_form()
+        return self.get_model_config().get_edit_form()
 
     def display_dialog(self, *args, **kwargs):
         """Display form and success message when set"""
@@ -758,7 +787,7 @@ class UpdateDialog(DialogView):
 
         return {
             'title': self.title.format(
-                model_name=self.config.model_name,
+                model_name=self.get_model_config().model_name,
                 object=str(self.object) if self.object else '',
             ),
             'content': self.render_to_string(self.template, {
@@ -777,7 +806,7 @@ class UpdateDialog(DialogView):
         if form.is_valid():
             obj = form.save()
             success_message = self.success_message.format(
-                model_name=self.config.model_name.capitalize(),
+                model_name=self.get_model_config().model_name.capitalize(),
                 object=str(obj),
             )
         return self.display_dialog(*args, form_instance=form, success_message=success_message, **kwargs)
@@ -793,4 +822,4 @@ class CreateDialog(UpdateDialog):
     def get_form_class(self):
         """Get create form class"""
         # TODO get form from url param
-        return self.config.get_create_form()
+        return self.get_model_config().get_create_form()
