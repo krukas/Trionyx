@@ -24,7 +24,13 @@
 {% else %}
     <li class="{% active_menu_item request item %}">
         <a href="{{ item.url }}">
-            <i class="fa fa-circle-o"></i> {{ item.name }}</a>
+            {% if item.icon and item.depth == 1 %}
+                <i class="{{ item.icon }}"></i>
+            {% else %}
+                <i class="fa fa-circle-o"></i>
+            {% endif %}
+            <span>{{ item.name }}</span>
+        </a>
     </li>
 {% endif %}
 
