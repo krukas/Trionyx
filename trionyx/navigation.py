@@ -322,7 +322,8 @@ class TabRegister:
                     return Layout(
                         Column12(
                             Panel(
-                                DescriptionList(fields=[f.name for f in obj.get_fields()])
+                                'info',
+                                DescriptionList(*[f.name for f in obj.get_fields()])
                             )
                         )
                     )

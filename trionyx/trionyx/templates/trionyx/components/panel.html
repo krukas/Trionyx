@@ -8,7 +8,7 @@
             {% endfor %}
         </div>
         {% if component.footer_components %}
-            {% for child in component.components %}
+            {% for child in component.footer_components %}
                 {% render_component child %}
             {% endfor %}
         {% endif %}
