@@ -15,5 +15,4 @@ static/CACHE/
 
 development.sqlite3
 .idea
-
-
+celerybeat-schedule

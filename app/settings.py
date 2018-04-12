@@ -32,3 +32,7 @@ DATABASES = {
 
 ALLOWED_HOSTS = []
 
+# Celery beat schedule
+from trionyx.utils import create_celerybeat_schedule
+CELERY_BEAT_SCHEDULE = create_celerybeat_schedule(INSTALLED_APPS)
+

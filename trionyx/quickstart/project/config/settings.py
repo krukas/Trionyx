@@ -17,6 +17,10 @@ ROOT_URLCONF = 'config.urls'
 
 ALLOWED_HOSTS = []
 
+# Celery beat schedule
+from trionyx.utils import create_celerybeat_schedule
+CELERY_BEAT_SCHEDULE = create_celerybeat_schedule(INSTALLED_APPS)
+
 # Local settings
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -32,3 +36,5 @@ if os.path.exists(local_settings_path):
     module.__file__ = local_settings_path
     sys.modules['config.local_settings'] = module
     exec(open(local_settings_path, "rb").read())
+
+# TODO inlude dev_settings.py

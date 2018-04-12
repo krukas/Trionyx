@@ -147,6 +147,16 @@ CORS_ORIGIN_WHITELIST = [
 ]
 
 # ==============================================================================
+# Celery
+# ==============================================================================
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+
+CELERY_ACCEPT_CONTENT = ['pickle']
+CELERY_TASK_SERIALIZER = 'pickle'
+CELERY_RESULT_SERIALIZER = 'pickle'
+CELERY_ENABLE_UTC = True
+
+# ==============================================================================
 # Trionyx settings
 # ==============================================================================
 TX_APP_NAME = 'Trionyx'

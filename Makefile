@@ -51,6 +51,14 @@ run:
 
 
 
+celery:
+	@( \
+		. env/bin/activate; \
+		celery worker -A app.celery -B -l info; \
+	)
+
+
+
 lint:
 	-$(FLAKE8) trionyx
 	-$(PYDOCSTYLE) trionyx
