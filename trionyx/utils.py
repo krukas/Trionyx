@@ -30,7 +30,7 @@ def create_celerybeat_schedule(apps):
         try:
             config = import_object_by_string(app)
             module = importlib.import_module('{}.cron'.format(config.name))
-        except (ModuleNotFoundError, AttributeError, ValueError):
+        except Exception:
             try:
                 module = importlib.import_module('{}.cron'.format(app))
             except (ModuleNotFoundError):
