@@ -33,7 +33,7 @@ def create_celerybeat_schedule(apps):
         except Exception:
             try:
                 module = importlib.import_module('{}.cron'.format(app))
-            except (ModuleNotFoundError):
+            except (ImportError, ModuleNotFoundError):
                 continue
 
         if not (hasattr(module, 'schedule') and isinstance(module.schedule, dict)):
