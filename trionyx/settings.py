@@ -7,6 +7,8 @@ All Trionyx base settings
 :copyright: 2017 by Maikel Martens
 :license: GPLv3
 """
+from kombu import Queue, Exchange
+
 
 INSTALLED_APPS = [
     # Trionyx apps
@@ -155,6 +157,16 @@ CELERY_ACCEPT_CONTENT = ['pickle']
 CELERY_TASK_SERIALIZER = 'pickle'
 CELERY_RESULT_SERIALIZER = 'pickle'
 CELERY_ENABLE_UTC = True
+
+CELERY_QUEUES = (
+	Queue('cron', Exchange('cron'), routing_key='cron'),
+	Queue('low_prio', Exchange('low_prio'), routing_key='low_prio'),
+	Queue('high_prio', Exchange('high_prio'), routing_key='high_prio'),
+)
+CELERY_DEFAULT_QUEUE = 'low_prio'
+
+CELERY_TASK_SOFT_TIME_LIMIT = 3600
+CELERY_TASK_TIME_LIMIT = 3900
 
 # ==============================================================================
 # Trionyx settings

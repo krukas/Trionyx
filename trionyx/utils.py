@@ -25,7 +25,7 @@ def import_object_by_string(namespace):
     return getattr(module, segments[-1])
 
 def create_celerybeat_schedule(apps):
-    schedule = {}
+    beat_schedule = {}
     for app in apps:
         try:
             config = import_object_by_string(app)
@@ -40,6 +40,13 @@ def create_celerybeat_schedule(apps):
             logger.warning('{} has no schedule or schedule is not a dict'.format(module.__name__))
             continue
 
-        schedule.update(module.schedule)
+        # Add cron queue option
+        for name, schedule in module.schedule.items():
+            options = schedule.get('options', {})
+            if 'queue' not in options:
+                options['queue'] = 'cron'
+                schedule['options'] = options
 
-    return schedule
+                beat_schedule[name] = schedule
+
+    return beat_schedule

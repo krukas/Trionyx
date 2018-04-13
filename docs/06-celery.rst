@@ -11,8 +11,23 @@ Configuration
 Default there is no configuration required if standard RabbitMQ server is installed on same server.
 Default broker url is: `amqp://guest:guest@localhost:5672//`
 
-.. note::
-    if you want to use other broker or multiple queue's look at the Celery documentation.
+Queue's
+~~~~~~~
+
+Default Trionyx configuration has three queue's:
+
+- **cron**: Every tasks started by Celery beat is default put in the cron queue.
+- **low_prio**: Is the default Queue every other tasks started by other processes are put in this queue.
+- **high_prio**: Queue can be used for putting high priority tasks, default no tasks are put in high_prio queue.
+
+Time limit
+~~~~~~~~~~
+
+Default configuration sets the soft time limit of tasks to 1 hour and hard time limit to 1 hour and 5 minutes.
+You can catch a soft time limit with the `SoftTimeLimitExceeded`,
+and with the default configuration you have 5 minutes to clean up a task.
+
+You can change the time limit with the settings `CELERY_TASK_SOFT_TIME_LIMIT` and `CELERY_TASK_TIME_LIMIT`
 
 
 Creating background task
@@ -114,7 +129,7 @@ Configuration file
 
 .. code-block:: ini
 
-    CELERYD_NODES="worker1"
+    CELERYD_NODES="cron_worker low_prio_worker high_prio_worker"
 
     # Absolute or relative path to the 'celery' command:
     CELERY_BIN="/usr/local/bin/celery"
@@ -122,7 +137,10 @@ Configuration file
     CELERY_APP="celery_app"
 
     # Extra command-line arguments to the worker
-    CELERYD_OPTS="--concurrency=8"
+    CELERYD_OPTS="-Ofair \
+    -Q:cron_worker          cron        -c:cron_worker      4 \
+    -Q:low_prio_worker      low_prio    -c:low_prio_worker  8 \
+    -Q:high_prio_worker     high_prio   -c:high_prio_worker 4"
 
     # - %n will be replaced with the first part of the nodename.
     # - %I will be replaced with the current child process index
