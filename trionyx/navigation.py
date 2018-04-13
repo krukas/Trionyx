@@ -246,6 +246,7 @@ class TabRegister:
         :return:
         """
         model_alias = self.get_model_alias(model_alias)
+
         def wrapper(create_layout):
             item = TabItem(
                 code=code,
@@ -273,6 +274,7 @@ class TabRegister:
         :return:
         """
         model_alias = self.get_model_alias(model_alias)
+
         def wrapper(update_layout):
             for item in self.tabs[model_alias]:
                 if item.code == code:

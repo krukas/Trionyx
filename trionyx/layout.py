@@ -366,6 +366,8 @@ class DescriptionList(Component):
 
 
 class Table(Component):
+    """Bootstrap table"""
+
     template_name = 'trionyx/components/table.html'
 
     def __init__(self, items, *fields, **options):
@@ -379,6 +381,7 @@ class Table(Component):
 
     @cached_property
     def rendered_items(self):
+        """Get rendered items"""
         items = self.items
 
         if isinstance(items, list):
@@ -399,6 +402,7 @@ class Table(Component):
 
     @cached_property
     def rendered_fields(self):
+        """Get rendered fields"""
         model = None
         if isinstance(self.items, str):
             items = getattr(self.object, self.items)

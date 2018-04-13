@@ -24,7 +24,9 @@ def import_object_by_string(namespace):
     module = importlib.import_module('.'.join(segments[:-1]))
     return getattr(module, segments[-1])
 
+
 def create_celerybeat_schedule(apps):
+    """Create Celery beat schedule by get schedule from every installed app"""
     beat_schedule = {}
     for app in apps:
         try:

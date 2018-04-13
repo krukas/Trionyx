@@ -159,9 +159,9 @@ CELERY_RESULT_SERIALIZER = 'pickle'
 CELERY_ENABLE_UTC = True
 
 CELERY_QUEUES = (
-	Queue('cron', Exchange('cron'), routing_key='cron'),
-	Queue('low_prio', Exchange('low_prio'), routing_key='low_prio'),
-	Queue('high_prio', Exchange('high_prio'), routing_key='high_prio'),
+    Queue('cron', Exchange('cron'), routing_key='cron'),
+    Queue('low_prio', Exchange('low_prio'), routing_key='low_prio'),
+    Queue('high_prio', Exchange('high_prio'), routing_key='high_prio'),
 )
 CELERY_DEFAULT_QUEUE = 'low_prio'
 

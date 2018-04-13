@@ -18,7 +18,7 @@ ROOT_URLCONF = 'config.urls'
 ALLOWED_HOSTS = []
 
 # Celery beat schedule
-from trionyx.utils import create_celerybeat_schedule
+from trionyx.utils import create_celerybeat_schedule  # noqa E402
 CELERY_BEAT_SCHEDULE = create_celerybeat_schedule(INSTALLED_APPS)
 
 # Local settings
