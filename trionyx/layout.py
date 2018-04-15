@@ -354,7 +354,8 @@ class DescriptionList(Component):
         return [
             {
                 'label': self.object._meta.get_field(field).verbose_name,
-                'value': getattr(self.object, field)
+                # TODO make generic function to get value
+                'value': getattr(self.object, 'get_{}_display'.format(field)) if hasattr(self.object, 'get_{}_display'.format(field)) else getattr(self.object, field)
             } if isinstance(field, str) else field
             for field in getattr(self, '_fields', [])
         ]
@@ -394,7 +395,8 @@ class Table(Component):
         # get items from QuerySet
         return [
             [
-                getattr(item, field)
+                # TODO make generic function to get value
+                getattr(item, 'get_{}_display'.format(field)) if hasattr(item, 'get_{}_display'.format(field)) else getattr(item, field)
                 for field in fields
             ]
             for item in items

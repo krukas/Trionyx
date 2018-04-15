@@ -62,9 +62,7 @@
                 </thead>
                 <tbody>
                     <tr v-for="item in items" v-on:click="clickItem(item)">
-                        <td v-for="column in item.row_data">
-                            [[ column ]]
-                        </td>
+                        <td v-for="column in item.row_data" v-html="column" />
                     </tr>
                 </tbody>
             </table>
