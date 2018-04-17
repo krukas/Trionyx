@@ -163,7 +163,7 @@ CELERY_QUEUES = (
     Queue('low_prio', Exchange('low_prio'), routing_key='low_prio'),
     Queue('high_prio', Exchange('high_prio'), routing_key='high_prio'),
 )
-CELERY_DEFAULT_QUEUE = 'low_prio'
+CELERY_TASK_DEFAULT_QUEUE = 'low_prio'
 
 CELERY_TASK_SOFT_TIME_LIMIT = 3600
 CELERY_TASK_TIME_LIMIT = 3900
