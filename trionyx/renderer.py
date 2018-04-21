@@ -10,7 +10,7 @@ from decimal import Decimal
 
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
-from django.utils import formats
+from django.utils import formats, timezone
 from babel.numbers import format_decimal, format_currency
 
 from trionyx import utils
@@ -20,7 +20,7 @@ from trionyx import models
 def datetime_value_renderer(value, **options):
     """Render datetime value with django formats, default is SHORT_DATETIME_FORMAT"""
     datetime_format = options.get('datetime_format', 'SHORT_DATETIME_FORMAT')
-    return formats.date_format(value, datetime_format)
+    return formats.date_format(timezone.localtime(value), datetime_format)
 
 
 def number_value_renderer(value, **options):
