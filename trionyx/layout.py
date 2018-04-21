@@ -8,7 +8,6 @@ trionyx.layout
 from django import template
 from django.utils.functional import cached_property
 from django.template.loader import render_to_string
-from django.db.models import QuerySet
 
 from trionyx import utils
 
@@ -134,6 +133,207 @@ class Component:
         """Render component"""
         context['component'] = self
         return render_to_string(self.template_name, context, request)
+
+
+class ComponentFieldsMixin:
+    """Mixin for adding fields support and rendering of object(s) with fields."""
+
+    fields = []
+    """
+    List of fields to be rendered. Item can be a string or dict, default options:
+
+    - **field**: Name of object attribute or dict key to be rendered
+    - **label**: Label of field
+    - **value**: Value to be rendered
+    - **format**: String format for rendering field, default is '{0}'
+    - **renderer**: Render function for rendering value, result will be given to format. (lambda value, **options: value)
+
+    Based on the order the fields are in the list a __index__ is set with the list index,
+    this is used for rendering a object that is a list.
+
+    .. code-block:: python
+
+        fields = [
+            'first_name',
+            'last_name'
+        ]
+
+        fields = [
+            'first_name',
+            {
+                'label': 'Real last name',
+                'value': object.last_name
+            }
+        ]
+    """
+
+    fields_options = {}
+    """
+    Options available for the field, this is not required to set options on field.
+
+    - **default**: Default option value when not set.
+
+    .. code-block:: python
+
+        fields_options = {
+            'width': {
+                'default': '150px',
+            }
+        }
+
+    """
+
+    objects = []
+    """
+    List of object to be rendered, this can be a QuerySet, list or string.
+    When its a string it will get the attribute of the object.
+
+    The items in the objects list can be a mix of Models, dicts or lists.
+    """
+
+    def get_fields(self):
+        """Get all fields"""
+        if not hasattr(self, '__fields'):
+            self.__fields = [
+                self.parse_field(field, index)
+                for index, field in enumerate(getattr(self, 'fields', []))
+            ]
+        return self.__fields
+
+    def parse_field(self, field_data, index=0):
+        """Parse field and add missing options"""
+        field = {
+            '__index__': index,
+        }
+
+        if isinstance(field_data, str):
+            field.update(self.parse_string_field(field_data))
+        elif isinstance(field_data, dict):
+            field.update(field_data)
+        else:
+            raise TypeError('Expected a str or dict get {}'.format(type(field_data)))
+
+        if 'field' not in field:
+            field['field'] = None
+
+        if 'label' not in field and field['field']:
+            try:
+                field['label'] = self.object._meta.get_field(field['field']).verbose_name.capitalize()
+            except Exception:
+                field['label'] = field['field'].replace('_', '').capitalize()
+        elif 'label' not in field:
+            field['label'] = ''
+
+        if 'format' not in field:
+            field['format'] = '{0}'
+
+        # Set default options
+        for name, options in self.fields_options.items():
+            if 'default' in options and name not in field:
+                field[name] = options['default']
+
+        return field
+
+    def parse_string_field(self, field_data):
+        """
+        Parse a string field to dict with options
+
+        String value is used as field name. Options can be given after = symbol.
+        Where key value is separated by : and different options by ;, when no : is used then the value becomes True.
+
+        **Example 1:** `field_name`
+
+        .. code-block:: python
+
+            # Output
+            {
+                'field': 'field_name'
+            }
+
+        **Example 3** `field_name=option1:some value;option2: other value`
+
+        .. code-block:: python
+
+            # Output
+            {
+                'field': 'field_name',
+                'option1': 'some value',
+                'option2': 'other value',
+            }
+
+        **Example 3** `field_name=option1;option2: other value`
+
+        .. code-block:: python
+
+            # Output
+            {
+                'field': 'field_name',
+                'option1': True,
+                'option2': 'other value',
+            }
+
+        :param str field_data:
+        :return dict:
+        """
+        field_name, *data = field_data.split('=', 1)
+        field = {
+            'field': field_name,
+        }
+
+        for option_string in ''.join(data).split(';'):
+            option, *value = option_string.split(':')
+            if option.strip():
+                field[option.strip()] = value[0].strip() if value else True
+
+        return field
+
+    def render_field(self, field, data):
+        """Render field for given data"""
+        from trionyx.renderer import renderer
+
+        if 'value' in field:
+            value = field['value']
+        elif isinstance(data, object) and hasattr(data, field['field']):
+            value = getattr(data, field['field'])
+            if 'renderer' not in field:
+                value = renderer.render_field(data, field['field'], **field)
+        elif isinstance(data, dict) and field['field'] in data:
+            value = data.get(field['field'])
+        elif isinstance(data, list) and field['__index__'] < len(data):
+            value = data[field['__index__']]
+        else:
+            return ''
+
+        options = {key: value for key, value in field.items() if key not in ['value', 'data_object']}
+        if 'renderer' in field:
+            value = field['renderer'](value, data_object=data, **options)
+        else:
+            value = renderer.render_value(value, data_object=data, **options)
+
+        return field['format'].format(value)
+
+    def get_rendered_object(self, obj=None):
+        """Render object"""
+        obj = obj if obj else self.object
+        return [
+            {
+                **field,
+                'value': self.render_field(field, obj)
+            }
+            for field in self.get_fields()
+        ]
+
+    def get_rendered_objects(self):
+        """Render objects"""
+        objects = self.objects
+
+        if isinstance(objects, str):
+            objects = getattr(self.object, objects).all()
+
+        return [
+            self.get_rendered_object(obj)
+            for obj in objects
+        ]
 
 
 # =============================================================================
@@ -312,29 +512,11 @@ class Panel(Component):
         self.title = title
 
 
-class DescriptionList(Component):
+class DescriptionList(Component, ComponentFieldsMixin):
     """
     Bootstrap description, fields are the params. available options
 
     - horizontal
-
-    .. code-block:: python
-
-        # fields example's
-        DescriptionList(
-            'first_name',
-            'last_name'
-        )
-
-        DescriptionList(
-            'first_name',
-            {
-                'label': 'Real last name',
-                'value': object.last_name
-            }
-        )
-
-
     """
 
     template_name = 'trionyx/components/description_list.html'
@@ -346,87 +528,34 @@ class DescriptionList(Component):
         super().__init__(**options)
         self.fields = fields
 
-    @property
-    def fields(self):
-        """Give back fields"""
-        if not self.object:
-            return []
-        return [
-            {
-                'label': self.object._meta.get_field(field).verbose_name,
-                # TODO make generic function to get value
-                'value': getattr(self.object, 'get_{}_display'.format(field)) if hasattr(self.object, 'get_{}_display'.format(field)) else getattr(self.object, field)
-            } if isinstance(field, str) else field
-            for field in getattr(self, '_fields', [])
-        ]
 
-    @fields.setter
-    def fields(self, fields):
-        """Set fields"""
-        setattr(self, '_fields', fields)
+class TableDescription(Component, ComponentFieldsMixin):
+    """Bootstrap table description, fields are the params"""
+
+    template_name = 'trionyx/components/table_description.html'
+
+    fields_options = {
+        'width': {
+            'default': '150px',
+        }
+    }
+
+    def __init__(self, *fields, **options):
+        """Init panel"""
+        super().__init__(**options)
+        self.fields = fields
 
 
-class Table(Component):
+class Table(Component, ComponentFieldsMixin):
     """Bootstrap table"""
 
     template_name = 'trionyx/components/table.html'
 
-    def __init__(self, items, *fields, **options):
+    def __init__(self, objects, *fields, **options):
         """Init Table"""
         super().__init__(**options)
 
-        self.items = items
+        self.objects = objects
         """Can be string with field name relation, Queryset or list"""
 
         self.fields = fields
-
-    @cached_property
-    def rendered_items(self):
-        """Get rendered items"""
-        items = self.items
-
-        if isinstance(items, list):
-            return items
-
-        if isinstance(items, str):
-            items = getattr(self.object, items).all()
-
-        fields = [f['field'] for f in self.rendered_fields]
-        # get items from QuerySet
-        return [
-            [
-                # TODO make generic function to get value
-                getattr(item, 'get_{}_display'.format(field)) if hasattr(item, 'get_{}_display'.format(field)) else getattr(item, field)
-                for field in fields
-            ]
-            for item in items
-        ]
-
-    @cached_property
-    def rendered_fields(self):
-        """Get rendered fields"""
-        model = None
-        if isinstance(self.items, str):
-            items = getattr(self.object, self.items)
-            model = items.model if items else None
-
-        if not model and isinstance(self.items, QuerySet):
-            model = self.items.model
-
-        if not model:
-            return [
-                {
-                    'title': field.split(':')[0],
-                    'width': field.split(':')[1] if ':' in field else None
-                } if isinstance(field, str) else field
-                for field in self.fields
-            ]
-
-        return [
-            {
-                'title': model._meta.get_field(field.split(':')[0]).verbose_name,
-                'field': field.split(':')[0],
-                'width': field.split(':')[1] if ':' in field else None
-            } if isinstance(field, str) else field
-            for field in self.fields
-        ]

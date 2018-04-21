@@ -6,13 +6,10 @@ trionyx.config
 :license: GPLv3
 """
 import inspect
-from datetime import datetime
-from decimal import Decimal
 
 from django.apps import apps
 from django.forms.models import modelform_factory
 from django.db.models import NOT_PROVIDED
-from django.utils import formats
 
 from trionyx.utils import import_object_by_string
 
@@ -164,22 +161,11 @@ class ModelConfig:
 
     def get_list_fields(self):
         """Get all list fields"""
+        from trionyx.renderer import renderer
         model_fields = {f.name: f for f in self.model.get_fields(True, True)}
 
         def create_list_fields(config_fields, list_fields=None):
             list_fields = list_fields if list_fields else {}
-            from trionyx.trionyx.models import BaseModel
-
-            def default_renderer(model, field):
-                value = getattr(model, field, '')
-
-                if isinstance(value, datetime):
-                    value = formats.date_format(value, "SHORT_DATETIME_FORMAT")
-                if isinstance(value, BaseModel):
-                    value = str(value)
-                if isinstance(value, Decimal):
-                    value = str(round(value, 2))
-                return value
 
             for field in config_fields:
                 config = field
@@ -194,7 +180,7 @@ class ModelConfig:
                     else:
                         config['label'] = config['field']
                 if 'renderer' not in config:
-                    config['renderer'] = default_renderer
+                    config['renderer'] = renderer.render_field
 
                 list_fields[config['field']] = config
             return list_fields
@@ -241,7 +227,7 @@ class Models:
 
     def get_all_configs(self, trionyx_models_only=True):
         """Get all model configs"""
-        from trionyx.trionyx.models import BaseModel
+        from trionyx.models import BaseModel
 
         for index, config in self.configs.items():
             if not isinstance(config.model(), BaseModel):

@@ -1,18 +1,18 @@
 <table class="table table-condensed">
     <thead>
         <tr>
-            {% for field in component.rendered_fields %}
+            {% for field in component.get_fields %}
                 <th {% if field.width %}style="width: {{ field.width }};"{% endif %}>
-                    {{ field.title }}
+                    {{ field.label }}
                 </th>
             {% endfor %}
         </tr>
     </thead>
     <tbody>
-        {% for row in component.rendered_items %}
+        {% for row in component.get_rendered_objects %}
             <tr>
                 {% for column in row %}
-                   <td>{{ column }}</td>
+                   <td>{{ column.value }}</td>
                 {% endfor %}
             </tr>
         {% endfor %}

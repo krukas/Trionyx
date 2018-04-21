@@ -1,0 +1,10 @@
+<table class="table table-condensed">
+    <tbody>
+        {% for field in component.get_rendered_object %}
+            <tr>
+                <th style="width: {{ field.width }};">{{ field.label }}:</th>
+                <td>{{ field.value }}</td>
+            </tr>
+        {% endfor %}
+  </tbody>
+</table>

@@ -10,6 +10,9 @@ import random
 import string
 import importlib
 
+from django.conf import settings
+from django.utils import translation
+
 logger = logging.getLogger(__name__)
 
 
@@ -52,3 +55,15 @@ def create_celerybeat_schedule(apps):
                 beat_schedule[name] = schedule
 
     return beat_schedule
+
+
+def get_current_language():
+    """Get active language by django.utils.translation or return settings LANGUAGE_CODE"""
+    if translation.get_language():
+        return translation.get_language()
+    return settings.LANGUAGE_CODE
+
+
+def get_current_locale():
+    """Get active locale based on get_current_language function"""
+    return translation.to_locale(get_current_language())

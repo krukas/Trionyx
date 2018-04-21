@@ -1,6 +1,6 @@
-{% if component.fields %}
+{% if component.get_rendered_object %}
     <dl {% if component.horizontal %}class="dl-horizontal"{% endif %}>
-        {% for field in component.fields %}
+        {% for field in component.get_rendered_object %}
             <dt>{{ field.label }}</dt>
             <dd>{{ field.value }}</dd>
         {% endfor %}

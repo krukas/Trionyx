@@ -308,7 +308,7 @@ class TabRegister:
 
     def get_model_alias(self, model_alias):
         """Get model alias if class then convert to alias string"""
-        from trionyx.trionyx.models import BaseModel
+        from trionyx.models import BaseModel
         if inspect.isclass(model_alias) and issubclass(model_alias, BaseModel):
             config = models_config.get_config(model_alias)
             return '{}.{}'.format(config.app_label, config.model_name)

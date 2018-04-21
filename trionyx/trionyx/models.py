@@ -6,71 +6,14 @@ trionyx.trionyx.models
 :license: GPLv3
 """
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
-from django.db import models
+from trionyx import models
 from django.utils import timezone
-from django.urls import reverse
-from jsonfield import JSONField
-
-from trionyx.config import models_config
 
 
-class BaseManager(models.Manager):
-    """model base manager for all Trionyx models"""
-
-    def get_queryset(self):
-        """Give qeuryset where deleted items are filtered"""
-        return super().get_queryset().filter(deleted=False)
-
-
-class BaseModel(models.Model):
-    """Base model for all Trionyx models"""
-
-    objects = BaseManager()
-
-    created_at = models.DateTimeField(auto_now_add=True)
-    """Created at field, date is set when model is created"""
-
-    updated_at = models.DateTimeField(auto_now=True)
-    """Update at field, date is set when model is saved"""
-
-    deleted = models.BooleanField(default=False)
-    """Deleted field, object is soft deleted"""
-
-    class Meta:
-        """Meta information for BaseModel"""
-
-        abstract = True
-        default_permissions = ('read', 'add', 'change', 'delete')
-
-    @classmethod
-    def get_fields(cls, inlcude_base=False, include_id=False):
-        """Get model fields"""
-        for field in cls._meta.fields:
-            if field.name == 'deleted':
-                continue
-            if not include_id and field.name == 'id':
-                continue
-            if not inlcude_base and field.name in ['created_at', 'updated_at']:
-                continue
-            yield field
-
-    def __str__(self):
-        """Give verbose name of object"""
-        app_label = self._meta.app_label
-        model_name = type(self).__name__
-        verbose_name = models_config.get_config(self).verbose_name
-        return verbose_name.format(model_name=model_name, app_label=app_label, **self.__dict__)
-
-    def get_absolute_url(self):
-        """Get model url"""
-        return reverse('trionyx:model-view', kwargs={
-            'app': self._meta.app_label,
-            'model': self._meta.model_name,
-            'pk': self.id
-        })
-
-
-class UserManager(BaseUserManager, BaseManager):
+# =============================================================================
+# User models
+# =============================================================================
+class UserManager(BaseUserManager, models.BaseManager):
     """Manager for user"""
 
     def _create_user(self, email, password, is_superuser, **extra_fields):
@@ -104,7 +47,7 @@ class UserManager(BaseUserManager, BaseManager):
         return super().get_queryset().filter(is_active=True)
 
 
-class User(BaseModel, AbstractBaseUser, PermissionsMixin):
+class User(models.BaseModel, AbstractBaseUser, PermissionsMixin):
     """User model"""
 
     email = models.EmailField(max_length=255, unique=True)
@@ -157,7 +100,7 @@ class UserAttribute(models.Model):
 
     user = models.ForeignKey(User, related_name='attributes')
     code = models.CharField(max_length=128, null=False)
-    value = JSONField()
+    value = models.JSONField()
 
     objects = UserAttributeManager()
 

@@ -36,6 +36,8 @@ setup(
 		'jsonfield==2.0.2',
 		'django-watson >= 1.5.0, < 1.6',
 
+		'Babel >= 2.5.3, < 2.6',
+
 		'celery >= 4.1.0, < 4.2',
 
 		'Pillow==5.0.0',
