@@ -23,13 +23,11 @@ function trionyxInitialize() {
 
 function getDataOptions(node, validOptions) {
     var options = {};
-console.log($(node).data())
     $.each($(node).data(), function(key, value) {
         if (validOptions.indexOf(key) >= 0) {
             options[key] = value;
         }
     });
-console.log(options)
     return options;
 }
 
