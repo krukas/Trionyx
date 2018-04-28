@@ -7,69 +7,103 @@ trionyx.trionyx.forms.layout
 """
 from crispy_forms.layout import Field
 
+from trionyx.utils import get_current_locale
 
-class TimePicker(Field):
-    """
-    Render field with timepicker: https://jdewit.github.io/bootstrap-timepicker/
 
-    Example:
-
-    .. code:: python
-
-        TimePicker('time_field', minute_step=10, show_inputs=False)
+class DateTimePicker(Field):
     """
 
-    template = 'trionyx/forms/timepicker.html'
-
-    max_hours = 24
-    """Specify a maximum number of hours the TimePicker can handle. showMeridian must be set to false"""
-
-    snap_to_step = False
-    """
-    If true, setting the time will snap it to the closest "step",
-    either minute or second, depending on which unit is currently highlighted.
-    If the number would otherwise snap to 60 higher, the unit "overflows" to 0
     """
 
-    minute_step = 15
-    """Specify a step for the minute field"""
+    template = 'trionyx/forms/datetimepicker.html'
 
-    show_seconds = False
-    """Show the seconds field"""
+    glyphicon = 'glyphicon-calendar'
 
-    default_time = 'current'
-    """
-    Set default time options are:
+    locale = False
+    """Locale of datetime picker default is active locale"""
 
-    - `'current'`: Set to the current time
-    - `'11:45'`: Set to a specific time
-    - `False`: Do not set a default time
-    """
+    format = False
+    """Date format, See momentjs' docs for valid formats. Format also dictates what components are shown, e.g. MM/dd/YYYY will not display the time picker."""
 
-    show_meridian = False
-    """When True show 12h mode on False show 24h mode"""
+    day_view_header_format = 'MMMM YYYY'
+    """Changes the heading of the datepicker when in "days" view."""
 
-    show_inputs = True
-    """When True Shows the text inputs in the widget."""
+    stepping = 5
+    """Number of minutes the up/down arrow's will move the minutes value in the time picker"""
 
-    disable_focus = False
-    """Disables the input from focusing. This is useful for touch screen devices that display a keyboard on input focus"""
+    min_date = False
+    """Prevents date/time selections before this date."""
+
+    max_date = False
+    """Prevents date/time selections after this date."""
+
+    use_current = True
+    """On show, will set the picker to the current date/time"""
+
+    default_date = False
+    """Sets the picker default date/time. Overrides useCurrent"""
+
+    side_by_side = True
+    """Shows the picker side by side when using the time and date together."""
+
+    view_mode = 'days'
+    """The default view to display when the picker is shown: 'decades','years','months','days'"""
+
+    toolbar_placement = 'bottom'
+    """Changes the placement of the icon toolbar: 'default', 'top', 'bottom'"""
+
+    show_today_button = True
+    """Show the "Today" button in the icon toolbar. Clicking the "Today" button will set the calendar view and set the date to now."""
+
+    show_clear = True
+    """Show the "Clear" button in the icon toolbar. Clicking the "Clear" button will set the calendar to null."""
+
+    show_close = False
+    """Show the "Close" button in the icon toolbar."""
 
     valid_options = [
-        'max_hours',
-        'snap_to_step',
-        'minute_step',
-        'show_seconds',
-        'default_time',
-        'show_meridian',
-        'show_inputs',
-        'disable_focus',
+        'locale',
+        'format',
+        'day_view_header_format',
+        'stepping',
+        'min_date',
+        'max_date',
+        'use_current',
+        'default_date',
+        'side_by_side',
+        'view_mode',
+        'toolbar_placement',
+        'show_today_button',
+        'show_clear',
+        'show_close'
     ]
 
     def __init__(self, field, **kwargs):
-        """Transform options to data options and add css class"""
-        for key in self.valid_options:
-            kwargs['data-{}'.format(key)] = str(kwargs.pop(key, getattr(self, key))).lower()
+        """Init DateTimePicker"""
+        if not self.locale:
+            self.locale = get_current_locale()
 
-        kwargs['css_class'] = '{} timepicker'.format(kwargs.get('css_class', '')).strip()
+        for key in self.valid_options:
+            value = kwargs.pop(key, getattr(self, key))
+            if isinstance(value, bool):
+                value = str(value).lower()
+            kwargs['data-{}'.format(key)] = str(value)
+
+        # Disable autocomplete default
+        if 'autocomplete' not in kwargs:
+            kwargs['autocomplete'] = 'off'
+
+        kwargs['css_class'] = '{} datetimepicker'.format(kwargs.get('css_class', '')).strip()
         super().__init__(field, **kwargs)
+
+    def render(self, *args, **kwargs):
+        extra_context = kwargs.get('extra_context', {})
+        extra_context['glyphicon'] = self.glyphicon
+        kwargs['extra_context'] = extra_context
+        return super().render(*args, **kwargs)
+
+
+class TimePicker(DateTimePicker):
+    format = 'H:m'
+    show_today_button = False
+    glyphicon = 'glyphicon-time'

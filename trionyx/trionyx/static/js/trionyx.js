@@ -1,8 +1,37 @@
 function trionyxInitialize() {
-    $('.timepicker').timepicker();
     $('.select').select2();
     $('.selectmultiple').select2();
+    $('.datetimepicker').each(function(index, input) {
+        $(input).datetimepicker(getDataOptions(input, [
+            'format',
+            'locale',
+            'dayViewHeaderFormat',
+            'stepping',
+            'minDate',
+            'maxDate',
+            'useCurrent',
+            'defaultDate',
+            'sideBySide',
+            'viewMode',
+            'toolbarPlacement',
+            'showTodayButton',
+            'showClear',
+            'showClose',
+        ]));
+    });
 };
+
+function getDataOptions(node, validOptions) {
+    var options = {};
+console.log($(node).data())
+    $.each($(node).data(), function(key, value) {
+        if (validOptions.indexOf(key) >= 0) {
+            options[key] = value;
+        }
+    });
+console.log(options)
+    return options;
+}
 
 $(function(){
     function fixHeader(transiton){
