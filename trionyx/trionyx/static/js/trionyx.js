@@ -213,8 +213,15 @@ function TrionyxDialog(url, options) {
     };
 
     // Build dialog
+    var dialogSizeClass = '';
+    if ('size' in options && options.size === 'large') {
+        dialogSizeClass = 'modal-lg';
+    } else if ('size' in options && options.size === 'small') {
+        dialogSizeClass = 'modal-sm';
+    }
+
     dialog.append(
-        $('<div class="modal-dialog">').append(
+        $('<div class="modal-dialog ' + dialogSizeClass + '">').append(
             $('<div class="modal-content">').append(
                 form.append(
                     $('<div class="modal-header">').append(
