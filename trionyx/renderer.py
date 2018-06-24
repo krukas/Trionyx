@@ -5,6 +5,7 @@ trionyx.renderer
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
+import os
 from datetime import datetime
 from decimal import Decimal
 
@@ -38,6 +39,13 @@ def price_value_renderer(value, currency=None, **options):
 def related_field_renderer(value, **options):
     """Render list of related items"""
     return ', '.join(str(obj) for obj in value.all())
+
+
+def file_field_renderer(file, **options):
+    if not file:
+        return ''
+
+    return '<a href="{file.url}" target="_blank">{name}</a>'.format(file=file, name=os.path.basename(file.path))
 
 
 class Renderer:
@@ -85,4 +93,5 @@ renderer = Renderer({
     int: number_value_renderer,
     models.PriceField: price_value_renderer,
     models.ManyToManyField: related_field_renderer,
+    models.FileField: file_field_renderer,
 })
