@@ -25,7 +25,7 @@ def active_menu_item(request, item):
 @register.simple_tag(takes_context=True)
 def render_component(context, component):
     """Render given component"""
-    return component.render(context.flatten(), context.request)
+    return component.render(context.flatten(), context.get('request'))
 
 
 @register.filter
