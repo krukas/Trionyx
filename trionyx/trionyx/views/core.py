@@ -45,7 +45,7 @@ def media_nginx_accel(request, path):
     """
     response = HttpResponse(status=200)
     response['Content-Type'] = ''
-    response['X-Accel-Redirect'] = '/protected/' + request.path
+    response['X-Accel-Redirect'] = '/protected' + request.path
     return response
 
 
