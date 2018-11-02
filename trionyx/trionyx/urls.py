@@ -5,7 +5,10 @@ trionyx.trionyx.url
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
+from django.conf import settings
 from django.conf.urls import url
+from django.conf.urls import include, url
+import django.views.static
 
 from trionyx.trionyx import views
 
@@ -33,3 +36,19 @@ urlpatterns = [
     url(r'^dialog/model/(?P<app>[\w]+)/(?P<model>[\w]+)/(?P<pk>[0-9]+)/edit/$', views.UpdateDialog.as_view(), name='model-dialog-edit'),
 
 ]
+
+if settings.DEBUG:
+    urlpatterns += [
+        url(r'^media/(?P<path>.*)$', django.views.static.serve, {'document_root': settings.MEDIA_ROOT}),
+    ]
+
+    import debug_toolbar
+
+    urlpatterns += [url(r'^__debug__/', include(debug_toolbar.urls))]
+else:
+    from trionyx.trionyx.views.core import media_xsendfile
+    urlpatterns += [
+        url(r'^media\/(?P<path>.*)$', media_xsendfile, {
+            'document_root': settings.MEDIA_ROOT,
+        }),
+    ]

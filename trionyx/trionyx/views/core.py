@@ -19,7 +19,7 @@ from django.views.generic import (
     CreateView as DjangoCreateView,
     DeleteView as DjangoDeleteView
 )
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, StreamingHttpResponse
 from django_jsend import JsendView
@@ -33,6 +33,29 @@ from crispy_forms.helper import FormHelper
 
 from trionyx.navigation import tabs
 from trionyx.config import models_config
+
+
+def media_xsendfile(request, path, document_root):
+    """
+    :param request:
+    :param path:
+    :param document_root:
+    :return:
+
+    location /media/ {
+        internal;
+        root <complete path to project root dir>;
+    }
+
+    """
+    if request.user.is_authenticated:
+        response = HttpResponse(status=200)
+        response['Content-Type'] = ''
+        response['X-Accel-Redirect'] = request.path
+        return response
+
+    else:
+        return HttpResponse(status=400)
 
 
 class ModelClassMixin:
