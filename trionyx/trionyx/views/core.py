@@ -35,27 +35,18 @@ from trionyx.navigation import tabs
 from trionyx.config import models_config
 
 
-def media_xsendfile(request, path, document_root):
+def media_nginx_accel(request, path):
     """
-    :param request:
-    :param path:
-    :param document_root:
-    :return:
-
-    location /media/ {
+    location /protected/ {
         internal;
         root <complete path to project root dir>;
     }
 
     """
-    if request.user.is_authenticated:
-        response = HttpResponse(status=200)
-        response['Content-Type'] = ''
-        response['X-Accel-Redirect'] = request.path
-        return response
-
-    else:
-        return HttpResponse(status=400)
+    response = HttpResponse(status=200)
+    response['Content-Type'] = ''
+    response['X-Accel-Redirect'] = '/protected/' + request.path
+    return response
 
 
 class ModelClassMixin:
