@@ -5,6 +5,7 @@ trionyx.trionyx.url
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
+from django.apps import apps
 from django.conf import settings
 from django.conf.urls import include, url
 import django.views.static
@@ -41,11 +42,12 @@ if settings.DEBUG:
         url(r'^media/(?P<path>.*)$', django.views.static.serve, {'document_root': settings.MEDIA_ROOT}),
     ]
 
-    import debug_toolbar
-
-    urlpatterns += [url(r'^__debug__/', include(debug_toolbar.urls))]
+    if apps.is_installed("debug_toolbar"):
+        import debug_toolbar
+        urlpatterns = [url(r'^__debug__/', include(debug_toolbar.urls))] + urlpatterns
 else:
     from trionyx.trionyx.views.core import media_nginx_accel
     urlpatterns += [
         url(r'^media\/(?P<path>.*)$', media_nginx_accel),
     ]
+
