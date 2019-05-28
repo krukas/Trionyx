@@ -2,6 +2,7 @@ import os
 
 from trionyx.settings import *
 
+INTERNAL_IPS = ('127.0.0.1','::1', '0.0.0.0')
 
 INSTALLED_APPS += [
 
@@ -10,7 +11,10 @@ INSTALLED_APPS += [
 
     # Development apps
     'django_extensions',
+    'debug_toolbar',
 ]
+
+MIDDLEWARE_CLASSES = ('debug_toolbar.middleware.DebugToolbarMiddleware',) + MIDDLEWARE_CLASSES
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))

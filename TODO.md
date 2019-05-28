@@ -9,7 +9,7 @@
   - ~~Add and sort columns~~
   - Add list filtering
   - Add list page size
-  - Add diferent layouts
+  - Add different layouts
     - Layout include filters, sort, columns
     - System layouts
       - system layout can lock filter, sort, columns

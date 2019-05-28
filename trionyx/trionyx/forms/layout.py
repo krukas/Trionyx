@@ -93,7 +93,7 @@ class DateTimePicker(Field):
         if 'autocomplete' not in kwargs:
             kwargs['autocomplete'] = 'off'
 
-        kwargs['css_class'] = '{} datetimepicker'.format(kwargs.get('css_class', '')).strip()
+        kwargs['css_class'] = '{} datetimepicker datetimeinput form-control'.format(kwargs.get('css_class', '')).strip()
         super().__init__(field, **kwargs)
 
     def render(self, *args, **kwargs):

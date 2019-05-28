@@ -9,7 +9,12 @@
     {% endif %}
 
     <div class="input-group date {{ field_class }}">
-        {% crispy_field field %}
+        <input type="{{ field.input_type }}"
+            name="{% if field.name|wordcount > 1 %}{{ field.name|slugify }}{% else %}{{ field.name }}{% endif %}"
+            value="{{ field.value|date:"SHORT_DATETIME_FORMAT" }}"
+            id="{{ field.auto_id }}"
+            {{ flat_attrs|safe }}
+        />
         <span class="input-group-addon">
             <span class="glyphicon {{ glyphicon }}"></span>
         </span>

@@ -29,7 +29,7 @@ from django.contrib import messages  # noqa F401 TODO add success message to cre
 from django.template.loader import render_to_string
 
 from watson import search as watson
-from crispy_forms.helper import FormHelper
+from trionyx.trionyx.forms import FormHelper
 
 from trionyx.navigation import tabs
 from trionyx.config import models_config
@@ -492,7 +492,7 @@ class UpdateView(DjangoUpdateView, ModelClassMixin):
         form = super().get_form(form_class)
 
         if not getattr(form, 'helper', None):
-            form.helper = FormHelper()
+            form.helper = FormHelper(form)
             form.helper.form_tag = False
         else:
             form.helper.form_tag = False
@@ -550,7 +550,7 @@ class CreateView(DjangoCreateView, ModelClassMixin):
         form = super().get_form(form_class)
 
         if not getattr(form, 'helper', None):
-            form.helper = FormHelper()
+            form.helper = FormHelper(form)
             form.helper.form_tag = False
         else:
             form.helper.form_tag = False
@@ -808,7 +808,7 @@ class UpdateDialog(DialogView):
             form = self.get_form_class()(initial=kwargs, instance=self.object)
 
         if not hasattr(form, "helper"):
-            form.helper = FormHelper()
+            form.helper = FormHelper(form)
         form.helper.form_tag = False
 
         return {

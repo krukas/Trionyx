@@ -34,17 +34,12 @@ urlpatterns = [
     # Generic Dialog views
     url(r'^dialog/model/(?P<app>[\w]+)/(?P<model>[\w]+)/create/$', views.CreateDialog.as_view(), name='model-dialog-create'),
     url(r'^dialog/model/(?P<app>[\w]+)/(?P<model>[\w]+)/(?P<pk>[0-9]+)/edit/$', views.UpdateDialog.as_view(), name='model-dialog-edit'),
-
 ]
 
 if settings.DEBUG:
     urlpatterns += [
         url(r'^media/(?P<path>.*)$', django.views.static.serve, {'document_root': settings.MEDIA_ROOT}),
     ]
-
-    if apps.is_installed("debug_toolbar"):
-        import debug_toolbar
-        urlpatterns = [url(r'^__debug__/', include(debug_toolbar.urls))] + urlpatterns
 else:
     from trionyx.trionyx.views.core import media_nginx_accel
     urlpatterns += [
