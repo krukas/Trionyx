@@ -64,6 +64,30 @@ ul.pagination a {
     font-size: 16px;
 }
 
+#app-model-list .active-filters {
+    padding-top: 10px;
+}
+
+#app-model-list .filter {
+    padding: 5px 10px;
+    border: 1px solid #999;
+    border-radius: 4px;
+    display: inline-block;
+    line-height: 20px;
+    vertical-align: middle;
+    margin: 4px;
+}
+
+#app-model-list .filter span {
+    cursor: pointer;
+    font-size: 20px;
+    font-weight: bold;
+    margin-left: 10px;
+    color: #bbb;
+    line-height: 20px;
+    vertical-align: middle;
+}
+
 /* DragTable */
 /*****************************************************************************/
 /* https://github.com/jebaird/dragtable/blob/master/src/css/dragtable-default.css */

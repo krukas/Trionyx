@@ -182,6 +182,14 @@ class ModelConfig:
                 if 'renderer' not in config:
                     config['renderer'] = renderer.render_field
 
+                if 'type' not in config and config['field'] in model_fields:
+                    config['type'] = self.get_field_type(
+                        self.model._meta.get_field(config['field'])
+                    )
+
+                if 'choices' not in config and config['field'] in model_fields:
+                    config['choices'] = self.model._meta.get_field(config['field']).choices
+
                 list_fields[config['field']] = config
             return list_fields
 
@@ -191,6 +199,21 @@ class ModelConfig:
             list_fields = create_list_fields(self.list_fields, list_fields)
 
         return list_fields
+
+    def get_field_type(self, field):
+        from trionyx import models
+        if isinstance(field, (models.CharField, models.TextField, models.EmailField)):
+            return 'text'
+        elif isinstance(field, (models.IntegerField, models.AutoField)):
+            return 'int'
+        elif isinstance(field, (models.DecimalField, models.FloatField)):
+            return 'float'
+        elif isinstance(field, models.BooleanField):
+            return 'bool'
+        elif isinstance(field, (models.DateTimeField, models.DateField)):
+            return 'datetime'
+        elif isinstance(field, (models.ForeignKey, models.OneToOneField)):
+            return 'related'
 
     def _get_form(self, config_name, only_required=False):
         """Get form for given config else create form"""

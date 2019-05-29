@@ -7,7 +7,10 @@ trionyx.trionyx.views.core
 """
 import csv
 import io
-from collections import OrderedDict
+import operator
+import json
+from functools import reduce
+from collections import OrderedDict, defaultdict
 
 from django.apps import apps
 from django.views.generic import (
@@ -27,6 +30,7 @@ from django.urls import reverse
 from django.core.paginator import Paginator
 from django.contrib import messages  # noqa F401 TODO add success message to create/edit/delete
 from django.template.loader import render_to_string
+from django.db.models import Q
 
 from watson import search as watson
 from trionyx.trionyx.forms import FormHelper
@@ -150,6 +154,10 @@ class ListView(TemplateView, ModelClassMixin):
         """Get create url"""
         return reverse('trionyx:model-create', kwargs=self.kwargs)
 
+    def get_choices_url(self):
+        """Get choices url"""
+        return reverse('trionyx:model-list-choices', kwargs=self.kwargs)
+
     def get_context_data(self, **kwargs):
         """Add context data to view"""
         context = super().get_context_data(**kwargs)
@@ -158,6 +166,7 @@ class ListView(TemplateView, ModelClassMixin):
             'ajax_url': self.get_ajax_url(),
             'download_url': self.get_download_url(),
             'create_url': self.get_create_url(),
+            'choices_url': self.get_choices_url(),
         })
         return context
 
@@ -192,12 +201,20 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
             self.get_session_value('page', self.page)
         return search
 
+    def get_filters(self):
+        try:
+            return json.loads(self.get_and_save_value('filters', '[]'))
+        except json.JSONDecodeError:
+            return []
+
     def get_all_fields(self):
         """Get all aviable fields"""
         return {
             name: {
                 'name': name,
                 'label': field['label'],
+                'type': field['type'],
+                'choices': field['choices'],
             }
             for name, field in self.get_model_config().get_list_fields().items()
         }
@@ -232,7 +249,47 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
     def get_queryset(self):
         """Get qeuryset for model"""
         query = self.search_queryset()
-        # TODO Apply filters
+
+        # Apply filters
+        field_indexed = self.get_all_fields()
+        grouped_filter = defaultdict(list)
+        for filter in self.get_filters():
+            field = field_indexed.get(filter['field'])
+
+            if not field:
+                continue
+
+            try:
+                if filter['operator'] == '==':
+                    grouped_filter[filter['field']].append(filter['value'])
+                elif filter['operator'] == '!=':
+                    if field.type == 'text':
+                        query = query.exclude(**{'{}__icontains'.format(filter['field']): filter['value']})
+                    else:
+                        query = query.exclude(**{filter['field']: filter['value']})
+                elif filter['operator'] == '<':
+                    query = query.filter(**{'{}__lt'.format(filter['field']): filter['value']})
+                elif filter['operator'] == '<=':
+                    query = query.filter(**{'{}__lte'.format(filter['field']): filter['value']})
+                elif filter['operator'] == '>':
+                    query = query.filter(**{'{}__gt'.format(filter['field']): filter['value']})
+                elif filter['operator'] == '>':
+                    query = query.filter(**{'{}__gte'.format(filter['field']): filter['value']})
+            except Exception as e:
+                messages.add_message(self.request, messages.ERROR, "Could not apply filter ({} {} {})".format(
+                    filter['field'],
+                    filter['operator'],
+                    filter['value']
+                ))
+        for name, values in grouped_filter.items():
+            field = field_indexed[name]
+            if field['type'] == 'text':
+                or_queries = [Q(**{'{}__icontains'.format(name): value}) for value in values]
+                query = query.filter(reduce(operator.or_, or_queries))
+            else:
+                or_queries = [Q(**{name: value}) for value in values]
+                query = query.filter(reduce(operator.or_, or_queries))
+
         return query.order_by(self.get_sort())
 
     def search_queryset(self):
@@ -265,6 +322,7 @@ class ListJsendView(JsendView, ModelListMixin):
         items = self.get_items(paginator, page)
         return {
             'search': search,
+            'filters': self.get_filters(),
             'page': page,
             'page_size': self.get_page_size(),
             'num_pages': paginator.num_pages,
@@ -340,6 +398,20 @@ class ListExportView(View, ModelListMixin):
         response = StreamingHttpResponse(stream(), content_type="text/csv")
         response["Content-Disposition"] = "attachment; filename={}.csv".format(self.get_model_config().model_name.lower())
         return response
+
+
+class ListChoicesJsendView(JsendView, ModelListMixin):
+    def handle_request(self, request, *args, **kwargs):
+        try:
+            ModelClass = self.get_model_class()
+            fields = request.GET.get('field').split('__')
+            RelatedClass = getattr(ModelClass, fields[0]).field.related_model
+
+            for field in fields[1:]:
+                RelatedClass = getattr(RelatedClass, field).field.related_model
+        except:
+            return []
+        return [[obj.id, str(obj)] for obj in RelatedClass.objects.all()]
 
 
 # =============================================================================

@@ -23,6 +23,7 @@ urlpatterns = [
     url(r'^model/(?P<app>[\w]+)/(?P<model>[\w]+)/$', views.ListView.as_view(), name='model-list'),
     url(r'^model/(?P<app>[\w]+)/(?P<model>[\w]+)/ajax/$', views.ListJsendView.as_view(), name='model-list-ajax'),
     url(r'^model/(?P<app>[\w]+)/(?P<model>[\w]+)/download/$', views.ListExportView.as_view(), name='model-list-download'),
+    url(r'^model/(?P<app>[\w]+)/(?P<model>[\w]+)/choices/$', views.ListChoicesJsendView.as_view(), name='model-list-choices'),
 
     url(r'^model/(?P<app>[\w]+)/(?P<model>[\w]+)/create/$', views.CreateView.as_view(), name='model-create'),
     url(r'^model/(?P<app>[\w]+)/(?P<model>[\w]+)/(?P<pk>[0-9]+)/$', views.DetailTabView.as_view(), name='model-view'),
