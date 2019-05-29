@@ -26,7 +26,7 @@
                 <form method="post" v-bind:action="downloadUrl">
                     <input type="hidden" name="csrfmiddlewaretoken" v-model="csrfmiddlewaretoken">
                     <input type="hidden" name="page" v-model="page">
-                    <input type="hidden" name="page_size" v-model="page_size">
+                    <input type="hidden" name="page_size" v-model="pageSize">
                     <input type="hidden" name="selected_fields" v-model="selected_fields">
                     <input type="hidden" name="sort" v-model="sort">
                     <input type="hidden" name="search" v-model="search">
@@ -61,7 +61,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="item in items" v-on:click="clickItem(item)">
+                    <tr v-for="item in enumeratedItems" v-on:click="clickItem(item)">
                         <td v-for="column in item.row_data" v-html="column" />
                     </tr>
                 </tbody>
@@ -69,7 +69,7 @@
         </div>
         <div class="box-footer clearfix" v-if="items.length > 0">
             Showing [[fromItemCount]] to [[toItemCount]] of [[count]] items
-            <select v-model="page_size" id="id_status">
+            <select v-model="pageSize" id="id_status">
                 <option>10</option>
                 <option>25</option>
                 <option>50</option>
@@ -78,8 +78,8 @@
 
             <ul class="pagination pagination-sm no-margin pull-right">
                 <li v-if="previousPage > 0"><a v-on:click="toPage(previousPage)">«</a></li>
-                <li v-for="page in pages" v-bind:class="{ active: page == current_page }">
-                    <a v-on:click="toPage(page)">[[page]]</a>
+                <li v-for="pageNumber in pages" v-bind:class="{ active: pageNumber == page }">
+                    <a v-on:click="toPage(pageNumber)">[[pageNumber]]</a>
                 </li>
 
                 <li v-if="nextPage > 0"><a v-on:click="toPage(nextPage)">»</a></li>
@@ -105,76 +105,160 @@
 
     <script type="text/javascript">
     function TrionyxList(ajaxUrl, downloadUrl){
-        var self = this;
-        self.ajaxUrl = ajaxUrl;
-        self.downloadUrl = downloadUrl;
-        self.app = new Vue({
+        return new Vue({
             el: '#app-model-list',
             delimiters: ['[[', ']]'],
             data: {
-                loading: true,
-                headers: [],
-                items: [],
-                fields: [],
+                ajaxUrl: ajaxUrl,
+                downloadUrl: downloadUrl,
+                ajaxCall: null,
 
-                // Download Form data
-                downloadUrl: self.downloadUrl,
+                loading: true,
+                items: [],
+
                 csrfmiddlewaretoken: getCookie('csrftoken'),
                 page: 1,
-                page_size: 10,
+                pageSize: 10,
+                numPages: 0,
                 count: 0,
                 sort: '',
+                allFields: {},
                 selected_fields: '',
+                currentFields: [],
                 search: '',
-
-                current_page: 1,
-                pages: [],
-                nextPage: 0,
-                previousPage: 0,
             },
 
             computed: {
+                headers: function(){
+                    var self = this;
+                    return this.currentFields.map(function(field){
+                        return {
+                            field: field,
+                            label: field in self.allFields ? self.allFields[field].label : '',
+                            sort: self.sort == field ? 'asc' : self.sort == '-' + field ? 'desc' : 'sort',
+                        }
+                    });
+                },
+                enumeratedItems: function(){
+                    var counter = (this.page - 1) * this.pageSize + 1;
+                    return this.items.map(function(item){
+                        item.row_data.splice(0, 0, counter++);
+                        return item;
+                    });
+                },
+                fields: function(){
+                    var self = this;
+                    return Object.keys(this.allFields).map(function(key){
+                        var field = self.allFields[key];
+                        field.checked = self.currentFields.indexOf(key) >= 0;
+                        return field;
+                    }).sort(function (a, b) {
+                        return a.label.localeCompare(b.label);
+                    });
+                },
+                pages: function() {
+                    var paginatePages = 3;
+
+                    var startPage = this.page - paginatePages;
+                    startPage = startPage > 0 ? startPage : 1;
+
+                    var endPage = this.page + paginatePages;
+                    endPage = endPage <= this.numPages ? endPage : this.numPages;
+
+                    return Array.apply(null, Array(endPage - startPage + 1)).map((item, index) => startPage + index);
+                },
+                nextPage: function() {
+                    return self.page < this.numPages ? this.page + 1 : 0;
+                },
+                previousPage: function() {
+                    return this.page > 1 ? this.page -1 : 0;
+                },
                 fromItemCount: function (){
-                    return this.page * this.page_size - this.page_size + 1;
+                    return this.page * this.pageSize - this.pageSize + 1;
                 },
                 toItemCount: function() {
-                    return this.page * this.page_size;
+                    return this.page * this.pageSize;
                 }
             },
             
             watch: {
-               page_size: function (page_size) {
-                   self.page = 1;
-                   self.app.page = 1;
-                   self.pageSize = page_size;
-                   self.load();
+               pageSize: function () {
+                   this.page = 1;
+                   this.load();
                } 
             },
             methods: {
                 clickSort: function (field) {
-                    if (self.sort == field){
-                        self.sort = '-' + field;
+                    if (this.sort == field){
+                        this.sort = '-' + field;
                     } else {
-                        self.sort = field;
+                        this.sort = field;
                     };
 
-                    self.load();
+                    this.load();
                 },
                 toPage: function (page) {
-                    self.page = page;
-                    self.load();
+                    this.page = page;
+                    this.load();
                 },
                 clickItem: function(item) {
                     window.location.href = item.url;
                 },
                 searchLoad: function() {
-                    self.load();
+                    this.load();
                 },
-                clickDownload: function() {
-                    console.log("download");
-                }
+                load: function(initial){
+                    var self = this;
+                    initial = typeof initial !== 'undefined' ? initial : false;
+                    var data = {
+                        page: this.page,
+                        page_size: this.pageSize,
+                        sort: this.sort,
+                        selected_fields: this.currentFields.join(','),
+                        search: this.search,
+                    };
+
+                    if (this.ajaxCall) {
+                        this.ajaxCall.abort();
+                    }
+
+                    this.ajaxCall = $.ajax({
+                        type: 'POST',
+                        url: this.ajaxUrl,
+                        data: initial ? {} : data,
+                    }).done(function(response){
+                        if(response.status != 'success') {
+                            return;
+                        }
+                        var data = response.data;
+
+                        if (initial) {
+                           self.search = data.search;
+                        }
+
+                        self.items = data.items;
+                        self.page = data.page;
+                        self.pageSize = data.page_size;
+                        self.numPages = data.num_pages;
+                        self.sort = data.sort;
+                        self.count = data.count;
+                        self.selected_fields = data.current_fields.join(',');
+                        self.allFields = data.fields;
+                        self.currentFields = data.current_fields;
+                    }).fail(function () {
+                        console.log('error');
+                    }).always(function () {
+                        self.ajaxCall = null;
+                    });
+                },
             },
+
+            created() {
+                this.load(true);
+            },
+
             mounted(){
+                var self = this;
                 $('#fields-popover').popover({
                     html: true,
                     content(){
@@ -183,19 +267,19 @@
                         content.find('input').each(function () {
                             var input = $(this);
                             var field = input.attr('name');
-                            if (self.current_fields.indexOf(field) >= 0) {
+                            if (self.currentFields.indexOf(field) >= 0) {
                                 input.attr('checked', true);
                             }
 
                             input.click(function(){
                                 if (this.checked) {
-                                    self.current_fields.push(field);
-                                    self.current_fields = $.arrayUnique(self.current_fields);
+                                    self.currentFields.push(field);
+                                    self.currentFields = $.arrayUnique(self.currentFields);
                                     self.load();
                                 } else {
-                                    var index = self.current_fields.indexOf(field);
+                                    var index = self.currentFields.indexOf(field);
                                     if (index >= 0) {
-                                        self.current_fields.splice(index, 1);
+                                        self.currentFields.splice(index, 1);
                                         self.load();
                                     }
                                 }
@@ -207,11 +291,13 @@
                     $(this).data("bs.popover").tip().css("max-width", "100%").css("min-width", "400px");
                 });
             },
+
             updated: function () {
+                var self = this;
                 $('#id_status').select2({
                   minimumResultsForSearch: -1
                 }).change(function ($event) {
-                    self.app.page_size = $($event.target).val();
+                    self.pageSize = $($event.target).val();
                 });
 
                 $('#app-model-list table').dragtable({
@@ -219,162 +305,28 @@
                         e.preventDefault();
                     },
                     stop(){
-                        var current_fields = ['NR'];
-                        $.each(self.current_fields, function(index, value){
-                           current_fields.push(value);
+                        var currentFields = ['NR'];
+                        $.each(self.currentFields, function(index, value){
+                           currentFields.push(value);
                         });
                         var changed_fields = $(this).dragtable('order');
 
-                        if (!$.arrayCompare(current_fields, changed_fields)) {
+                        if (!$.arrayCompare(currentFields, changed_fields)) {
                             changed_fields.shift();
-                            self.current_fields = changed_fields;
+                            self.currentFields = changed_fields;
                             self.load();
                         }
                     }
                 });
 
                 // Update DragTable
-                var current_fields = ['NR'];
-                $.each(self.current_fields, function(index, value){
-                   current_fields.push(value);
+                var currentFields = ['NR'];
+                $.each(self.currentFields, function(index, value){
+                   currentFields.push(value);
                 });
-                $('#app-model-list table').dragtable('order', current_fields);
+                $('#app-model-list table').dragtable('order', currentFields);
             }
         });
-
-        self.page = 1;
-        self.pageSize = 10;
-        self.num_pages = 1;
-        self.sort = '-pk';
-        self.current_fields = [];
-
-        self.ajax = null;
-        self.load = function(initial) {
-            initial = typeof initial !== 'undefined' ? initial : false;
-            var data = {
-                page: self.page,
-                page_size: self.pageSize,
-                sort: self.sort,
-                selected_fields: self.current_fields.join(','),
-                search: self.app.search,
-            };
-
-            if (self.ajax) {
-                self.ajax.abort();
-            }
-
-            self.ajax = $.ajax({
-                type: 'POST',
-                url: self.ajaxUrl,
-                data: initial ? {} : data,
-            }).done(function(response){
-                if(response.status != 'success') {
-                    return;
-                }
-
-                self.page = response.data.page;
-                self.pageSize = response.data.page_size;
-                self.numPages = response.data.num_pages;
-                self.sort = response.data.sort;
-
-                if (initial) {
-                   self.app.search = response.data.search;
-                }
-                self.setFormData(response.data);
-                self.setHeaders(response.data);
-                self.setItems(response.data);
-                self.updatePagination();
-                self.setFields(response.data);
-
-            }).fail(function () {
-                console.log('error');
-            }).always(function () {
-                self.ajax = null;
-            });
-        };
-
-        self.setFormData = function(data) {
-            self.app.page = data.page;
-            self.app.page_size = data.page_size;
-            self.app.sort = data.sort;
-            self.app.count = data.count;
-            self.app.selected_fields = data.current_fields.join(',');
-        };
-
-        self.setHeaders = function(data) {
-            var headers = [];
-            self.current_fields = data.current_fields;
-
-            $.each(data.current_fields, function (index, field) {
-                var sort = 'sort';
-                if (self.sort == field) {
-                    sort = 'asc';
-                } else if(self.sort == '-' + field){
-                    sort = 'desc';
-                }
-
-                headers.push({
-                    field: field,
-                    label: data.fields[field].label,
-                    sort: sort,
-                });
-            });
-
-            self.app.headers = headers;
-        };
-
-        self.setItems = function(data){
-            var items = [];
-            var counter = (data.page - 1) * data.page_size + 1;
-
-            $.each(data.items, function (index, item) {
-                item.row_data.splice(0, 0, counter);
-                counter++;
-                items.push(item);
-            });
-
-            self.app.items = items;
-        };
-
-        self.updatePagination = function () {
-            var paginatePages = 3;
-
-            var startPage = self.page - paginatePages;
-            if (startPage < 1) {
-                startPage = 1;
-            }
-
-            var endPage = self.page + paginatePages;
-            if (endPage > self.numPages) {
-                endPage = self.numPages;
-            }
-
-            var pages = [];
-            for (var i = startPage; i <= endPage; i++) {
-                pages.push(i);
-            }
-
-            self.app.current_page = self.page;
-            self.app.pages = pages;
-            self.app.nextPage = self.page < self.numPages ? self.page + 1 : 0;
-            self.app.previousPage = self.page > 1 ? self.page -1 : 0;
-        };
-
-        self.setFields = function(data){
-            var fields = [];
-            for (var key in data.fields) {
-                var field = data.fields[key];
-                field.checked = data.current_fields.indexOf(key) >= 0;
-                fields.push(field);
-            }
-
-            fields.sort(function (a, b) {
-                return a.label.localeCompare(b.label);
-            });
-            self.app.fields = fields;
-        };
-
-        self.load(true);
     }
     </script>
 {% endblock %}
