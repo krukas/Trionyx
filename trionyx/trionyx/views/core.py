@@ -268,6 +268,7 @@ class ListJsendView(JsendView, ModelListMixin):
             'page': page,
             'page_size': self.get_page_size(),
             'num_pages': paginator.num_pages,
+            'count': paginator.count,
             'sort': self.get_sort(),
             'current_fields': self.get_current_fields(),
             'fields': self.get_all_fields(),

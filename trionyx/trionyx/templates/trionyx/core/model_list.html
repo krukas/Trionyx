@@ -68,6 +68,14 @@
             </table>
         </div>
         <div class="box-footer clearfix" v-if="items.length > 0">
+            Showing [[fromItemCount]] to [[toItemCount]] of [[count]] items
+            <select v-model="page_size" id="id_status">
+                <option>10</option>
+                <option>25</option>
+                <option>50</option>
+            </select>
+            per page
+
             <ul class="pagination pagination-sm no-margin pull-right">
                 <li v-if="previousPage > 0"><a v-on:click="toPage(previousPage)">«</a></li>
                 <li v-for="page in pages" v-bind:class="{ active: page == current_page }">
@@ -114,6 +122,7 @@
                 csrfmiddlewaretoken: getCookie('csrftoken'),
                 page: 1,
                 page_size: 10,
+                count: 0,
                 sort: '',
                 selected_fields: '',
                 search: '',
@@ -122,6 +131,24 @@
                 pages: [],
                 nextPage: 0,
                 previousPage: 0,
+            },
+
+            computed: {
+                fromItemCount: function (){
+                    return this.page * this.page_size - this.page_size + 1;
+                },
+                toItemCount: function() {
+                    return this.page * this.page_size;
+                }
+            },
+            
+            watch: {
+               page_size: function (page_size) {
+                   self.page = 1;
+                   self.app.page = 1;
+                   self.pageSize = page_size;
+                   self.load();
+               } 
             },
             methods: {
                 clickSort: function (field) {
@@ -181,6 +208,12 @@
                 });
             },
             updated: function () {
+                $('#id_status').select2({
+                  minimumResultsForSearch: -1
+                }).change(function ($event) {
+                    self.app.page_size = $($event.target).val();
+                });
+
                 $('#app-model-list table').dragtable({
                     start(e){
                         e.preventDefault();
@@ -210,7 +243,7 @@
         });
 
         self.page = 1;
-        self.page_size = 10;
+        self.pageSize = 10;
         self.num_pages = 1;
         self.sort = '-pk';
         self.current_fields = [];
@@ -264,6 +297,7 @@
             self.app.page = data.page;
             self.app.page_size = data.page_size;
             self.app.sort = data.sort;
+            self.app.count = data.count;
             self.app.selected_fields = data.current_fields.join(',');
         };
 

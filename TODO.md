@@ -22,3 +22,23 @@
     - Default admin group with always every permission (cant be deleted, or remove permission)
 - Dashboard
   - Determine basic widgets
+- DB logger
+  - Logs all from trionyx and apps
+  - Admin can see logs in interface
+  - log level is set as setting
+- Layout/Value renderers
+  - Progressbar
+    - option for ajax updates
+  - Unordered/Ordered List
+  - icon renderer/shortcut
+  - button
+    - Link to, open dialog crud/view, callable js function
+  - ChartJs
+    - realtime option
+- Forms
+  - Slider field
+  - File uploader (Maybe generic file model)
+  - email/money field with icon
+  - wysiwyg (support for files with generic file model)
+  - color picker
+  - 
