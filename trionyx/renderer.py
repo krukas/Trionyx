@@ -42,6 +42,7 @@ def related_field_renderer(value, **options):
 
 
 def file_field_renderer(file, **options):
+    """Render file field as link"""
     if not file:
         return ''
 

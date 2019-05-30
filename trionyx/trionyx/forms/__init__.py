@@ -19,8 +19,10 @@ __all__ = ['UserUpdateForm']
 
 
 class FormHelper(CrispyFormHelper):
+    """Form helper for Trionyx forms"""
 
     def build_default_layout(self, form):
+        """Build default layout use custom form layouts based on field type"""
         get_model_field = form.Meta.model._meta.get_field if form.Meta.model else None
 
         fields = []
@@ -28,7 +30,7 @@ class FormHelper(CrispyFormHelper):
             field = None
             try:
                 mfield = get_model_field(name)
-            except:
+            except Exception:
                 mfield = None
 
             # Try get best layout based on model or form field

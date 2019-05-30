@@ -16,9 +16,7 @@ from trionyx.utils import (
 
 
 class DateTimePicker(Field):
-    """
-
-    """
+    """DatetimePicker field renderer"""
 
     template = 'trionyx/forms/datetimepicker.html'
 
@@ -105,6 +103,7 @@ class DateTimePicker(Field):
         super().__init__(field, **kwargs)
 
     def render(self, *args, **kwargs):
+        """Render field"""
         extra_context = kwargs.get('extra_context', {})
         extra_context['glyphicon'] = self.glyphicon
         extra_context['input_format'] = datetime_format_to_django_template(self.format)
@@ -113,6 +112,8 @@ class DateTimePicker(Field):
 
 
 class TimePicker(DateTimePicker):
+    """Timepicker field renderer"""
+
     format = 'H:m'
     show_today_button = False
     glyphicon = 'glyphicon-time'

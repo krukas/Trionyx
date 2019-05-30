@@ -201,6 +201,7 @@ class ModelConfig:
         return list_fields
 
     def get_field_type(self, field):
+        """Get field type base on model field class"""
         from trionyx import models
         if isinstance(field, (models.CharField, models.TextField, models.EmailField)):
             return 'text'

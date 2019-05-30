@@ -5,9 +5,8 @@ trionyx.trionyx.url
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
-from django.apps import apps
 from django.conf import settings
-from django.conf.urls import include, url
+from django.conf.urls import url
 import django.views.static
 
 from trionyx.trionyx import views
@@ -49,4 +48,3 @@ else:
     urlpatterns += [
         url(r'^media\/(?P<path>.*)$', media_nginx_accel),
     ]
-

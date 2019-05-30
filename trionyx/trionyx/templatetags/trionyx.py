@@ -30,6 +30,7 @@ def render_component(context, component):
 
 @register.filter
 def jsonify(obj):
+    """Jsonify given input"""
     if isinstance(obj, QuerySet):
         return mark_safe(serialize(obj))
     return mark_safe(json.dumps(obj))

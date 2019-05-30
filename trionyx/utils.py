@@ -83,7 +83,7 @@ def get_datetime_input_format(date_only=False):
 
 def datetime_format_to_momentjs(format):
     """
-    Converts python datetime string format to momentjs string format.
+    Convert python datetime string format to momentjs string format.
 
     :param format: python datetime string format
     :return:
@@ -119,7 +119,7 @@ def datetime_format_to_momentjs(format):
 
 def datetime_format_to_django_template(format):
     """
-    Converts python datetime string format to django template string format.
+    Convert python datetime string format to django template string format.
 
     :param format: python datetime string format
     :return:

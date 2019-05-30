@@ -44,7 +44,7 @@ from trionyx import utils
 
 def media_nginx_accel(request, path):
     """
-    location /protected/ {
+    Location /protected/ {
         internal;
         root <complete path to project root dir>;
     }
@@ -119,8 +119,10 @@ class SessionValueMixin:
 # Global search
 # =============================================================================
 class GlobalSearchJsendView(JsendView):
+    """View for global search uses watson to search all models"""
+
     def handle_request(self, request):
-        # get all global search models
+        """Handle search"""
         models = []
         content_types = {}
         for config in models_config.get_all_configs():
@@ -239,13 +241,14 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
         return search
 
     def get_filters(self):
+        """Get all active filters"""
         try:
             return json.loads(self.get_and_save_value('filters', '[]'))
         except json.JSONDecodeError:
             return []
 
     def get_all_fields(self):
-        """Get all aviable fields"""
+        """Get all available fields"""
         return {
             name: {
                 'name': name,
@@ -300,7 +303,9 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
                 if field['type'] == 'datetime':
                     filter['value'] = timezone.make_aware(timezone.datetime.strptime(filter['value'], utils.get_datetime_input_format()))
                 if field['type'] == 'date':
-                    filter['value'] = timezone.make_aware(timezone.datetime.strptime(filter['value'], utils.get_datetime_input_format(date_only=True)))
+                    filter['value'] = timezone.make_aware(timezone.datetime.strptime(
+                        filter['value'],
+                        utils.get_datetime_input_format(date_only=True)))
 
                 if filter['operator'] == '==':
                     grouped_filter[filter['field']].append(filter['value'])
@@ -317,7 +322,7 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
                     query = query.filter(**{'{}__gt'.format(filter['field']): filter['value']})
                 elif filter['operator'] == '>':
                     query = query.filter(**{'{}__gte'.format(filter['field']): filter['value']})
-            except Exception as e:
+            except Exception:
                 messages.add_message(self.request, messages.ERROR, "Could not apply filter ({} {} {})".format(
                     filter['field'],
                     filter['operator'],
@@ -443,7 +448,10 @@ class ListExportView(View, ModelListMixin):
 
 
 class ListChoicesJsendView(JsendView, ModelListMixin):
+    """View for getting choices list for related field"""
+
     def handle_request(self, request, *args, **kwargs):
+        """Build choices list for related field"""
         try:
             ModelClass = self.get_model_class()
             fields = request.GET.get('field').split('__')
@@ -451,7 +459,7 @@ class ListChoicesJsendView(JsendView, ModelListMixin):
 
             for field in fields[1:]:
                 RelatedClass = getattr(RelatedClass, field).field.related_model
-        except:
+        except Exception:
             return []
         return [[obj.id, str(obj)] for obj in RelatedClass.objects.all()]
 
