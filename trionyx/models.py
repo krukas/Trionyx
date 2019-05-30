@@ -70,13 +70,13 @@ class BaseModel(Model):  # noqa F405
 
     def __str__(self):
         """Give verbose name of object"""
-        from trionyx.renderer import renderer
+        from trionyx.renderer import LazyFieldRenderer
         app_label = self._meta.app_label
         model_name = type(self).__name__
         verbose_name = models_config.get_config(self).verbose_name
         return verbose_name.format(model_name=model_name, app_label=app_label, **{
-            field.name: renderer.render_field(self, field.name)
-            for field in self.get_fields()
+            field.name: LazyFieldRenderer(self, field.name)
+            for field in self.get_fields(True, True)
         })
 
     def get_absolute_url(self):

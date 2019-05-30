@@ -26,14 +26,14 @@ def datetime_value_renderer(value, **options):
 
 def number_value_renderer(value, **options):
     """Format decimal value, with current locale"""
-    return format_decimal(value, locale=utils.get_current_locale())
+    return format_decimal(value if value else 0.0, locale=utils.get_current_locale())
 
 
 def price_value_renderer(value, currency=None, **options):
     """Format price value, with current locale and CURRENCY in settings"""
     if not currency:
         currency = getattr(settings, 'CURRENCY', 'USD')
-    return format_currency(value, currency, locale=utils.get_current_locale())
+    return format_currency(value if value else 0.0, currency, locale=utils.get_current_locale())
 
 
 def related_field_renderer(value, **options):
@@ -47,6 +47,20 @@ def file_field_renderer(file, **options):
         return ''
 
     return '<a href="{file.url}" target="_blank">{name}</a>'.format(file=file, name=os.path.basename(file.path))
+
+
+class LazyFieldRenderer:
+    """Performs render action when __str__ is called"""
+
+    def __init__(self, obj, field_name, **options):
+        """Init"""
+        self.obj = obj
+        self.field_name = field_name
+        self.options = options
+
+    def __str__(self):
+        """Render field"""
+        return renderer.render_field(self.obj, self.field_name, **self.options)
 
 
 class Renderer:
