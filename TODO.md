@@ -41,4 +41,3 @@
   - email/money field with icon
   - wysiwyg (support for files with generic file model)
   - color picker
-  - 

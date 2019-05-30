@@ -126,6 +126,8 @@ class GlobalSearchJsendView(JsendView):
         models = []
         content_types = {}
         for config in models_config.get_all_configs():
+            if config.disable_search_index or not config.global_search:
+                continue
             models.append(config.model)
             content_type = ContentType.objects.get_for_model(config.model, False)
             content_types[content_type.id] = config.model._meta.verbose_name_plural
