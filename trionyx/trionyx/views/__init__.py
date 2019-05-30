@@ -7,11 +7,12 @@ trionyx.trionyx.views
 """
 from .core import (
     ListView, ListJsendView, ListExportView, DetailTabView, DetailTabJsendView, UpdateView, CreateView, DeleteView,
-    DialogView, CreateDialog, UpdateDialog, ListChoicesJsendView
+    DialogView, CreateDialog, UpdateDialog, ListChoicesJsendView, GlobalSearchJsendView
 )
 from . import accounts
 
 __all__ = [
     'ListView', 'ListJsendView', 'ListExportView', 'DetailTabView', 'DetailTabJsendView', 'UpdateView',
     'CreateView', 'DeleteView', 'accounts', 'DialogView', 'CreateDialog', 'UpdateDialog', 'ListChoicesJsendView',
+    'GlobalSearchJsendView',
 ]

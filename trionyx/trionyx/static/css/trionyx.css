@@ -88,6 +88,91 @@ ul.pagination a {
     vertical-align: middle;
 }
 
+/* Global search */
+
+#trionyx-global-search-app {
+    display: inline-block;
+    height: 50px;
+    line-height: 50px;
+}
+
+.header-global-search {
+    color: rgba(225,225,225,.95);
+    line-height: 20px;
+    cursor: pointer;
+}
+
+.global-search-container {
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    background: rgba(225,225,225,.95);
+    z-index: 99999;
+    height: 100%;
+    line-height: 1.42857143;
+}
+
+.global-search-results-wrapper {
+    overflow-x: scroll;
+    overflow-x: hidden;
+    height: 100%;
+    padding: 0 25px;
+}
+
+.global-search-container .box {
+    background: rgba(255,255,255,.95);
+}
+
+.close-button {
+    position: absolute;
+    top: 25px;
+    right: 25px;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.overlay-search {
+    font-weight: 700;
+    font-size: 77px;
+    height: 110px;
+    letter-spacing: -1.925px;
+    line-height: 100px;
+    width: 100%;
+    padding-left: 25px;
+    padding-top: 25px;
+    padding-right: 25px;
+    background-color: transparent !important;
+}
+
+.global-search-results {
+    padding: 15px 25px;
+}
+
+.global-search-list {
+    list-style: none;
+    padding: 0;
+}
+
+.global-search-list li {
+    border-bottom: 1px solid #f4f4f4;
+    padding: 10px 0;
+    cursor: pointer;
+}
+
+.global-search-list li:first-child {
+    padding-top: 0;
+}
+
+.global-search-list li:hover a {
+    color: #72afd2;
+}
+
+.global-search-list li p {
+    margin: 0;
+}
+
 /* DragTable */
 /*****************************************************************************/
 /* https://github.com/jebaird/dragtable/blob/master/src/css/dragtable-default.css */

@@ -19,6 +19,9 @@ urlpatterns = [
     url(r'^account/edit$', views.accounts.UpdateUserAccountView.as_view(), name='edit-account'),
     url(r'^account/view$', views.accounts.ViewUserAccountView.as_view(), name='view-account'),
 
+    # Global search
+    url(r'^global-search$', views.GlobalSearchJsendView.as_view(), name='global-search'),
+
     # Generic model views
     url(r'^model/(?P<app>[\w]+)/(?P<model>[\w]+)/$', views.ListView.as_view(), name='model-list'),
     url(r'^model/(?P<app>[\w]+)/(?P<model>[\w]+)/ajax/$', views.ListJsendView.as_view(), name='model-list-ajax'),

@@ -99,7 +99,6 @@
 
             {% block content_bottom %}{% endblock %}
         </div>
-
     </div>
 {% endblock %}
 
@@ -119,8 +118,9 @@
 
     <script>
         $(document).ready(function () {
-            $('.sidebar-menu').tree()
-        })
+            $('.sidebar-menu').tree();
+            initGlobalSearch("{% url 'trionyx:global-search' %}");
+        });
     </script>
 
     {% block extra_js %}{% endblock %}

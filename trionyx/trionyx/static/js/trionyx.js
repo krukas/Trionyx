@@ -124,6 +124,86 @@ jQuery.extend({
     }
 });
 
+
+/* Global search */
+function initGlobalSearch(searchUrl) {
+    return new Vue({
+        el: '#trionyx-global-search-app',
+        delimiters: ['[[', ']]'],
+        data: {
+            searchUrl: searchUrl,
+            search: '',
+            show: false,
+            ajaxCall: null,
+
+            results: [],
+        },
+        watch: {
+            search: function(search) {
+                var self = this;
+                if (this.ajaxCall) {
+                    this.ajaxCall.abort();
+                }
+
+                if (!search) {
+                    this.results = [];
+                    return;
+                }
+
+                this.ajaxCall = $.ajax({
+                    type: 'GET',
+                    url: this.searchUrl + '?search=' + this.search,
+                }).done(function(response) {
+                    if (response.status !== 'success') {
+                        return;
+                    }
+
+                    self.results = response.data;
+                }).always(function () {
+                    self.ajaxCall = null;
+                });
+            }
+        },
+        methods: {
+            close: function(){
+              this.search = '';
+              this.show = false;
+            },
+            open: function(){
+                this.show = true;
+            },
+            itemClick: function(url){
+                window.location.href = url;
+            }
+        },
+        created: function() {
+            var self = this;
+            $(window).keypress(function (event) {
+                var activeElement = $(document.activeElement);
+                if (activeElement.is('body') && event.charCode > 0) {
+                    self.show = true;
+                    self.search += String.fromCharCode(event.charCode);
+                }
+            });
+
+            $(window).keydown(function(event){
+                event = event ? event : window.event;
+                var activeElement = $(document.activeElement);
+
+                if (self.show && event.keyCode === 27) {
+                    self.search = ''
+                    self.show = false;
+                } else if (self.show && self.search && activeElement.is('body') && event.keyCode ===  8) {
+                    self.search = self.search.slice(0, -1);
+                } else if (self.show && !self.search && event.keyCode == 8) {
+                    self.search = '';
+                    self.show = false;
+                }
+            });
+        }
+    });
+}
+
 /* Dialog */
 function openDialog(url, options) {
     new TrionyxDialog(url, options);

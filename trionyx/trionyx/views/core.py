@@ -32,6 +32,7 @@ from django.contrib import messages  # noqa F401 TODO add success message to cre
 from django.template.loader import render_to_string
 from django.db.models import Q
 from django.utils import timezone
+from django.contrib.contenttypes.models import ContentType
 
 from watson import search as watson
 from trionyx.trionyx.forms import FormHelper
@@ -112,6 +113,37 @@ class SessionValueMixin:
         self.request.session[session_name] = value
         setattr(self, name, value)
         return value
+
+
+# =============================================================================
+# Global search
+# =============================================================================
+class GlobalSearchJsendView(JsendView):
+    def handle_request(self, request):
+        # get all global search models
+        models = []
+        content_types = {}
+        for config in models_config.get_all_configs():
+            models.append(config.model)
+            content_type = ContentType.objects.get_for_model(config.model, False)
+            content_types[content_type.id] = config.model._meta.verbose_name_plural
+
+        results = OrderedDict()
+        for entry in watson.search(request.GET.get('search', ''), models=models)[:100]:
+            if entry.content_type_id not in results:
+                results[entry.content_type_id] = {
+                    'name': content_types[entry.content_type_id],
+                    'items': [],
+                }
+
+            if len(results[entry.content_type_id]['items']) <= 10:
+                results[entry.content_type_id]['items'].append({
+                    'url': entry.url,
+                    'title': entry.title,
+                    'description': entry.description,
+                })
+
+        return list(results.values())
 
 
 # =============================================================================
