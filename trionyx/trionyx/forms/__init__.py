@@ -5,14 +5,13 @@ trionyx.core.forms
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
-from django.utils import formats
-
+from django import forms
 from crispy_forms.helper import FormHelper as CrispyFormHelper
 from crispy_forms.layout import Layout
 
 from trionyx import models
-from django import forms
 from trionyx.trionyx.forms import layout
+from trionyx.utils import get_datetime_input_format
 
 from .accounts import UserUpdateForm
 
@@ -36,7 +35,7 @@ class FormHelper(CrispyFormHelper):
             if (mfield and isinstance(mfield, models.DateTimeField)) or isinstance(ffield, forms.DateTimeField):
                 field = layout.DateTimePicker(name)
             elif (mfield and isinstance(mfield, models.DateField)) or isinstance(ffield, forms.DateField):
-                field = layout.DateTimePicker(name, format=formats.get_format_lazy('DATE_INPUT_FORMATS')[0])
+                field = layout.DateTimePicker(name, format=get_datetime_input_format(date_only=True))
             elif (mfield and isinstance(mfield, models.TimeField)) or isinstance(ffield, forms.TimeField):
                 field = layout.TimePicker(field)
 

@@ -38,7 +38,7 @@
                     <input type="hidden" name="selected_fields" v-model="selected_fields">
                     <input type="hidden" name="sort" v-model="sort">
                     <input type="hidden" name="search" v-model="search">
-                    <button type="button" class="btn btn-default hidden-xs" onclick="$('#listfiltersmodal').modal('show');">
+                    <button type="button" class="btn btn-default hidden-xs" onclick="$('#listfiltersmodal').modal({backdrop: 'static', keyboard: false}, 'show');">
                         <i class="fa fa-filter"></i>
                     </button>
                     <button type="submit" class="btn btn-default hidden-xs" v-if="downloadUrl != ''">
@@ -113,7 +113,11 @@
             <div class="modal-dialog " role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Filters</h4>
+                        <h4 class="modal-title">Filters
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </h4>
                     </div>
                     <div class="modal-body">
                         <div class="row">
@@ -145,7 +149,7 @@
                             <div class="col-lg-4">
                                 <div class="form-group">
                                     <label>Filter by</label>
-                                    <input type="text" v-model="filterValue" v-if="filterValueInputType == 'text'" class="form-control" autocomplete="off" />
+                                    <input type="text" v-model="filterValue" v-if="filterValueInputType == 'text'" class="form-control" id="filter-value-text" autocomplete="off" />
                                     <div v-if="filterValueInputType == 'select'" >
                                         <select v-model="filterSelectValue" class="form-control" id="select-filter-value">
                                             <option v-for="choice in filterChoices" v-bind:value="choice.value">
@@ -177,15 +181,20 @@
     <script src="{% static "js/jquery.dragtable.js" %}"></script>
 
     <script type="text/javascript">
-    function TrionyxList(ajaxUrl, downloadUrl, choicesUrl){
+    function TrionyxList(config){
         return new Vue({
             el: '#app-model-list',
             delimiters: ['[[', ']]'],
             data: {
-                ajaxUrl: ajaxUrl,
-                downloadUrl: downloadUrl,
-                choicesUrl: choicesUrl,
+                ajaxUrl: config.ajaxUrl,
+                downloadUrl: config.downloadUrl,
+                choicesUrl: config.choicesUrl,
                 ajaxCall: null,
+
+                datetimeInputFormat: config.datetimeInputFormat,
+                dateInputFormat: config.dateInputFormat,
+                currentLocale: config.currentLocale,
+                inputFormat: '',
 
                 loading: true,
                 items: [],
@@ -328,6 +337,19 @@
                             }
                         })
                     } else {
+                        if (['datetime', 'date'].indexOf(field.type) !== -1) {
+                            var self = this;
+                            $('#filter-value-text').datetimepicker({
+                                format: field.type === 'date' ? this.dateInputFormat : this.datetimeInputFormat,
+                                locale: this.currentLocale,
+                                dayViewHeaderFormat: 'MMMM YYYY'
+                            }).on('dp.change',function(event){
+                                var dp = $('#filter-value-text').data("DateTimePicker");
+                                self.filterValue = event.date ? event.date.format(dp.format()) : null;
+                            });
+                        } else if ($('#filter-value-text').data("DateTimePicker")) {
+                            $('#filter-value-text').data("DateTimePicker").destroy()
+                        }
                         this.filterValueInputType = 'text';
                     }
                 },
@@ -554,7 +576,14 @@
     <script type="text/javascript">
         $(function(){
            $(function () {
-                var trionyxList = new TrionyxList("{{ ajax_url }}", "{{ download_url }}", "{{ choices_url }}");
+                var trionyxList = new TrionyxList({
+                    ajaxUrl: "{{ ajax_url }}",
+                    downloadUrl: "{{ download_url }}",
+                    choicesUrl: "{{ choices_url }}",
+                    datetimeInputFormat: "{{ datetime_input_format }}",
+                    dateInputFormat: "{{ date_input_format }}",
+                    currentLocale: "{{ current_locale }}"
+                });
             });
         });
     </script>

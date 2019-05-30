@@ -210,8 +210,10 @@ class ModelConfig:
             return 'float'
         elif isinstance(field, models.BooleanField):
             return 'bool'
-        elif isinstance(field, (models.DateTimeField, models.DateField)):
+        elif isinstance(field, models.DateTimeField):
             return 'datetime'
+        elif isinstance(field, models.DateField):
+            return 'date'
         elif isinstance(field, (models.ForeignKey, models.OneToOneField)):
             return 'related'
 

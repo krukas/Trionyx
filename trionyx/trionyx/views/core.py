@@ -31,12 +31,14 @@ from django.core.paginator import Paginator
 from django.contrib import messages  # noqa F401 TODO add success message to create/edit/delete
 from django.template.loader import render_to_string
 from django.db.models import Q
+from django.utils import timezone
 
 from watson import search as watson
 from trionyx.trionyx.forms import FormHelper
 
 from trionyx.navigation import tabs
 from trionyx.config import models_config
+from trionyx import utils
 
 
 def media_nginx_accel(request, path):
@@ -167,6 +169,9 @@ class ListView(TemplateView, ModelClassMixin):
             'download_url': self.get_download_url(),
             'create_url': self.get_create_url(),
             'choices_url': self.get_choices_url(),
+            'datetime_input_format': utils.datetime_format_to_momentjs(utils.get_datetime_input_format()),
+            'date_input_format': utils.datetime_format_to_momentjs(utils.get_datetime_input_format(date_only=True)),
+            'current_locale': utils.get_current_locale(),
         })
         return context
 
@@ -260,10 +265,15 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
                 continue
 
             try:
+                if field['type'] == 'datetime':
+                    filter['value'] = timezone.make_aware(timezone.datetime.strptime(filter['value'], utils.get_datetime_input_format()))
+                if field['type'] == 'date':
+                    filter['value'] = timezone.make_aware(timezone.datetime.strptime(filter['value'], utils.get_datetime_input_format(date_only=True)))
+
                 if filter['operator'] == '==':
                     grouped_filter[filter['field']].append(filter['value'])
                 elif filter['operator'] == '!=':
-                    if field.type == 'text':
+                    if field['type'] == 'text':
                         query = query.exclude(**{'{}__icontains'.format(filter['field']): filter['value']})
                     else:
                         query = query.exclude(**{filter['field']: filter['value']})

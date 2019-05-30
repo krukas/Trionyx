@@ -5,10 +5,14 @@ trionyx.trionyx.forms.layout
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
-from django.utils import formats
 from crispy_forms.layout import Field
 
-from trionyx.utils import get_current_locale
+from trionyx.utils import (
+    get_current_locale,
+    get_datetime_input_format,
+    datetime_format_to_django_template,
+    datetime_format_to_momentjs
+)
 
 
 class DateTimePicker(Field):
@@ -82,7 +86,7 @@ class DateTimePicker(Field):
     def __init__(self, field, **kwargs):
         """Init DateTimePicker"""
         if not self.format:
-            self.format = formats.get_format_lazy('DATETIME_INPUT_FORMATS')[0]
+            self.format = get_datetime_input_format()
 
         if not self.locale:
             self.locale = get_current_locale()
@@ -91,7 +95,7 @@ class DateTimePicker(Field):
             value = kwargs.pop(key, getattr(self, key))
             if isinstance(value, bool):
                 value = str(value).lower()
-            kwargs['data-{}'.format(key)] = str(value if key != 'format' else self.convert_pyton_to_momentjs(value))
+            kwargs['data-{}'.format(key)] = str(value if key != 'format' else datetime_format_to_momentjs(value))
 
         # Disable autocomplete default
         if 'autocomplete' not in kwargs:
@@ -103,59 +107,9 @@ class DateTimePicker(Field):
     def render(self, *args, **kwargs):
         extra_context = kwargs.get('extra_context', {})
         extra_context['glyphicon'] = self.glyphicon
-        extra_context['input_format'] = self.convert_python_to_django_template(self.format)
+        extra_context['input_format'] = datetime_format_to_django_template(self.format)
         kwargs['extra_context'] = extra_context
         return super().render(*args, **kwargs)
-
-    def convert_pyton_to_momentjs(self, format):
-        mapping = {
-            '%a': 'ddd',
-            '%A': 'dddd',
-            '%w': 'd',
-            '%d': 'DD',
-            '%b': 'MMM',
-            '%B': 'MMMM',
-            '%m': 'MM',
-            '%y': 'YY',
-            '%Y': 'YYYY',
-            '%H': 'HH',
-            '%I': 'hh',
-            '%p': 'A',
-            '%M': 'mm',
-            '%S': 'ss',
-            '%f': 'SSS',
-            '%z': 'ZZ',
-            '%Z': 'z',
-            '%j': 'DDDD',
-            '%U': 'ww',
-            '%W': 'ww',
-            '%c': 'ddd MMM DD HH:mm:ss YYYY',
-            '%x': 'MM/DD/YYYY',
-            '%X': 'HH:mm:ss',
-            '%%': '%'
-        }
-
-        for p_format, m_format in mapping.items():
-            format = format.replace(p_format, m_format)
-
-        return format
-
-    def convert_python_to_django_template(self, format):
-        mapping = {
-            '%d': 'd',  # Day of the month, 2 digits with leading zeros.
-            '%m': 'm',  # Month, 2 digits with leading zeros.
-            '%y': 'y',  # Year, 2 digits.
-            '%Y': 'Y',  # Year, 4 digits.
-            '%H': 'H',  # Hour, 24-hour format.
-            '%M': 'i',  # Minutes
-            '%S': 's',  # Seconds, 2 digits with leading zeros.
-            '%p': 'A',  # 'AM' or 'PM'
-        }
-
-        for p_format, m_format in mapping.items():
-            format = format.replace(p_format, m_format)
-
-        return format
 
 
 class TimePicker(DateTimePicker):
