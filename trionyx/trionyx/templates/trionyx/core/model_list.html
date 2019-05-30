@@ -109,7 +109,7 @@
         </div>
 
         <!-- Filter Modal -->
-        <div class="modal fade" id="listfiltersmodal" tabindex="-1" role="dialog">
+        <div class="modal fade" id="listfiltersmodal" role="dialog">
             <div class="modal-dialog " role="document">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -516,7 +516,7 @@
             updated: function () {
                 var self = this;
                 $('#select-pageSize').select2({
-                  minimumResultsForSearch: -1
+                    minimumResultsForSearch: -1
                 }).change(function ($event) {
                     self.pageSize = $($event.target).val();
                 });
@@ -529,14 +529,14 @@
                 });
 
                 $('#select-filter-operator').select2({
-                  minimumResultsForSearch: -1,
+                    minimumResultsForSearch: -1,
                     width: "100%"
                 }).change(function ($event) {
                     self.filterOperator = $($event.target).val();
                 });
 
                 $('#select-filter-value').select2({
-                   width: "100%"
+                    width: "100%"
                 }).change(function($event){
                     self.filterSelectValue = $($event.target).val();
                 });
