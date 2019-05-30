@@ -60,7 +60,8 @@ class LazyFieldRenderer:
 
     def __str__(self):
         """Render field"""
-        return renderer.render_field(self.obj, self.field_name, **self.options)
+        result = renderer.render_field(self.obj, self.field_name, **self.options)
+        return str(result) if result is not None else ''
 
 
 class Renderer:
