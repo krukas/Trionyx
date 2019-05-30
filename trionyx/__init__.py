@@ -2,7 +2,7 @@
 trionyx
 ~~~~~~~
 
-:copyright: 2017 by Maikel Martens
+:copyright: 2019 by Maikel Martens
 :license: GPLv3
 """
-__version__ = '0.0.1'
+__version__ = '0.1.0'
