@@ -17,21 +17,29 @@ class ModelSearchAdapter(search.SearchAdapter):
 
     def get_title(self, obj):
         """Set search entry title for object"""
+        from trionyx.renderer import renderer
         search_title = self.get_model_config_value(obj, 'search_title')
 
         if not search_title:
             return super().get_title(obj)
 
-        return search_title.format(**obj.__dict__)
+        return search_title.format(**{
+            field.name: renderer.render_field(obj, field.name)
+            for field in obj.get_fields()
+        })
 
     def get_description(self, obj):
         """Set search entry description for object"""
+        from trionyx.renderer import renderer
         search_description = self.get_model_config_value(obj, 'search_description')
 
         if not search_description:
             return super().get_description(obj)
 
-        return search_description.format(**obj.__dict__)
+        return search_description.format(**{
+            field.name: renderer.render_field(obj, field.name)
+            for field in obj.get_fields()
+        })
 
     def get_model_config_value(self, obj, name):
         """Get config value for given model"""
