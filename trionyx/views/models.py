@@ -350,7 +350,7 @@ class ListChoicesJsendView(JsendView, ModelListMixin):
                 RelatedClass = getattr(RelatedClass, field).field.related_model
         except Exception:
             return []
-        return [[obj.id, str(obj)] for obj in RelatedClass.objects.all()]
+        return list(RelatedClass.objects.values_list('id', 'verbose_name'))
 
 
 # =============================================================================

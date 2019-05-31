@@ -50,6 +50,12 @@ class BaseModel(Model):  # noqa F405
     deleted = BooleanField(default=False)  # noqa F405
     """Deleted field, object is soft deleted"""
 
+    created_by = ForeignKey('trionyx.User', SET_NULL, default=None, blank=True, null=True)
+    """Created by field"""
+
+    verbose_name = TextField(default='')
+    """Verbose name field"""
+
     class Meta:
         """Meta information for BaseModel"""
 
@@ -70,6 +76,18 @@ class BaseModel(Model):  # noqa F405
 
     def __str__(self):
         """Give verbose name of object"""
+        return self.verbose_name if self.verbose_name else self.generate_verbose_name()
+
+    def save(self, *args, **kwargs):
+        """Save model"""
+        try:
+            self.verbose_name = self.generate_verbose_name()
+        except Exception:
+            pass
+        return super().save(*args, **kwargs)
+
+    def generate_verbose_name(self):
+        """Generate verbose name"""
         from trionyx.renderer import LazyFieldRenderer
         app_label = self._meta.app_label
         model_name = type(self).__name__
