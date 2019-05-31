@@ -384,7 +384,6 @@ class DetailTabView(DetailView, ModelClassMixin):
 
     def get_context_data(self, **kwargs):
         """Add context data to view"""
-        from trionyx.views import tabs
         context = super().get_context_data(**kwargs)
         tabs = self.get_active_tabs()
         context.update({
@@ -500,7 +499,8 @@ class UpdateView(DjangoUpdateView, ModelClassMixin):
         """Get form class for model"""
         if self.form_class:
             return self.form_class
-        return self.get_model_config().get_edit_form()
+        from trionyx.forms import form_register
+        return form_register.get_edit_form(self.get_model_class())
 
     def get_form(self, form_class=None):
         """Get form for model"""
@@ -558,7 +558,8 @@ class CreateView(DjangoCreateView, ModelClassMixin):
         """Get form class for model"""
         if self.form_class:
             return self.form_class
-        return self.get_model_config().get_create_form()
+        from trionyx.forms import form_register
+        return form_register.get_create_form(self.get_model_class())
 
     def get_form(self, form_class=None):
         """Get form for model"""

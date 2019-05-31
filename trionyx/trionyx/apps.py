@@ -37,7 +37,7 @@ class Config(BaseConfig):
         """Auto load Trionyx"""
         models_config.auto_load_configs()
 
-        self.auto_load_app_modules(['layouts', 'signals'])
+        self.auto_load_app_modules(['layouts', 'signals', 'forms'])
 
         app_menu.auto_load_model_menu()
 

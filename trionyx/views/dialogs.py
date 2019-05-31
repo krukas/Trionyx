@@ -174,7 +174,8 @@ class UpdateDialog(DialogView):
     def get_form_class(self):
         """Get form class for dialog, default will get form from model config"""
         # TODO get form from url param
-        return self.get_model_config().get_edit_form()
+        from trionyx.forms import form_register
+        return form_register.get_edit_form(self.get_model_class())
 
     def display_dialog(self, *args, **kwargs):
         """Display form and success message when set"""
@@ -225,4 +226,5 @@ class CreateDialog(UpdateDialog):
     def get_form_class(self):
         """Get create form class"""
         # TODO get form from url param
-        return self.get_model_config().get_create_form()
+        from trionyx.forms import form_register
+        return form_register.get_create_form(self.get_model_class())

@@ -8,10 +8,6 @@ trionyx.config
 import inspect
 
 from django.apps import apps
-from django.forms.models import modelform_factory
-from django.db.models import NOT_PROVIDED
-
-from trionyx.utils import import_object_by_string
 
 
 class ModelConfig:
@@ -74,24 +70,6 @@ class ModelConfig:
     Is given medium priority and is used in global search page
     """
 
-    create_form = None
-    """
-    String of form class that is used for create, default will create form based on model.
-    Form is rendered with crispy forms
-    """
-
-    create_form_minimal = None
-    """
-    String of form class that is used for minimal create, default is form with all required fields.
-    Form is rendered with crispy forms.
-    """
-
-    edit_form = None
-    """
-    String of form class that is used for edit, default will create form based on model.
-    Form is rendered with crispy forms.
-    """
-
     list_fields = None
     """
     Customise the available fields for model list view, default all model fields are available.
@@ -146,18 +124,6 @@ class ModelConfig:
             return super().__getattr__(item)
         except AttributeError:
             return None
-
-    def get_create_form(self):
-        """Return create form"""
-        return self._get_form('create_form')
-
-    def get_create_minimal_form(self):
-        """Return minimal form"""
-        return self._get_form('create_form_minimal', True)
-
-    def get_edit_form(self):
-        """Return edit form"""
-        return self._get_form('edit_form')
 
     def get_list_fields(self):
         """Get all list fields"""
@@ -217,18 +183,6 @@ class ModelConfig:
             return 'date'
         elif isinstance(field, (models.ForeignKey, models.OneToOneField)):
             return 'related'
-
-    def _get_form(self, config_name, only_required=False):
-        """Get form for given config else create form"""
-        if getattr(self, config_name, None):
-            return import_object_by_string(getattr(self, config_name))
-
-        def use_field(field):
-            if not only_required:
-                return True
-            return field.default == NOT_PROVIDED
-
-        return modelform_factory(self.model, fields=[f.name for f in self.model.get_fields() if use_field(f)])
 
 
 class Models:
