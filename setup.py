@@ -42,5 +42,18 @@ setup(
 
 		'Pillow==5.0.0',
     ],
+	extras_require={
+		'dev': [
+			'django-extensions',
+			'django-debug-toolbar',
+			'Werkzeug',
+			'coverage',
+			'flake8',
+			'pydocstyle',
+			'ipython',
+			'Sphinx',
+			'sphinx_rtd_theme',
+		]
+	}
 )
 

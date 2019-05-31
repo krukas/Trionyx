@@ -399,7 +399,7 @@ class Button(Html):
     - dialog_url
     - onClick
     """
-    
+
     tag = 'button'
     valid_attr = ['onClick']
 

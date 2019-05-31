@@ -31,8 +31,8 @@ virtualenv: clean
 
 
 setup: virtualenv
-	$(PIP) install -r requirements.txt
-	$(PIP) install -r requirements-dev.txt
+	$(PIP) install -e .
+	$(PIP) install -e .[dev]
 
 
 
