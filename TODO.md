@@ -1,14 +1,14 @@
 # TODO
 
 - Model dialog
-  - Generic create model
-  - Generic view model (uses layout)
-  - Generic edit model
+  - ~~Generic create model~~
+  - ~~Generic view model (uses layout)~~
+  - ~~Generic edit model~~
   - Generic Delete model
 - Model list view
   - ~~Add and sort columns~~
-  - Add list filtering
-  - Add list page size
+  - ~~Add list filtering~~
+  - ~~Add list page size~~
   - Add different layouts
     - Layout include filters, sort, columns
     - System layouts
@@ -31,7 +31,7 @@
     - option for ajax updates
   - Unordered/Ordered List
   - icon renderer/shortcut
-  - button
+  - ~~button~~
     - Link to, open dialog crud/view, callable js function
   - ChartJs
     - realtime option
