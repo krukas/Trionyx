@@ -114,6 +114,6 @@ class DateTimePicker(Field):
 class TimePicker(DateTimePicker):
     """Timepicker field renderer"""
 
-    format = 'H:m'
+    format = '%H:%M'
     show_today_button = False
     glyphicon = 'glyphicon-time'
