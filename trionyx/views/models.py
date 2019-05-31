@@ -469,6 +469,26 @@ class DetailTabJsendView(JsendView, ModelClassMixin):
         return item.get_layout(object).render(request)
 
 
+class LayoutView(DetailTabView):
+    """Display layout for model"""
+
+    template_name = "trionyx/core/layout_view.html"
+
+    def get_context_data(self, **kwargs):
+        """Add layout to context"""
+        context = super().get_context_data(**kwargs)
+        from trionyx.views import layouts
+        try:
+            context['layout'] = layouts.get_layout(
+                self.kwargs.get('code'),
+                self.object,
+                self.request
+            )
+        except Exception:
+            raise Http404()
+        return context
+
+
 # =============================================================================
 # Update/Create/Delete view
 # =============================================================================

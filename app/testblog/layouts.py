@@ -1,8 +1,9 @@
-from trionyx.navigation import tabs
+from trionyx.views import tabs, layouts
 from trionyx.layout import Container, Row, Column6, Panel, DescriptionList, Column12, Table, TableDescription
 
 from .models import Post, Tag
 
+@layouts.register('view')
 @tabs.register(Post)
 def post_overview(obj):
     return [

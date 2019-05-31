@@ -13,11 +13,41 @@ from trionyx.layout import Layout, Column12, Panel, DescriptionList, Component
 
 from .models import (  # noqa F401
     ListView, ListJsendView, ListExportView, ListChoicesJsendView, DetailTabView,
-    DetailTabJsendView, UpdateView, CreateView, DeleteView,
+    DetailTabJsendView, UpdateView, CreateView, DeleteView, LayoutView,
 )
 from .dialogs import (  # noqa F401
-    DialogView, UpdateDialog, CreateDialog,
+    DialogView, UpdateDialog, CreateDialog, LayoutDialog,
 )
+
+
+class LayoutRegister:
+    """Class where tab layout can be registered"""
+
+    def __init__(self):
+        """Init"""
+        self.layouts = {}
+
+    def register(self, code):
+        """Add layout to register"""
+        def wrapper(create_layout):
+            self.layouts[code] = create_layout
+            return create_layout
+        return wrapper
+
+    def get_layout(self, code, object, request=None):
+        """Get complete layout for given object"""
+        if code not in self.layouts:
+            raise Exception('layout does not exist')
+        layout = self.layouts.get(code)
+        layout = layout(object)
+        if isinstance(layout, Component):
+            layout = Layout(layout)
+
+        if isinstance(layout, list):
+            layout = Layout(*layout)
+
+        layout.set_object(object)
+        return layout.render(request)
 
 
 class TabRegister:
@@ -202,3 +232,4 @@ class TabItem:
 
 
 tabs = TabRegister()
+layouts = LayoutRegister()

@@ -1,0 +1,21 @@
+{% extends "trionyx/base.html" %}
+{% load i18n static trionyx %}
+
+{% block title %}{% if title %}{{ title }}{% else %}{{ object }} | {{ model_verbose_name }}{% endif %}{% endblock %}
+{% block page_title %}{% if title %}{{ title }}{% else %}{{ object }}{% endif %}{% endblock %}
+
+{% block header_buttons %}
+    {% if back_url %}
+        <a href="{{ back_url }}" class="btn btn-default">Back</a>
+    {% endif %}
+    {% if delete_url %}
+        <a href="{{ delete_url }}" class="btn btn-default">Delete</a>
+    {% endif %}
+    {% if edit_url %}
+        <a href="{{ edit_url }}" class="btn btn-default">Edit</a>
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {{ layout|safe }}
+{% endblock %}

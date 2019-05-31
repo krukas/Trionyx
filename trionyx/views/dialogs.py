@@ -156,6 +156,23 @@ class DialogView(View, ModelClassMixin):
         return JsonResponse(data)
 
 
+class LayoutDialog(DialogView):
+    """Render layout in dialog"""
+
+    def display_dialog(self, code):
+        """Render layout for object"""
+        from trionyx.views import layouts
+        try:
+            content = layouts.get_layout(code, self.object, self.request)
+        except Exception:
+            content = 'Layout does not exists'
+
+        return {
+            'title': str(self.object),
+            'content': content,
+        }
+
+
 class UpdateDialog(DialogView):
     """Update dialog view for updating a model"""
 

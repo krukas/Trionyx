@@ -34,12 +34,14 @@ urlpatterns = [
     path('model/<str:app>/<str:model>/create/<str:code>/', core_views.CreateView.as_view(), name='model-create-custom'),
     path('model/<str:app>/<str:model>/<int:pk>/', core_views.DetailTabView.as_view(), name='model-view'),
     path('model/<str:app>/<str:model>/<int:pk>/tab/', core_views.DetailTabJsendView.as_view(), name='model-tab'),
+    path('model/<str:app>/<str:model>/<int:pk>/<str:code>/', core_views.LayoutView.as_view(), name='model-view-custom'),
 
     path('model/<str:app>/<str:model>/<int:pk>/edit/', core_views.UpdateView.as_view(), name='model-edit'),
     path('model/<str:app>/<str:model>/<int:pk>/edit/<str:code>/', core_views.UpdateView.as_view(), name='model-edit-custom'),
     path('model/<str:app>/<str:model>/<int:pk>/delete/', core_views.DeleteView.as_view(), name='model-delete'),
 
     # Generic Dialog views
+    path('dialog/model/<str:app>/<str:model>/<int:pk>/<str:code>/', core_views.LayoutDialog.as_view(), name='model-dialog-view'),
     path('dialog/model/<str:app>/<str:model>/create/', core_views.CreateDialog.as_view(), name='model-dialog-create'),
     path('dialog/model/<str:app>/<str:model>/create/<str:code>/', core_views.CreateDialog.as_view(), name='model-dialog-create-custom'),
     path('dialog/model/<str:app>/<str:model>/<int:pk>/edit/', core_views.UpdateDialog.as_view(), name='model-dialog-edit'),
