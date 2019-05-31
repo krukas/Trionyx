@@ -1,14 +1,14 @@
 """
-trionyx.trionyx.forms.accounts
+trionyx.trionyx.forms
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
-from django import forms
+from trionyx import forms
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import password_validation
-from crispy_forms.helper import FormHelper
+from trionyx.forms.helper import FormHelper
 from crispy_forms.layout import Layout, Fieldset, Div
 
 from trionyx.trionyx.models import User

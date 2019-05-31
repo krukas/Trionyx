@@ -1,11 +1,11 @@
 """
-trionyx.trionyx.forms.layout
+trionyx.forms.layout
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
-from crispy_forms.layout import Field
+from crispy_forms.layout import *  # noqa F403
 
 from trionyx.utils import (
     get_current_locale,

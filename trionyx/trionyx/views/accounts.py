@@ -12,7 +12,7 @@ from django.urls import reverse
 from .core import UpdateView, DetailTabView
 
 from trionyx.trionyx.models import User
-from trionyx.trionyx.forms.accounts import UserUpdateForm
+from trionyx.trionyx.forms import UserUpdateForm
 
 
 class LoginView(DjangoLoginView):

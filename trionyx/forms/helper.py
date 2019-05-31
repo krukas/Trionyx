@@ -1,21 +1,17 @@
 """
-trionyx.core.forms
-~~~~~~~~~~~~~~~~~~
+trionyx.forms.helper
+~~~~~~~~~~~~~~~~~~~~
+
+Helper forms for Trionyx
 
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
-from django import forms
 from crispy_forms.helper import FormHelper as CrispyFormHelper
-from crispy_forms.layout import Layout
-
 from trionyx import models
-from trionyx.trionyx.forms import layout
+from trionyx import forms
+from trionyx.forms import layout
 from trionyx.utils import get_datetime_input_format
-
-from .accounts import UserUpdateForm
-
-__all__ = ['UserUpdateForm']
 
 
 class FormHelper(CrispyFormHelper):
@@ -43,4 +39,4 @@ class FormHelper(CrispyFormHelper):
 
             fields.append(field if field else name)
 
-        return Layout(*fields)
+        return layout.Layout(*fields)

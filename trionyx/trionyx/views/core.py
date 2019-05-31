@@ -35,7 +35,7 @@ from django.utils import timezone
 from django.contrib.contenttypes.models import ContentType
 
 from watson import search as watson
-from trionyx.trionyx.forms import FormHelper
+from trionyx.forms.helper import FormHelper
 
 from trionyx.navigation import tabs
 from trionyx.config import models_config
