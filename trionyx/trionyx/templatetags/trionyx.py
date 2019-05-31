@@ -38,6 +38,13 @@ def jsonify(obj):
     return mark_safe(json.dumps(obj))
 
 
+@register.simple_tag
+def model_url(model, view_name, code=None):
+    """Short cut for generating model urls"""
+    from trionyx.urls import model_url
+    return model_url(model, view_name, code)
+
+
 @register.filter
 def is_date(value):
     """Check if value is date object"""

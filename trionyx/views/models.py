@@ -500,6 +500,8 @@ class UpdateView(DjangoUpdateView, ModelClassMixin):
         if self.form_class:
             return self.form_class
         from trionyx.forms import form_register
+        if self.kwargs.get('code'):
+            return form_register.get_form(self.get_model_class(), self.kwargs.get('code'))
         return form_register.get_edit_form(self.get_model_class())
 
     def get_form(self, form_class=None):
@@ -559,6 +561,8 @@ class CreateView(DjangoCreateView, ModelClassMixin):
         if self.form_class:
             return self.form_class
         from trionyx.forms import form_register
+        if self.kwargs.get('code'):
+            return form_register.get_form(self.get_model_class(), self.kwargs.get('code'))
         return form_register.get_create_form(self.get_model_class())
 
     def get_form(self, form_class=None):

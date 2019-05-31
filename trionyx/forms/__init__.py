@@ -50,6 +50,10 @@ class FormRegister:
             return '{}.{}'.format(config.app_label, config.model_name)
         return model_alias
 
+    def get_form(self, model, code):
+        """Get form based on code"""
+        return self.forms.get(self.get_model_alias(model), dict()).get(code)['form']
+
     def get_create_form(self, model):
         """Get default create form"""
         form = self._get_model_form_by_config(model, 'default_create')
