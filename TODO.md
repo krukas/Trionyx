@@ -15,8 +15,8 @@
       - system layout can lock filter, sort, columns
     - User layouts
   - Mass actions (update/delete)
-- Save verbose_name as field
-  - Change choices field to values_list('id', 'verbose_name')
+- ~~Save verbose_name as field~~
+  - ~~Change choices field to values_list('id', 'verbose_name')~~
 - Replace crispy form with trionyx own layout/components
 - component collect all js/css files
 - Add translations
