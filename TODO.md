@@ -1,4 +1,4 @@
-# TODO
+# TODO/IDEAS
 
 - Model dialog
   - ~~Generic create model~~
@@ -14,6 +14,14 @@
     - System layouts
       - system layout can lock filter, sort, columns
     - User layouts
+  - Mass actions (update/delete)
+- Save verbose_name as field
+  - Change choices field to values_list('id', 'verbose_name')
+- Replace crispy form with trionyx own layout/components
+- component collect all js/css files
+- Add translations
+- Audit log for user changed models
+  - Add created_by to model
 - Add permission check for generic views
 - User management
   - CRUD users
@@ -21,23 +29,40 @@
   - CRUD Groups
     - Default admin group with always every permission (cant be deleted, or remove permission)
 - Dashboard
+  - multiple dashboards with different default per user group.
   - Determine basic widgets
+  - TODO (uses user UserAttribute)
+  - notepad (uses user UserAttribute)
 - DB logger
   - Logs all from trionyx and apps
   - Admin can see logs in interface
   - log level is set as setting
 - Layout/Value renderers
-  - Progressbar
-    - option for ajax updates
+  - Progressbar with realtime option
   - Unordered/Ordered List
   - icon renderer/shortcut
-  - ~~button~~
-    - Link to, open dialog crud/view, callable js function
-  - ChartJs
-    - realtime option
+  - ~~button (Link to/open dialog)~~
+  - ChartJs with realtime option
 - Forms
+  - computed field
+  - render layout components
   - Slider field
   - File uploader (Maybe generic file model)
   - email/money field with icon
   - wysiwyg (support for files with generic file model)
   - color picker
+- Changelog/version view based project CHANGELOG.md
+- DB config
+  - App have config description (value type, options, yes/no, etc)
+  - Based on app config descriptions generate admin settings page
+- Standard models that are connected with a component:
+  - Media files
+    - Generic media file model (name, size, extension/file type)
+    - maybe file manager interface?
+  - comments
+- contrib apps:
+  - Knowledge base with easy linking to multiple models
+    - Connect knowledge base with layout component
+  - Companies: Manage company relations/contact information
+  - Social login
+    

@@ -5,6 +5,7 @@ trionyx.layout
 :copyright: 2017 by Maikel Martens
 :license: GPLv3
 """
+import json
 from django import template
 from django.utils.functional import cached_property
 from django.template.loader import render_to_string
@@ -41,6 +42,7 @@ class Layout:
 
     def render(self, request=None):
         """Render layout for given request"""
+        # TODO Collect and all JS and CSS resources
         return render_to_string('trionyx/layout.html', {'layout': self}, request)
 
     def set_object(self, object):
@@ -403,13 +405,14 @@ class Button(Html):
     tag = 'button'
     valid_attr = ['onClick']
 
-    def __init__(self, label, link_url, dialog_url, **options):
+    def __init__(self, label, link_url=None, dialog_url=None, dialog_options=None, **options):
         """Init button"""
+        dialog_options = dialog_options if dialog_options else {}
         if not options.get('onClick') and (link_url or dialog_url):
             if link_url:
                 options['onClick'] = "window.location.href='{}'".format(link_url)
             else:
-                options['onClick'] = "openDialog('{}')".format(dialog_url)
+                options['onClick'] = "openDialog('{}', {})".format(dialog_url, json.dumps(dialog_options))
 
         super().__init__(html=label, **options)
 
