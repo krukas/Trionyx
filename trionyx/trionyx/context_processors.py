@@ -6,7 +6,7 @@ trionyx.trionyx.context_processors
 :license: GPLv3
 """
 from django.conf import settings
-from trionyx.navigation import app_menu
+from trionyx.menu import app_menu
 
 
 def trionyx(request):

@@ -1,6 +1,6 @@
 from django.test import TestCase
 
-from trionyx.navigation import Menu, MenuItem
+from trionyx.menu import Menu, MenuItem
 
 
 class UtilsTestCase(TestCase):

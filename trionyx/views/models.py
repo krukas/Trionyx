@@ -34,7 +34,6 @@ from watson import search as watson
 
 from trionyx.views.mixins import ModelClassMixin, SessionValueMixin
 from trionyx.forms.helper import FormHelper
-from trionyx.navigation import tabs
 from trionyx import utils
 
 
@@ -385,6 +384,7 @@ class DetailTabView(DetailView, ModelClassMixin):
 
     def get_context_data(self, **kwargs):
         """Add context data to view"""
+        from trionyx.views import tabs
         context = super().get_context_data(**kwargs)
         tabs = self.get_active_tabs()
         context.update({
@@ -440,6 +440,7 @@ class DetailTabView(DetailView, ModelClassMixin):
 
     def get_active_tabs(self):
         """Get all active tabs"""
+        from trionyx.views import tabs
         return list(tabs.get_tabs(self.get_model_alias(), self.object))
 
     def dispatch(self, request, *args, **kwargs):
@@ -454,6 +455,7 @@ class DetailTabJsendView(JsendView, ModelClassMixin):
 
     def handle_request(self, request, app, model, pk):
         """Render and return tab"""
+        from trionyx.views import tabs
         ModelClass = self.get_model_class()
         object = ModelClass.objects.get(id=pk)
 
