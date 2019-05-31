@@ -40,4 +40,5 @@ def jsonify(obj):
 
 @register.filter
 def is_date(value):
+    """Check if value is date object"""
     return isinstance(value, date)

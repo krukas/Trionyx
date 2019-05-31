@@ -399,10 +399,12 @@ class Button(Html):
     - dialog_url
     - onClick
     """
+    
     tag = 'button'
     valid_attr = ['onClick']
 
     def __init__(self, label,link_url, dialog_url, **options):
+        """Init button"""
         if not options.get('onClick') and (link_url or dialog_url):
             if link_url:
                 options['onClick'] = "window.location.href='{}'".format(link_url)

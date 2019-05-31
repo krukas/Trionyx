@@ -130,7 +130,7 @@ class GlobalSearchJsendView(JsendView):
                 continue
             models.append(config.model)
             content_type = ContentType.objects.get_for_model(config.model, False)
-            content_types[content_type.id] = config.model._meta.verbose_name_plural
+            content_types[content_type.id] = str(config.model._meta.verbose_name_plural)
 
         results = OrderedDict()
         for entry in watson.search(request.GET.get('search', ''), models=models)[:100]:
