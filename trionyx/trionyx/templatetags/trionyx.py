@@ -6,6 +6,8 @@ trionyx.trionyx.templatetags.trionyx
 :license: GPLv3
 """
 import json
+from datetime import date
+
 from django import template
 from django.core.serializers import serialize
 from django.db.models.query import QuerySet
@@ -34,3 +36,8 @@ def jsonify(obj):
     if isinstance(obj, QuerySet):
         return mark_safe(serialize(obj))
     return mark_safe(json.dumps(obj))
+
+
+@register.filter
+def is_date(value):
+    return isinstance(value, date)

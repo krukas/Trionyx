@@ -1,4 +1,5 @@
 {% load crispy_forms_field %}
+{% load trionyx %}
 
 
 <{% if tag %}{{ tag }}{% else %}div{% endif %} id="div_{{ field.auto_id }}" {% if not field|is_checkbox %}class="form-group{% else %}class="checkbox{% endif %}{% if wrapper_class %} {{ wrapper_class }}{% endif %}{% if form_show_errors%}{% if field.errors %} has-error{% endif %}{% endif %}{% if field.css_classes %} {{ field.css_classes }}{% endif %}">
@@ -11,7 +12,7 @@
     <div class="input-group date {{ field_class }}">
         <input type="{{ field.input_type }}"
             name="{% if field.name|wordcount > 1 %}{{ field.name|slugify }}{% else %}{{ field.name }}{% endif %}"
-            value="{{ field.value|date:input_format }}"
+            value="{% if field.value|is_date %}{{ field.value|date:input_format }}{% else %}{{ field.value }}{% endif %}"
             id="{{ field.auto_id }}"
             {{ flat_attrs|safe }}
         />

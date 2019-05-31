@@ -391,6 +391,27 @@ class Img(Html):
     }
 
 
+class Button(Html):
+    """
+    Bootstrap button
+
+    - link_url
+    - dialog_url
+    - onClick
+    """
+    tag = 'button'
+    valid_attr = ['onClick']
+
+    def __init__(self, label,link_url, dialog_url, **options):
+        if not options.get('onClick') and (link_url or dialog_url):
+            if link_url:
+                options['onClick'] = "window.location.href='{}'".format(link_url)
+            else:
+                options['onClick'] = "openDialog('{}')".format(dialog_url)
+
+        super().__init__(html=label, **options)
+
+
 # =============================================================================
 # Bootstrap grid system
 # =============================================================================
