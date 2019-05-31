@@ -6,6 +6,7 @@ trionyx.forms.layout
 :license: GPLv3
 """
 from crispy_forms.layout import *  # noqa F403
+from crispy_forms.bootstrap import *  # noqa F403
 
 from trionyx.utils import (
     get_current_locale,

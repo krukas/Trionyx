@@ -58,6 +58,6 @@ Trionyx
 TimePicker
 ~~~~~~~~~~
 
-.. autoclass:: trionyx.trionyx.forms.layout.TimePicker
+.. autoclass:: trionyx.forms.layout.TimePicker
     :members:
 
