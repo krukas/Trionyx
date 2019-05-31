@@ -53,7 +53,7 @@ WSGI_APPLICATION = 'wsgi.application'
 # ==============================================================================
 # Middleware
 # ==============================================================================
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
 
     # 'corsheaders.middleware.CorsMiddleware',
@@ -61,7 +61,6 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
 
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
 
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',

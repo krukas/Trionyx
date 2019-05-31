@@ -98,7 +98,7 @@ class UserAttributeManager(models.Manager):
 class UserAttribute(models.Model):
     """User attribute to store system values for user"""
 
-    user = models.ForeignKey(User, related_name='attributes')
+    user = models.ForeignKey(User, models.CASCADE, related_name='attributes')
     code = models.CharField(max_length=128, null=False)
     value = models.JSONField()
 

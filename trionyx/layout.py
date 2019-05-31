@@ -403,7 +403,7 @@ class Button(Html):
     tag = 'button'
     valid_attr = ['onClick']
 
-    def __init__(self, label,link_url, dialog_url, **options):
+    def __init__(self, label, link_url, dialog_url, **options):
         """Init button"""
         if not options.get('onClick') and (link_url or dialog_url):
             if link_url:

@@ -6,16 +6,18 @@ trionyx.urls
 :license: GPLv3
 """
 from django.conf import settings
-from django.conf.urls import url, include
-import django.views.static
+from django.conf.urls import include
+from django.conf.urls.static import static
+from django.urls import path
 
 urlpatterns = [
-    url(r'^', include('trionyx.trionyx.urls', namespace='trionyx')),
+    path('', include('trionyx.trionyx.urls', namespace='trionyx')),
 ]
 
 if settings.DEBUG:
     import debug_toolbar
     urlpatterns += [
-        url(r'^media/(?P<path>.*)$', django.views.static.serve, {'document_root': settings.MEDIA_ROOT}),
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    ]
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + static(
+        settings.STATIC_URL, document_root=settings.STATIC_ROOT
+    )

@@ -18,7 +18,7 @@ class Post(models.BaseModel):
 
     publish_date = models.DateTimeField()
 
-    category = models.ForeignKey(Category, related_name='posts')
+    category = models.ForeignKey(Category, models.CASCADE, related_name='posts')
     tags = models.ManyToManyField(Tag, related_name='posts')
 
     STATUS_NEW = 1
