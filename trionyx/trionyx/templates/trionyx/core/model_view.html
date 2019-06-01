@@ -95,8 +95,8 @@
             tab_id = tab_id || trionyx_current_tab;
             show_tab = show_tab || false;
 
-            if(tab_id in loaded_tabs){
-			    delete loaded_tabs[tab_id];
+            if(tab_id in trionyx_loaded_tabs){
+			    delete trionyx_loaded_tabs[tab_id];
 		    }
 
 		    trionyx_load_tab(tab_id, show_tab);

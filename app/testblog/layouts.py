@@ -1,5 +1,6 @@
 from trionyx.views import tabs, layouts
-from trionyx.layout import Container, Row, Column6, Panel, DescriptionList, Column12, Table, TableDescription
+from trionyx.layout import Panel, Button, Column12, Table, TableDescription
+from trionyx.urls import model_url
 
 from .models import Post, Tag
 
@@ -17,6 +18,16 @@ def post_overview(obj):
                     'category',
                     'tags',
                     'price',
+                    {
+                        'label': 'Update',
+                        'value': Button(
+                            'Delete',
+                            dialog_url=model_url(obj, 'dialog-delete'),
+                            dialog_options={
+                                'callback': "function(){trionyx_reload_tab('general')}"
+                            }
+                        )
+                    }
                 )
             )
         ),

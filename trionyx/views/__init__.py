@@ -16,7 +16,7 @@ from .models import (  # noqa F401
     DetailTabJsendView, UpdateView, CreateView, DeleteView, LayoutView,
 )
 from .dialogs import (  # noqa F401
-    DialogView, UpdateDialog, CreateDialog, LayoutDialog,
+    DialogView, UpdateDialog, CreateDialog, LayoutDialog, DeleteDialog
 )
 
 

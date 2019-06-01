@@ -1,10 +1,10 @@
 # TODO/IDEAS
 
-- Model dialog
+- ~~Model dialog~~
   - ~~Generic create model~~
   - ~~Generic view model (uses layout)~~
   - ~~Generic edit model~~
-  - Generic Delete model
+  - ~~Generic Delete model~~
 - Model list view
   - ~~Add and sort columns~~
   - ~~Add list filtering~~

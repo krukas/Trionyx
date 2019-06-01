@@ -247,3 +247,59 @@ class CreateDialog(UpdateDialog):
         if self.kwargs.get('code'):
             return form_register.get_form(self.get_model_class(), self.kwargs.get('code'))
         return form_register.get_create_form(self.get_model_class())
+
+
+class DeleteDialog(DialogView):
+    """Delete model dialog"""
+
+    template = 'trionyx/dialog/model_delete.html'
+    """Template for dialog content"""
+
+    title = "Delete {model_name}: {object}"
+    """Dialog title model_name and object, variable are given"""
+
+    submit_label = 'delete'
+    """Dialog submit label value"""
+
+    success_message = '{model_name} ({object}) is successfully deleted'
+    """Success message on successfully deleted"""
+
+    def display_dialog(self, *args, **kwargs):
+        """Display delete confirmation"""
+        return {
+            'title': self.title.format(
+                model_name=self.get_model_config().model_name,
+                object=str(self.object),
+            ),
+            'content': self.render_to_string(self.template, {
+                'model_name': self.get_model_config().model_name.capitalize(),
+                'object': self.object,
+            }),
+            'submit_label': self.submit_label,
+        }
+
+    def handle_dialog(self, *args, **kwargs):
+        object_name = str(self.object)
+        response = {
+            'title': self.title.format(
+                model_name=self.get_model_config().model_name,
+                object=object_name,
+            ),
+        }
+
+        try:
+            self.object.delete()
+            response.update({
+                'content': self.success_message.format(
+                    model_name=self.get_model_config().model_name.capitalize(),
+                    object=object_name,
+                )
+            })
+        except Exception:
+            response.update({
+                'content': """<p class="alert alert-danger">Something went wrong on deleting {}</p>""".format(
+                    self.get_model_config().model_name.capitalize()
+                )
+            })
+
+        return response
