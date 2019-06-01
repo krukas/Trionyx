@@ -70,7 +70,7 @@ class BaseModel(Model):  # noqa F405
                 continue
             if not include_id and field.name == 'id':
                 continue
-            if not inlcude_base and field.name in ['created_at', 'updated_at']:
+            if not inlcude_base and field.name in ['created_at', 'updated_at', 'created_by', 'verbose_name']:
                 continue
             yield field
 
