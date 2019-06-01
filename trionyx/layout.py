@@ -107,6 +107,8 @@ class Component:
         self.id = options.get('id')
         self.components = list(components)
         self.object = False
+        self.context = {}
+        self.request = None
 
         # set options on object
         for key, value in options.items():
@@ -134,6 +136,8 @@ class Component:
     def render(self, context, request=None):
         """Render component"""
         context['component'] = self
+        self.context = context
+        self.request = request
         return render_to_string(self.template_name, context, request)
 
 
@@ -309,6 +313,9 @@ class ComponentFieldsMixin:
         options = {key: value for key, value in field.items() if key not in ['value', 'data_object']}
         if 'renderer' in field:
             value = field['renderer'](value, data_object=data, **options)
+        elif isinstance(value, Component):
+            value.set_object(self.object)
+            value = value.render(self.context, self.request)
         else:
             value = renderer.render_value(value, data_object=data, **options)
 
@@ -410,11 +417,16 @@ class Button(Html):
         dialog_options = dialog_options if dialog_options else {}
         if not options.get('onClick') and (link_url or dialog_url):
             if link_url:
-                options['onClick'] = "window.location.href='{}'".format(link_url)
+                options['onClick'] = "window.location.href='{}'; return false;".format(link_url)
             else:
-                options['onClick'] = "openDialog('{}', {})".format(dialog_url, json.dumps(dialog_options))
-
+                options['onClick'] = "openDialog('{}', {}); return false;".format(dialog_url, self.format_dialog_options(dialog_options))
         super().__init__(html=label, **options)
+
+    def format_dialog_options(self, dialog_options):
+        """Fromat options to JS dict"""
+        return '{{ {} }}'.format(','.join(
+            ("{}:{}" if key == 'callback' else "{}:'{}'").format(key, value)
+            for key, value in dialog_options.items()))
 
 
 # =============================================================================
