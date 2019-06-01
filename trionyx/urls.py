@@ -7,6 +7,7 @@ trionyx.urls
 """
 import inspect
 from django.conf import settings
+from django.apps import apps
 from django.conf.urls import include
 from django.conf.urls.static import static
 from django.urls import path, reverse, NoReverseMatch
@@ -38,9 +39,12 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
+    urlpatterns += static(
+        settings.STATIC_URL, document_root=settings.STATIC_ROOT
+    )
+
+if settings.DEBUG and apps.is_installed("debug_toolbar"):
     import debug_toolbar
     urlpatterns += [
         path('__debug__/', include(debug_toolbar.urls)),
-    ] + static(
-        settings.STATIC_URL, document_root=settings.STATIC_ROOT
-    )
+    ]

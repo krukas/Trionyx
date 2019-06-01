@@ -1,19 +1,11 @@
-"""
-Local project settings, DON't include in your code repository.
+"""Dev project settings"""
+from .base import *  # noqa: F401,F403
 
-This file is exec'd from settings.py, so it has access to and can
-modify all the variables in settings.py.
-"""
-import os
-
-DEBUG = True
-
-# Make these unique, and don't share it with anybody.
-SECRET_KEY = "[[secret_key]]"
+COMPRESS_ENABLED = False
 
 DATABASES = {
     "default": {
-        # Ends with "postgresql_psycopg2", "mysql", "sqlite3" or "oracle".
+        # Ends with "postgresql", "mysql", "sqlite3" or "oracle".
         "ENGINE": "django.db.backends.sqlite3",
         # DB name or path to database file if using sqlite3.
         "NAME": os.path.join(BASE_DIR, 'dev.sqlite3'),  # noqa F821

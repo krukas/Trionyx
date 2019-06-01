@@ -40,7 +40,7 @@ class Quickstart:
             'trionyx_version': trionyx.__version__
         })
 
-        self.update_file(project_path, 'config/local_settings.py', {
+        self.update_file(project_path, 'environment.json', {
             'secret_key': utils.random_string(32)
         })
 

@@ -7,8 +7,32 @@ All Trionyx base settings
 :copyright: 2017 by Maikel Martens
 :license: GPLv3
 """
-from kombu import Queue, Exchange
+import os
+import json
 
+from kombu import Queue, Exchange
+from django.core.exceptions import ImproperlyConfigured
+
+try:
+    with open(os.environ.get('TRIONYX_CONFIG', 'environment.json')) as f:
+        trionyx_config = json.loads(f.read())
+except FileNotFoundError:
+    raise ImproperlyConfigured("Could not load Trionyx config file, is env variable WORKBUNDLE_CONFIG correctly configuerd?")
+
+
+def get_env_var(setting, default=None, configs=trionyx_config):
+    """Get environment variable"""
+    try:
+        return configs[setting]
+    except KeyError:
+        if default is not None:
+            return default
+        raise ImproperlyConfigured("ImproperlyConfigured: Set {} environment variable".format(setting))
+
+
+DEBUG = get_env_var('DEBUG', False)
+ALLOWED_HOSTS = get_env_var('ALLOWED_HOSTS', [])
+SECRET_KEY = get_env_var('SECRET_KEY')
 
 INSTALLED_APPS = [
     # Trionyx apps
@@ -55,13 +79,9 @@ WSGI_APPLICATION = 'wsgi.application'
 # ==============================================================================
 MIDDLEWARE = (
     'django.contrib.sessions.middleware.SessionMiddleware',
-
-    # 'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'trionyx.trionyx.middleware.LoginRequiredMiddleware',

@@ -16,6 +16,7 @@
 - refactor views/core from Django app to Trionyx package
 - Rename navigation to menu
 - Move navigtaion.tabs to views.tabs
+- Quickstart project settings layout + add environment.json
 
 #### Fixed
 - Cant search in fitler select field
