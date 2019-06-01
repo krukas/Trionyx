@@ -37,11 +37,25 @@ class ModelClassMixin:
 class ModelPermissionMixin:
     """Check Model permission"""
 
+    permission_type = None
+
     def dispatch(self, request, *args, **kwargs):
         """Validate if user can use view"""
-        if False:  # TODO do permission check based on Model
+        if self.permission and not request.user.has_perm(self.permission):
             raise PermissionDenied()
         return super().dispatch(request, *args, **kwargs)
+
+    @property
+    def permission(self):
+        """Permission for view"""
+        if self.permission_type and hasattr(self, 'get_model_config'):
+            config = self.get_model_config()
+            return '{app_label}.{type}_{model_name}'.format(
+                app_label=config.app_label,
+                type=self.permission_type,
+                model_name=config.model_name,
+            ).lower()
+        return None
 
 
 class SessionValueMixin:

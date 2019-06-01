@@ -60,7 +60,6 @@ class BaseModel(Model):  # noqa F405
         """Meta information for BaseModel"""
 
         abstract = True
-        default_permissions = ('read', 'add', 'change', 'delete')
 
     @classmethod
     def get_fields(cls, inlcude_base=False, include_id=False):

@@ -6,6 +6,7 @@ trionyx.navigation
 :license: GPLv3
 """
 import re
+import copy
 
 from django.apps import apps
 from django.urls import reverse
@@ -64,7 +65,11 @@ class Menu:
                             'app': model._meta.app_label,
                             'model': model._meta.model_name,
                         }
-                    )
+                    ),
+                    permission='{app_label}.view_{model_name}'.format(
+                        app_label=config.app_label,
+                        model_name=config.model_name,
+                    ).lower()
                 )
 
             if model_order > 0:
@@ -112,11 +117,22 @@ class Menu:
         else:
             root_item.add_child(new_item)
 
-    def get_menu_items(self):
+    def get_menu_items(self, user=None):
         """Get menu items"""
         if not self.root_item:
             return []
-        return self.root_item.childs
+
+        def filter_childs(childs):
+            menu = []
+            for item in childs:
+                if not item.permission or (item.permission and user.has_perm(item.permission)):
+                    item = copy.copy(item)
+                    menu.append(item)
+                    if item.childs:
+                        item.childs = filter_childs(item.childs)
+            return menu
+
+        return filter_childs(self.root_item.childs)
 
 
 class MenuItem:

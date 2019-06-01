@@ -9,7 +9,9 @@
 {% endblock %}
 
 {% block header_buttons %}
-    <a href="{{ create_url }}" class="btn btn-default">Create</a>
+    {% if create_permission %}
+        <a href="{{ create_url }}" class="btn btn-default">Create</a>
+    {% endif %}
 {% endblock %}
 
 

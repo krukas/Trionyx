@@ -42,6 +42,9 @@ class DialogView(View, ModelClassMixin):
         </button>
     """
 
+    permission_type = 'view'
+    """Permission type used for model when no permission is set"""
+
     permission = None
     """Permission of dialog, when not set and model is set model view permission is used"""
 
@@ -109,10 +112,12 @@ class DialogView(View, ModelClassMixin):
             return True
 
         if not self.permission:
-            return request.user.has_perm('{}_{}'.format(
-                self.model_permission,
-                self.object.__class__.__name__.lower()), self.object
-            )
+            config = self.get_model_config()
+            return request.user.has_perm('{app_label}.{type}_{model_name}'.format(
+                app_label=config.app_label,
+                type=self.permission_type,
+                model_name=config.model_name,
+            ).lower())
 
         return request.user.has_perm(self.permission)
 
@@ -176,6 +181,8 @@ class LayoutDialog(DialogView):
 class UpdateDialog(DialogView):
     """Update dialog view for updating a model"""
 
+    permission_type = 'change'
+
     template = 'trionyx/dialog/model_form.html'
     """Template for dialog content"""
 
@@ -237,6 +244,8 @@ class UpdateDialog(DialogView):
 class CreateDialog(UpdateDialog):
     """Dialog view for creating a model"""
 
+    permission_type = 'add'
+
     title = "Create {model_name}"
     submit_label = 'create'
     success_message = '{model_name} ({object}) is successfully created'
@@ -251,6 +260,8 @@ class CreateDialog(UpdateDialog):
 
 class DeleteDialog(DialogView):
     """Delete model dialog"""
+
+    permission_type = 'delete'
 
     template = 'trionyx/dialog/model_delete.html'
     """Template for dialog content"""

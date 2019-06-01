@@ -113,6 +113,14 @@ class GlobalSearchJsendView(JsendView):
         for config in models_config.get_all_configs():
             if config.disable_search_index or not config.global_search:
                 continue
+
+            # Check if user has view permission
+            if not request.user.has_perm('{app_label}.view_{model_name}'.format(
+                app_label=config.app_label,
+                model_name=config.model_name,
+            ).lower()):
+                continue
+
             models.append(config.model)
             content_type = ContentType.objects.get_for_model(config.model, False)
             content_types[content_type.id] = str(config.model._meta.verbose_name_plural)

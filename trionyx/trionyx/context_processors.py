@@ -18,6 +18,6 @@ def trionyx(request):
         'TX_LOGO_NAME_SMALL_START': settings.TX_LOGO_NAME_SMALL_START,
         'TX_LOGO_NAME_SMALL_END': settings.TX_LOGO_NAME_SMALL_END,
 
-        'trionyx_menu_items': app_menu.get_menu_items(),
+        'trionyx_menu_items': app_menu.get_menu_items(request.user),
         'trionyx_menu_collapse': request.COOKIES.get('menu.state') == 'collapsed',
     }

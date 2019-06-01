@@ -32,7 +32,7 @@ from django.db.models import Q
 from django.utils import timezone
 from watson import search as watson
 
-from trionyx.views.mixins import ModelClassMixin, SessionValueMixin
+from trionyx.views.mixins import ModelClassMixin, SessionValueMixin, ModelPermissionMixin
 from trionyx.forms.helper import FormHelper
 from trionyx import utils
 
@@ -40,9 +40,10 @@ from trionyx import utils
 # =============================================================================
 # List view
 # =============================================================================
-class ListView(TemplateView, ModelClassMixin):
+class ListView(ModelPermissionMixin, TemplateView, ModelClassMixin):
     """List view for showing model"""
 
+    permission_type = 'view'
     template_name = "trionyx/core/model_list.html"
 
     model = None
@@ -95,6 +96,10 @@ class ListView(TemplateView, ModelClassMixin):
             'datetime_input_format': utils.datetime_format_to_momentjs(utils.get_datetime_input_format()),
             'date_input_format': utils.datetime_format_to_momentjs(utils.get_datetime_input_format(date_only=True)),
             'current_locale': utils.get_current_locale(),
+            'create_permission': self.request.user.has_perm('{app_label}.add_{model_name}'.format(
+                app_label=self.get_model_config().app_label,
+                model_name=self.get_model_config().model_name,
+            ).lower())
         })
         return context
 
@@ -238,8 +243,10 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
         return watson.filter(queryset, self.get_search(), ranking=False)
 
 
-class ListJsendView(JsendView, ModelListMixin):
+class ListJsendView(ModelPermissionMixin, JsendView, ModelListMixin):
     """Ajax list view"""
+
+    permission_type = 'view'
 
     def __init__(self, *args, **kwargs):
         """Init ListJsendView"""
@@ -289,8 +296,10 @@ class ListJsendView(JsendView, ModelListMixin):
         return items
 
 
-class ListExportView(View, ModelListMixin):
+class ListExportView(ModelPermissionMixin, View, ModelListMixin):
     """View for downloading an export of a list view"""
+
+    permission_type = 'view'
 
     def post(self, request, app, model, **kwargs):
         """Handle post request"""
@@ -336,8 +345,10 @@ class ListExportView(View, ModelListMixin):
         return response
 
 
-class ListChoicesJsendView(JsendView, ModelListMixin):
+class ListChoicesJsendView(ModelPermissionMixin, JsendView, ModelListMixin):
     """View for getting choices list for related field"""
+
+    permission_type = 'view'
 
     def handle_request(self, request, *args, **kwargs):
         """Build choices list for related field"""
@@ -356,8 +367,10 @@ class ListChoicesJsendView(JsendView, ModelListMixin):
 # =============================================================================
 # Detail tab views
 # =============================================================================
-class DetailTabView(DetailView, ModelClassMixin):
+class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
     """Detail tab view, shows model details in tab view"""
+
+    permission_type = 'view'
 
     template_name = "trionyx/core/model_view.html"
     """Template name for rendering the view, default is 'trionyx/core/detail_tab_view.html'
@@ -397,6 +410,14 @@ class DetailTabView(DetailView, ModelClassMixin):
             'edit_url': self.get_edit_url(),
             'delete_url': self.get_delete_url(),
             'title': self.title,
+            'change_permission': self.request.user.has_perm('{app_label}.change_{model_name}'.format(
+                app_label=self.get_model_config().app_label,
+                model_name=self.get_model_config().model_name,
+            ).lower()),
+            'delete_permission': self.request.user.has_perm('{app_label}.delete_{model_name}'.format(
+                app_label=self.get_model_config().app_label,
+                model_name=self.get_model_config().model_name,
+            ).lower())
         })
         return context
 
@@ -449,8 +470,10 @@ class DetailTabView(DetailView, ModelClassMixin):
         return super().dispatch(request, *args, **kwargs)
 
 
-class DetailTabJsendView(JsendView, ModelClassMixin):
+class DetailTabJsendView(ModelPermissionMixin, JsendView, ModelClassMixin):
     """View for getting tab view with ajax"""
+
+    permission_type = 'view'
 
     def handle_request(self, request, app, model, pk):
         """Render and return tab"""
@@ -472,6 +495,8 @@ class DetailTabJsendView(JsendView, ModelClassMixin):
 class LayoutView(DetailTabView):
     """Display layout for model"""
 
+    permission_type = 'view'
+
     template_name = "trionyx/core/layout_view.html"
 
     def get_context_data(self, **kwargs):
@@ -492,8 +517,10 @@ class LayoutView(DetailTabView):
 # =============================================================================
 # Update/Create/Delete view
 # =============================================================================
-class UpdateView(DjangoUpdateView, ModelClassMixin):
+class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
     """Update view that renders view with crispy-forms"""
+
+    permission_type = 'change'
 
     template_name = 'trionyx/core/model_update.html'
 
@@ -553,8 +580,10 @@ class UpdateView(DjangoUpdateView, ModelClassMixin):
         return response
 
 
-class CreateView(DjangoCreateView, ModelClassMixin):
+class CreateView(ModelPermissionMixin, DjangoCreateView, ModelClassMixin):
     """Create view that renders view with crispy-forms"""
+
+    permission_type = 'add'
 
     template_name = 'trionyx/core/model_create.html'
 
@@ -626,8 +655,10 @@ class CreateView(DjangoCreateView, ModelClassMixin):
         return response
 
 
-class DeleteView(DjangoDeleteView, ModelClassMixin):
+class DeleteView(ModelPermissionMixin, DjangoDeleteView, ModelClassMixin):
     """Delete view"""
+
+    permission_type = 'delete'
 
     template_name = 'trionyx/core/model_delete.html'
 
