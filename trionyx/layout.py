@@ -5,7 +5,6 @@ trionyx.layout
 :copyright: 2017 by Maikel Martens
 :license: GPLv3
 """
-import json
 from django import template
 from django.utils.functional import cached_property
 from django.template.loader import render_to_string

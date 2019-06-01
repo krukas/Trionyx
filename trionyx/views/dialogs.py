@@ -279,6 +279,7 @@ class DeleteDialog(DialogView):
         }
 
     def handle_dialog(self, *args, **kwargs):
+        """Handle delete model"""
         object_name = str(self.object)
         response = {
             'title': self.title.format(
