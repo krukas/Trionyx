@@ -1,6 +1,7 @@
 # Minimal makefile for Sphinx documentation
 #
-export TRIONYX_CONFIG = ../environment.json
+ROOT_DIR:=$(shell dirname $(shell dirname $(realpath $(lastword $(MAKEFILE_LIST)))))
+export TRIONYX_CONFIG = ${ROOT_DIR}/environment.json
 
 # You can set these variables from the command line.
 SPHINXOPTS    =

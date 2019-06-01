@@ -14,7 +14,7 @@ from kombu import Queue, Exchange
 from django.core.exceptions import ImproperlyConfigured
 
 try:
-    with open(os.environ.get('TRIONYX_CONFIG', 'environment.json')) as f:
+    with open(os.path.abspath(os.environ.get('TRIONYX_CONFIG', 'environment.json'))) as f:
         trionyx_config = json.loads(f.read())
 except FileNotFoundError:
     raise ImproperlyConfigured("Could not load Trionyx config file, is env variable TRIONYX_CONFIG correctly configuerd?")
