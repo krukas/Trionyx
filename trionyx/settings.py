@@ -17,7 +17,7 @@ try:
     with open(os.environ.get('TRIONYX_CONFIG', 'environment.json')) as f:
         trionyx_config = json.loads(f.read())
 except FileNotFoundError:
-    raise ImproperlyConfigured("Could not load Trionyx config file, is env variable WORKBUNDLE_CONFIG correctly configuerd?")
+    raise ImproperlyConfigured("Could not load Trionyx config file, is env variable TRIONYX_CONFIG correctly configuerd?")
 
 
 def get_env_var(setting, default=None, configs=trionyx_config):
