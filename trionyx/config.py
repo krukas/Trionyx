@@ -8,7 +8,11 @@ trionyx.config
 import inspect
 
 from django.apps import apps
+from django.urls import reverse
+from django.conf import settings
 
+TX_MODEL_CONFIGS = settings.TX_CORE_MODEL_CONFIGS
+TX_MODEL_CONFIGS.update(settings.TX_MODEL_CONFIGS)
 
 class ModelConfig:
     """
@@ -125,10 +129,29 @@ class ModelConfig:
         except AttributeError:
             return None
 
+    def get_fields(self, inlcude_base=False, include_id=False):
+        """Get model fields"""
+        for field in self.model._meta.fields:
+            if field.name == 'deleted':
+                continue
+            if not include_id and field.name == 'id':
+                continue
+            if not inlcude_base and field.name in ['created_at', 'updated_at', 'created_by', 'verbose_name']:
+                continue
+            yield field
+
+    def get_absolute_url(self, model):
+        """Get model url"""
+        return reverse('trionyx:model-view', kwargs={
+            'app': model._meta.app_label,
+            'model': model._meta.model_name,
+            'pk': model.id
+        })
+
     def get_list_fields(self):
         """Get all list fields"""
         from trionyx.renderer import renderer
-        model_fields = {f.name: f for f in self.model.get_fields(True, True)}
+        model_fields = {f.name: f for f in self.get_fields(True, True)}
 
         def create_list_fields(config_fields, list_fields=None):
             list_fields = list_fields if list_fields else {}
@@ -199,6 +222,11 @@ class Models:
                 config = ModelConfig(model, getattr(app, model.__name__, None))
                 self.configs[self.get_model_name(model)] = config
 
+        # Update configs from settings
+        for model_name, config in TX_MODEL_CONFIGS.items():
+            for key, value in config.items():
+                setattr(self.configs[model_name], key, value)
+
     def get_config(self, model):
         """Get config for given model"""
         if not inspect.isclass(model):
@@ -217,7 +245,7 @@ class Models:
 
     def get_model_name(self, model):
         """Get model name for given model"""
-        return '{}.{}'.format(model.__module__, model.__name__)
+        return '{}.{}'.format(model._meta.app_label, model._meta.model_name)
 
 
 models_config = Models()

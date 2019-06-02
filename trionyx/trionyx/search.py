@@ -25,7 +25,7 @@ class ModelSearchAdapter(search.SearchAdapter):
 
         return search_title.format(**{
             field.name: LazyFieldRenderer(obj, field.name)
-            for field in obj.get_fields(True, True)
+            for field in models_config.get_config(obj).get_fields(True, True)
         })
 
     def get_description(self, obj):
@@ -38,7 +38,7 @@ class ModelSearchAdapter(search.SearchAdapter):
 
         return search_description.format(**{
             field.name: LazyFieldRenderer(obj, field.name)
-            for field in obj.get_fields(True, True)
+            for field in models_config.get_config(obj).get_fields(True, True)
         })
 
     def get_model_config_value(self, obj, name):

@@ -171,7 +171,7 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
 
         if not current_fields:
             config = self.get_model_config()
-            current_fields = config.list_default_fields if config.list_default_fields else ['created_at', 'id']
+            current_fields = config.list_default_fields if config.list_default_fields else ['id']
 
         self.current_fields = current_fields
         return current_fields
@@ -287,7 +287,7 @@ class ListJsendView(ModelPermissionMixin, JsendView, ModelListMixin):
         for item in page:
             items.append({
                 'id': item.id,
-                'url': item.get_absolute_url(),
+                'url': self.get_model_config().get_absolute_url(item),
                 'row_data': [
                     fields[field]['renderer'](item, field)
                     for field in self.get_current_fields()
@@ -533,6 +533,10 @@ class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
     cancel_url = None
     """Url code for cancel button, when not set object.get_absolute_url is used"""
 
+    @property
+    def success_url(self):
+        return self.get_model_config().get_absolute_url(self.object)
+
     def get_queryset(self):
         """Get queryset based on url params(<app>, <mode>) if model is not set on class"""
         if self.queryset is None and not self.model:
@@ -595,6 +599,10 @@ class CreateView(ModelPermissionMixin, DjangoCreateView, ModelClassMixin):
 
     cancel_url = None
     """Url code for cancel button, when not set model list view is used"""
+
+    @property
+    def success_url(self):
+        return self.get_model_config().get_absolute_url(self.object)
 
     def get_queryset(self):
         """Get queryset based on url params(<app>, <mode>) if model is not set on class"""

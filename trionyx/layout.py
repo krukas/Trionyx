@@ -8,6 +8,7 @@ trionyx.layout
 from django import template
 from django.utils.functional import cached_property
 from django.template.loader import render_to_string
+from trionyx.config import models_config
 
 from trionyx import utils
 

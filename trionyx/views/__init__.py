@@ -66,7 +66,8 @@ class TabRegister:
         :return:
         """
         model_alias = self.get_model_alias(model_alias)
-        for item in self.tabs[model_alias]:
+
+        for item in self.tabs.get(model_alias, list()):
             if item.display_filter(object):
                 yield item
 
@@ -80,6 +81,7 @@ class TabRegister:
         :return:
         """
         model_alias = self.get_model_alias(model_alias)
+
         for item in self.tabs[model_alias]:
             if item.code == tab_code and item.display_filter(object):
                 return item
@@ -175,7 +177,7 @@ class TabRegister:
                         Column12(
                             Panel(
                                 'info',
-                                DescriptionList(*[f.name for f in obj.get_fields()])
+                                DescriptionList(*[f.name for f in models_config.get_config(obj).get_fields()])
                             )
                         )
                     )

@@ -61,18 +61,6 @@ class BaseModel(Model):  # noqa F405
 
         abstract = True
 
-    @classmethod
-    def get_fields(cls, inlcude_base=False, include_id=False):
-        """Get model fields"""
-        for field in cls._meta.fields:
-            if field.name == 'deleted':
-                continue
-            if not include_id and field.name == 'id':
-                continue
-            if not inlcude_base and field.name in ['created_at', 'updated_at', 'created_by', 'verbose_name']:
-                continue
-            yield field
-
     def __str__(self):
         """Give verbose name of object"""
         return self.verbose_name if self.verbose_name else self.generate_verbose_name()
@@ -93,7 +81,7 @@ class BaseModel(Model):  # noqa F405
         verbose_name = models_config.get_config(self).verbose_name
         return verbose_name.format(model_name=model_name, app_label=app_label, **{
             field.name: LazyFieldRenderer(self, field.name)
-            for field in self.get_fields(True, True)
+            for field in models_config.get_config(self).get_fields(True, True)
         })
 
     def get_absolute_url(self):

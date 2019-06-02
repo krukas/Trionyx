@@ -84,7 +84,8 @@ class FormRegister:
                 return True
             return field.default == NOT_PROVIDED
 
-        return modelform_factory(model, fields=[f.name for f in model.get_fields() if use_field(f)])
+        config = models_config.get_config(model)
+        return modelform_factory(model, fields=[f.name for f in config.get_fields() if use_field(f)])
 
 
 form_register = FormRegister()
