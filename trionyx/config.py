@@ -14,6 +14,7 @@ from django.conf import settings
 TX_MODEL_CONFIGS = settings.TX_CORE_MODEL_CONFIGS
 TX_MODEL_CONFIGS.update(settings.TX_MODEL_CONFIGS)
 
+
 class ModelConfig:
     """
     ModelConfig holds all config related to a model that is used for trionyx functionality.
@@ -217,9 +218,13 @@ class Models:
 
     def auto_load_configs(self):
         """Auto load all configs from app configs"""
+        from trionyx.models import BaseModel
+
         for app in apps.get_app_configs():
             for model in app.get_models():
                 config = ModelConfig(model, getattr(app, model.__name__, None))
+                if not isinstance(config.model(), BaseModel):
+                    config.disable_search_index = True
                 self.configs[self.get_model_name(model)] = config
 
         # Update configs from settings
@@ -229,7 +234,7 @@ class Models:
 
     def get_config(self, model):
         """Get config for given model"""
-        if not inspect.isclass(model):
+        if not inspect.isclass(model) and not isinstance(model, str):
             model = model.__class__
         return self.configs.get(self.get_model_name(model))
 
@@ -238,13 +243,15 @@ class Models:
         from trionyx.models import BaseModel
 
         for index, config in self.configs.items():
-            if not isinstance(config.model(), BaseModel):
+            if trionyx_models_only and not isinstance(config.model(), BaseModel):
                 continue
 
             yield config
 
     def get_model_name(self, model):
         """Get model name for given model"""
+        if isinstance(model, str):
+            return model
         return '{}.{}'.format(model._meta.app_label, model._meta.model_name)
 
 

@@ -197,4 +197,9 @@ TX_LOGO_NAME_SMALL_START = 'T'
 TX_LOGO_NAME_SMALL_END = 'X'
 
 TX_MODEL_CONFIGS = {}
-TX_CORE_MODEL_CONFIGS = {}
+TX_CORE_MODEL_CONFIGS = {
+    'auth.group': {
+        'list_default_fields': ['name'],
+        'disable_search_index': False,
+    }
+}

@@ -168,7 +168,7 @@ class TabRegister:
 
     def auto_generate_missing_tabs(self):
         """Auto generate tabs for models with no tabs"""
-        for config in models_config.get_all_configs():
+        for config in models_config.get_all_configs(False):
             model_alias = '{}.{}'.format(config.app_label, config.model_name)
             if model_alias not in self.tabs:
                 @self.register(model_alias)

@@ -26,7 +26,7 @@
     {% if cancel_url %}
         <a href="{% url cancel_url %}" class="btn btn-default">Cancel</a>
     {% else %}
-        <a href="{{ object.get_absolute_url }}" class="btn btn-default">Cancel</a>
+        <a href="{{ object_url }}" class="btn btn-default">Cancel</a>
     {% endif %}
     <input type="submit" value="{% if submit_value %}{{ submit_value }}{% else %}Update{% endif %}" class="btn btn-primary"/>
 {% endblock %}

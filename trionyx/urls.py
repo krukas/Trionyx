@@ -25,7 +25,7 @@ def model_url(model, view_name, code=None):
     if code:
         kwargs['code'] = code
 
-    if not inspect.isclass(model):
+    if not inspect.isclass(model) and not isinstance(model, str):
         try:
             kwargs['pk'] = model.pk
             return reverse(view_name, kwargs=kwargs)

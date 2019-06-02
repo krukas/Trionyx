@@ -18,7 +18,6 @@ from django.contrib.contenttypes.models import ContentType
 
 from trionyx.views import UpdateView, DetailTabView
 from trionyx.trionyx.models import User
-from trionyx.trionyx.forms import UserUpdateForm
 from trionyx.config import models_config
 
 
@@ -52,9 +51,14 @@ class UpdateUserAccountView(UpdateView):
     """Update user view"""
 
     model = User
-    form_class = UserUpdateForm
     title = 'Update account'
     cancel_url = 'trionyx:view-account'
+
+    @property
+    def form_class(self):
+        """Form class used by view"""
+        from trionyx.trionyx.forms import ProfileUpdateForm
+        return ProfileUpdateForm
 
     def get(self, request, *args, **kwargs):
         """Add user id to kwargs"""
@@ -110,7 +114,7 @@ class GlobalSearchJsendView(JsendView):
         """Handle search"""
         models = []
         content_types = {}
-        for config in models_config.get_all_configs():
+        for config in models_config.get_all_configs(False):
             if config.disable_search_index or not config.global_search:
                 continue
 

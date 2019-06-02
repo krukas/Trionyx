@@ -46,10 +46,14 @@ class ModelSearchAdapter(search.SearchAdapter):
         config = models_config.get_config(obj)
         return getattr(config, name)
 
+    def get_url(self, obj):
+        """Return the URL of the given obj."""
+        return models_config.get_config(obj).get_absolute_url(obj)
+
 
 def auto_register_search_models():
     """Auto register all search models"""
-    for config in models_config.get_all_configs():
+    for config in models_config.get_all_configs(False):
         if config.disable_search_index:
             continue
 

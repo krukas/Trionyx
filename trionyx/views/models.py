@@ -535,6 +535,7 @@ class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
 
     @property
     def success_url(self):
+        """Return success url"""
         return self.get_model_config().get_absolute_url(self.object)
 
     def get_queryset(self):
@@ -573,6 +574,7 @@ class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
             'title': self.title,
             'submit_value': self.submit_value,
             'cancel_url': self.cancel_url,
+            'object_url': self.get_model_config().get_absolute_url(self.object),
         })
 
         return context
@@ -602,6 +604,7 @@ class CreateView(ModelPermissionMixin, DjangoCreateView, ModelClassMixin):
 
     @property
     def success_url(self):
+        """Return success url"""
         return self.get_model_config().get_absolute_url(self.object)
 
     def get_queryset(self):
@@ -651,7 +654,7 @@ class CreateView(ModelPermissionMixin, DjangoCreateView, ModelClassMixin):
             'title': self.title,
             'submit_value': self.submit_value,
             'cancel_url': self.get_cancel_url(),
-            'model_verbose_name': self.get_model_class()._meta.verbose_name
+            'model_verbose_name': self.get_model_class()._meta.verbose_name,
         })
 
         return context
@@ -694,7 +697,8 @@ class DeleteView(ModelPermissionMixin, DjangoDeleteView, ModelClassMixin):
         context.update({
             'title': self.title,
             'submit_value': self.submit_value,
-            'cancel_url': self.cancel_url
+            'cancel_url': self.cancel_url,
+            'object_url': self.get_model_config().get_absolute_url(self.object)
         })
         return context
 
