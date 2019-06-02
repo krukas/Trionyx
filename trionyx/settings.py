@@ -1,11 +1,12 @@
+# Copyright 2019 by Maikel Martens
+#
+# License GPLv3
+
 """
-trionyx.settings
-~~~~~~~~~~~~~~~~
+Settings
+========
 
 All Trionyx base settings
-
-:copyright: 2017 by Maikel Martens
-:license: GPLv3
 """
 import os
 import json
@@ -21,7 +22,12 @@ except FileNotFoundError:
 
 
 def get_env_var(setting, default=None, configs=trionyx_config):
-    """Get environment variable"""
+    """
+    Get environment variable from the environment json file
+
+    Default environment file is `environment.json` in the root of project,
+    Other file path can be set with the `TRIONYX_CONFIG` environment variable
+    """
     try:
         return configs[setting]
     except KeyError:
@@ -97,6 +103,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 LOGIN_EXEMPT_URLS = [
     'static',
 ]
+"""A list of urls that dont require a login"""
 
 AUTH_PASSWORD_VALIDATORS = [
     {
@@ -191,12 +198,36 @@ CELERY_TASK_TIME_LIMIT = 3900
 # Trionyx settings
 # ==============================================================================
 TX_APP_NAME = 'Trionyx'
+"""Full application name"""
+
 TX_LOGO_NAME_START = 'Tri'
+"""The first characters of the name that are bold"""
+
 TX_LOGO_NAME_END = 'onyx'
+"""The rest of the characters"""
+
 TX_LOGO_NAME_SMALL_START = 'T'
+"""The first character or characters of the small logo that is bold"""
+
 TX_LOGO_NAME_SMALL_END = 'X'
+"""The last character or characters of the small logo that is normal"""
+
+TX_THEME_COLOR = 'blue'
+"""The theme skin color (header). Aviable colors: blue, yellow, green, purple, red, black. All colors have a light version blue-light"""
 
 TX_MODEL_CONFIGS = {}
+"""
+Dict with configs for non Trionyx model, example:
+
+.. code-block:: python
+
+    TX_MODEL_CONFIGS = 'auth.group': {
+        'list_default_fields': ['name'],
+        'disable_search_index': False,
+    }
+
+"""
+
 TX_CORE_MODEL_CONFIGS = {
     'auth.group': {
         'list_default_fields': ['name'],

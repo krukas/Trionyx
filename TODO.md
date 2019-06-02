@@ -22,12 +22,10 @@
 - Add translations
 - Audit log for user changed models
   - Add created_by to model
-- Add permission check for generic views
-- User management
-  - CRUD users
-    - Change permission (as Tree view) and groups
-  - CRUD Groups
-    - Default admin group with always every permission (cant be deleted, or remove permission)
+- ~~Add permission check for generic views~~
+- ~~User management~~
+  - ~~CRUD users~~
+  - ~~CRUD Groups~~
 - Dashboard
   - multiple dashboards with different default per user group.
   - Determine basic widgets

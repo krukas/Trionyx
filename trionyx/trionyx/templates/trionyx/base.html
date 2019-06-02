@@ -18,12 +18,13 @@
         <link rel="stylesheet" type="text/css" href="{% static "plugins/datetimepicker/css/bootstrap-datetimepicker.min.css" %}">
 
         <link rel="stylesheet" type="text/css" href="{% static "css/AdminLTE.min.css" %}">
-        <link rel="stylesheet" type="text/css" href="{% static "css/skins/skin-blue.min.css" %}">
         <link rel="stylesheet" type="text/css" href="{% static "css/trionyx.css" %}">
 
         {% block extra_css %}{% endblock %}
 
     {% endcompress %}
+
+    <link rel="stylesheet" type="text/css" href="{% static tx_skin_css %}">
 
     {% block extra_head %}{% endblock %}
 
@@ -38,7 +39,7 @@
     <link rel="stylesheet"
           href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
 </head>
-<body class="hold-transition skin-blue sidebar-mini fixed {% block body_class %}{% endblock %} {% if trionyx_menu_collapse %}sidebar-collapse{% endif %}">
+<body class="hold-transition skin-{{ TX_THEME_COLOR }} sidebar-mini fixed {% block body_class %}{% endblock %} {% if trionyx_menu_collapse %}sidebar-collapse{% endif %}">
 
 {% block body %}
     <div class="wrapper">

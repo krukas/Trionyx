@@ -1,9 +1,44 @@
-"""
-trionyx.layout
-~~~~~~~~~~~~~~
+# copyright 2019 by Maikel Martens
+#
+# license GPLv3
 
-:copyright: 2017 by Maikel Martens
-:license: GPLv3
+"""
+Layout and Components
+=====================
+
+Layouts are used to render a view for an object.
+Layouts are defined and registered in layouts.py in an app.
+
+
+**Example of a tab layout for the user profile:**
+
+.. code-block:: python
+
+    @tabs.register('trionyx.profile')
+    def account_overview(obj):
+        return Container(
+            Row(
+                Column2(
+                    Panel(
+                        'Avatar',
+                        Img(src="{}{}".format(settings.MEDIA_URL, obj.avatar)),
+                        collapse=True,
+                    ),
+                ),
+                Column10(
+                    Panel(
+                        'Account information',
+                        DescriptionList(
+                            'email',
+                            'first_name',
+                            'last_name',
+                        ),
+                    )
+                ),
+            )
+        )
+
+
 """
 from django import template
 from django.utils.functional import cached_property

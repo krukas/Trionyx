@@ -1,0 +1,2 @@
+.. automodule:: trionyx.settings
+   :members:
