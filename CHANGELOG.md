@@ -8,6 +8,7 @@
 - Add custom form urls + shortcut model_url function
 - Add layout register + layout views
 - Add model verbose_name field + change choices to use verbose_name query
+- Add permission checks and hide menu/buttons with no permission
 
 #### Changed
 - Render fields for verbose_name and search title/description

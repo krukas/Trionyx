@@ -39,3 +39,57 @@ ALLOWED_HOSTS = []
 # Celery beat schedule
 from trionyx.utils import create_celerybeat_schedule
 CELERY_BEAT_SCHEDULE = create_celerybeat_schedule(INSTALLED_APPS)
+
+LOGGING = {
+	'version': 1,
+	'formatters': {
+		'color_console': {
+			'()': 'colorlog.ColoredFormatter',
+			'format': '%(log_color)s%(levelname)-8s [%(name)s:%(lineno)s]%(reset)s %(blue)s %(message)s',
+			'datefmt': "%d/%b/%Y %H:%M:%S",
+			'log_colors': {
+				'DEBUG': 'cyan',
+				'INFO': 'green',
+				'WARNING': 'yellow',
+				'ERROR': 'red',
+				'CRITICAL': 'red',
+			},
+		},
+	},
+	'filters': {
+		'require_debug_true': {
+			'()': 'django.utils.log.RequireDebugTrue',
+		}
+	},
+	'handlers': {
+		'console': {
+			'level': 'DEBUG',
+			'filters': ['require_debug_true'],
+			'class': 'logging.StreamHandler',
+			'formatter': 'color_console',
+		}
+	},
+	'loggers': {
+		'apps': {
+			'level': 'DEBUG',
+			'handlers': ['console'],
+		},
+        'trionyx': {
+			'level': 'DEBUG',
+			'handlers': ['console'],
+		},
+        'django_jsend': {
+			'level': 'DEBUG',
+			'handlers': ['console'],
+		},
+		# 'django.db.backends': {
+		#     'level': 'DEBUG',
+		#     'handlers': ['console'],
+		# },
+		'werkzeug': {
+			'handlers': ['console'],
+			'level': 'DEBUG',
+			'propagate': True,
+		},
+	}
+}

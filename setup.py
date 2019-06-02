@@ -44,6 +44,7 @@ setup(
     ],
     extras_require={
         'dev': [
+            'colorlog',
             'django-extensions',
             'django-debug-toolbar',
             'Werkzeug',
