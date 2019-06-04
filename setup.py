@@ -10,7 +10,7 @@ setup(
 	packages = find_packages(exclude=['app']),
 	include_package_data=True,
 	scripts=['trionyx/bin/trionyx'],
-	version = '0.0.1',
+	version = '0.0.2',
 	description = 'Trionyx is an application framework for managing data and processes',
 	long_description=readme(),
 	classifiers=[
@@ -24,7 +24,7 @@ setup(
 	author_email = 'maikel@martens.me',
 	license='GPL3',
 	url = 'https://github.com/krukas/Trionyx',
-	download_url = 'https://github.com/krukas/Trionyx/releases/tag/0.0.1',
+	download_url = 'https://github.com/krukas/Trionyx/releases/tag/0.0.2',
 	keywords = ['Django', 'Trionyx', 'framework', 'admin', 'data', 'processes', 'application', 'stack'],
 	install_requires=[
         "Django >= 1.11.0, < 1.12",
