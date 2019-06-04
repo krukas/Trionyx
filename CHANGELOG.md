@@ -1,4 +1,4 @@
-### [DEVELOP] - 
+### [0.2.0] - 04-06-2019 
 
 **Compatibility breaking changes**
 
