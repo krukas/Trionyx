@@ -1,5 +1,6 @@
 from setuptools import setup
 from setuptools import find_packages
+from trionyx import __version__
 
 def readme():
     with open('README.rst') as f:
@@ -10,7 +11,7 @@ setup(
     packages = find_packages(exclude=['app']),
     include_package_data=True,
     scripts=['trionyx/bin/trionyx'],
-    version = '0.1.1',
+    version = __version__,
     description = 'Trionyx is an application framework for managing data and processes',
     long_description=readme(),
     classifiers=[
@@ -24,7 +25,7 @@ setup(
     author_email = 'maikel@martens.me',
     license='GPL3',
     url = 'https://github.com/krukas/Trionyx',
-    download_url = 'https://github.com/krukas/Trionyx/releases/tag/0.1.1',
+    download_url = 'https://github.com/krukas/Trionyx/releases/tag/{}'.format(__version__),
     keywords = ['Django', 'Trionyx', 'framework', 'admin', 'data', 'processes', 'application', 'stack'],
     install_requires=[
         "Django >= 2.2.0, < 2.3",
