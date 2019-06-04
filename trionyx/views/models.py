@@ -9,6 +9,7 @@ import csv
 import io
 import operator
 import json
+import logging
 from functools import reduce
 from collections import OrderedDict, defaultdict
 
@@ -35,6 +36,8 @@ from watson import search as watson
 from trionyx.views.mixins import ModelClassMixin, SessionValueMixin, ModelPermissionMixin
 from trionyx.forms.helper import FormHelper
 from trionyx import utils
+
+logger = logging.getLogger(__name__)
 
 
 # =============================================================================
@@ -585,6 +588,11 @@ class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
         messages.success(self.request, "Successfully saved ({})".format(self.object))
         return response
 
+    def form_invalid(self, form):
+        """form invalid"""
+        logger.debug(json.dumps(form.errors))
+        return super().form_invalid(form)
+
 
 class CreateView(ModelPermissionMixin, DjangoCreateView, ModelClassMixin):
     """Create view that renders view with crispy-forms"""
@@ -664,6 +672,11 @@ class CreateView(ModelPermissionMixin, DjangoCreateView, ModelClassMixin):
         response = super().form_valid(form)
         messages.success(self.request, "Successfully created ({})".format(self.object))
         return response
+
+    def form_invalid(self, form):
+        """form invalid"""
+        logger.debug(json.dumps(form.errors))
+        return super().form_invalid(form)
 
 
 class DeleteView(ModelPermissionMixin, DjangoDeleteView, ModelClassMixin):

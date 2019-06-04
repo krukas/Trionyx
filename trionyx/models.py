@@ -53,7 +53,7 @@ class BaseModel(Model):  # noqa F405
     created_by = ForeignKey('trionyx.User', SET_NULL, default=None, blank=True, null=True)
     """Created by field"""
 
-    verbose_name = TextField(default='')
+    verbose_name = TextField(default='', blank=True)
     """Verbose name field"""
 
     class Meta:
