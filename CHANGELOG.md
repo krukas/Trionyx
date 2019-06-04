@@ -1,9 +1,16 @@
+### [DEVELOP]
+#### Added
+- Add get_current_request to utils
+
+#### Fixed
+- Project create settings BASE_DIR was incorrect 
+
+
 ### [0.2.0] - 04-06-2019 
 
 **Compatibility breaking changes**
 
 #### Added
-- All website are reported as down
 - Form register and refactor default forms to use this
 - Add custom form urls + shortcut model_url function
 - Add layout register + layout views

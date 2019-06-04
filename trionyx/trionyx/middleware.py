@@ -5,11 +5,14 @@ trionyx.trionyx.middleware
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
+import threading
 from re import compile
 
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.conf import settings
+
+LOCAL_DATA = threading.local()
 
 EXEMPT_URLS = [
     compile(reverse(settings.LOGIN_URL).lstrip('/')),
@@ -41,3 +44,19 @@ class LoginRequiredMiddleware:
                 return HttpResponseRedirect(reverse(settings.LOGIN_URL))
 
         return self.get_response(request)
+
+
+class GlobalRequestMiddleware(object):
+    """Store request in thread local data"""
+
+    def __init__(self, get_response):
+        """Init"""
+        self.get_response = get_response
+
+    def __call__(self, request):
+        """Store request in local data"""
+        LOCAL_DATA.request = request
+        try:
+            return self.get_response(request)
+        finally:
+            del LOCAL_DATA.request

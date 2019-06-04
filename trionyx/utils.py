@@ -135,3 +135,9 @@ def datetime_format_to_django_template(format):
         '%p': 'A',  # 'AM' or 'PM'
     }
     return reduce(lambda value, key: value.replace(key, mapping[key]), mapping.keys(), format)
+
+
+def get_current_request():
+    """Get current request object"""
+    from trionyx.trionyx.middleware import LOCAL_DATA
+    return LOCAL_DATA.request
