@@ -140,4 +140,4 @@ def datetime_format_to_django_template(format):
 def get_current_request():
     """Get current request object"""
     from trionyx.trionyx.middleware import LOCAL_DATA
-    return LOCAL_DATA.request
+    return getattr(LOCAL_DATA, 'request', None)

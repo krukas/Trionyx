@@ -127,9 +127,13 @@ class Menu:
             for item in childs:
                 if not item.permission or (item.permission and user.has_perm(item.permission)):
                     item = copy.copy(item)
-                    menu.append(item)
                     if item.childs:
                         item.childs = filter_childs(item.childs)
+                        if item.childs:
+                            menu.append(item)
+                    else:
+                        menu.append(item)
+
             return menu
 
         return filter_childs(self.root_item.childs)

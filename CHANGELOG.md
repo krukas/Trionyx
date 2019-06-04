@@ -4,6 +4,7 @@
 
 #### Fixed
 - Project create settings BASE_DIR was incorrect 
+- Menu item with empty filtered childs is shown
 
 
 ### [0.2.0] - 04-06-2019 
