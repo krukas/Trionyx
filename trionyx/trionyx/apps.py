@@ -7,7 +7,6 @@ Core apps package containing Appconfig
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
-import logging
 from importlib import import_module
 
 from django.apps import AppConfig
@@ -16,6 +15,7 @@ from django.apps import apps
 from trionyx.config import models_config
 from trionyx.menu import app_menu
 from trionyx.trionyx.search import auto_register_search_models
+from trionyx.log import enable_db_logger
 
 from .renderers import render_level
 
@@ -39,6 +39,8 @@ class Config(BaseConfig):
     def ready(self):
         """Auto load Trionyx"""
         from trionyx.urls import model_url
+
+        enable_db_logger()
 
         models_config.auto_load_configs()
 
