@@ -40,8 +40,6 @@ class Config(BaseConfig):
         """Auto load Trionyx"""
         from trionyx.urls import model_url
 
-        self.enable_db_logger()
-
         models_config.auto_load_configs()
 
         self.auto_load_app_modules(['layouts', 'signals', 'forms'])
@@ -67,23 +65,6 @@ class Config(BaseConfig):
                     import_module('{}.{}'.format(app.module.__package__, module))
                 except ImportError:
                     pass
-
-    def enable_db_logger(self):
-        """Enable db logger"""
-        class LogDBHandler(logging.Handler):
-            """DB log handler"""
-
-            def emit(self, record):
-                """Save log record"""
-                from trionyx.trionyx.models import Log
-                try:
-                    Log.objects.create_log_entry_by_record(record)
-                except Exception:
-                    pass  # Logception?
-
-        db_handler = LogDBHandler()
-        db_handler.setLevel(logging.WARNING)
-        logging.getLogger().addHandler(db_handler)
 
     class User:
         """User config"""
