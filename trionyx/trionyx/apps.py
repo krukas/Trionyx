@@ -7,6 +7,7 @@ Core apps package containing Appconfig
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
+import logging
 from importlib import import_module
 
 from django.apps import AppConfig
@@ -15,6 +16,8 @@ from django.apps import apps
 from trionyx.config import models_config
 from trionyx.menu import app_menu
 from trionyx.trionyx.search import auto_register_search_models
+
+from .renderers import render_level
 
 
 class BaseConfig(AppConfig):
@@ -37,6 +40,8 @@ class Config(BaseConfig):
         """Auto load Trionyx"""
         from trionyx.urls import model_url
 
+        self.enable_db_logger()
+
         models_config.auto_load_configs()
 
         self.auto_load_app_modules(['layouts', 'signals', 'forms'])
@@ -52,6 +57,7 @@ class Config(BaseConfig):
         app_menu.add_item('admin', 'Admin', icon='fa fa-cogs', order=9000, permission='is_superuser')
         app_menu.add_item('admin/users', 'Users', url=model_url('trionyx.user', 'list'), order=9010, permission='is_superuser')
         app_menu.add_item('admin/groups', 'Permission groups', url=model_url('auth.group', 'list'), order=9010, permission='is_superuser')
+        app_menu.add_item('admin/logs', 'Logs', url=model_url('trionyx.log', 'list'), order=9090, permission='is_superuser')
 
     def auto_load_app_modules(self, modules):
         """Auto load app modules"""
@@ -62,7 +68,41 @@ class Config(BaseConfig):
                 except ImportError:
                     pass
 
+    def enable_db_logger(self):
+        """Enable db logger"""
+        class LogDBHandler(logging.Handler):
+            """DB log handler"""
+
+            def emit(self, record):
+                """Save log record"""
+                from trionyx.trionyx.models import Log
+                try:
+                    Log.objects.create_log_entry_by_record(record)
+                except Exception:
+                    pass  # Logception?
+
+        db_handler = LogDBHandler()
+        db_handler.setLevel(logging.WARNING)
+        logging.getLogger().addHandler(db_handler)
+
     class User:
         """User config"""
 
         list_default_fields = ['created_at', 'email', 'first_name', 'last_name', 'is_active', 'is_superuser']
+
+    class Log:
+        """Log config"""
+
+        disable_add = True
+        disable_change = True
+        disable_delete = True
+
+        list_default_fields = ['message', 'level', 'last_event', 'log_count']
+        list_default_sort = '-last_event'
+        list_fields = [
+            {
+                'field': 'level',
+                'label': 'Level',
+                'renderer': render_level
+            }
+        ]

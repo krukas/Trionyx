@@ -41,15 +41,32 @@ class ModelPermissionMixin:
 
     def dispatch(self, request, *args, **kwargs):
         """Validate if user can use view"""
-        if self.permission and not request.user.has_perm(self.permission):
+        if not self.is_enabled() or (self.permission and not request.user.has_perm(self.permission)):
             raise PermissionDenied()
         return super().dispatch(request, *args, **kwargs)
+
+    def is_enabled(self):
+        """Check if permission type is enabled for model"""
+        if not hasattr(self, 'get_model_config'):
+            return True
+
+        if self.permission_type == 'change' and self.get_model_config().disable_change:
+            return False
+
+        if self.permission_type == 'add' and self.get_model_config().disable_add:
+            return False
+
+        if self.permission_type == 'delete' and self.get_model_config().disable_delete:
+            return False
+
+        return True
 
     @property
     def permission(self):
         """Permission for view"""
         if self.permission_type and hasattr(self, 'get_model_config'):
             config = self.get_model_config()
+
             return '{app_label}.{type}_{model_name}'.format(
                 app_label=config.app_label,
                 type=self.permission_type,

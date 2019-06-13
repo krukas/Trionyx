@@ -5,8 +5,12 @@ trionyx.trionyx.models
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
+import hashlib
+import traceback
+
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from trionyx import models
+from trionyx.utils import get_current_request
 from django.utils import timezone
 
 
@@ -112,3 +116,86 @@ class UserAttribute(models.Model):
     def __str__(self):
         """User Attribute representation"""
         return self.code
+
+
+# =============================================================================
+# Logging
+# =============================================================================
+class LogManager(models.BaseManager):
+    """Log manager"""
+
+    def create_log_entry_by_record(self, record):
+        """Create log entry by `logging.LogRecord`"""
+        log_hash = hashlib.md5(str(record.pathname + str(record.lineno)).encode()).hexdigest()
+        ' '.join(str(x) for x in [
+            record.pathname,
+            record.lineno,
+            record.msg,
+        ])
+
+        log, _ = self.get_or_create(log_hash=log_hash, defaults={
+            'level': record.levelno,
+            'message': record.msg,
+            'file_path': record.pathname,
+            'file_line': record.lineno,
+            'last_event': timezone.now(),
+        })
+
+        if record.exc_info and not log.traceback:
+            log.traceback = ''.join(traceback.TracebackException(
+                *record.exc_info
+            ).format())
+
+        request = get_current_request()
+        entry = LogEntry.objects.create(
+            log=log,
+            log_time=timezone.now(),
+            user=request.user if request and not request.user.is_anonymous else None,
+            user_agent=request.META.get('HTTP_USER_AGENT') if request else '',
+        )
+
+        log.last_event = entry.log_time
+        log.log_count = log.entries.count()
+        log.save()
+
+
+class Log(models.BaseModel):
+    """Log"""
+
+    CRITICAL = 50
+    ERROR = 40
+    WARNING = 30
+    INFO = 20
+    DEBUG = 10
+    NOTSET = 0
+
+    LEVEL_CHOICES = [
+        (CRITICAL, 'Critical'),
+        (ERROR, 'Error'),
+        (WARNING, 'Warning'),
+        (INFO, 'Info'),
+        (DEBUG, 'Debug'),
+        (NOTSET, 'Not set'),
+    ]
+
+    log_hash = models.CharField(max_length=32)
+    level = models.IntegerField(choices=LEVEL_CHOICES)
+    message = models.TextField()
+    file_path = models.CharField(max_length=256)
+    file_line = models.IntegerField()
+    traceback = models.TextField(default='')
+
+    last_event = models.DateTimeField()
+    log_count = models.IntegerField(default=1)
+
+    objects = LogManager()
+
+
+class LogEntry(models.Model):
+    """Log entry event"""
+
+    log = models.ForeignKey(Log, models.CASCADE, related_name='entries')
+    log_time = models.DateTimeField()
+
+    user = models.ForeignKey(User, models.SET_NULL, null=True, blank=True)
+    user_agent = models.TextField(default='')

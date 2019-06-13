@@ -102,7 +102,7 @@ class ListView(ModelPermissionMixin, TemplateView, ModelClassMixin):
             'create_permission': self.request.user.has_perm('{app_label}.add_{model_name}'.format(
                 app_label=self.get_model_config().app_label,
                 model_name=self.get_model_config().model_name,
-            ).lower())
+            ).lower()) and not self.get_model_config().disable_add
         })
         return context
 
@@ -126,7 +126,7 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
 
     def get_sort(self):
         """Get current sort or sort in session"""
-        return self.get_and_save_value('sort', '-id')
+        return self.get_and_save_value('sort', self.get_model_config().list_default_sort)
 
     def get_search(self):
         """Get current search or search from session, reset page if search is changed"""
@@ -416,11 +416,11 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
             'change_permission': self.request.user.has_perm('{app_label}.change_{model_name}'.format(
                 app_label=self.get_model_config().app_label,
                 model_name=self.get_model_config().model_name,
-            ).lower()),
+            ).lower()) and not self.get_model_config().disable_change,
             'delete_permission': self.request.user.has_perm('{app_label}.delete_{model_name}'.format(
                 app_label=self.get_model_config().app_label,
                 model_name=self.get_model_config().model_name,
-            ).lower())
+            ).lower()) and not self.get_model_config().disable_delete
         })
         return context
 
@@ -589,7 +589,7 @@ class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
         return response
 
     def form_invalid(self, form):
-        """form invalid"""
+        """Form invalid"""
         logger.debug(json.dumps(form.errors))
         return super().form_invalid(form)
 
@@ -674,7 +674,7 @@ class CreateView(ModelPermissionMixin, DjangoCreateView, ModelClassMixin):
         return response
 
     def form_invalid(self, form):
-        """form invalid"""
+        """Form invalid"""
         logger.debug(json.dumps(form.errors))
         return super().form_invalid(form)
 

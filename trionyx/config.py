@@ -102,6 +102,9 @@ class ModelConfig:
     list_select_related = None
     """Array of fields to add foreign-key relationships to query, use this for relations that are used in search or renderer"""
 
+    list_default_sort = '-id'
+    """Default sort field for list view"""
+
     verbose_name = "{model_name}({id})"
     """
     Verbose name used for displaying model, default value is "{model_name}({id})"
@@ -110,6 +113,15 @@ class ModelConfig:
         - app_label: App name
         - model_name: Class name of model
     """
+
+    disable_add = False
+    """Disable add for this model"""
+
+    disable_change = False
+    """Disable change for this model"""
+
+    disable_delete = False
+    """Disable delete for this model"""
 
     def __init__(self, model, MetaConfig=None):
         """Init config"""
