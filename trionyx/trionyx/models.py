@@ -126,12 +126,11 @@ class LogManager(models.BaseManager):
 
     def create_log_entry_by_record(self, record):
         """Create log entry by `logging.LogRecord`"""
-        log_hash = hashlib.md5(str(record.pathname + str(record.lineno)).encode()).hexdigest()
-        ' '.join(str(x) for x in [
+        log_hash = hashlib.md5(str(' '.join(str(x) for x in [
             record.pathname,
             record.lineno,
             record.msg,
-        ])
+        ])).encode()).hexdigest()
 
         log, _ = self.get_or_create(log_hash=log_hash, defaults={
             'level': record.levelno,
