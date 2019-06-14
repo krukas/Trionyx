@@ -87,7 +87,7 @@ class TabRegister:
                 return item
         raise Exception('Given tab does not exits or is filtered')
 
-    def register(self, model_alias, code='general', name=None, order=None, display_filter=None):
+    def register(self, model_alias, code='general', name=None, order=10, display_filter=None):
         """
         Register new tab
 
@@ -112,7 +112,7 @@ class TabRegister:
                 raise Exception("Tab {} already registered for model {}".format(code, model_alias))
 
             self.tabs[model_alias].append(item)
-            self.tabs[model_alias] = sorted(self.tabs[model_alias], key=lambda item: item.order if item.order else 999)
+            self.tabs[model_alias] = sorted(self.tabs[model_alias], key=lambda item: item.order if item.order else 10)
 
             return create_layout
         return wrapper
@@ -134,7 +134,7 @@ class TabRegister:
             return update_layout
         return wrapper
 
-    def update(self, model_alias, code='general', name=None, order=None, display_filter=None):
+    def update(self, model_alias, code='general', name=None, order=10, display_filter=None):
         """
         Update given tab
 
@@ -156,7 +156,7 @@ class TabRegister:
             if display_filter:
                 item.display_filter = display_filter
             break
-        self.tabs[model_alias] = sorted(self.tabs[model_alias], key=lambda item: item.code if item.code else 999)
+        self.tabs[model_alias] = sorted(self.tabs[model_alias], key=lambda item: item.code if item.code else 10)
 
     def get_model_alias(self, model_alias):
         """Get model alias if class then convert to alias string"""
@@ -171,7 +171,7 @@ class TabRegister:
         for config in models_config.get_all_configs(False):
             model_alias = '{}.{}'.format(config.app_label, config.model_name)
             if model_alias not in self.tabs:
-                @self.register(model_alias)
+                @self.register(model_alias, order=10)
                 def general_layout(obj):
                     return Layout(
                         Column12(

@@ -4,6 +4,7 @@
 - Add DB logger
 - Add options to disable create/update/delete for model
 - Add debug logging for form errors
+- Add audit log for models
 
 #### Fixed
 - Project create settings BASE_DIR was incorrect 

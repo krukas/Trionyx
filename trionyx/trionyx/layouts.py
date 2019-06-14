@@ -5,7 +5,10 @@ trionyx.trionyx.layouts
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
+from django.contrib.contenttypes.models import ContentType
+from trionyx.trionyx.models import AuditLogEntry
 from trionyx.views import tabs
+from trionyx.renderer import datetime_value_renderer
 from trionyx.layout import (
     Container, Row, Column10, Column2, Column12, Column6, Panel, DescriptionList, TableDescription, Img, Table, Html
 )
@@ -154,3 +157,34 @@ def trionyx_log(obj):
             )
         )
     )
+
+
+def auditlog(obj):
+    """Create auditlog history layout"""
+    content_type = ContentType.objects.get_for_model(obj)
+    return [
+        Column12(
+            Panel(
+                '{action} on {date} by {user}'.format(
+                    action=auditlog.get_action_display(),
+                    date=datetime_value_renderer(auditlog.created_at),
+                    user=auditlog.user if auditlog.user else 'System'
+                ),
+                Table(
+                    [[field, *changes] for field, changes in auditlog.changes.items()],
+                    {
+                        'label': 'Field',
+                        'width': '10%',
+                    },
+                    {
+                        'label': 'Old value',
+                        'width': '45%',
+                    },
+                    {
+                        'label': 'New value',
+                        'width': '45%',
+                    },
+                )
+            )
+        ) for auditlog in AuditLogEntry.objects.filter(content_type=content_type, object_id=obj.id).order_by('-created_at')
+    ]

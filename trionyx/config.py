@@ -123,11 +123,18 @@ class ModelConfig:
     disable_delete = False
     """Disable delete for this model"""
 
+    auditlog_disable = False
+    """Disable auditlog for this model"""
+
+    auditlog_ignore_fields = None
+    """Auditlog fields to be ignored"""
+
     def __init__(self, model, MetaConfig=None):
         """Init config"""
         self.model = model
         self.app_label = model._meta.app_label
         self.model_name = model._meta.model_name
+        self.__changed = {}
 
         if MetaConfig:
             for key, value in MetaConfig.__dict__.items():
@@ -135,12 +142,31 @@ class ModelConfig:
                     continue
                 setattr(self, key, value)
 
+    def __setattr__(self, name, value):
+        """Add attribute to changed list"""
+        try:
+            self.__changed[name] = True
+        except Exception:
+            # Ignore errors from __init__ that __changed does not exists
+            pass
+        super().__setattr__(name, value)
+
     def __getattr__(self, item):
         """Get attribute and returns null if not set"""
         try:
             return super().__getattr__(item)
         except AttributeError:
             return None
+
+    @property
+    def is_trionyx_model(self):
+        """Check if config is for Trionyx model"""
+        from trionyx.models import BaseModel
+        return isinstance(self.model(), BaseModel)
+
+    def has_config(self, name):
+        """Check if config is set"""
+        return name in self.__changed
 
     def get_fields(self, inlcude_base=False, include_id=False):
         """Get model fields"""

@@ -38,8 +38,6 @@ class Config(BaseConfig):
 
     def ready(self):
         """Auto load Trionyx"""
-        from trionyx.urls import model_url
-
         enable_db_logger()
 
         models_config.auto_load_configs()
@@ -53,7 +51,11 @@ class Config(BaseConfig):
         from trionyx.views import tabs
         tabs.auto_generate_missing_tabs()
 
+        from trionyx.trionyx.auditlog import init_auditlog
+        init_auditlog()
+
         # Add admin menu items
+        from trionyx.urls import model_url
         app_menu.add_item('admin', 'Admin', icon='fa fa-cogs', order=9000, permission='is_superuser')
         app_menu.add_item('admin/users', 'Users', url=model_url('trionyx.user', 'list'), order=9010, permission='is_superuser')
         app_menu.add_item('admin/groups', 'Permission groups', url=model_url('auth.group', 'list'), order=9010, permission='is_superuser')
@@ -80,6 +82,8 @@ class Config(BaseConfig):
         disable_change = True
         disable_delete = True
 
+        auditlog_disable = True
+
         list_default_fields = ['message', 'level', 'last_event', 'log_count']
         list_default_sort = '-last_event'
         list_fields = [
@@ -89,3 +93,14 @@ class Config(BaseConfig):
                 'renderer': render_level
             }
         ]
+
+    class AuditLogEntry:
+        """AuditlogEntry config"""
+
+        disable_search_index = True
+
+        disable_add = True
+        disable_change = True
+        disable_delete = True
+
+        auditlog_disable = True

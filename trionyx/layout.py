@@ -333,7 +333,7 @@ class ComponentFieldsMixin:
 
         if 'value' in field:
             value = field['value']
-        elif isinstance(data, object) and hasattr(data, field['field']):
+        elif isinstance(data, object) and field['field'] and hasattr(data, field['field']):
             value = getattr(data, field['field'])
             if 'renderer' not in field:
                 value = renderer.render_field(data, field['field'], **field)

@@ -9,9 +9,10 @@ import hashlib
 import traceback
 
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
+from django.contrib.contenttypes import fields
+from django.utils import timezone
 from trionyx import models
 from trionyx.utils import get_current_request
-from django.utils import timezone
 
 
 # =============================================================================
@@ -198,3 +199,32 @@ class LogEntry(models.Model):
 
     user = models.ForeignKey(User, models.SET_NULL, null=True, blank=True)
     user_agent = models.TextField(default='')
+
+
+class AuditLogEntry(models.BaseModel):
+    """Auditlog model"""
+
+    ACTION_ADDED = 10
+    ACTION_CHANGED = 20
+    ACTION_DELETED = 30
+
+    action_choices = [
+        (ACTION_ADDED, 'Added'),
+        (ACTION_CHANGED, 'Changed'),
+        (ACTION_DELETED, 'Deleted'),
+    ]
+
+    content_type = models.ForeignKey('contenttypes.ContentType', models.CASCADE, related_name='+')
+    object_id = models.BigIntegerField(blank=True, null=True)
+    content_object = fields.GenericForeignKey('content_type', 'object_id')
+
+    user = models.ForeignKey(User, models.SET_NULL, blank=True, null=True, related_name='+')
+    action = models.IntegerField(choices=action_choices)
+    changes = models.JSONField()
+
+    class Meta:
+        """Model meta description"""
+
+        indexes = [
+            models.Index(fields=['content_type', 'object_id']),
+        ]
