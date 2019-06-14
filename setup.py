@@ -18,8 +18,6 @@ setup(
         'License :: OSI Approved :: GNU General Public License v3 (GPLv3)',
         'Programming Language :: Python :: 3',
         'Framework :: Django',
-        'Topic :: Office/Business :: Groupware',
-
     ],
     author = 'Maikel Martens',
     author_email = 'maikel@martens.me',

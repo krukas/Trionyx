@@ -1,10 +1,14 @@
 ### [DEVELOP]
 #### Added
 - Add get_current_request to utils
+- Add DB logger
+- Add options to disable create/update/delete for model
+- Add debug logging for form errors
 
 #### Fixed
 - Project create settings BASE_DIR was incorrect 
 - Menu item with empty filtered childs is shown
+- Make verbose_name field not required
 
 
 ### [0.2.0] - 04-06-2019 
