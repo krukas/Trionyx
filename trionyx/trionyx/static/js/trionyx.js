@@ -178,9 +178,19 @@ function initGlobalSearch(searchUrl) {
         },
         created: function() {
             var self = this;
+            var ctrlDown = false;
+            var ctrlKey = 17;
+            var cmdKey = 91;
+            $(document).keydown(function(e) {
+                if (e.keyCode === ctrlKey || e.keyCode === cmdKey) ctrlDown = true;
+            }).keyup(function(e) {
+                if (e.keyCode === ctrlKey || e.keyCode === cmdKey) ctrlDown = false;
+            });
+
+
             $(window).keypress(function (event) {
                 var activeElement = $(document.activeElement);
-                if (activeElement.is('body') && event.charCode > 0) {
+                if (!ctrlDown && activeElement.is('body') && event.charCode > 0) {
                     self.show = true;
                     self.search += String.fromCharCode(event.charCode);
                 }
