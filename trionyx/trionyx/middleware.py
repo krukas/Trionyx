@@ -11,6 +11,7 @@ from re import compile
 from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.conf import settings
+from django.utils import timezone
 
 LOCAL_DATA = threading.local()
 
@@ -46,7 +47,7 @@ class LoginRequiredMiddleware:
         return self.get_response(request)
 
 
-class GlobalRequestMiddleware(object):
+class GlobalRequestMiddleware:
     """Store request in thread local data"""
 
     def __init__(self, get_response):
@@ -60,3 +61,20 @@ class GlobalRequestMiddleware(object):
             return self.get_response(request)
         finally:
             del LOCAL_DATA.request
+
+
+class LastLoginMiddleware:
+    """Set last login for user"""
+
+    def __init__(self, get_response):
+        """Init"""
+        self.get_response = get_response
+
+    def __call__(self, request):
+        """Set last login"""
+        minute_ago = timezone.now() - timezone.timedelta(minutes=1)
+        if request.user.is_authenticated and (not request.user.last_online or request.user.last_online <= minute_ago):
+            request.user.last_online = timezone.now()
+            request.user.save(update_fields=['last_online'])
+
+        return self.get_response(request)

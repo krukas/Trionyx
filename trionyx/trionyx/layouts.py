@@ -55,7 +55,10 @@ def trionyx_user(obj):
             Column2(
                 Panel(
                     'Avatar',
-                    Img(src="{}{}".format(settings.MEDIA_URL, obj.avatar)),
+                    Img(src="{}{}".format(
+                        settings.MEDIA_URL if obj.avatar else settings.STATIC_URL,
+                        obj.avatar if obj.avatar else 'img/avatar.png'
+                    )),
                     collapse=True,
                 ),
             ),
@@ -68,6 +71,7 @@ def trionyx_user(obj):
                         'last_name',
                         'created_at',
                         'last_login',
+                        'last_online',
                         'is_active',
                         'is_superuser',
                         'groups',

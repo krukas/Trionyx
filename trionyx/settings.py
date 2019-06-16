@@ -93,6 +93,7 @@ MIDDLEWARE = (
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'trionyx.trionyx.middleware.LoginRequiredMiddleware',
     'trionyx.trionyx.middleware.GlobalRequestMiddleware',
+    'trionyx.trionyx.middleware.LastLoginMiddleware',
 )
 
 # ==============================================================================

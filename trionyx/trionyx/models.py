@@ -60,6 +60,7 @@ class User(models.BaseModel, AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=64, blank=True, default='')
     is_active = models.BooleanField(default=True)
     date_joined = models.DateTimeField(default=timezone.now)
+    last_online = models.DateTimeField(blank=None, null=True)
     avatar = models.ImageField(blank=True, upload_to='avatars/', default='')
 
     USERNAME_FIELD = 'email'
