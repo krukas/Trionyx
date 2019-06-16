@@ -78,6 +78,8 @@ class Config(BaseConfig):
     class Log:
         """Log config"""
 
+        verbose_name = '{message}'
+
         disable_add = True
         disable_change = True
         disable_delete = True
