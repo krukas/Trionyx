@@ -82,6 +82,7 @@ class Config(BaseConfig):
         disable_change = True
         disable_delete = True
 
+        global_search = True
         auditlog_disable = True
 
         list_default_fields = ['message', 'level', 'last_event', 'log_count']
