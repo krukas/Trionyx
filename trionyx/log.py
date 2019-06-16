@@ -8,6 +8,7 @@ Core app for Trionyx
 :license: GPLv3
 """
 import logging
+from django.conf import settings
 
 
 class LogDBHandler(logging.Handler):
@@ -25,5 +26,5 @@ class LogDBHandler(logging.Handler):
 def enable_db_logger():
     """Enable DB logger"""
     db_handler = LogDBHandler()
-    db_handler.setLevel(logging.WARNING)
+    db_handler.setLevel(settings.TX_DB_LOG_LEVEL)
     logging.getLogger().addHandler(db_handler)

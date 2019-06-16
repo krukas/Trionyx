@@ -20,7 +20,7 @@
 - Replace crispy form with trionyx own layout/components
 - component collect all js/css files
 - Add translations
-- Audit log for user changed models
+- ~~Audit log for user changed models~~
   - Add created_by to model
 - ~~Add permission check for generic views~~
 - ~~User management~~
@@ -31,10 +31,10 @@
   - Determine basic widgets
   - TODO (uses user UserAttribute)
   - notepad (uses user UserAttribute)
-- DB logger
-  - Logs all from trionyx and apps
-  - Admin can see logs in interface
-  - log level is set as setting
+- ~~DB logger~~
+  - ~~Logs all from trionyx and apps~~
+  - ~~Admin can see logs in interface~~
+  - ~~log level is set as setting~~
 - Layout/Value renderers
   - Progressbar with realtime option
   - Unordered/Ordered List

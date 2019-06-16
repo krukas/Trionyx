@@ -10,6 +10,7 @@ All Trionyx base settings
 """
 import os
 import json
+import logging
 
 from kombu import Queue, Exchange
 from django.core.exceptions import ImproperlyConfigured
@@ -235,3 +236,6 @@ TX_CORE_MODEL_CONFIGS = {
         'disable_search_index': False,
     }
 }
+
+TX_DB_LOG_LEVEL = logging.WARNING
+"""The DB log level for logging"""
