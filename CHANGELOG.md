@@ -6,10 +6,14 @@
 - Add debug logging for form errors
 - Add audit log for models
 
+#### Changed
+- Set fallback for user profile name and avatar
+
 #### Fixed
 - Project create settings BASE_DIR was incorrect 
 - Menu item with empty filtered childs is shown
 - Make verbose_name field not required
+- Global search is activated on CTRL commands
 
 
 ### [0.2.0] - 04-06-2019 
