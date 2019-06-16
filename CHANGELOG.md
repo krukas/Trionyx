@@ -5,6 +5,7 @@
 - Add options to disable create/update/delete for model
 - Add debug logging for form errors
 - Add audit log for models
+- Add user last_online field
 
 #### Changed
 - Set fallback for user profile name and avatar
