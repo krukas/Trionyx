@@ -49,6 +49,11 @@ def get_field_value(obj, field):
                 value = timezone.make_naive(value, timezone=timezone.utc)
         except ObjectDoesNotExist:
             value = field.default if field.default is not models.NOT_PROVIDED else None
+    if isinstance(field, models.DecimalField):
+        try:
+            value = smart_text(float(getattr(obj, field.name, None)))
+        except ObjectDoesNotExist:
+            value = field.default if field.default is not models.NOT_PROVIDED else None
     else:
         try:
             value = smart_text(getattr(obj, field.name, None))
