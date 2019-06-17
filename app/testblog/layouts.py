@@ -48,7 +48,18 @@ def post_overview(obj):
                         'label': 'Value',
                         'value': 'fixed value',
                         'renderer': lambda value, data_object, **options: '{}'.format(data_object)
-                    }
+                    },
+                    footer=[
+                        [
+                            ['Subtotaal', '12,50'],
+                            ['Totaal', '12,50'],
+                        ],
+                        {
+                            'colspan': 2,
+                            'class': 'text-right'
+                        },
+                        'Price'
+                    ]
                 )
             )
         )

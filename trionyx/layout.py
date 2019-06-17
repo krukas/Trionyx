@@ -619,15 +619,58 @@ class TableDescription(Component, ComponentFieldsMixin):
 
 
 class Table(Component, ComponentFieldsMixin):
-    """Bootstrap table"""
+    """
+    Bootstrap table
+
+    footer: array with first items array/queryset and other items are the fields,
+            Same way how the constructor works
+
+    """
 
     template_name = 'trionyx/components/table.html'
 
     def __init__(self, objects, *fields, **options):
         """Init Table"""
+        footer = options.pop('footer', None)
         super().__init__(**options)
 
         self.objects = objects
         """Can be string with field name relation, Queryset or list"""
 
         self.fields = fields
+
+        self.footer_objects = footer[0] if footer else None
+        """Can be string with field name relation, Queryset or list"""
+
+        self.footer_fields = footer[1:] if footer else []
+
+    def get_footer_fields(self):
+        """Get all footer fields"""
+        if not hasattr(self, '__footer_fields'):
+            self.__footer_fields = [
+                self.parse_field(field, index)
+                for index, field in enumerate(self.footer_fields)
+            ]
+        return self.__footer_fields
+
+    def get_rendered_footer_object(self, obj):
+        """Render footer object"""
+        return [
+            {
+                **field,
+                'value': self.render_field(field, obj)
+            }
+            for field in self.get_footer_fields()
+        ]
+
+    def get_rendered_footer_objects(self):
+        """Render footer objects"""
+        objects = self.footer_objects
+
+        if isinstance(objects, str):
+            objects = getattr(self.object, objects).all()
+
+        return [
+            self.get_rendered_footer_object(obj)
+            for obj in objects
+        ]

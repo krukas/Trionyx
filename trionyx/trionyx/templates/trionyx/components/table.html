@@ -12,9 +12,27 @@
         {% for row in component.get_rendered_objects %}
             <tr>
                 {% for column in row %}
-                   <td>{{ column.value|safe }}</td>
+                   <td {% if column.class %}class="{{ column.class }}"{% endif %}>
+                       {{ column.value|safe }}
+                   </td>
                 {% endfor %}
             </tr>
         {% endfor %}
-  </tbody>
+    </tbody>
+    {% if component.footer_objects %}
+        <tfooter class="">
+            {% for row in component.get_rendered_footer_objects %}
+                <tr>
+                    {% for column in row %}
+                       <td
+                               {% if column.class %}class="{{ column.class }}"{% endif %}
+                               {% if column.colspan %}colspan="{{ column.colspan }}"{% endif %}
+                       >
+                           {{ column.value|safe }}
+                       </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tfooter>
+    {% endif %}
 </table>
