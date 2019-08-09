@@ -52,7 +52,7 @@ def get_field_value(obj, field):
     if isinstance(field, models.DecimalField):
         try:
             value = smart_text(float(getattr(obj, field.name, None)))
-        except ObjectDoesNotExist:
+        except TypeError:
             value = field.default if field.default is not models.NOT_PROVIDED else None
     else:
         try:
