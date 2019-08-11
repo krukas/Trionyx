@@ -221,3 +221,8 @@ table .dragtable-col-placeholder:first {
 th:hover .dragtable-drag-handle {
     display: inline;
 }
+
+.description-value .form-control {
+    padding: 2px 4px;
+    height: inherit;
+}

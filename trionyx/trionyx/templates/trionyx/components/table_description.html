@@ -3,7 +3,7 @@
         {% for field in component.get_rendered_object %}
             <tr>
                 <th style="width: {{ field.width }};">{{ field.label }}:</th>
-                <td>{{ field.value|safe }}</td>
+                <td class="description-value">{{ field.value|safe }}</td>
             </tr>
         {% endfor %}
   </tbody>

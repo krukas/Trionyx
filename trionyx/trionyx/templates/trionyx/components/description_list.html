@@ -2,7 +2,7 @@
     <dl {% if component.horizontal %}class="dl-horizontal"{% endif %}>
         {% for field in component.get_rendered_object %}
             <dt>{{ field.label }}</dt>
-            <dd>{{ field.value|safe }}</dd>
+            <dd class="description-value">{{ field.value|safe }}</dd>
         {% endfor %}
     </dl>
 {% elif component.no_data_message %}

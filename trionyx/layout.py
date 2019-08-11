@@ -237,6 +237,7 @@ class ComponentFieldsMixin:
             self.__fields = [
                 self.parse_field(field, index)
                 for index, field in enumerate(getattr(self, 'fields', []))
+                if not (field is False or field is None)
             ]
         return self.__fields
 
@@ -349,7 +350,7 @@ class ComponentFieldsMixin:
             value = field['renderer'](value, data_object=data, **options)
         elif isinstance(value, Component):
             value.set_object(self.object)
-            value = value.render(self.context, self.request)
+            value = value.render(self.context.copy(), self.request)
         else:
             value = renderer.render_value(value, data_object=data, **options)
 
@@ -396,7 +397,7 @@ class HtmlTagWrapper(Component):
     def __init__(self, *args, **kwargs):
         """Initialize HtmlTagWrapper"""
         super().__init__(*args, **kwargs)
-        self.attr = self.attr if self.attr else {}
+        self.attr = self.attr.copy() if self.attr else {}
 
     def get_attr_text(self):
         """Get html attr text to render in template"""
@@ -431,6 +432,15 @@ class Img(Html):
     valid_attr = ['src', 'width']
     attr = {
         'width': '100%',
+    }
+
+
+class Input(Html):
+    tag = 'input'
+    valid_attr = ['name', 'value', 'type', 'placeholder', 'class']
+    attr = {
+        'type': 'text',
+        'class': 'form-control',
     }
 
 
