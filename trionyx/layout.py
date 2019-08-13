@@ -139,7 +139,7 @@ class Component:
     def __init__(self, *components, **options):
         """Initialize Component"""
         self.id = options.get('id')
-        self.components = list(components)
+        self.components = list(filter(None, components))
         self.object = False
         self.context = {}
         self.request = None

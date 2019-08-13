@@ -6,6 +6,7 @@
 - Add debug logging for form errors
 - Add audit log for models
 - Add user last_online field
+- Add support for inline formsets
 
 #### Changed
 - Set fallback for user profile name and avatar

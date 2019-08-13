@@ -226,3 +226,17 @@ th:hover .dragtable-drag-handle {
     padding: 2px 4px;
     height: inherit;
 }
+
+.inline-form-table.table tr td {
+    padding: 0;
+    border: none;
+}
+
+.inline-form-table .form-group {
+    margin: 0;
+}
+
+.inline-form-table .checkbox input[type="checkbox"] {
+    margin-left: -16px;
+    left: 50%;
+}

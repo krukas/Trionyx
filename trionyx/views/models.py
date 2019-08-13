@@ -32,6 +32,7 @@ from django.contrib import messages
 from django.db.models import Q
 from django.utils import timezone
 from watson import search as watson
+from django.db import transaction
 
 from trionyx.views.mixins import ModelClassMixin, SessionValueMixin, ModelPermissionMixin
 from trionyx.forms.helper import FormHelper
@@ -573,6 +574,11 @@ class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
     def get_context_data(self, **kwargs):
         """Add context data to view"""
         context = super().get_context_data(**kwargs)
+
+        inline_formsets = getattr(self.get_form_class(), 'inline_formsets', {})
+        for key, InlineFormset in inline_formsets.items():
+            context[key] = InlineFormset(self.request.POST if self.request.POST else None, instance=self.object)
+
         context.update({
             'title': self.title,
             'submit_value': self.submit_value,
@@ -584,6 +590,23 @@ class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
 
     def form_valid(self, form):
         """Add success message"""
+        context = self.get_context_data()
+        inline_formsets = getattr(self.get_form_class(), 'inline_formsets', {})
+
+        valid = True
+        for key in inline_formsets:
+            valid = valid and context[key].is_valid()
+
+        if not valid:
+            return self.form_invalid(form)
+
+        with transaction.atomic():
+            self.object = form.save()
+
+            for key in inline_formsets:
+                context[key].instance = self.object
+                context[key].save()
+
         response = super().form_valid(form)
         messages.success(self.request, "Successfully saved ({})".format(self.object))
         return response
@@ -658,6 +681,11 @@ class CreateView(ModelPermissionMixin, DjangoCreateView, ModelClassMixin):
     def get_context_data(self, **kwargs):
         """Add context data to view"""
         context = super().get_context_data(**kwargs)
+
+        inline_formsets = getattr(self.get_form_class(), 'inline_formsets', {})
+        for key, InlineFormset in inline_formsets.items():
+            context[key] = InlineFormset(self.request.POST if self.request.POST else None, instance=self.object)
+
         context.update({
             'title': self.title,
             'submit_value': self.submit_value,
@@ -669,6 +697,23 @@ class CreateView(ModelPermissionMixin, DjangoCreateView, ModelClassMixin):
 
     def form_valid(self, form):
         """Add success message"""
+        context = self.get_context_data()
+        inline_formsets = getattr(self.get_form_class(), 'inline_formsets', {})
+
+        valid = True
+        for key in inline_formsets:
+            valid = valid and context[key].is_valid()
+
+        if not valid:
+            return self.form_invalid(form)
+
+        with transaction.atomic():
+            self.object = form.save()
+
+            for key in inline_formsets:
+                context[key].instance = self.object
+                context[key].save()
+
         response = super().form_valid(form)
         messages.success(self.request, "Successfully created ({})".format(self.object))
         return response

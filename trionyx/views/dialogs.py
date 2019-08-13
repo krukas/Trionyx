@@ -11,6 +11,7 @@ import json
 from django.views.generic import View
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from django.db import transaction
 
 from trionyx.views.mixins import ModelClassMixin
 from trionyx.forms.helper import FormHelper
@@ -206,6 +207,15 @@ class UpdateDialog(DialogView):
             return form_register.get_form(self.get_model_class(), self.kwargs.get('code'))
         return form_register.get_edit_form(self.get_model_class())
 
+    def get_inline_forms(self):
+        if not hasattr(self, '__inline_forms'):
+            self.__inline_forms = {
+                key: InlineFormset(self.request.POST if self.request.POST else None, instance=self.object)
+                for key, InlineFormset in getattr(self.get_form_class(), 'inline_formsets', {}).items()
+            }
+
+        return self.__inline_forms
+
     def display_dialog(self, *args, **kwargs):
         """Display form and success message when set"""
         form = kwargs.pop('form_instance', None)
@@ -226,6 +236,7 @@ class UpdateDialog(DialogView):
             'content': self.render_to_string(self.template, {
                 'form': form,
                 'success_message': success_message,
+                **self.get_inline_forms()
             }),
             'submit_label': self.submit_label,
             'success': bool(success_message),
@@ -235,9 +246,21 @@ class UpdateDialog(DialogView):
         """Handle form and save and set success message on valid form"""
         form = self.get_form_class()(self.request.POST, initial=kwargs, instance=self.object)
 
+        valid = form.is_valid()
+        for key, inline_form in self.get_inline_forms().items():
+            valid = valid and inline_form.is_valid()
+
         success_message = None
-        if form.is_valid():
-            obj = form.save()
+        if valid:
+            with transaction.atomic():
+                obj = form.save()
+
+                for key, inline_form in self.get_inline_forms().items():
+                    inline_form.instance = obj
+                    inline_form.save()
+
+            obj.save()
+
             success_message = self.success_message.format(
                 model_name=self.get_model_config().model_name.capitalize(),
                 object=str(obj),
