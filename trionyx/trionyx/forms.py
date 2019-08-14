@@ -7,7 +7,9 @@ trionyx.trionyx.forms
 """
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import password_validation
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, Permission
+from django.contrib.contenttypes.models import ContentType
+from django.db.models import Q
 
 from trionyx import forms
 from trionyx.forms.layout import Layout, Fieldset, Div
@@ -260,6 +262,23 @@ class UserUpdateForm(forms.ModelForm):
 @forms.register(default_create=True, default_edit=True)
 class GroupForm(forms.ModelForm):
     """Group form"""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)  # populates the post
+        self.fields['permissions'].queryset = Permission.objects.exclude(
+            content_type__in=ContentType.objects.filter(
+                Q(app_label__in=['contenttypes', 'sessions', 'watson'])
+                |
+                Q(app_label='auth') & Q(model='permission')
+                |
+                Q(app_label='trionyx') & Q(model='auditlogentry')
+                |
+                Q(app_label='trionyx') & Q(model='logentry')
+                |
+                Q(app_label='trionyx') & Q(model='userattribute')
+            )
+        )
+
 
     class Meta:
         """Meta description for form"""
