@@ -436,12 +436,25 @@ class Img(Html):
 
 
 class Input(Html):
-    tag = 'input'
+    template_name = 'trionyx/components/input.html'
+
     valid_attr = ['name', 'value', 'type', 'placeholder', 'class']
     attr = {
         'type': 'text',
         'class': 'form-control',
     }
+
+    def __init__(self, form_field=None, has_error=False, **kwargs):
+        super().__init__(None, **kwargs)
+        self.has_error = has_error
+
+        if form_field:
+            self.attr['name'] = form_field.name
+            self.attr['value'] = form_field.value()
+            self.has_error = form_field.errors
+
+        if 'value' in self.attr and self.attr['value'] is None:
+            self.attr['value'] = ''
 
 
 class Button(Html):
