@@ -5,22 +5,22 @@ trionyx.trionyx.layouts
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
-from trionyx.trionyx.models import AuditLogEntry
-from trionyx.views import tabs
-from trionyx.renderer import datetime_value_renderer
+from rest_framework.authtoken.models import Token
 from trionyx.layout import (
     Container, Row, Column10, Column2, Column12, Column6, Panel, DescriptionList, TableDescription, Img, Table, Html
 )
-
-from django.conf import settings
-
+from trionyx.renderer import datetime_value_renderer
+from trionyx.trionyx.models import AuditLogEntry
+from trionyx.views import tabs
 from .renderers import render_level
 
 
 @tabs.register('trionyx.profile')
 def account_overview(obj):
     """Create layout for user profile"""
+    token, _ = Token.objects.get_or_create(user=obj)
     return Container(
         Row(
             Column2(
@@ -41,6 +41,16 @@ def account_overview(obj):
                         'first_name',
                         'last_name',
                     ),
+                ),
+                Panel(
+                    # TODO Add token reset button
+                    'API',
+                    DescriptionList(
+                        {
+                            'label': 'Token',
+                            'value': token.key,
+                        }
+                    ),
                 )
             ),
         )
@@ -50,6 +60,7 @@ def account_overview(obj):
 @tabs.register('trionyx.user')
 def trionyx_user(obj):
     """Create layout for admin user"""
+    token, _ = Token.objects.get_or_create(user=obj)
     return Container(
         Row(
             Column2(

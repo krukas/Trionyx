@@ -7,6 +7,7 @@
 - Add audit log for models
 - Add user last_online field
 - Add support for inline formsets
+- Add rest API support
 
 #### Changed
 - Set fallback for user profile name and avatar

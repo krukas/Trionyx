@@ -1,0 +1,44 @@
+"""
+trionyx.trionyx.api.serializers
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+:copyright: 2019 by Maikel Martens
+:license: GPLv3
+"""
+import inspect
+
+from trionyx.config import models_config
+
+
+class SerializerRegister:
+    def __init__(self):
+        self.serializers = {}
+
+    def register(self, model_alias):
+        """Add form to register"""
+
+        def wrapper(serializer):
+            model_name = self.get_model_alias(model_alias)
+
+            if model_name in self.serializers:
+                raise Exception("Serializer {} already registered for model {}".format(serializer, model_name))
+
+            self.serializers[model_name] = serializer
+            return serializer
+
+        return wrapper
+
+    def get_model_alias(self, model_alias):
+        """Get model alias if class then convert to alias string"""
+        from trionyx.models import BaseModel
+        if inspect.isclass(model_alias) and issubclass(model_alias, BaseModel):
+            config = models_config.get_config(model_alias)
+            return '{}.{}'.format(config.app_label, config.model_name)
+        return model_alias
+
+    def get(self, model_alias):
+        return self.serializers.get(self.get_model_alias(model_alias))
+
+
+serializer_register = SerializerRegister()
+register = serializer_register.register

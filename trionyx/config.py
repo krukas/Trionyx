@@ -105,6 +105,12 @@ class ModelConfig:
     list_default_sort = '-id'
     """Default sort field for list view"""
 
+    api_fields = None
+    """Fields used in API model serializer, fallback on fields used in create and edit forms"""
+
+    api_disable = False
+    """Disable API for model"""
+
     verbose_name = "{model_name}({id})"
     """
     Verbose name used for displaying model, default value is "{model_name}({id})"

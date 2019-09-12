@@ -87,6 +87,7 @@ class Config(BaseConfig):
 
         global_search = False
         auditlog_disable = True
+        api_disable = True
 
         list_default_fields = ['message', 'level', 'last_event', 'log_count']
         list_default_sort = '-last_event'
@@ -108,3 +109,4 @@ class Config(BaseConfig):
         disable_delete = True
 
         auditlog_disable = True
+        api_disable = True

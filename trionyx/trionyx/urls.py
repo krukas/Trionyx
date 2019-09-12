@@ -7,14 +7,17 @@ trionyx.trionyx.url
 """
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import path
+from django.urls import path, include
 
 from trionyx import views as core_views
 from trionyx.trionyx import views
+from trionyx.api.routers import AutoRouter
 
 app_name = 'trionyx'
 
 urlpatterns = [
+    path('api/', include(AutoRouter().urls)),
+
     path('login/', views.LoginView.as_view(), name='login'),
     path('logout/', views.logout, name='logout'),
 

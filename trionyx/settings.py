@@ -53,6 +53,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django.contrib.humanize',
 
+    'rest_framework',
+    'rest_framework.authtoken',
     'watson',
     'crispy_forms',
     'compressor',
@@ -196,6 +198,31 @@ CELERY_TASK_DEFAULT_QUEUE = 'low_prio'
 
 CELERY_TASK_SOFT_TIME_LIMIT = 3600
 CELERY_TASK_TIME_LIMIT = 3900
+
+
+# ==============================================================================
+# Trionyx settings
+# ==============================================================================
+REST_FRAMEWORK = {
+    'DEFAULT_FILTER_BACKENDS': (
+        'trionyx.api.filters.SearchFilter',
+        'rest_framework.filters.OrderingFilter',
+    ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.BrowsableAPIRenderer',
+        'rest_framework.renderers.JSONRenderer',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PAGINATION_CLASS': 'trionyx.api.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20,
+}
 
 # ==============================================================================
 # Trionyx settings
