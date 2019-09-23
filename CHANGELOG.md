@@ -8,6 +8,7 @@
 - Add user last_online field
 - Add support for inline formsets
 - Add rest API support
+- Add option to add extra buttons to header
 
 #### Changed
 - Set fallback for user profile name and avatar

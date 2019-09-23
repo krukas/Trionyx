@@ -120,6 +120,24 @@ class ModelConfig:
         - model_name: Class name of model
     """
 
+    view_header_buttons = None
+    """
+    List with button configurations to be displayed in view header bar
+    
+    .. code-block:: python
+
+         view_header_buttons = [
+            {
+                'label': 'Send email', # string or function
+                'url': lambda obj : reverse('blog.post', kwargs={'pk': obj.id}), # string or function
+                'type': 'default',
+                'show': lambda obj, alias : True, # Function that gives True or False if button must be displayed
+                'modal': True, 
+            }
+         ]
+    
+    """
+
     disable_add = False
     """Disable add for this model"""
 

@@ -410,6 +410,7 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
             'model_name': self.get_model_name(),
             'model_alias': self.get_model_alias(),
             'model_verbose_name': self.object._meta.verbose_name.title(),
+            'view_header_buttons': list(self.view_header_buttons()),
             'back_url': self.get_back_url(),
             'edit_url': self.get_edit_url(),
             'delete_url': self.get_delete_url(),
@@ -447,6 +448,27 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
             'model': self.get_model_name(),
             'pk': self.object.id
         })
+
+    def view_header_buttons(self):
+        if self.get_model_config().view_header_buttons:
+            for config in self.get_model_config().view_header_buttons:
+                if 'show' in config and not config['show'](self.object, self.get_model_alias()):
+                    continue
+
+                button_type = config.get('type', 'default')
+                yield {
+                    'label': config['label'](self.object, self.get_model_alias()) if callable(config['label']) else config['label'],
+                    'type':button_type(self.object, self.get_model_alias()) if callable(button_type) else button_type,
+                    'url': config['url'](self.object, self.get_model_alias()) if callable(config['url']) else reverse(
+                        config['url'],
+                        kwargs={
+                            'app': self.get_app_label(),
+                            'model': self.get_model_name(),
+                            'pk': self.object.id
+                        }
+                    ),
+                    'modal': config.get('modal', True)
+                }
 
     def get_model_alias(self):
         """Get model alias"""

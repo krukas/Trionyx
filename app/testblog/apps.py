@@ -16,6 +16,16 @@ class BlogConfig(BaseConfig):
         search_description = '{publish_date} {title} {price}'
         list_default_fields = ['id', 'publish_date', 'title']
 
+        view_header_buttons = [
+            {
+                'label': 'Publish',  # string or function
+                'url': 'trionyx:model-edit',  # string or function
+                'type': 'default', # string or function
+                'show': lambda obj, alias: True,  # Function that gives True or False if button must be displayed
+                'modal': True,
+            }
+        ]
+
     class Category:
         verbose_name = '{name}'
 
