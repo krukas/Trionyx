@@ -450,6 +450,28 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
         })
 
     def view_header_buttons(self):
+        from django.urls.exceptions import NoReverseMatch
+        def url_reverse(url):
+            kwargs_list = [
+                {
+                    'app': self.get_app_label(),
+                    'model': self.get_model_name(),
+                    'pk': self.object.id
+                },
+                {
+                    'pk': self.object.id
+                },
+                {}
+            ]
+
+            for kwargs in kwargs_list:
+                try:
+                    return reverse(url, kwargs=kwargs)
+                except NoReverseMatch:
+                    pass
+
+            raise NoReverseMatch('Could not find match for {}'.format(url))
+
         if self.get_model_config().view_header_buttons:
             for config in self.get_model_config().view_header_buttons:
                 if 'show' in config and not config['show'](self.object, self.get_model_alias()):
@@ -459,14 +481,7 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
                 yield {
                     'label': config['label'](self.object, self.get_model_alias()) if callable(config['label']) else config['label'],
                     'type':button_type(self.object, self.get_model_alias()) if callable(button_type) else button_type,
-                    'url': config['url'](self.object, self.get_model_alias()) if callable(config['url']) else reverse(
-                        config['url'],
-                        kwargs={
-                            'app': self.get_app_label(),
-                            'model': self.get_model_name(),
-                            'pk': self.object.id
-                        }
-                    ),
+                    'url': config['url'](self.object, self.get_model_alias()) if callable(config['url']) else url_reverse(config['url']),
                     'modal': config.get('modal', True)
                 }
 
