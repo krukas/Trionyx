@@ -7,7 +7,7 @@ body {
 }
 .content-header-affix {
     z-index: 999;
-    background-color: #ecf0f5;
+    background-color: #fff;
     padding-bottom: 15px;
     border-bottom: 1px solid #ddd;
     right: 0;
