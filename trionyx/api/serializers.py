@@ -11,12 +11,14 @@ from trionyx.config import models_config
 
 
 class SerializerRegister:
+    """SerializerRegister class"""
+
     def __init__(self):
+        """Init class"""
         self.serializers = {}
 
     def register(self, model_alias):
         """Add form to register"""
-
         def wrapper(serializer):
             model_name = self.get_model_alias(model_alias)
 
@@ -37,6 +39,7 @@ class SerializerRegister:
         return model_alias
 
     def get(self, model_alias):
+        """Get serializer based on model or model alias"""
         return self.serializers.get(self.get_model_alias(model_alias))
 
 

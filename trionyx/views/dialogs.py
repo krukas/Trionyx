@@ -208,6 +208,7 @@ class UpdateDialog(DialogView):
         return form_register.get_edit_form(self.get_model_class())
 
     def get_inline_forms(self):
+        """Get inline forms"""
         if not hasattr(self, '__inline_forms'):
             self.__inline_forms = {
                 key: InlineFormset(self.request.POST if self.request.POST else None, instance=self.object)

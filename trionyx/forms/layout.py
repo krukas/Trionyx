@@ -1,6 +1,6 @@
 """
 trionyx.forms.layout
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~
 
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
@@ -121,14 +121,18 @@ class TimePicker(DateTimePicker):
 
 
 class Formset(LayoutObject):
+    """Layout renderer for inline forms"""
+
     template = 'trionyx/forms/formset.html'
 
     def __init__(self, formset_name_in_context, template=None):
+        """Init Formset"""
         self.formset_name_in_context = formset_name_in_context
         self.fields = []
         if template:
             self.template = template
 
     def render(self, form, form_style, context, template_pack=TEMPLATE_PACK):
+        """Render form"""
         formset = context[self.formset_name_in_context]
         return render_to_string(self.template, {'formset': formset})

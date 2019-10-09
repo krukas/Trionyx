@@ -86,7 +86,6 @@ class AutoRouter(routers.DefaultRouter):
 
     def generate_model_serializer(self, model, config):
         """Generate a model serializer with all fields"""
-
         class MetaModelSerializer(serializers.ModelSerializer):
             """Meta model serializer to make all fields work"""
 
@@ -96,7 +95,7 @@ class AutoRouter(routers.DefaultRouter):
 
         fields = []
         if config.api_fields:
-            fields =  config.api_fields
+            fields = config.api_fields
         else:
             forms = [
                 form_register.get_create_form(model),

@@ -436,6 +436,8 @@ class Img(Html):
 
 
 class Input(Html):
+    """Input tag"""
+
     template_name = 'trionyx/components/input.html'
 
     valid_attr = ['name', 'value', 'type', 'placeholder', 'class']
@@ -445,6 +447,7 @@ class Input(Html):
     }
 
     def __init__(self, form_field=None, has_error=False, **kwargs):
+        """Init input"""
         super().__init__(None, **kwargs)
         self.has_error = has_error
 

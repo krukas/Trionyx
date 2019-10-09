@@ -450,7 +450,9 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
         })
 
     def view_header_buttons(self):
+        """Get the view header buttons"""
         from django.urls.exceptions import NoReverseMatch
+
         def url_reverse(url):
             kwargs_list = [
                 {
@@ -480,7 +482,7 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
                 button_type = config.get('type', 'default')
                 yield {
                     'label': config['label'](self.object, self.get_model_alias()) if callable(config['label']) else config['label'],
-                    'type':button_type(self.object, self.get_model_alias()) if callable(button_type) else button_type,
+                    'type': button_type(self.object, self.get_model_alias()) if callable(button_type) else button_type,
                     'url': config['url'](self.object, self.get_model_alias()) if callable(config['url']) else url_reverse(config['url']),
                     'modal': config.get('modal', True)
                 }

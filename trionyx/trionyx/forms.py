@@ -264,21 +264,17 @@ class GroupForm(forms.ModelForm):
     """Group form"""
 
     def __init__(self, *args, **kwargs):
+        """Init GroupForm"""
         super().__init__(*args, **kwargs)  # populates the post
         self.fields['permissions'].queryset = Permission.objects.exclude(
             content_type__in=ContentType.objects.filter(
                 Q(app_label__in=['contenttypes', 'sessions', 'watson'])
-                |
-                Q(app_label='auth') & Q(model='permission')
-                |
-                Q(app_label='trionyx') & Q(model='auditlogentry')
-                |
-                Q(app_label='trionyx') & Q(model='logentry')
-                |
-                Q(app_label='trionyx') & Q(model='userattribute')
+                | Q(app_label='auth') & Q(model='permission')  # noqa w503
+                | Q(app_label='trionyx') & Q(model='auditlogentry')  # noqa w503
+                | Q(app_label='trionyx') & Q(model='logentry')  # noqa w503
+                | Q(app_label='trionyx') & Q(model='userattribute')  # noqa w503
             )
         )
-
 
     class Meta:
         """Meta description for form"""
