@@ -101,9 +101,12 @@
 
         <div id="fields-popover-content" class="hidden">
             <div style="max-height: 250px; overflow-y: scroll">
+                <div class="col-md-12">
+                    <input id="fields-popover-search" placeholder="search" class="form-control">
+                </div>
                 <div v-for="field in fields" class="col-md-6">
-                    <label v-on:click="clickTest()">
-                        <input v-bind:checked="field.checked" v-model="field.checked" v-bind:name="field.name" type="checkbox">
+                    <label>
+                        <input v-bind:name="field.name" type="checkbox">
                         [[field.label]]
                     </label>
                 </div>
@@ -242,12 +245,7 @@
                     });
                 },
                 fields: function(){
-                    var self = this;
-                    return Object.keys(this.allFields).map(function(key){
-                        var field = self.allFields[key];
-                        field.checked = self.currentFields.indexOf(key) >= 0;
-                        return field;
-                    }).sort(function (a, b) {
+                    return Object.values(this.allFields).sort(function (a, b) {
                         return a.label.localeCompare(b.label);
                     });
                 },
@@ -484,10 +482,25 @@
                 var self = this;
                 $('#fields-popover').popover({
                     html: true,
-                    content(){
+                    content: function(){
                         // TODO render this with vuejs?
                         var content = $($('#fields-popover-content').html());
-                        content.find('input').each(function () {
+
+                        // Add field search
+                        $(content.find('#fields-popover-search')[0]).keyup(function(){
+                            var search = $(this).val().toLowerCase();
+                           content.find('input:checkbox').each(function () {
+                               var field = $(this).attr('name').toLowerCase();
+                               var parent = $(this).parent().parent();
+                               if (field.indexOf(search) !== -1){
+                                   $(parent).removeClass('hidden');
+                               } else {
+                                   $(parent).addClass('hidden');
+                               }
+                           });
+                        });
+
+                        content.find('input:checkbox').each(function () {
                             var input = $(this);
                             var field = input.attr('name');
                             if (self.currentFields.indexOf(field) >= 0) {
@@ -511,7 +524,13 @@
                         return content;
                     },
                 }).on("show.bs.popover", function(){
-                    $(this).data("bs.popover").tip().css("max-width", "100%").css("min-width", "400px");
+                    var popover =  $(this).data("bs.popover").tip();
+                    popover.css("max-width", "100%").css("min-width", "400px");
+
+                    // Dirty hack to lock popover width for when search is used.
+                    setTimeout(function(){
+                        popover.css("width", popover.width() + 'px');
+                    }, 50);
                 });
             },
 

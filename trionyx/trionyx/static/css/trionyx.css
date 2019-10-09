@@ -64,6 +64,10 @@ ul.pagination a {
     font-size: 16px;
 }
 
+#fields-popover-search {
+    margin-bottom: 10px;
+}
+
 #app-model-list .active-filters {
     padding-top: 10px;
 }
