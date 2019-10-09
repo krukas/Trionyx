@@ -25,6 +25,7 @@ setup(
     url = 'https://github.com/krukas/Trionyx',
     download_url = 'https://github.com/krukas/Trionyx/releases/tag/{}'.format(__version__),
     keywords = ['Django', 'Trionyx', 'framework', 'admin', 'data', 'processes', 'application', 'stack'],
+    python_requires='~=3.5',
     install_requires=[
         "Django >= 2.2.0, < 2.3",
 
@@ -40,7 +41,7 @@ setup(
 
         'celery >= 4.3.0, < 4.4',
 
-        'Pillow==6.0.0',
+        'Pillow>=5.0.0',
     ],
     extras_require={
         'dev': [
