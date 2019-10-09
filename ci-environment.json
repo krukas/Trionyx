@@ -1,0 +1,5 @@
+{
+  "DEBUG": true,
+  "CELERY_BROKER_URL": "redis://localhost:6379/0",
+  "SECRET_KEY": "Not a secret"
+}
