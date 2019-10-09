@@ -1,5 +1,5 @@
-.. image:: https://api.travis-ci.org/krukas/Trionyx.svg?branch=master
-    :target: https://travis-ci.org/krukas/Trionyx
+.. image:: https://circleci.com/gh/krukas/Trionyx/tree/master.svg?style=svg
+    :target: https://circleci.com/gh/krukas/Trionyx/tree/master
     
 .. image:: https://readthedocs.org/projects/trionyx/badge/?version=latest
     :target: http://trionyx.readthedocs.io/en/latest
@@ -10,8 +10,6 @@
 .. image:: https://badge.fury.io/py/Trionyx.svg
     :target: https://badge.fury.io/py/Trionyx
     
-**PRE PRE ALPHA, still in active development**
-
 
 Trionyx
 =======
