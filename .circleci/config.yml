@@ -29,6 +29,4 @@ jobs:
             pydocstyle trionyx
             flake8 tests
             coverage run manage.py test tests
-      - run
-          command: |
-            codecov
+      - run: codecov
