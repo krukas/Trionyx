@@ -9,7 +9,7 @@ class ModelConfigTestCase(TestCase):
 
     def test_default_list_fields(self):
         config = ModelConfig(Tag)
-        self.assertListEqual(list(config.get_list_fields().keys()), self.fields)
+        self.assertEqual(set(config.get_list_fields().keys()), set(self.fields))
 
     def test_custom_list_fields(self):
         config = ModelConfig(Tag)
