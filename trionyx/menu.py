@@ -205,7 +205,7 @@ class MenuItem:
         elif self.url == '/':
             return False
 
-        if self.url and path.startswith(self.url):
+        if self.url and self.url == path:
             return True
 
         if self.active_regex and re.compile(self.active_regex).match(path):
