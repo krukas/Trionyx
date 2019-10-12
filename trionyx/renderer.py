@@ -77,7 +77,7 @@ class Renderer:
 
     def render_value(self, value, **options):
         """Render value"""
-        renderer = self.renderers.get(type(value), lambda value, **options: value)
+        renderer = self.renderers.get(type(value), lambda value, **options: str(value))
         return renderer(value, **options)
 
     def render_field(self, obj, field_name, **options):

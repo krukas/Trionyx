@@ -12,6 +12,7 @@ dist/
 *.swp
 *.iml
 static/CACHE/
+htmlcov/
 
 development.sqlite3
 .idea

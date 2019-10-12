@@ -163,13 +163,13 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
             return self.current_fields
 
         field_attribute = 'list_{}_{}_fields'.format(self.kwargs.get('app'), self.kwargs.get('model'))
-        current_fields = self.request.user.attributes.get_attribute(field_attribute, [])
+        current_fields = self.request.user.get_attribute(field_attribute, [])
         request_fields = self.request.POST.get('selected_fields', None)
 
         if request_fields and ','.join(current_fields) != request_fields:
             # TODO validate fields
             current_fields = request_fields.split(',')
-            self.request.user.attributes.set_attribute(field_attribute, current_fields)
+            self.request.user.set_attribute(field_attribute, current_fields)
         elif request_fields:
             current_fields = request_fields.split(',')
 

@@ -19,7 +19,7 @@ class BlogConfig(BaseConfig):
         view_header_buttons = [
             {
                 'label': 'Publish',  # string or function
-                'url': 'trionyx:model-edit',  # string or function
+                'url': 'trionyx:model-dialog-edit',  # string or function
                 'type': 'default', # string or function
                 'show': lambda obj, alias: True,  # Function that gives True or False if button must be displayed
                 'modal': True,

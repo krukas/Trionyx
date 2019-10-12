@@ -83,20 +83,26 @@ class User(models.BaseModel, AbstractBaseUser, PermissionsMixin):
         """User representation"""
         return self.email
 
+    def set_attribute(self, code, value):
+        """Set user attribute"""
+        UserAttribute.objects.set_attribute(self, code, value)
+
+    def get_attribute(self, code, default=None):
+        """Get user attribute"""
+        return UserAttribute.objects.get_attribute(self, code, default)
+
 
 class UserAttributeManager(models.Manager):
     """User attribute manager"""
 
-    def set_attribute(self, code, value):
+    def set_attribute(self, user, code, value):
         """Set attribute for user"""
-        attr, _ = self.get_or_create(code=code)
-        attr.value = value
-        attr.save()
+        self.update_or_create(user=user, code=code, defaults={'value': value})
 
-    def get_attribute(self, code, default=None):
+    def get_attribute(self, user, code, default=None):
         """Get attribute for user"""
         try:
-            return self.get(code=code).value
+            return self.get(user=user, code=code).value
         except models.ObjectDoesNotExist:
             return default
 

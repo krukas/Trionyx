@@ -42,7 +42,8 @@ class Config(BaseConfig):
 
         models_config.auto_load_configs()
 
-        self.auto_load_app_modules(['layouts', 'signals', 'forms'])
+        from trionyx import widgets  # noqa F401
+        self.auto_load_app_modules(['layouts', 'signals', 'forms', 'widgets'])
 
         app_menu.auto_load_model_menu()
 
@@ -56,6 +57,7 @@ class Config(BaseConfig):
 
         # Add admin menu items
         from trionyx.urls import model_url
+        app_menu.add_item('dashboard', 'Dashboard', url='/', icon='fa fa-dashboard', order=1)
         app_menu.add_item('admin', 'Admin', icon='fa fa-cogs', order=9000, permission='is_superuser')
         app_menu.add_item('admin/users', 'Users', url=model_url('trionyx.user', 'list'), order=9010, permission='is_superuser')
         app_menu.add_item('admin/groups', 'Permission groups', url=model_url('auth.group', 'list'), order=9010, permission='is_superuser')

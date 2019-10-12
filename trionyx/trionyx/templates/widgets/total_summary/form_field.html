@@ -1,0 +1,30 @@
+{% load trionyx %}
+
+<div class="form-group">
+    <label for="id_all" class="control-label">Field</label>
+    <div class="controls ">
+        <select name="field" id="widget-field" class="form-control"></select>
+    </div>
+</div>
+
+<script>
+    var summaryFields = {{ summary_fields|jsonify }};
+    function txSummaryFieldsUpdate() {
+        $('#widget-field').select2().empty();
+        $('#widget-field').select2({
+            data: [{id: '__count__', text: ' -- Count records ---'}].concat(summaryFields[$('#id_model').val()]),
+        });
+    };
+
+    $('#widget-field').select2({
+        data: [{id: '__count__', text: '--- Count records ---'}],
+    });
+
+    $('#id_model').on('change', function(){
+        txSummaryFieldsUpdate();
+    });
+
+    //Init
+    txSummaryFieldsUpdate();
+    $('#widget-field').val('{{ value }}').trigger('change');
+</script>

@@ -246,6 +246,19 @@ TX_LOGO_NAME_SMALL_END = 'X'
 TX_THEME_COLOR = 'blue'
 """The theme skin color (header). Aviable colors: blue, yellow, green, purple, red, black. All colors have a light version blue-light"""
 
+TX_DEFAULT_DASHBOARD = [
+    {
+        'code': 'auditlog',
+        'config': {
+            'title': 'Action history',
+        },
+        'x': 0,
+        'y': 0,
+        'w': 6,
+        'h': 16,
+    },
+]
+
 TX_MODEL_CONFIGS = {}
 """
 Dict with configs for non Trionyx model, example:

@@ -1,0 +1,32 @@
+{% load crispy_forms_tags %}
+
+<input type="hidden" name="__post__">
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            <label class="control-label">Title</label>
+            <div class="controls ">
+                <input type="text" name="title" value="{{ title }}" class="textinput textInput form-control">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label class="control-label">Refresh</label>
+            <div class="controls ">
+                <select name="refresh" class="select form-control">
+                    <option value="0" {% if refresh == '0' %}selected{% endif %}>Never</option>
+                    <option value="15" {% if refresh == '15' %}selected{% endif %}>Every 15 minutes</option>
+                    <option value="30" {% if refresh == '30' %}selected{% endif %}>Every 30 minutes</option>
+                    <option value="60" {% if refresh == '60' %}selected{% endif %}>Every 1 hour</option>
+                    <option value="120" {% if refresh == '120' %}selected{% endif %}>Every 2 hours</option>
+                </select>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if form %}
+    {% crispy form %}
+{% endif %}

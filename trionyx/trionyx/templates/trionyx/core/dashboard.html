@@ -1,0 +1,365 @@
+{% extends 'trionyx/base.html' %}
+{% load static %}
+{% load trionyx %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+
+{% block extra_css %}
+    <style>
+        .vue-grid-item {
+            overflow-y: auto;
+        }
+
+        .dashboard-edit .vue-grid-item {
+             overflow-y: hidden;
+        }
+
+        #tx-dashboard .box, #tx-dashboard .info-box {
+            margin: 0;
+        }
+
+        .drag-handle {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            cursor: grab;
+            background-color: rgba(255,255,255,0.8);
+        }
+
+        .color-picker {
+            padding: 10px;
+            margin-right: 70px;
+        }
+
+        .color-picker .fa {
+            font-size: 24px;
+            cursor: pointer;
+        }
+
+        .widget-add {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+        }
+
+        .widget-remove {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+
+        .widget-edit {
+            position: absolute;
+            top: 10px;
+            right: 55px;
+        }
+
+        .new-widget {
+            position: relative;
+            height: 200px;
+            overflow: hidden;
+            box-shadow: 0px 2px 4px 0px rgba(102,102,102,1);
+            cursor: pointer;
+            padding: 0;
+            background-color: #ecf0f5;
+        }
+
+        .new-widget img {
+            margin: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .new-widget:hover {
+            box-shadow: 0px 2px 4px 0px rgba(60,141,188,1);
+        }
+
+        .new-widget-title {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background-color: rgba(255,255,255,0.9);
+            padding: 10px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .new-widget-description {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 10px;
+            background-color: rgba(255,255,255,0.9);
+        }
+
+        .new-widget-modal .row {
+            padding: 0 10px;
+        }
+    </style>
+{% endblock %}
+
+
+{% block header_buttons %}
+    <button id="dashboard-edit" class="btn btn-default" onclick="clickDashboardEdit(this)">Edit</button>
+    <button id="dashboard-save" class="btn btn-success hide" onclick="clickDashboardSave(this)">Save</button>
+{% endblock %}
+
+
+{% block content %}
+    <div id="tx-dashboard" v-cloak>
+        <grid-layout
+            :layout.sync="dashboard"
+            :row-height="10"
+            :is-draggable="edit"
+            :is-resizable="edit"
+            :vertical-compact="true"
+            :margin="[10, 10]"
+            :use-css-transforms="true"
+            :class="{'dashboard-edit': edit}"
+        >
+            <grid-item v-for="widget in dashboard"
+                       :x="widget.x"
+                       :y="widget.y"
+                       :w="widget.w"
+                       :h="widget.h"
+                       :i="widget.i"
+                       :key="widget.i"
+                       :drag-allow-from="'.drag-handle'"
+            >
+                <component v-bind:is="'widget-' + widget.code" v-bind="{widget:widget}" :ref="widget.i"></component>
+                <div v-if="edit" class="drag-handle">
+                    <div class="color-picker">
+                        <div>
+                            <i class="fa fa-circle text-light-blue" @click="updateWidgetConfig(widget, 'color', 'light-blue')"></i>
+                            <i class="fa fa-circle text-aqua" @click="updateWidgetConfig(widget, 'color', 'aqua')"></i>
+                            <i class="fa fa-circle text-green" @click="updateWidgetConfig(widget, 'color', 'green')"></i>
+                            <i class="fa fa-circle text-yellow" @click="updateWidgetConfig(widget, 'color', 'yellow')"></i>
+                            <i class="fa fa-circle text-red" @click="updateWidgetConfig(widget, 'color', 'red')"></i>
+                            <i class="fa fa-circle text-gray" @click="updateWidgetConfig(widget, 'color', 'gray')"></i>
+                        </div>
+                        <div>
+                            <i class="fa fa-circle text-navy" @click="updateWidgetConfig(widget, 'color', 'navy')"></i>
+                            <i class="fa fa-circle text-teal" @click="updateWidgetConfig(widget, 'color', 'teal')"></i>
+                            <i class="fa fa-circle text-purple" @click="updateWidgetConfig(widget, 'color', 'purple')"></i>
+                            <i class="fa fa-circle text-orange" @click="updateWidgetConfig(widget, 'color', 'orange')"></i>
+                            <i class="fa fa-circle text-maroon" @click="updateWidgetConfig(widget, 'color', 'maroon')"></i>
+                            <i class="fa fa-circle text-black" @click="updateWidgetConfig(widget, 'color', 'black')"></i>
+                        </div>
+                    </div>
+                    <span class="btn btn-info widget-edit" @click="openWidgetConfigDialog(widget, this)"><i class="fa fa-edit"></i></span>
+                    <span class="btn btn-danger widget-remove" @click="removeWidget(widget)"><i class="fa fa-trash"></i></span>
+                </div>
+            </grid-item>
+        </grid-layout>
+
+        <button v-if="edit" @click="showNewModal = true" class="btn btn-lg btn-success widget-add"><i class="fa fa-plus-circle"></i></button>
+        <div v-if="showNewModal">
+            <transition name="modal">
+                <div class="modal new-widget-modal" style="display: block">
+                  <div class="modal-dialog modal-lg" role="document">
+                    <div class="modal-content">
+                      <div class="modal-header">
+                        <button type="button" class="close" aria-label="Close">
+                          <span aria-hidden="true" @click="showNewModal = false">×</span></button>
+                        <h4 class="modal-title">Add Widget</h4>
+                      </div>
+                      <div class="modal-body">
+                          <div class="row">
+                              <div v-for="widget in widgets" class="col-md-4">
+                                  <div class="new-widget" @click="addWidget(widget)">
+                                      <img :src="widget.image" style="width: 95%">
+                                      <div class="new-widget-title">
+                                          [[widget.name]]
+                                      </div>
+
+                                      <div class="new-widget-description">
+                                          [[widget.description]]
+                                      </div>
+                                  </div>
+                              </div>
+                          </div>
+                      </div>
+                      <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-right" @click="showNewModal = false">Close</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+            </transition>
+          </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script type="text/javascript">
+        var TxWidgetMixin = {
+            delimiters: ['[[', ']]'],
+            props: ['widget'],
+            created: function () {
+                var self = this;
+                this.load();
+
+                if ('refresh' in this.widget.config && this.widget.config.refresh > 0) {
+                    this.refreshInterval = setInterval(function () {
+                        self.load();
+                    }, 1000 * this.widget.config.refresh);
+                }
+            },
+            data: function() {
+              return {
+                  data: null,
+                  error: false,
+                  refreshInterval: null,
+              };
+            },
+            watch: {
+                'widget.config.refresh': function () {
+                    var self = this;
+                    clearTimeout(this.refreshInterval);
+                    if (this.widget.config.refresh > 0) {
+                        this.refreshInterval = setInterval(function () {
+                            self.load();
+                        }, 1000 * this.widget.config.refresh);
+                    }
+                },
+            },
+            computed: {
+                widgetClass: function(){
+                    return 'box box-' + (this.widget.config.color || 'light-blue');
+                },
+            },
+            methods: {
+                load: function () {
+                    var self = this;
+                    $.ajax({
+                        url: '/dashboard/widget-data/',
+                        method: 'post',
+                        data: JSON.stringify({
+                            code: this.widget.code,
+                            config: this.widget.config,
+                        }),
+                        contentType: "application/json; charset=utf-8",
+                        dataType: "json",
+                        success: function(response) {
+                            if(response.status === 'success'){
+                                self.data = response.data;
+                            } else {
+                                self.error = true;
+                            }
+                            self.loading = false;
+                        }
+                    });
+                }
+            }
+        };
+
+        function tx_initDashboard(config) {
+           return new Vue({
+                el: '#tx-dashboard',
+                delimiters: ['[[', ']]'],
+                data: {
+                    widgets: config.widgets,
+                    dashboard: config.dashboard,
+                    edit: false,
+                    showNewModal: false,
+                },
+                methods: {
+                    saveDashboard: function(){
+                        var self = this;
+                        this.edit = false;
+                        $.ajax({
+                            url: config.saveDashboardUrl,
+                            method: 'post',
+                            data: JSON.stringify(self.dashboard),
+                            contentType: "application/json; charset=utf-8",
+                            dataType: "json",
+                        });
+                    },
+                    updateWidgetConfig: function(widget, code, value){
+                        widget.config[code] = value;
+                    },
+                    openWidgetConfigDialog: function(widget){
+                        var self = this;
+                        openDialog('/dashboard/widget-config/' + widget.code + '/', {
+                            post: widget.config,
+                            callback: function (data, dialog) {
+                                if (data.config) {
+                                    for (var key in data.config) {
+                                        widget.config[key] = data.config[key];
+                                    }
+                                    dialog.close();
+                                    self.$refs[widget.i][0].load();
+                                }
+                            }
+                        })
+                    },
+                    addWidget: function (widget) {
+                        let config = {
+                            title: widget.name,
+                            color: 'light-blue',
+                            refresh: 0,
+                        };
+                        for (let key in widget.config_fields) {
+                            config[key] = null;
+                        }
+
+                        var newWidget = {
+                            code: widget.code,
+                            config: config,
+                            x: 0,
+                            y: Math.max(...this.dashboard.map(item => item.y + item.h)),
+                            w: widget.default_w,
+                            h: widget.default_h,
+                            i: randomString(16),
+                        };
+
+                        this.dashboard.push(newWidget);
+                        this.showNewModal = false;
+                        this.openWidgetConfigDialog(newWidget);
+                    },
+                    removeWidget: function (widget) {
+                        this.dashboard.splice(this.dashboard.indexOf(widget), 1);
+                    }
+                },
+            });
+        };
+
+        function clickDashboardEdit(){
+            window.tx_dashboard.edit = true;
+            $('#dashboard-edit').addClass('hide');
+            $('#dashboard-save').removeClass('hide');
+        }
+
+        function clickDashboardSave(){
+            window.tx_dashboard.saveDashboard();
+            $('#dashboard-save').addClass('hide');
+            $('#dashboard-edit').removeClass('hide');
+        }
+    </script>
+{% endblock %}
+
+{% block extra_foot %}
+    <script type="text/javascript" src="static/js/vue-grid-layout.umd.js"></script>
+
+    {% for template in widget_templates %}
+        {% include template %}
+    {% endfor %}
+    <script type="text/javascript">
+        $(function(){
+            window.tx_dashboard = tx_initDashboard({
+                saveDashboardUrl: '{% url 'trionyx:dashboard-save' %}',
+                widgets: {{ widgets|jsonify }},
+                dashboard: {{ dashboard|jsonify }},
+            });
+        });
+    </script>
+{% endblock %}

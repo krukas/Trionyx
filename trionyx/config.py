@@ -315,5 +315,19 @@ class Models:
             return model
         return '{}.{}'.format(model._meta.app_label, model._meta.model_name)
 
+    def get_all_models(self, user=None, trionyx_models_only=True):
+        """Get all user models"""
+        for config in self.get_all_configs(trionyx_models_only):
+            if config.app_label == 'trionyx' and config.model_name in ['session', 'auditlogentry', 'log', 'logentry', 'userattribute']:
+                continue
+
+            if user and user.has_perm('{app_label}.view_{model_name}'.format(
+                app_label=config.app_label,
+                model_name=config.model_name,
+            ).lower()):
+                yield config.model
+            elif not user:
+                yield config.model
+
 
 models_config = Models()

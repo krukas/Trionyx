@@ -12,9 +12,12 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 
 from trionyx import forms
-from trionyx.forms.layout import Layout, Fieldset, Div
+from trionyx.forms.layout import Layout, Fieldset, Div, HtmlTemplate
 from trionyx.forms.helper import FormHelper
 from trionyx.trionyx.models import User
+from trionyx.trionyx.icons import ICON_CHOICES
+from trionyx.config import models_config
+from trionyx import utils
 
 
 class ProfileUpdateForm(forms.ModelForm):
@@ -281,3 +284,100 @@ class GroupForm(forms.ModelForm):
 
         model = Group
         fields = ['name', 'permissions']
+
+
+class AuditlogWidgetForm(forms.Form):
+    """Auditlog widget form"""
+
+    SHOW_CHOICES = [
+        ('all', 'All'),
+        ('user', 'Users only'),
+        ('system', 'Systems only'),
+    ]
+
+    show = forms.ChoiceField(choices=SHOW_CHOICES)
+
+
+class TotalSummaryWidgetForm(forms.Form):
+    """Total summary widget form"""
+
+    PERIOD_CHOICES = [
+        ('all', 'All'),
+        ('year', 'Current year'),
+        ('month', 'Current month'),
+        ('week', 'Current week'),
+        ('day', 'Current day'),
+        ('365days', 'Last 365 days'),
+        ('30days', 'Last 30 days'),
+        ('7days', 'Last 7 days'),
+    ]
+
+    icon = forms.ChoiceField(choices=ICON_CHOICES)
+
+    model = forms.ChoiceField(choices=[], required=False)
+    field = forms.CharField()
+
+    period = forms.ChoiceField(choices=PERIOD_CHOICES)
+    period_field = forms.CharField(required=False)
+
+    def __init__(self, *args, **kwargs):
+        """Init form"""
+        super().__init__(*args, **kwargs)
+        content_type_map = ContentType.objects.get_for_models(*list(models_config.get_all_models(utils.get_current_request().user)))
+        period_fields = {}
+        summary_fields = {}
+
+        for config in models_config.get_all_configs():
+            if config.model not in content_type_map:
+                continue
+
+            summary_fields[content_type_map[config.model].id] = [
+                {
+                    'id': field.name,
+                    'text': str(field.verbose_name)
+                } for field in config.get_fields() if config.get_field_type(field) in ['int', 'float']
+            ]
+
+            period_fields[content_type_map[config.model].id] = [
+                {
+                    'id': field.name,
+                    'text': str(field.verbose_name)
+                } for field in config.get_fields(True) if config.get_field_type(field) in ['date', 'datetime']
+            ]
+
+        self.fields['model'].choices = [
+            (content_type.id, model._meta.verbose_name.capitalize()) for model, content_type
+            in content_type_map.items() if summary_fields.get(content_type.id)]
+
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            'icon',
+            Div(
+                Div(
+                    'model',
+                    css_class="col-md-6",
+                ),
+                Div(
+                    HtmlTemplate('widgets/total_summary/form_field.html', {
+                        'summary_fields': summary_fields,
+                        'value': self.initial.get('field'),
+                    }),
+                    css_class="col-md-6",
+                ),
+                css_class="row"
+            ),
+            Div(
+                Div(
+                    'period',
+                    css_class="col-md-6",
+                ),
+                Div(
+                    HtmlTemplate('widgets/total_summary/period_field.html', {
+                        'period_fields': period_fields,
+                        'value': self.initial.get('period_field'),
+                    }),
+                    css_class="col-md-6",
+                ),
+                css_class="row"
+            ),
+        )

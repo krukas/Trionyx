@@ -1,0 +1,19 @@
+<script type="text/x-template" id="widget-total_summary">
+    <div class="info-box">
+        <span class="info-box-icon" :class="'bg-' + widget.config.color">
+            <i :class="widget.config.icon"></i>
+        </span>
+
+        <div class="info-box-content">
+          <span class="info-box-text">[[widget.config.title]]</span>
+          <span class="info-box-number">[[data]]</span>
+        </div>
+    </div>
+</script>
+
+<script>
+    Vue.component('widget-total_summary', {
+        mixins: [TxWidgetMixin],
+        template: '#widget-total_summary',
+    });
+</script>
