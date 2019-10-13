@@ -222,11 +222,11 @@ ul.pagination a {
     margin-bottom: 10px;
 }
 
-#app-model-list .active-filters {
+.trionyx-filters {
     padding-top: 10px;
 }
 
-#app-model-list .filter {
+.trionyx-filters .filter {
     padding: 5px 10px;
     border: 1px solid #999;
     border-radius: 4px;
@@ -236,7 +236,7 @@ ul.pagination a {
     margin: 4px;
 }
 
-#app-model-list .filter span {
+.trionyx-filters .filter span {
     cursor: pointer;
     font-size: 20px;
     font-weight: bold;

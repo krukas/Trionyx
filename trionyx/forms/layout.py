@@ -8,6 +8,8 @@ trionyx.forms.layout
 from crispy_forms.layout import *  # noqa F403
 from crispy_forms.bootstrap import *  # noqa F403
 from django.template.loader import render_to_string
+from django.contrib.contenttypes.models import ContentType
+from trionyx import utils
 
 from trionyx.utils import (
     get_current_locale,
@@ -153,3 +155,31 @@ class Formset(LayoutObject):
         """Render form"""
         formset = context[self.formset_name_in_context]
         return render_to_string(self.template, {'formset': formset})
+
+
+class Filters:
+    """Form Filter field"""
+
+    def __init__(self, name, model=None, content_type_input_id=None):
+        """Init Filter field, model or content_type_input_id must be supplied"""
+        self.name = name
+        self.model = model
+        self.content_type_input_id = content_type_input_id
+
+        if not model and not content_type_input_id:
+            raise Exception('A model or content_type_input_id must be supplied')
+
+    def render(self, form, form_style, context, **kwargs):
+        """Render template"""
+        value = form.data.get(self.name, form.initial.get(self.name, '[]'))
+        if not value:
+            value = '[]'
+
+        return render_to_string('trionyx/forms/filters.html', {
+            **context.flatten(),
+            'uuid': utils.random_string(8),
+            'name': self.name,
+            'value': value,
+            'content_type_input_id': self.content_type_input_id,
+            'content_type_id': ContentType.objects.get_for_model(self.model).id if self.model else -1
+        })

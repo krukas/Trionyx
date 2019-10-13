@@ -211,7 +211,7 @@
                 if ('refresh' in this.widget.config && this.widget.config.refresh > 0) {
                     this.refreshInterval = setInterval(function () {
                         self.load();
-                    }, 1000 * this.widget.config.refresh);
+                    }, 1000 * 60 * this.widget.config.refresh);
                 }
             },
             data: function() {
@@ -228,7 +228,7 @@
                     if (this.widget.config.refresh > 0) {
                         this.refreshInterval = setInterval(function () {
                             self.load();
-                        }, 1000 * this.widget.config.refresh);
+                        }, 1000 * 60 * this.widget.config.refresh);
                     }
                 },
             },
