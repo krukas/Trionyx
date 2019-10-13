@@ -25,7 +25,7 @@
                 </div>
             </div>
 
-            <div class="active-filters">
+            <div class="trionyx-filters">
                 <div v-for="filter in renderedActiveFilters" class="filter filter-block">
                     [[filter.field]] [[filter.operator]] [[filter.renderedValue]]
                     <span v-on:click="clickRemoveFilter(filter)">×</span>
@@ -125,55 +125,7 @@
                         </h4>
                     </div>
                     <div class="modal-body">
-                        <div class="row">
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>Field</label>
-                                    <select v-model="filterField" class="form-control" id="select-filter-field">
-                                        <option v-for="field in fields" v-bind:value="field.name">
-                                            [[field.label]]
-                                        </option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>Operator</label>
-                                    <select v-model="filterOperator" class="form-control" id="select-filter-operator" autocomplete="off">
-                                        <option value="==">Equal</option>
-                                        <option value="!=">Not Equal</option>
-                                        <option value="<">Less than</option>
-                                        <option value="<=">Less than or equal</option>
-                                        <option value=">">Greater than</option>
-                                        <option value=">=">Greater than or equal</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-4">
-                                <div class="form-group">
-                                    <label>Filter by</label>
-                                    <input type="text" v-model="filterValue" v-if="filterValueInputType == 'text'" class="form-control" id="filter-value-text" autocomplete="off" />
-                                    <div v-if="filterValueInputType == 'select'" >
-                                        <select v-model="filterSelectValue" class="form-control" id="select-filter-value">
-                                            <option v-for="choice in filterChoices" v-bind:value="choice.value">
-                                                [[choice.label]]
-                                            </option>
-                                        </select>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <button class="btn btn-success btn-block" v-on:click="clickAddFilter()">Add filter</button>
-                        <div class="active-filters">
-                            <div v-for="filter in renderedActiveFilters" class="filter filter-block">
-                                [[filter.field]] [[filter.operator]] [[filter.renderedValue]]
-                                <span v-on:click="clickRemoveFilter(filter)">×</span>
-                            </div>
-                        </div>
-
+                        <trionyx-filters :filters="activeFilters" :content-type-id="contentTypeId" ref="trionyxFilters"></trionyx-filters>
                     </div>
                 </div>
             </div>
@@ -193,15 +145,10 @@
             data: {
                 ajaxUrl: config.ajaxUrl,
                 downloadUrl: config.downloadUrl,
-                choicesUrl: config.choicesUrl,
                 ajaxCall: null,
+                contentTypeId: config.contentTypeId,
 
-                datetimeInputFormat: config.datetimeInputFormat,
-                dateInputFormat: config.dateInputFormat,
-                currentLocale: config.currentLocale,
-                inputFormat: '',
-
-                loading: true,
+                loading: false,
                 items: [],
 
                 csrfmiddlewaretoken: getCookie('csrftoken'),
@@ -217,13 +164,7 @@
                 search: '',
 
                 activeFilters: [],
-                filterField: null,
-                filterOperator: '==',
-                filterValue: '',
-                filterSelectValue: '',
-                filterChoices: [],
-                filterValueInputType: 'text',
-                cachedRelatedChoices: {},
+                renderedActiveFilters: [],
             },
 
             computed: {
@@ -247,33 +188,6 @@
                 fields: function(){
                     return Object.values(this.allFields).sort(function (a, b) {
                         return a.label.localeCompare(b.label);
-                    });
-                },
-                renderedActiveFilters: function(){
-                    var self = this;
-                    return this.activeFilters.map(function(filter){
-                        var field = self.allFields[filter.field];
-                        if (['related', 'bool'].indexOf(field.type) !== -1 || field.choices.length > 0){
-                            var choices = field.choices;
-                            if (field.type === 'bool') {
-                                choices = [
-                                    [0, 'False'],
-                                    [1, 'True']
-                                ];
-                            } else if (field.type === 'related') {
-                                choices = self.getRelatedChoices(filter.field)
-                            }
-
-                            $.each(choices, function(index, choice){
-                                if (choice[0] == filter.value) {
-                                    filter.renderedValue = choice[1];
-                                    return false;
-                                }
-                            });
-                        } else {
-                            filter.renderedValue = filter.value;
-                        }
-                        return filter;
                     });
                 },
                 pages: function() {
@@ -302,6 +216,13 @@
             },
             
             watch: {
+                activeFilters: function() {
+                    this.renderedActiveFilters = this.$refs.trionyxFilters.renderedFilters;
+
+                    if (!this.loading) {
+                        this.load();
+                    }
+                },
                 pageSize: function (pageSize) {
                     // Prevent a double load on initial load
                     if (this.initialPageSize === pageSize) {
@@ -310,48 +231,6 @@
                     }
                     this.page = 1;
                     this.load();
-                },
-                filterField: function (value) {
-                    if (!(value in this.allFields)) {
-                        return;
-                    }
-
-                    var field = this.allFields[value];
-                    if (['related', 'bool'].indexOf(field.type) !== -1 || field.choices.length > 0){
-                        this.filterValueInputType = 'select';
-                        var choices = field.choices;
-                        if (field.type === 'bool') {
-                            choices = [
-                                [0, 'False'],
-                                [1, 'True']
-                            ]
-                        } else if (field.type === 'related') {
-                            choices = this.getRelatedChoices(value)
-                        }
-
-                        this.filterSelectValue = choices.length > 0 ? choices[0][0] : '';
-                        this.filterChoices = choices.map(function(choice){
-                            return {
-                                value: choice[0],
-                                label: choice[1],
-                            }
-                        })
-                    } else {
-                        if (['datetime', 'date'].indexOf(field.type) !== -1) {
-                            var self = this;
-                            $('#filter-value-text').datetimepicker({
-                                format: field.type === 'date' ? this.dateInputFormat : this.datetimeInputFormat,
-                                locale: this.currentLocale,
-                                dayViewHeaderFormat: 'MMMM YYYY'
-                            }).on('dp.change',function(event){
-                                var dp = $('#filter-value-text').data("DateTimePicker");
-                                self.filterValue = event.date ? event.date.format(dp.format()) : null;
-                            });
-                        } else if ($('#filter-value-text').data("DateTimePicker")) {
-                            $('#filter-value-text').data("DateTimePicker").destroy()
-                        }
-                        this.filterValueInputType = 'text';
-                    }
                 },
             },
             methods: {
@@ -371,61 +250,17 @@
                 clickItem: function(item) {
                     window.location.href = item.url;
                 },
-                clickAddFilter: function(){
-                    if (!(this.filterField in this.allFields)) {
-                        return;
-                    }
-                    var field = this.allFields[this.filterField];
-                    var value = ['related', 'bool'].indexOf(field.type) !== -1 || field.choices.length > 0 ?
-                        this.filterSelectValue : this.filterValue;
-
-                    if (this.filterField && this.filterOperator) {
-                        this.activeFilters.push({
-                            field: this.filterField,
-                            operator: this.filterOperator,
-                            value: value,
-                        });
-
-                        this.filterField = '';
-                        this.filterOperator = '==';
-                        this.filterValue = '';
-                        this.filterSelectValue = '';
-                        this.load();
-                    } else {
-                        console.log('some inputs are empty')
-                    }
-                },
                 clickRemoveFilter: function(filter){
                     if (this.activeFilters.indexOf(filter) !== -1) {
                         this.activeFilters.splice(this.activeFilters.indexOf(filter), 1);
-                        this.load();
                     }
-                },
-                getRelatedChoices: function(field) {
-                    if (field in this.cachedRelatedChoices) {
-                        return this.cachedRelatedChoices[field];
-                    }
-
-                    var choices = [];
-                    this.ajaxCall = $.ajax({
-                        type: 'GET',
-                        url: this.choicesUrl + '?field=' + field,
-                        async: false,
-                    }).done(function(response){
-                        if (response.status == 'success') {
-                            choices = response.data;
-                        }
-                    });
-
-                    this.cachedRelatedChoices[field] = choices;
-
-                    return choices;
                 },
                 searchLoad: function() {
                     this.load();
                 },
                 load: function(initial){
                     var self = this;
+                    this.loading = true;
                     initial = typeof initial !== 'undefined' ? initial : false;
                     var data = {
                         page: this.page,
@@ -470,6 +305,11 @@
                         console.log('error');
                     }).always(function () {
                         self.ajaxCall = null;
+
+                        // To prevent watch is little later and get in load loop
+                        setTimeout(function () {
+                            self.loading = false;
+                        }, 100);
                     });
                 },
             },
@@ -536,30 +376,13 @@
 
             updated: function () {
                 var self = this;
+
+                this.renderedActiveFilters = this.$refs.trionyxFilters.renderedFilters;
+
                 $('#select-pageSize').select2({
                     minimumResultsForSearch: -1
                 }).change(function ($event) {
                     self.pageSize = $($event.target).val();
-                });
-
-
-                $('#select-filter-field').select2({
-                    width: "100%"
-                }).change(function ($event) {
-                    self.filterField = $($event.target).val();
-                });
-
-                $('#select-filter-operator').select2({
-                    minimumResultsForSearch: -1,
-                    width: "100%"
-                }).change(function ($event) {
-                    self.filterOperator = $($event.target).val();
-                });
-
-                $('#select-filter-value').select2({
-                    width: "100%"
-                }).change(function($event){
-                    self.filterSelectValue = $($event.target).val();
                 });
 
                 $('#app-model-list table').dragtable({
@@ -600,10 +423,7 @@
                 var trionyxList = new TrionyxList({
                     ajaxUrl: "{{ ajax_url }}",
                     downloadUrl: "{{ download_url }}",
-                    choicesUrl: "{{ choices_url }}",
-                    datetimeInputFormat: "{{ datetime_input_format }}",
-                    dateInputFormat: "{{ date_input_format }}",
-                    currentLocale: "{{ current_locale }}"
+                    contentTypeId: {{ content_type_id }},
                 });
             });
         });

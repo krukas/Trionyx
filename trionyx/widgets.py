@@ -5,6 +5,8 @@ trionyx.widgets
 :copyright: 2019 by Maikel Martens
 :license: GPLv3
 """
+import json
+
 from django.utils import timezone
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.contrib.contenttypes.models import ContentType
@@ -12,7 +14,7 @@ from trionyx.trionyx.models import AuditLogEntry
 from trionyx.renderer import renderer
 from trionyx.config import models_config
 from trionyx.trionyx.forms import AuditlogWidgetForm, TotalSummaryWidgetForm
-from trionyx.models import Sum
+from trionyx.models import Sum, filter_queryset_with_user_filters
 
 
 widgets = {}
@@ -150,13 +152,13 @@ class AuditlogWidget(BaseWidget):
 
         return [
             {
-                'user_full_name': log.user.get_full_name(),
-                'user_avatar': log.user.avatar.url if log.user.avatar else static('img/avatar.png'),
+                'user_full_name': log.user.get_full_name() if log.user else 'System',
+                'user_avatar': log.user.avatar.url if log.user and log.user.avatar else static('img/avatar.png'),
                 'action': renderer.render_field(log, 'action'),
                 'object': '({}) {}'.format(
-                    log.content_object._meta.verbose_name.capitalize(),
-                    renderer.render_field(log, 'content_object')),
-                'object_url': log.content_object.get_absolute_url(),
+                    log.content_type.model_class()._meta.verbose_name.capitalize(),
+                    log.object_verbose_name),
+                'object_url': log.content_object.get_absolute_url() if log.content_object else '',
                 'created_at': renderer.render_field(log, 'created_at'),
 
             } for log in logs.order_by('-created_at')[:6]
@@ -176,6 +178,9 @@ class TotalSummaryWidget(BaseWidget):
         """Get data"""
         ModelClass = ContentType.objects.get_for_id(config['model']).model_class()
         query = ModelClass.objects.get_queryset()
+
+        if config['filters']:
+            query = filter_queryset_with_user_filters(query, json.loads(config['filters']))
 
         if config['period'] != 'all':
             today = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)

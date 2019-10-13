@@ -1,0 +1,270 @@
+<script type="text/x-template" id="trionyx-filters-component">
+    <div>
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label>Field</label>
+                    <select v-model="filterField" class="form-control" ref="selectFilterField">
+                        <option v-for="field in fieldOptions" v-bind:value="field.name">
+                            [[field.label]]
+                        </option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label>Operator</label>
+                    <select v-model="filterOperator" class="form-control" ref="selectFilterOperator" autocomplete="off">
+                        <option value="==">Equal</option>
+                        <option value="!=">Not Equal</option>
+                        <option value="<">Less than</option>
+                        <option value="<=">Less than or equal</option>
+                        <option value=">">Greater than</option>
+                        <option value=">=">Greater than or equal</option>
+                        <option value="null">Is null</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="form-group">
+                    <label>Filter by</label>
+                    <input type="text" v-model="filterValue" v-if="filterValueInputType == 'text'" class="form-control" ref="filterValueText" autocomplete="off" />
+                    <div v-if="filterValueInputType == 'select'" >
+                        <select v-model="filterSelectValue" class="form-control" ref="selectFilterValue">
+                            <option v-for="choice in filterChoices" v-bind:value="choice.value">
+                                [[choice.label]]
+                            </option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <span class="btn btn-success btn-block" v-on:click="clickAddFilter()">Add filter</span>
+        <div class="trionyx-filters">
+            <div v-for="filter in renderedFilters" class="filter filter-block">
+                [[filter.field]] [[filter.operator]] [[filter.renderedValue]]
+                <span v-on:click="clickRemoveFilter(filter)">×</span>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/javascript">
+    Vue.component('trionyx-filters', {
+        delimiters: ['[[', ']]'],
+        props: ['contentTypeId', 'filters'],
+        template: '#trionyx-filters-component',
+        data: function () {
+            return {
+                fields: {},
+
+                datetimeInputFormat: '{{ datetime_input_format }}',
+                dateInputFormat: '{{ date_input_format }}',
+                currentLocale: '{{ current_locale }}',
+
+                filterField: null,
+                filterOperator: '==',
+                filterValue: '',
+                filterSelectValue: '',
+                filterChoices: [],
+                filterValueInputType: 'text',
+
+                cachedRelatedChoices: {},
+                cachedContentTypes: {},
+            }
+        },
+        computed: {
+            fieldOptions: function(){
+                return Object.values(this.fields).sort(function (a, b) {
+                    return a.label.localeCompare(b.label);
+                });
+            },
+            renderedFilters: function(){
+                var self = this;
+                return this.filters.map(function(filter){
+                    if (!(filter.field in self.fields)) {
+                        filter.renderedValue = filter.value;
+                        return filter;
+                    }
+                    var field = self.fields[filter.field];
+
+                    if (['related', 'bool'].indexOf(field.type) !== -1 || field.choices.length > 0 || filter.operator === 'null'){
+                        var choices = field.choices;
+                        if (field.type === 'bool' || filter.operator === 'null') {
+                            choices = [
+                                [0, 'False'],
+                                [1, 'True']
+                            ];
+                        } else if (field.type === 'related') {
+                            choices = self.getRelatedChoices(filter.field)
+                        }
+
+                        $.each(choices, function(index, choice){
+                            if (choice[0] == filter.value) {
+                                filter.renderedValue = choice[1];
+                                return false;
+                            }
+                        });
+                    } else {
+                        filter.renderedValue = filter.value;
+                    }
+                    return filter;
+                });
+            },
+        },
+        watch: {
+            contentTypeId: function () {
+                this.fields = this.getContentType() ? this.getContentType().fields : {};
+            },
+            filterField: function () {
+                this.updateValueInput();
+            },
+            filterOperator: function () {
+                this.updateValueInput();
+            },
+        },
+        created: function(){
+            this.fields = this.getContentType() ? this.getContentType().fields : {};
+        },
+        methods: {
+            updateValueInput: function () {
+                if (!(this.filterField in this.fields)) {
+                    return;
+                }
+
+                var field = this.fields[this.filterField];
+                if (['related', 'bool'].indexOf(field.type) !== -1 || field.choices.length > 0 || this.filterOperator === 'null'){
+                    this.filterValueInputType = 'select';
+                    var choices = field.choices;
+                    if (field.type === 'bool' || this.filterOperator === 'null') {
+                        choices = [
+                            [0, 'False'],
+                            [1, 'True']
+                        ]
+                    } else if (field.type === 'related') {
+                        choices = this.getRelatedChoices(this.filterField)
+                    }
+
+                    this.filterSelectValue = choices.length > 0 ? choices[0][0] : '';
+                    this.filterChoices = choices.map(function(choice){
+                        return {
+                            value: choice[0],
+                            label: choice[1],
+                        }
+                    })
+                } else {
+                    var filterValueText = $(this.$refs.filterValueText);
+                    if (['datetime', 'date'].indexOf(field.type) !== -1) {
+                        var self = this;
+                        filterValueText.datetimepicker({
+                            format: field.type === 'date' ? this.dateInputFormat : this.datetimeInputFormat,
+                            locale: this.currentLocale,
+                            dayViewHeaderFormat: 'MMMM YYYY'
+                        }).on('dp.change',function(event){
+                            var dp = filterValueText.data("DateTimePicker");
+                            self.filterValue = event.date ? event.date.format(dp.format()) : null;
+                        });
+                    } else if (filterValueText.data("DateTimePicker")) {
+                        filterValueText.data("DateTimePicker").destroy()
+                    }
+                    this.filterValueInputType = 'text';
+                }
+            },
+            clickAddFilter: function(){
+                if (!(this.filterField in this.fields)) {
+                    return;
+                }
+                var field = this.fields[this.filterField];
+                var value = ['related', 'bool'].indexOf(field.type) !== -1 || field.choices.length > 0 || this.filterOperator === 'null' ?
+                    this.filterSelectValue : this.filterValue;
+
+                if (this.filterField && this.filterOperator) {
+                    this.filters.push({
+                        field: this.filterField,
+                        operator: this.filterOperator,
+                        value: value,
+                    });
+
+                    this.filterField = '';
+                    this.filterOperator = '==';
+                    this.filterValue = '';
+                    this.filterSelectValue = '';
+                } else {
+                    console.log('some inputs are empty')
+                }
+            },
+            clickRemoveFilter: function(filter){
+                if (this.filters.indexOf(filter) !== -1) {
+                    this.filters.splice(this.filters.indexOf(filter), 1);
+                }
+            },
+            getContentType: function(){
+                if (this.contentTypeId in this.cachedContentTypes) {
+                    return this.cachedContentTypes[this.contentTypeId];
+                }
+
+                var self = this;
+                this.ajaxCall = $.ajax({
+                    type: 'GET',
+                    url: '/model-filter-fields/?id=' + this.contentTypeId,
+                    async: false,
+                }).done(function(response){
+                    if (response.status === 'success') {
+                        self.cachedContentTypes[response.data.id] = response.data;
+                    }
+                });
+
+                // Todo handle error?
+                if (this.contentTypeId in this.cachedContentTypes) {
+                    return this.cachedContentTypes[this.contentTypeId];
+                }
+                return null;
+            },
+            getRelatedChoices: function(field) {
+                if (field in this.cachedRelatedChoices) {
+                    return this.cachedRelatedChoices[field];
+                }
+
+                var choices = [];
+                this.ajaxCall = $.ajax({
+                    type: 'GET',
+                    url: this.getContentType().choices_url + '?field=' + field,
+                    async: false,
+                }).done(function(response){
+                    if (response.status === 'success') {
+                        choices = response.data;
+                    }
+                });
+
+                this.cachedRelatedChoices[field] = choices;
+
+                return choices;
+            },
+        },
+        updated: function () {
+            var self = this;
+
+            $(this.$refs.selectFilterField).select2({
+                width: "100%"
+            }).change(function ($event) {
+                self.filterField = $($event.target).val();
+            });
+
+            $(this.$refs.selectFilterOperator).select2({
+                minimumResultsForSearch: -1,
+                width: "100%"
+            }).change(function ($event) {
+                self.filterOperator = $($event.target).val();
+            });
+
+            $(this.$refs.selectFilterValue).select2({
+                width: "100%"
+            }).change(function($event){
+                self.filterSelectValue = $($event.target).val();
+            });
+        }
+    });
+</script>

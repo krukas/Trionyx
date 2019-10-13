@@ -5,11 +5,18 @@ trionyx.models
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
+import operator
+from collections import defaultdict
+from functools import reduce
+
 from django.db.models import *  # noqa F403
 from django.urls import reverse
 from jsonfield import JSONField  # noqa F401
+from django.contrib import messages
+from django.utils import timezone
 
 from trionyx.config import models_config
+from trionyx import utils
 
 
 # =============================================================================
@@ -71,6 +78,13 @@ class BaseModel(Model):  # noqa F405
             self.verbose_name = self.generate_verbose_name()
         except Exception:
             pass
+
+        try:
+            if not self.pk and not self.created_by:
+                self.created_by = utils.get_current_request().user
+        except Exception:
+            pass
+
         return super().save(*args, **kwargs)
 
     def generate_verbose_name(self):
@@ -91,3 +105,68 @@ class BaseModel(Model):  # noqa F405
             'model': self._meta.model_name,
             'pk': self.id
         })
+
+
+def filter_queryset_with_user_filters(queryset, filters, request=None):
+    """Apply user provided filters on queryset"""
+    config = models_config.get_config(queryset.model)
+
+    field_indexed = {
+        name: {
+            'name': name,
+            'label': field['label'],
+            'type': field['type'],
+            'choices': field['choices'],
+        }
+        for name, field in config.get_list_fields().items()
+    }
+    grouped_filter = defaultdict(list)
+    for filter in filters:
+        field = field_indexed.get(filter['field'])
+
+        if not field:
+            continue
+
+        try:
+            if filter['operator'] == 'null':
+                queryset = queryset.filter(**{'{}__isnull'.format(filter['field']): filter['value']})
+            elif field['type'] == 'datetime':
+                filter['value'] = timezone.make_aware(
+                    timezone.datetime.strptime(filter['value'], utils.get_datetime_input_format()))
+            elif field['type'] == 'date':
+                filter['value'] = timezone.make_aware(timezone.datetime.strptime(
+                    filter['value'],
+                    utils.get_datetime_input_format(date_only=True)))
+
+            if filter['operator'] == '==':
+                grouped_filter[filter['field']].append(filter['value'])
+            elif filter['operator'] == '!=':
+                if field['type'] == 'text':
+                    queryset = queryset.exclude(**{'{}__icontains'.format(filter['field']): filter['value']})
+                else:
+                    queryset = queryset.exclude(**{filter['field']: filter['value']})
+            elif filter['operator'] == '<':
+                queryset = queryset.filter(**{'{}__lt'.format(filter['field']): filter['value']})
+            elif filter['operator'] == '<=':
+                queryset = queryset.filter(**{'{}__lte'.format(filter['field']): filter['value']})
+            elif filter['operator'] == '>':
+                queryset = queryset.filter(**{'{}__gt'.format(filter['field']): filter['value']})
+            elif filter['operator'] == '>':
+                queryset = queryset.filter(**{'{}__gte'.format(filter['field']): filter['value']})
+        except Exception:
+            if request:
+                messages.add_message(request, messages.ERROR, "Could not apply filter ({} {} {})".format(
+                    filter['field'],
+                    filter['operator'],
+                    filter['value']
+                ))
+    for name, values in grouped_filter.items():
+        field = field_indexed[name]
+        if field['type'] == 'text':
+            or_queries = [Q(**{'{}__icontains'.format(name): value}) for value in values]
+            queryset = queryset.filter(reduce(operator.or_, or_queries))
+        else:
+            or_queries = [Q(**{name: value}) for value in values]
+            queryset = queryset.filter(reduce(operator.or_, or_queries))
+
+    return queryset

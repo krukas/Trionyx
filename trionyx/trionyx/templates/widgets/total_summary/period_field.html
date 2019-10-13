@@ -10,8 +10,6 @@
 <script>
     var periodFields = {{ period_fields|jsonify }};
     function txPeriodFieldsUpdate() {
-        console.log(periodFields)
-
         $('#widget-period-field').select2().empty();
         $('#widget-period-field').select2({
             data: periodFields[$('#id_model').val()],

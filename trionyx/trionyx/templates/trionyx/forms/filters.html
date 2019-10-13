@@ -1,0 +1,34 @@
+{% load trionyx %}
+
+
+<div id="filters-{{ uuid }}">
+    <input type="hidden" name="{{ name }}" :value="filtersJson">
+    <trionyx-filters :filters="filters" :content-type-id="contentTypeId"></trionyx-filters>
+</div>
+
+
+<script type="text/javascript">
+    var filters{{ uuid }} = new Vue({
+        el: '#filters-{{ uuid }}',
+        delimiters: ['[[', ']]'],
+        data: {
+            contentTypeId: '{{ content_type_id }}',
+            filters: {{ value|safe }},
+        },
+        computed: {
+            filtersJson: function(){
+                return JSON.stringify(this.filters);
+            },
+        },
+    });
+
+    {% if content_type_input_id %}
+        var contentTypeInputId = '#{{ content_type_input_id }}';
+
+        filters{{ uuid }}.contentTypeId = $(contentTypeInputId).val();
+        $(contentTypeInputId).on('change', function () {
+            filters{{ uuid }}.contentTypeId = $(contentTypeInputId).val();
+            filters{{ uuid }}.filters = [];
+        });
+    {% endif %}
+</script>

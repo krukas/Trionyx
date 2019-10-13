@@ -33,6 +33,8 @@ urlpatterns = [
     path('dashboard/widget-data/', views.WidgetDataJsendView.as_view(), name='dashboard-widget-data'),
     path('dashboard/widget-config/<str:code>/', views.WidgetConfigDialog.as_view(), name='dashboard-widget-config'),
 
+    path('model-filter-fields/', views.FilterFieldsJsendView.as_view(), name='model-filter-fields'),
+
     # Generic model views
     path('model/<str:app>/<str:model>/', core_views.ListView.as_view(), name='model-list'),
     path('model/<str:app>/<str:model>/ajax/', core_views.ListJsendView.as_view(), name='model-list-ajax'),

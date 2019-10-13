@@ -8,6 +8,7 @@ trionyx.trionyx.models
 import hashlib
 import traceback
 
+
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.contrib.contenttypes import fields
 from django.utils import timezone
@@ -77,10 +78,6 @@ class User(models.BaseModel, AbstractBaseUser, PermissionsMixin):
         """Get short name if no name is set email is given"""
         if self.first_name:
             return self.first_name
-        return self.email
-
-    def __str__(self):
-        """User representation"""
         return self.email
 
     def set_attribute(self, code, value):
@@ -224,6 +221,7 @@ class AuditLogEntry(models.BaseModel):
     content_type = models.ForeignKey('contenttypes.ContentType', models.CASCADE, related_name='+')
     object_id = models.BigIntegerField(blank=True, null=True)
     content_object = fields.GenericForeignKey('content_type', 'object_id')
+    object_verbose_name = models.TextField(default='', blank=True)
 
     user = models.ForeignKey(User, models.SET_NULL, blank=True, null=True, related_name='+')
     action = models.IntegerField(choices=action_choices)

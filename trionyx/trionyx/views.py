@@ -157,6 +157,31 @@ class GlobalSearchJsendView(JsendView):
         return list(results.values())
 
 
+class FilterFieldsJsendView(JsendView):
+    """View for getting model filter fields"""
+
+    def handle_request(self, request, *args, **kwargs):
+        """Get filter fields"""
+        from trionyx.urls import model_url
+
+        modelClass = ContentType.objects.get_for_id(request.GET.get('id')).model_class()
+        config = models_config.get_config(modelClass)
+
+        return {
+            'id': request.GET.get('id'),
+            'choices_url': model_url(config.model, 'list-choices'),
+            'fields': {
+                name: {
+                    'name': name,
+                    'label': str(field['label']),
+                    'type': field['type'],
+                    'choices': field['choices'],
+                }
+                for name, field in config.get_list_fields().items()
+            }
+        }
+
+
 # =============================================================================
 # Dashboard
 # =============================================================================

@@ -12,7 +12,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.db.models import Q
 
 from trionyx import forms
-from trionyx.forms.layout import Layout, Fieldset, Div, HtmlTemplate
+from trionyx.forms.layout import Layout, Fieldset, Div, HtmlTemplate, Filters
 from trionyx.forms.helper import FormHelper
 from trionyx.trionyx.models import User
 from trionyx.trionyx.icons import ICON_CHOICES
@@ -319,10 +319,13 @@ class TotalSummaryWidgetForm(forms.Form):
 
     period = forms.ChoiceField(choices=PERIOD_CHOICES)
     period_field = forms.CharField(required=False)
+    filters = forms.CharField(required=False)
 
     def __init__(self, *args, **kwargs):
         """Init form"""
         super().__init__(*args, **kwargs)
+
+        # TODO Change this to use ajax
         content_type_map = ContentType.objects.get_for_models(*list(models_config.get_all_models(utils.get_current_request().user)))
         period_fields = {}
         summary_fields = {}
@@ -380,4 +383,8 @@ class TotalSummaryWidgetForm(forms.Form):
                 ),
                 css_class="row"
             ),
+            Fieldset(
+                'Filters',
+                Filters('filters', content_type_input_id='id_model'),
+            )
         )

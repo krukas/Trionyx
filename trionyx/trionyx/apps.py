@@ -77,6 +77,7 @@ class Config(BaseConfig):
 
         list_default_fields = ['created_at', 'email', 'first_name', 'last_name', 'is_active', 'is_superuser']
         auditlog_ignore_fields = ['last_online', 'last_login']
+        verbose_name = '{email}'
 
     class Log:
         """Log config"""
