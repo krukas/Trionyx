@@ -102,8 +102,6 @@ class BaseModel(Model):  # noqa F405
 
 def filter_queryset_with_user_filters(queryset, filters, request=None):
     """Apply user provided filters on queryset"""
-
-
     config = models_config.get_config(queryset.model)
 
     field_indexed = {

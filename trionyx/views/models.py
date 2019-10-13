@@ -7,11 +7,9 @@ trionyx.views
 """
 import csv
 import io
-import operator
 import json
 import logging
-from functools import reduce
-from collections import OrderedDict, defaultdict
+from collections import OrderedDict
 
 from django.apps import apps
 from django.views.generic import (
@@ -29,15 +27,12 @@ from django_jsend import JsendView
 from django.urls import reverse
 from django.core.paginator import Paginator
 from django.contrib import messages
-from django.db.models import Q
-from django.utils import timezone
 from watson import search as watson
 from django.db import transaction
 from django.contrib.contenttypes.models import ContentType
 
 from trionyx.views.mixins import ModelClassMixin, SessionValueMixin, ModelPermissionMixin
 from trionyx.forms.helper import FormHelper
-from trionyx import utils
 from trionyx.models import filter_queryset_with_user_filters
 
 logger = logging.getLogger(__name__)
