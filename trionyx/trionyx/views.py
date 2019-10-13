@@ -195,8 +195,11 @@ class DashboardView(TemplateView):
         context = super().get_context_data(*args, ** kwargs)
         dashboard = self.request.user.get_attribute('tx_dashboard', [])
         if not dashboard:
-            default_dashboard = settings.TX_DEFAULT_DASHBOARD() if callable(settings.TX_DEFAULT_DASHBOARD) else settings.TX_DEFAULT_DASHBOARD
-            for widget in default_dashboard:
+            for widget in (
+                settings.TX_DEFAULT_DASHBOARD()
+                if callable(settings.TX_DEFAULT_DASHBOARD)
+                else settings.TX_DEFAULT_DASHBOARD
+            ):
                 widget = widget.copy()
                 widget['i'] = utils.random_string(16)
                 dashboard.append(widget)
