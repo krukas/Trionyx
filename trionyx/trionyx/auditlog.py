@@ -67,6 +67,7 @@ def create_log(instance, changes, action):
     """Create a new log entry"""
     AuditLogEntry.objects.create(
         content_object=instance,
+        object_verbose_name=str(instance),
         action=action,
         changes=changes,
         user=get_current_request().user if get_current_request() and not get_current_request().user.is_anonymous else None

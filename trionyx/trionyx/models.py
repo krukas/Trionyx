@@ -221,6 +221,7 @@ class AuditLogEntry(models.BaseModel):
     content_type = models.ForeignKey('contenttypes.ContentType', models.CASCADE, related_name='+')
     object_id = models.BigIntegerField(blank=True, null=True)
     content_object = fields.GenericForeignKey('content_type', 'object_id')
+    object_verbose_name = models.TextField(default='', blank=True)
 
     user = models.ForeignKey(User, models.SET_NULL, blank=True, null=True, related_name='+')
     action = models.IntegerField(choices=action_choices)

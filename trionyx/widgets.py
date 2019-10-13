@@ -156,9 +156,9 @@ class AuditlogWidget(BaseWidget):
                 'user_avatar': log.user.avatar.url if log.user and log.user.avatar else static('img/avatar.png'),
                 'action': renderer.render_field(log, 'action'),
                 'object': '({}) {}'.format(
-                    log.content_object._meta.verbose_name.capitalize(),
-                    renderer.render_field(log, 'content_object')),
-                'object_url': log.content_object.get_absolute_url(),
+                    log.content_type.model_class()._meta.verbose_name.capitalize(),
+                    log.object_verbose_name),
+                'object_url': log.content_object.get_absolute_url() if log.content_object else '',
                 'created_at': renderer.render_field(log, 'created_at'),
 
             } for log in logs.order_by('-created_at')[:6]
