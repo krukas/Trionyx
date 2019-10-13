@@ -19,7 +19,7 @@ class FormHelper(CrispyFormHelper):
 
     def build_default_layout(self, form):
         """Build default layout use custom form layouts based on field type"""
-        get_model_field = form.Meta.model._meta.get_field if form.Meta.model else None
+        get_model_field = form.Meta.model._meta.get_field if hasattr(form, 'Meta') and hasattr(form.Meta, 'model') else None
 
         fields = []
         for name, ffield in form.fields.items():

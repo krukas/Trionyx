@@ -28,9 +28,9 @@
   - ~~CRUD Groups~~
 - Dashboard
   - multiple dashboards with different default per user group.
-  - Determine basic widgets
-  - TODO (uses user UserAttribute)
-  - notepad (uses user UserAttribute)
+  - ~~Add/Edit widgets~~
+  - Graph widget
+  - List widget (slim down version of list view with filters in config)
 - ~~DB logger~~
   - ~~Logs all from trionyx and apps~~
   - ~~Admin can see logs in interface~~

@@ -22,10 +22,16 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'),
 
     path('account/edit/', views.UpdateUserAccountView.as_view(), name='edit-account'),
-    path(r'account/view', views.ViewUserAccountView.as_view(), name='view-account'),
+    path('account/view', views.ViewUserAccountView.as_view(), name='view-account'),
 
     # Global search
     path('global-search', views.GlobalSearchJsendView.as_view(), name='global-search'),
+
+    # Dashboard
+    path('', views.DashboardView.as_view(), name='dashboard'),
+    path('dashboard/save/', views.SaveDashboardJsendView.as_view(), name='dashboard-save'),
+    path('dashboard/widget-data/', views.WidgetDataJsendView.as_view(), name='dashboard-widget-data'),
+    path('dashboard/widget-config/<str:code>/', views.WidgetConfigDialog.as_view(), name='dashboard-widget-config'),
 
     # Generic model views
     path('model/<str:app>/<str:model>/', core_views.ListView.as_view(), name='model-list'),

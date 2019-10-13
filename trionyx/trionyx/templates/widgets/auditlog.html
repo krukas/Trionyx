@@ -1,0 +1,44 @@
+<script type="text/x-template" id="widget-auditlog-template">
+    <div :class="widgetClass">
+        <div class="box-header with-border">
+          <h3 class="box-title">[[widget.config.title]]</h3>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+          <div class="table-responsive">
+            <table class="table no-margin">
+              <thead>
+              <tr>
+                <th style="width: 40px">User</th>
+                <th style="width: 40px">Action</th>
+                <th>Object</th>
+                <th style="width: 150px">Time</th>
+              </tr>
+              </thead>
+              <tbody>
+                  <tr v-for="item in data">
+                      <td>
+                          <img :src="item.user_avatar" class="avatar" :title="item.user_full_name" />
+                      </td>
+                      <td>[[item.action]]</td>
+                      <td>
+                          <a :href="item.object_url">
+                            [[item.object]]
+                          </a>
+                      </td>
+                      <td>[[item.created_at]]</td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+</script>
+
+
+<script>
+    Vue.component('widget-auditlog', {
+        mixins: [TxWidgetMixin],
+        template: '#widget-auditlog-template',
+    });
+</script>

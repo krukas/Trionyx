@@ -12,6 +12,7 @@ from trionyx.menu import app_menu
 def trionyx(request):
     """Add trionyx context data"""
     return {
+        'DEBUG': settings.DEBUG,
         'TX_APP_NAME': settings.TX_APP_NAME,
         'TX_LOGO_NAME_START': settings.TX_LOGO_NAME_START,
         'TX_LOGO_NAME_END': settings.TX_LOGO_NAME_END,

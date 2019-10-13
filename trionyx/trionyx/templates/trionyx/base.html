@@ -114,7 +114,11 @@
     <script src="{% static "plugins/datetimepicker/js/bootstrap-datetimepicker.min.js" %}"></script>
 
     <script src="{% static "js/adminlte.min.js" %}"></script>
-    <script src="{% static "js/vue.min.js" %}"></script>
+    {% if DEBUG %}
+        <script src="{% static "js/vue.dev.js" %}"></script>
+    {% else %}
+        <script src="{% static "js/vue.min.js" %}"></script>
+    {% endif %}
     <script src="{% static "js/trionyx.js" %}"></script>
 
     <script>

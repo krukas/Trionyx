@@ -7,6 +7,7 @@ trionyx.forms.layout
 """
 from crispy_forms.layout import *  # noqa F403
 from crispy_forms.bootstrap import *  # noqa F403
+from django.template.loader import render_to_string
 
 from trionyx.utils import (
     get_current_locale,
@@ -14,6 +15,22 @@ from trionyx.utils import (
     datetime_format_to_django_template,
     datetime_format_to_momentjs
 )
+
+
+class HtmlTemplate:
+    """HTML template renderer"""
+
+    def __init__(self, template, context=None):
+        """Init layout object"""
+        self.template = template
+        self.context = context if context else {}
+
+    def render(self, form, form_style, context, template_pack=TEMPLATE_PACK, **kwargs):
+        """Render template"""
+        return render_to_string(self.template, {
+            **context.flatten(),
+            **self.context,
+        })
 
 
 class DateTimePicker(Field):

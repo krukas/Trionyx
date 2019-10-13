@@ -1,6 +1,14 @@
 function trionyxInitialize() {
-    $('.select').select2();
-    $('.selectmultiple').select2();
+    $('.select').select2({
+        escapeMarkup: function(markup) {
+            return markup;
+        }
+    });
+    $('.selectmultiple').select2({
+        escapeMarkup: function(markup) {
+            return markup;
+        }
+    });
     $('.datetimepicker').each(function(index, input) {
         $(input).datetimepicker(getDataOptions(input, [
             'format',
@@ -101,6 +109,16 @@ function setCookie(cname, cvalue, exdays) {
     d.setTime(d.getTime() + (exdays*24*60*60*1000));
     var expires = "expires="+d.toUTCString();
     document.cookie = cname + "=" + cvalue + "; " + expires + "; path=/";
+}
+
+function randomString(length) {
+   var result           = '';
+   var characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+   var charactersLength = characters.length;
+   for ( var i = 0; i < length; i++ ) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+   }
+   return result;
 }
 
 jQuery.extend({
@@ -344,7 +362,17 @@ function TrionyxDialog(url, options) {
     $(dialog).modal('show');
 
     // Load dialog
-    $.get(url, function(response){
-        self.processResponse(response);
-    });
+    if ('post' in options) {
+       $.ajax({
+            url: url,
+            data: options.post,
+            type: "POST",
+        }).done(function(data){
+            self.processResponse(data);
+        });
+    } else {
+        $.get(url, function(response){
+            self.processResponse(response);
+        });
+    }
 };

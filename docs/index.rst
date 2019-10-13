@@ -17,6 +17,7 @@ Welcome to Trionyx's documentation!
    05-components
    06-forms
    07-celery
+   08-widgets
 
 
 

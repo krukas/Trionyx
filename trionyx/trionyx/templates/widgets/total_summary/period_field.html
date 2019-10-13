@@ -1,0 +1,32 @@
+{% load trionyx %}
+
+<div class="form-group">
+    <label for="id_all" class="control-label">Period Field</label>
+    <div class="controls ">
+        <select name="period_field" id="widget-period-field" class="form-control"></select>
+    </div>
+</div>
+
+<script>
+    var periodFields = {{ period_fields|jsonify }};
+    function txPeriodFieldsUpdate() {
+        console.log(periodFields)
+
+        $('#widget-period-field').select2().empty();
+        $('#widget-period-field').select2({
+            data: periodFields[$('#id_model').val()],
+        });
+    };
+
+    $('#widget-period-field').select2({
+        data: [],
+    });
+
+    $('#id_model').on('change', function(){
+        txPeriodFieldsUpdate();
+    });
+
+    //Init
+    txPeriodFieldsUpdate();
+    $('#widget-period-field').val('{{ value }}').trigger('change');
+</script>
