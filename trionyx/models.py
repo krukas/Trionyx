@@ -78,6 +78,13 @@ class BaseModel(Model):  # noqa F405
             self.verbose_name = self.generate_verbose_name()
         except Exception:
             pass
+
+        try:
+            if not self.pk and not self.created_by:
+                self.created_by = utils.get_current_request().user
+        except Exception:
+            pass
+
         return super().save(*args, **kwargs)
 
     def generate_verbose_name(self):
