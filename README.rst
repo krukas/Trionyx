@@ -16,6 +16,9 @@ Trionyx
 
 Trionyx is an application framework for managing data and processes, or can be used as an glorified customer admin panel for Django.
 
+
+.. image:: screenshots/dashboard.jpg
+
 Installation
 ============
 To install Trionyx, run:
