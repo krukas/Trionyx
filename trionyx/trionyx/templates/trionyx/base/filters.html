@@ -60,12 +60,18 @@
         data: function () {
             return {
                 fields: {},
+
+                datetimeInputFormat: '{{ datetime_input_format }}',
+                dateInputFormat: '{{ date_input_format }}',
+                currentLocale: '{{ current_locale }}',
+
                 filterField: null,
                 filterOperator: '==',
                 filterValue: '',
                 filterSelectValue: '',
                 filterChoices: [],
                 filterValueInputType: 'text',
+
                 cachedRelatedChoices: {},
                 cachedContentTypes: {},
             }

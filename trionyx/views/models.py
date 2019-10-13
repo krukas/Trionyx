@@ -33,10 +33,12 @@ from django.db.models import Q
 from django.utils import timezone
 from watson import search as watson
 from django.db import transaction
+from django.contrib.contenttypes.models import ContentType
 
 from trionyx.views.mixins import ModelClassMixin, SessionValueMixin, ModelPermissionMixin
 from trionyx.forms.helper import FormHelper
 from trionyx import utils
+from trionyx.models import filter_queryset_with_user_filters
 
 logger = logging.getLogger(__name__)
 
@@ -84,22 +86,15 @@ class ListView(ModelPermissionMixin, TemplateView, ModelClassMixin):
         """Get create url"""
         return reverse('trionyx:model-create', kwargs=self.kwargs)
 
-    def get_choices_url(self):
-        """Get choices url"""
-        return reverse('trionyx:model-list-choices', kwargs=self.kwargs)
-
     def get_context_data(self, **kwargs):
         """Add context data to view"""
         context = super().get_context_data(**kwargs)
         context.update({
             'title': self.get_title(),
+            'content_type_id': ContentType.objects.get_for_model(self.get_model_class()).id,
             'ajax_url': self.get_ajax_url(),
             'download_url': self.get_download_url(),
             'create_url': self.get_create_url(),
-            'choices_url': self.get_choices_url(),
-            'datetime_input_format': utils.datetime_format_to_momentjs(utils.get_datetime_input_format()),
-            'date_input_format': utils.datetime_format_to_momentjs(utils.get_datetime_input_format(date_only=True)),
-            'current_locale': utils.get_current_locale(),
             'create_permission': self.request.user.has_perm('{app_label}.add_{model_name}'.format(
                 app_label=self.get_model_config().app_label,
                 model_name=self.get_model_config().model_name,
@@ -187,54 +182,7 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
     def get_queryset(self):
         """Get qeuryset for model"""
         query = self.search_queryset()
-
-        # Apply filters
-        field_indexed = self.get_all_fields()
-        grouped_filter = defaultdict(list)
-        for filter in self.get_filters():
-            field = field_indexed.get(filter['field'])
-
-            if not field:
-                continue
-
-            try:
-                if field['type'] == 'datetime':
-                    filter['value'] = timezone.make_aware(timezone.datetime.strptime(filter['value'], utils.get_datetime_input_format()))
-                if field['type'] == 'date':
-                    filter['value'] = timezone.make_aware(timezone.datetime.strptime(
-                        filter['value'],
-                        utils.get_datetime_input_format(date_only=True)))
-
-                if filter['operator'] == '==':
-                    grouped_filter[filter['field']].append(filter['value'])
-                elif filter['operator'] == '!=':
-                    if field['type'] == 'text':
-                        query = query.exclude(**{'{}__icontains'.format(filter['field']): filter['value']})
-                    else:
-                        query = query.exclude(**{filter['field']: filter['value']})
-                elif filter['operator'] == '<':
-                    query = query.filter(**{'{}__lt'.format(filter['field']): filter['value']})
-                elif filter['operator'] == '<=':
-                    query = query.filter(**{'{}__lte'.format(filter['field']): filter['value']})
-                elif filter['operator'] == '>':
-                    query = query.filter(**{'{}__gt'.format(filter['field']): filter['value']})
-                elif filter['operator'] == '>':
-                    query = query.filter(**{'{}__gte'.format(filter['field']): filter['value']})
-            except Exception:
-                messages.add_message(self.request, messages.ERROR, "Could not apply filter ({} {} {})".format(
-                    filter['field'],
-                    filter['operator'],
-                    filter['value']
-                ))
-        for name, values in grouped_filter.items():
-            field = field_indexed[name]
-            if field['type'] == 'text':
-                or_queries = [Q(**{'{}__icontains'.format(name): value}) for value in values]
-                query = query.filter(reduce(operator.or_, or_queries))
-            else:
-                or_queries = [Q(**{name: value}) for value in values]
-                query = query.filter(reduce(operator.or_, or_queries))
-
+        query = filter_queryset_with_user_filters(query, self.get_filters(), self.request)
         return query.order_by(self.get_sort())
 
     def search_queryset(self):

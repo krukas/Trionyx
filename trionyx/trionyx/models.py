@@ -80,10 +80,6 @@ class User(models.BaseModel, AbstractBaseUser, PermissionsMixin):
             return self.first_name
         return self.email
 
-    def __str__(self):
-        """User representation"""
-        return self.email
-
     def set_attribute(self, code, value):
         """Set user attribute"""
         UserAttribute.objects.set_attribute(self, code, value)

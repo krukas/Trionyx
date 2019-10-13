@@ -7,6 +7,7 @@ trionyx.trionyx.context_processors
 """
 from django.conf import settings
 from trionyx.menu import app_menu
+from trionyx import utils
 
 
 def trionyx(request):
@@ -23,4 +24,8 @@ def trionyx(request):
 
         'trionyx_menu_items': app_menu.get_menu_items(request.user),
         'trionyx_menu_collapse': request.COOKIES.get('menu.state') == 'collapsed',
+
+        'datetime_input_format': utils.datetime_format_to_momentjs(utils.get_datetime_input_format()),
+        'date_input_format': utils.datetime_format_to_momentjs(utils.get_datetime_input_format(date_only=True)),
+        'current_locale': utils.get_current_locale(),
     }
