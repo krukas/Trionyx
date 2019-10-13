@@ -247,16 +247,70 @@ TX_THEME_COLOR = 'blue'
 """The theme skin color (header). Aviable colors: blue, yellow, green, purple, red, black. All colors have a light version blue-light"""
 
 TX_DEFAULT_DASHBOARD = [
-    {
-        'code': 'auditlog',
-        'config': {
-            'title': 'Action history',
-        },
-        'x': 0,
-        'y': 0,
-        'w': 6,
-        'h': 16,
-    },
+   {
+      "code":"auditlog",
+      "config":{
+         "title":"Action history",
+         "color":"light-blue",
+         "show":"all",
+         "refresh":"0"
+      },
+      "x":0,
+      "y":5,
+      "w":6,
+      "h":22,
+   },
+   {
+      "code":"total_summary",
+      "config":{
+         "title":"Unique users today",
+         "color":"purple",
+         "model":"1",
+         "field":"__count__",
+         "icon":"fa fa-user",
+         "period":"day",
+         "period_field":"last_online",
+         "refresh":"15"
+      },
+      "x":0,
+      "y":0,
+      "w":4,
+      "h":5,
+   },
+   {
+      "code":"total_summary",
+      "config":{
+         "title":"New users this week",
+         "color":"green",
+         "refresh":"15",
+         "icon":"fa fa-user-plus",
+         "model":"1",
+         "field":"__count__",
+         "period":"week",
+         "period_field":"created_at"
+      },
+      "x":4,
+      "y":0,
+      "w":4,
+      "h":5,
+   },
+   {
+      "code":"total_summary",
+      "config":{
+         "title":"User count",
+         "color":"yellow",
+         "refresh":"0",
+         "icon":"fa fa-users",
+         "model":"1",
+         "field":"__count__",
+         "period":"all",
+         "period_field":""
+      },
+      "x":8,
+      "y":0,
+      "w":4,
+      "h":5,
+   }
 ]
 
 TX_MODEL_CONFIGS = {}

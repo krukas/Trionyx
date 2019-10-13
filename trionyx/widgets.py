@@ -30,7 +30,51 @@ class MetaClass(type):
 
 
 class BaseWidget(metaclass=MetaClass):
-    """Base widget"""
+    """
+    Base widget to extend for creating custom widgets.
+    Custom widgets are created in `widgets.py` in root of app folder.
+
+    **Example of random widget:**
+
+    .. code-block:: python
+
+        # <app dir>/widgets.py
+        RandomWidget(BaseWidget):
+            code = 'random'
+            name = 'Random widget'
+            description = 'Shows random string'
+
+            def get_data(self, request, config):
+                return utils.random_string(16)
+
+
+    .. code-block:: html
+
+        <!-- template path: widgets/random.html -->
+        <script type="text/x-template" id="widget-random-template">
+            <div :class="widgetClass">
+                <div class="box-header with-border">
+                    <!-- Get title from config, your form fields are also available in the config -->
+                    <h3 class="box-title">[[widget.config.title]]</h3>
+                </div>
+                <!-- /.box-header -->
+                <div class="box-body">
+                    <!-- vue data property will be filled with the get_data results method --->
+                    [[data]]
+                </div>
+              </div>
+        </script>
+
+
+        <script>
+            <!-- The component must be called `widget-<code>` -->
+            Vue.component('widget-random', {
+                mixins: [TxWidgetMixin],
+                template: '#widget-random-template',
+            });
+        </script>
+
+    """
 
     code = None
     """Code for widget"""

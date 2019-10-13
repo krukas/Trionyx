@@ -347,7 +347,7 @@ class TotalSummaryWidgetForm(forms.Form):
 
         self.fields['model'].choices = [
             (content_type.id, model._meta.verbose_name.capitalize()) for model, content_type
-            in content_type_map.items() if summary_fields.get(content_type.id)]
+            in content_type_map.items()]
 
         self.helper = FormHelper()
         self.helper.layout = Layout(
