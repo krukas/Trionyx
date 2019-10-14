@@ -5,12 +5,7 @@ trionyx.trionyx.management.commands.create_app
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
-import os
-
-from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
-
-from trionyx.quickstart import Quickstart
+from django.core.management.base import BaseCommand
 
 
 class Command(BaseCommand):
