@@ -122,14 +122,14 @@ class UtilsTestCase(TestCase):
 
     def test_menu_item_active(self):
         menu = Menu()
-        menu.add_item('/item', 'item', url='/item')
-        menu.add_item('/item/subitem', 'item', url='/item/subitem')
+        menu.add_item('/item', 'item', url='/item/')
+        menu.add_item('/item/subitem', 'item', url='/item/subitem/')
         item = menu.get_menu_items()[0]
 
         self.assertFalse(item.is_active('/'))
-        self.assertFalse(item.is_active('/items'))
-        self.assertTrue(item.is_active('/item'))
-        self.assertTrue(item.is_active('/item/subitem'))
+        self.assertFalse(item.is_active('/items/'))
+        self.assertTrue(item.is_active('/item/'))
+        self.assertTrue(item.is_active('/item/subitem/'))
 
     def test_root_menu_item_active(self):
         menu = Menu()
@@ -137,12 +137,12 @@ class UtilsTestCase(TestCase):
         item = menu.get_menu_items()[0]
 
         self.assertTrue(item.is_active('/'))
-        self.assertFalse(item.is_active('/path'))
+        self.assertFalse(item.is_active('/path/'))
 
     def test_regex_menu_item_active(self):
         menu = Menu()
-        menu.add_item('regex', 'regex', active_regex=r'/test.+')
+        menu.add_item('regex', 'regex', active_regex=r'/test.+/')
         item = menu.get_menu_items()[0]
 
-        self.assertFalse(item.is_active('/test'))
-        self.assertTrue(item.is_active('/test123'))
+        self.assertFalse(item.is_active('/test/'))
+        self.assertTrue(item.is_active('/test123/'))

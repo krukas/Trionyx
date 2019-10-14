@@ -23,13 +23,13 @@
 
 
 {% block header_buttons %}
-    <a href="{{ cancel_url }}" class="btn btn-default">Cancel</a>
-    <input type="submit" value="{% if submit_value %}{{ submit_value }}{% else %}Create{% endif %}" class="btn btn-primary"/>
+    <a href="{{ cancel_url }}" class="btn bg-theme">Cancel</a>
+    <input type="submit" value="{% if submit_value %}{{ submit_value }}{% else %}Create{% endif %}" class="btn btn-success"/>
 {% endblock %}
 
 
 {% block content %}
-    <div class="box box-primary">
+    <div class="info-box">
         <div class="box-header with-border">
             <h3 class="box-title">Create {{ model_verbose_name }}</h3>
         </div>

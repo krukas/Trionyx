@@ -20,7 +20,7 @@ class BlogConfig(BaseConfig):
             {
                 'label': 'Publish',  # string or function
                 'url': 'trionyx:model-dialog-edit',  # string or function
-                'type': 'default', # string or function
+                'type': 'bg-theme', # string or function
                 'show': lambda obj, alias: True,  # Function that gives True or False if button must be displayed
                 'modal': True,
             }
