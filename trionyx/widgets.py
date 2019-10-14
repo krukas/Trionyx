@@ -179,10 +179,10 @@ class TotalSummaryWidget(BaseWidget):
         ModelClass = ContentType.objects.get_for_id(config['model']).model_class()
         query = ModelClass.objects.get_queryset()
 
-        if config['filters']:
+        if config.get('filters'):
             query = filter_queryset_with_user_filters(query, json.loads(config['filters']))
 
-        if config['period'] != 'all':
+        if config.get('period', 'all') != 'all':
             today = timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
             query = query.filter(**{
                 'year': {
@@ -208,7 +208,7 @@ class TotalSummaryWidget(BaseWidget):
                 },
             }.get(config['period'], {}))
 
-        if config['field'] == '__count__':
+        if config.get('field', '__count__') == '__count__':
             return query.count()
         else:
             result = query.aggregate(sum=Sum(config['field']))
