@@ -246,72 +246,74 @@ TX_LOGO_NAME_SMALL_END = 'X'
 TX_THEME_COLOR = 'purple'
 """The theme skin color (header). Aviable colors: blue, yellow, green, purple, red, black. All colors have a light version blue-light"""
 
-TX_DEFAULT_DASHBOARD = [
-    {
-        "code": "auditlog",
-        "config": {
-            "title": "Action history",
-            "color": "light-blue",
-            "show": "all",
-            "refresh": "0"
+def TX_DEFAULT_DASHBOARD():
+    from django.contrib.contenttypes.models import ContentType
+    return [
+        {
+            "code": "auditlog",
+            "config": {
+                "title": "Action history",
+                "color": "light-blue",
+                "show": "all",
+                "refresh": "0"
+            },
+            "x": 0,
+            "y": 5,
+            "w": 6,
+            "h": 22,
         },
-        "x": 0,
-        "y": 5,
-        "w": 6,
-        "h": 22,
-    },
-    {
-        "code": "total_summary",
-        "config": {
-            "title": "Unique users today",
-            "color": "purple",
-            "model": "1",
-            "field": "__count__",
-            "icon": "fa fa-user",
-            "period": "day",
-            "period_field": "last_online",
-            "refresh": "15"
+        {
+            "code": "total_summary",
+            "config": {
+                "title": "Unique users today",
+                "color": "purple",
+                "model": ContentType.objects.get_by_natural_key('trionyx', 'user').id,
+                "field": "__count__",
+                "icon": "fa fa-user",
+                "period": "day",
+                "period_field": "last_online",
+                "refresh": "15"
+            },
+            "x": 0,
+            "y": 0,
+            "w": 4,
+            "h": 5,
         },
-        "x": 0,
-        "y": 0,
-        "w": 4,
-        "h": 5,
-    },
-    {
-        "code": "total_summary",
-        "config": {
-            "title": "New users this week",
-            "color": "green",
-            "refresh": "15",
-            "icon": "fa fa-user-plus",
-            "model": "1",
-            "field": "__count__",
-            "period": "week",
-            "period_field": "created_at"
+        {
+            "code": "total_summary",
+            "config": {
+                "title": "New users this week",
+                "color": "green",
+                "refresh": "15",
+                "icon": "fa fa-user-plus",
+                "model": ContentType.objects.get_by_natural_key('trionyx', 'user').id,
+                "field": "__count__",
+                "period": "week",
+                "period_field": "created_at"
+            },
+            "x": 4,
+            "y": 0,
+            "w": 4,
+            "h": 5,
         },
-        "x": 4,
-        "y": 0,
-        "w": 4,
-        "h": 5,
-    },
-    {
-        "code": "total_summary",
-        "config": {
-            "title": "User count",
-            "color": "yellow",
-            "refresh": "0",
-            "icon": "fa fa-users",
-            "model": "1",
-            "field": "__count__",
-            "period": "all",
-            "period_field": ""
-        },
-        "x": 8,
-        "y": 0,
-        "w": 4,
-        "h": 5,
-    }
-]
+        {
+            "code": "total_summary",
+            "config": {
+                "title": "User count",
+                "color": "yellow",
+                "refresh": "0",
+                "icon": "fa fa-users",
+                "model": ContentType.objects.get_by_natural_key('trionyx', 'user').id,
+                "field": "__count__",
+                "period": "all",
+                "period_field": ""
+            },
+            "x": 8,
+            "y": 0,
+            "w": 4,
+            "h": 5,
+        }
+    ]
 
 TX_MODEL_CONFIGS = {}
 """
