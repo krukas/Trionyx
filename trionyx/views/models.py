@@ -113,7 +113,7 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
 
     def get_page_size(self):
         """Get current page size or page size in session"""
-        return self.get_and_save_value('page_size', 10)
+        return self.get_and_save_value('page_size', '10')
 
     def get_sort(self):
         """Get current sort or sort in session"""
@@ -422,7 +422,7 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
                 if 'show' in config and not config['show'](self.object, self.get_model_alias()):
                     continue
 
-                button_type = config.get('type', 'default')
+                button_type = config.get('type', 'bg-theme')
                 yield {
                     'label': config['label'](self.object, self.get_model_alias()) if callable(config['label']) else config['label'],
                     'type': button_type(self.object, self.get_model_alias()) if callable(button_type) else button_type,

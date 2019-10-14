@@ -6,24 +6,24 @@
 
 {% block header_buttons %}
     {% if back_url %}
-        <a href="{{ back_url }}" class="btn btn-default">Back</a>
+        <a href="{{ back_url }}" class="btn bg-theme">Back</a>
     {% endif %}
 
     {% for button in view_header_buttons %}
         <a
            href="{% if button.modal %}#{% else %}{{ button.url }}{% endif %}"
            {% if button.modal %}onClick="openDialog('{{ button.url }}')"{% endif %}
-           class="btn btn-{{ button.type }}"
+           class="btn {{ button.type }}"
         >
             {{ button.label }}
         </a>
     {% endfor %}
 
     {% if delete_url and delete_permission %}
-        <a href="{{ delete_url }}" class="btn btn-default">Delete</a>
+        <a href="{{ delete_url }}" class="btn bg-theme">Delete</a>
     {% endif %}
     {% if edit_url and change_permission %}
-        <a href="{{ edit_url }}" class="btn btn-default">Edit</a>
+        <a href="{{ edit_url }}" class="btn bg-theme">Edit</a>
     {% endif %}
 
 {% endblock %}
@@ -48,9 +48,8 @@
         {% for item in page_detail_tabs %}
             <div class="tab-pane fade in {% if item.code == active_tab %}active{% endif %}" id="{{ item.code }}">
                 <div class="row tab-content" style="padding:0px" id="trionyx-tab-{{ item.code }}">
-                    <div style="margin: 0 auto; width: 150px; margin-top: 5%; text-align: center;">
-                        {{ item.code }}
-                        <img  src='{% static 'img/grid-loader.svg' %}' />
+                    <div style="font-size: 40px; margin: 0 auto; margin-top: 5%; text-align: center;">
+                        <i class="fa fa-refresh fa-spin text-theme"></i>
                     </div>
                 </div>
             </div>

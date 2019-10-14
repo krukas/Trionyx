@@ -24,16 +24,16 @@
 
 {% block header_buttons %}
     {% if cancel_url %}
-        <a href="{% url cancel_url %}" class="btn btn-default">Cancel</a>
+        <a href="{% url cancel_url %}" class="btn bg-theme">Cancel</a>
     {% else %}
-        <a href="{{ object_url }}" class="btn btn-default">Cancel</a>
+        <a href="{{ object_url }}" class="btn bg-theme">Cancel</a>
     {% endif %}
-    <input type="submit" value="{% if submit_value %}{{ submit_value }}{% else %}Update{% endif %}" class="btn btn-primary"/>
+    <input type="submit" value="{% if submit_value %}{{ submit_value }}{% else %}Update{% endif %}" class="btn btn-success"/>
 {% endblock %}
 
 
 {% block content %}
-    <div class="box box-primary">
+    <div class="info-box">
         <div class="box-header with-border">
             <h3 class="box-title">Update {{ object }}</h3>
         </div>

@@ -2,6 +2,300 @@ body {
     background-color: #ecf0f5;;
 }
 
+/*****************************************************************************/
+/* Theme colors*/
+/*****************************************************************************/
+.skin-blue .bg-theme,
+.skin-blue .nav-pills > li.active > a,
+.skin-blue .pagination > li.active > a,
+.skin-blue .select2-container--default .select2-results__option--highlighted[aria-selected],
+.skin-blue .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-blue .bootstrap-datetimepicker-widget table td.active,
+.skin-blue .box.box-solid.box-theme > .box-header,
+.skin-blue-light .bg-theme,
+.skin-blue-light .nav-pills > li.active > a,
+.skin-blue-light .pagination > li.active > a,
+.skin-blue-light .select2-container--default .select2-results__option--highlighted[aria-selected],
+.skin-blue-light .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-blue-light .bootstrap-datetimepicker-widget table td.active,
+.skin-blue-light .box.box-solid.box-theme > .box-header
+{
+    background-color: #0073b7 !important;
+    color: #ffffff !important;
+}
+
+
+.skin-blue .select2-container--default.select2-container--focus .select2-selection--multiple,
+.skin-blue .select2-container--default .select2-search--dropdown .select2-search__field,
+.skin-blue .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-blue .nav-pills > li.active > a,
+.skin-blue .pagination > li.active > a,
+.skin-blue .box-theme,
+.skin-blue .form-control:focus,
+.skin-blue-light .select2-container--default.select2-container--focus .select2-selection--multiple,
+.skin-blue-light .select2-container--default .select2-search--dropdown .select2-search__field,
+.skin-blue-light .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-blue-light .nav-pills > li.active > a,
+.skin-blue-light .pagination > li.active > a,
+.skin-blue-light .box-theme,
+.skin-blue-light .form-control:focus
+{
+    border-color: #0073b7 !important;
+}
+
+
+.skin-blue .text-theme,
+.skin-blue .bootstrap-datetimepicker-widget a,
+.skin-blue-light .text-theme,
+.skin-blue-light .bootstrap-datetimepicker-widget a
+{
+    color: #0073b7 !important;
+}
+
+
+.skin-yellow .bg-theme,
+.skin-yellow .nav-pills > li.active > a,
+.skin-yellow .pagination > li.active > a,
+.skin-yellow .select2-container--default .select2-results__option--highlighted[aria-selected],
+.skin-yellow .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-yellow .bootstrap-datetimepicker-widget table td.active,
+.skin-yellow .box.box-solid.box-theme > .box-header,
+.skin-yellow-light .bg-theme,
+.skin-yellow-light .nav-pills > li.active > a,
+.skin-yellow-light .pagination > li.active > a,
+.skin-yellow-light .select2-container--default .select2-results__option--highlighted[aria-selected],
+.skin-yellow-light .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-yellow-light .bootstrap-datetimepicker-widget table td.active,
+.skin-yellow-light .box.box-solid.box-theme > .box-header
+{
+    background-color: #f39c12 !important;
+    color: #ffffff !important;
+}
+
+
+.skin-yellow .select2-container--default.select2-container--focus .select2-selection--multiple,
+.skin-yellow .select2-container--default .select2-search--dropdown .select2-search__field,
+.skin-yellow .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-yellow .nav-pills > li.active > a,
+.skin-yellow .pagination > li.active > a,
+.skin-yellow .box-theme,
+.skin-yellow .form-control:focus,
+.skin-yellow-light .select2-container--default.select2-container--focus .select2-selection--multiple,
+.skin-yellow-light .select2-container--default .select2-search--dropdown .select2-search__field,
+.skin-yellow-light .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-yellow-light .nav-pills > li.active > a,
+.skin-yellow-light .pagination > li.active > a,
+.skin-yellow-light .box-theme,
+.skin-yellow-light .form-control:focus
+{
+    border-color: #f39c12 !important;
+}
+
+
+.skin-yellow .text-theme,
+.skin-yellow .bootstrap-datetimepicker-widget a,
+.skin-yellow-light .text-theme,
+.skin-yellow-light .bootstrap-datetimepicker-widget a
+{
+    color: #f39c12 !important;
+}
+
+
+.skin-green .bg-theme,
+.skin-green .nav-pills > li.active > a,
+.skin-green .pagination > li.active > a,
+.skin-green .select2-container--default .select2-results__option--highlighted[aria-selected],
+.skin-green .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-green .bootstrap-datetimepicker-widget table td.active,
+.skin-green .box.box-solid.box-theme > .box-header,
+.skin-green-light .bg-theme,
+.skin-green-light .nav-pills > li.active > a,
+.skin-green-light .pagination > li.active > a,
+.skin-green-light .select2-container--default .select2-results__option--highlighted[aria-selected],
+.skin-green-light .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-green-light .bootstrap-datetimepicker-widget table td.active,
+.skin-green-light .box.box-solid.box-theme > .box-header
+{
+    background-color: #00a65a !important;
+    color: #ffffff !important;
+}
+
+
+.skin-green .select2-container--default.select2-container--focus .select2-selection--multiple,
+.skin-green .select2-container--default .select2-search--dropdown .select2-search__field,
+.skin-green .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-green .nav-pills > li.active > a,
+.skin-green .pagination > li.active > a,
+.skin-green .box-theme,
+.skin-green .form-control:focus,
+.skin-green-light .select2-container--default.select2-container--focus .select2-selection--multiple,
+.skin-green-light .select2-container--default .select2-search--dropdown .select2-search__field,
+.skin-green-light .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-green-light .nav-pills > li.active > a,
+.skin-green-light .pagination > li.active > a,
+.skin-green-light .box-theme,
+.skin-green-light .form-control:focus
+{
+    border-color: #00a65a !important;
+}
+
+
+.skin-green .text-theme,
+.skin-green .bootstrap-datetimepicker-widget a,
+.skin-green-light .text-theme,
+.skin-green-light .bootstrap-datetimepicker-widget a
+{
+    color: #00a65a !important;
+}
+
+
+.skin-purple .bg-theme,
+.skin-purple .nav-pills > li.active > a,
+.skin-purple .pagination > li.active > a,
+.skin-purple .select2-container--default .select2-results__option--highlighted[aria-selected],
+.skin-purple .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-purple .bootstrap-datetimepicker-widget table td.active,
+.skin-purple .box.box-solid.box-theme > .box-header,
+.skin-purple-light .bg-theme,
+.skin-purple-light .nav-pills > li.active > a,
+.skin-purple-light .pagination > li.active > a,
+.skin-purple-light .select2-container--default .select2-results__option--highlighted[aria-selected],
+.skin-purple-light .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-purple-light .bootstrap-datetimepicker-widget table td.active,
+.skin-purple-light .box.box-solid.box-theme > .box-header
+{
+    background-color: #605ca8 !important;
+    color: #ffffff !important;
+}
+
+
+.skin-purple .select2-container--default.select2-container--focus .select2-selection--multiple,
+.skin-purple .select2-container--default .select2-search--dropdown .select2-search__field,
+.skin-purple .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-purple .nav-pills > li.active > a,
+.skin-purple .pagination > li.active > a,
+.skin-purple .box-theme,
+.skin-purple .form-control:focus,
+.skin-purple-light .select2-container--default.select2-container--focus .select2-selection--multiple,
+.skin-purple-light .select2-container--default .select2-search--dropdown .select2-search__field,
+.skin-purple-light .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-purple-light .nav-pills > li.active > a,
+.skin-purple-light .pagination > li.active > a,
+.skin-purple-light .box-theme,
+.skin-purple-light .form-control:focus
+{
+    border-color: #605ca8 !important;
+}
+
+
+.skin-purple .text-theme,
+.skin-purple .bootstrap-datetimepicker-widget a,
+.skin-purple-light .text-theme,
+.skin-purple-light .bootstrap-datetimepicker-widget a
+{
+    color: #605ca8 !important;
+}
+
+
+.skin-red .bg-theme,
+.skin-red .nav-pills > li.active > a,
+.skin-red .pagination > li.active > a,
+.skin-red .select2-container--default .select2-results__option--highlighted[aria-selected],
+.skin-red .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-red .bootstrap-datetimepicker-widget table td.active,
+.skin-red .box.box-solid.box-theme > .box-header,
+.skin-red-light .bg-theme,
+.skin-red-light .nav-pills > li.active > a,
+.skin-red-light .pagination > li.active > a,
+.skin-red-light .select2-container--default .select2-results__option--highlighted[aria-selected],
+.skin-red-light .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-red-light .bootstrap-datetimepicker-widget table td.active,
+.skin-red-light .box.box-solid.box-theme > .box-header
+{
+    background-color: #dd4b39 !important;
+    color: #ffffff !important;
+}
+
+
+.skin-red .select2-container--default.select2-container--focus .select2-selection--multiple,
+.skin-red .select2-container--default .select2-search--dropdown .select2-search__field,
+.skin-red .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-red .nav-pills > li.active > a,
+.skin-red .pagination > li.active > a,
+.skin-red .box-theme,
+.skin-red .form-control:focus,
+.skin-red-light .select2-container--default.select2-container--focus .select2-selection--multiple,
+.skin-red-light .select2-container--default .select2-search--dropdown .select2-search__field,
+.skin-red-light .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-red-light .nav-pills > li.active > a,
+.skin-red-light .pagination > li.active > a,
+.skin-red-light .box-theme,
+.skin-red-light .form-control:focus
+{
+    border-color: #dd4b39 !important;
+}
+
+
+.skin-red .text-theme,
+.skin-red .bootstrap-datetimepicker-widget a,
+.skin-red-light .text-theme,
+.skin-red-light .bootstrap-datetimepicker-widget a
+{
+    color: #dd4b39 !important;
+}
+
+
+.skin-black .bg-theme,
+.skin-black .nav-pills > li.active > a,
+.skin-black .pagination > li.active > a,
+.skin-black .select2-container--default .select2-results__option--highlighted[aria-selected],
+.skin-black .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-black .bootstrap-datetimepicker-widget table td.active,
+.skin-black .box.box-solid.box-theme > .box-header,
+.skin-black-light .bg-theme,
+.skin-black-light .nav-pills > li.active > a,
+.skin-black-light .pagination > li.active > a,
+.skin-black-light .select2-container--default .select2-results__option--highlighted[aria-selected],
+.skin-black-light .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-black-light .bootstrap-datetimepicker-widget table td.active,
+.skin-black-light .box.box-solid.box-theme > .box-header
+{
+    background-color: #111111 !important;
+    color: #ffffff !important;
+}
+
+
+.skin-black .select2-container--default.select2-container--focus .select2-selection--multiple,
+.skin-black .select2-container--default .select2-search--dropdown .select2-search__field,
+.skin-black .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-black .nav-pills > li.active > a,
+.skin-black .pagination > li.active > a,
+.skin-black .box-theme,
+.skin-black .form-control:focus,
+.skin-black-light .select2-container--default.select2-container--focus .select2-selection--multiple,
+.skin-black-light .select2-container--default .select2-search--dropdown .select2-search__field,
+.skin-black-light .select2-container--default .select2-selection--multiple .select2-selection__choice,
+.skin-black-light .nav-pills > li.active > a,
+.skin-black-light .pagination > li.active > a,
+.skin-black-light .box-theme,
+.skin-black-light .form-control:focus
+{
+    border-color: #111111 !important;
+}
+
+
+.skin-black .text-theme,
+.skin-black .bootstrap-datetimepicker-widget a,
+.skin-black-light .text-theme,
+.skin-black-light .bootstrap-datetimepicker-widget a
+{
+    color: #111111 !important;
+}
+
+
+
+
+/*****************************************************************************/
 .content-header-wrapper {
     min-height: 65px;
 }
@@ -125,26 +419,26 @@ dl {
 
 /* purple */
 .box.box-purple {
-    border-top-color: #39CCCC;
+    border-top-color: #605ca8;
 }
 .box.box-solid.box-purple {
-    border: 1px solid #39CCCC;
+    border: 1px solid #605ca8;
 }
 .box.box-solid.box-purple > .box-header {
     color: #fff;
-    background-color: #39CCCC;
+    background-color: #605ca8;
 }
 
 /* teal */
 .box.box-teal {
-    border-top-color: #605ca8;
+    border-top-color: #39CCCC;
 }
 .box.box-solid.box-teal {
-    border: 1px solid #605ca8;
+    border: 1px solid #39CCCC;
 }
 .box.box-solid.box-teal > .box-header {
     color: #fff;
-    background-color: #605ca8;
+    background-color: #39CCCC;
 }
 
 /* orange */

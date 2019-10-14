@@ -10,13 +10,13 @@
 
 {% block header_buttons %}
     {% if create_permission %}
-        <a href="{{ create_url }}" class="btn btn-default">Create</a>
+        <a href="{{ create_url }}" class="btn bg-theme">Create</a>
     {% endif %}
 {% endblock %}
 
 
 {% block content %}
-    <div class="box" id="app-model-list" v-cloak>
+    <div class="info-box" id="app-model-list" v-cloak>
         <div class="box-header">
             <div class="input-group input-group-sm" style="width: 150px;">
                 <input type="text" name="table_search" class="form-control pull-right" placeholder="Search" v-model="search" v-on:keyup="searchLoad()">

@@ -243,7 +243,7 @@ TX_LOGO_NAME_SMALL_START = 'T'
 TX_LOGO_NAME_SMALL_END = 'X'
 """The last character or characters of the small logo that is normal"""
 
-TX_THEME_COLOR = 'blue'
+TX_THEME_COLOR = 'purple'
 """The theme skin color (header). Aviable colors: blue, yellow, green, purple, red, black. All colors have a light version blue-light"""
 
 TX_DEFAULT_DASHBOARD = [
