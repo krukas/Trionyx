@@ -246,7 +246,9 @@ TX_LOGO_NAME_SMALL_END = 'X'
 TX_THEME_COLOR = 'purple'
 """The theme skin color (header). Aviable colors: blue, yellow, green, purple, red, black. All colors have a light version blue-light"""
 
+
 def TX_DEFAULT_DASHBOARD():
+    """Return default dashboard"""
     from django.contrib.contenttypes.models import ContentType
     return [
         {
@@ -314,6 +316,7 @@ def TX_DEFAULT_DASHBOARD():
             "h": 5,
         }
     ]
+
 
 TX_MODEL_CONFIGS = {}
 """
