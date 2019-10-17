@@ -1,3 +1,10 @@
+"""
+trionyx.data.countries
+~~~~~~~~~~~~~~~~~~~~~~
+
+:copyright: 2019 by Maikel Martens
+:license: GPLv3
+"""
 COUNTRIES = (
     ('AF', 'Afghanistan'),
     ('AX', 'Åland Islands'),

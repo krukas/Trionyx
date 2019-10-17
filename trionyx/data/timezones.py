@@ -1,3 +1,10 @@
+"""
+trionyx.data.timezones
+~~~~~~~~~~~~~~~~~~~~~~
+
+:copyright: 2019 by Maikel Martens
+:license: GPLv3
+"""
 TIMEZONES = (
     ("Etc/GMT+12", "Etc/GMT+12"),
     ("Etc/GMT+11", "Etc/GMT+11"),

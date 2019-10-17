@@ -19,6 +19,7 @@ from trionyx.config import models_config
 
 
 class ModelForm(DjangoModelForm):
+    """Trionyx ModelForm"""
 
     def get_inline_forms(self):
         """Get inline forms"""
@@ -43,6 +44,7 @@ class ModelForm(DjangoModelForm):
         return self.__inline_forms
 
     def is_valid(self):
+        """Check if form and inline forms are valid"""
         valid = super().is_valid()
 
         for key, form in self.get_inline_forms().items():
@@ -51,6 +53,7 @@ class ModelForm(DjangoModelForm):
         return valid
 
     def save(self, commit=True):
+        """Save form and inline forms"""
         object_updated = False
         config = models_config.get_config(self._meta.model)
         fields = [field.name for field in config.get_fields()]

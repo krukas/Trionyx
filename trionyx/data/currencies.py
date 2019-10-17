@@ -1,3 +1,10 @@
+"""
+trionyx.data.currencies
+~~~~~~~~~~~~~~~~~~~~~~~
+
+:copyright: 2019 by Maikel Martens
+:license: GPLv3
+"""
 CURRENCIES = (
     ("AFN", "Afghani"),
     ("EUR", "Euro"),
