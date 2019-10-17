@@ -57,7 +57,7 @@ class BaseModel(Model):  # noqa F405
     deleted = BooleanField(default=False)  # noqa F405
     """Deleted field, object is soft deleted"""
 
-    created_by = ForeignKey('trionyx.User', SET_NULL, default=None, blank=True, null=True)
+    created_by = ForeignKey('trionyx.User', SET_NULL, default=None, blank=True, null=True, related_name='+')
     """Created by field"""
 
     verbose_name = TextField(default='', blank=True)
