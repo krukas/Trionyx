@@ -140,7 +140,7 @@ class Component:
         """Initialize Component"""
         self.id = options.get('id')
         self.components = list(filter(None, components))
-        self.object = False
+        self.object = options.get('object', False)
         self.context = {}
         self.request = None
 
@@ -162,6 +162,8 @@ class Component:
         """
         if self.object is False:
             self.object = object
+        else:
+            object = self.object
 
         # Pass object along to child components for rendering
         for component in self.components:

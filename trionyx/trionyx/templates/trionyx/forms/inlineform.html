@@ -1,0 +1,32 @@
+{% load crispy_forms_tags %}
+
+{% if inline_form.forms %}
+    <table class="table inline-form-table">
+        {{ inline_form.management_form|crispy }}
+
+        {% for form in inline_form.forms %}
+            {% if forloop.first %}
+                <tr>
+                    {% for field in form.visible_fields %}
+                        <th>{{ field.label }}</th>
+                    {% endfor %}
+                </tr>
+            {% endif %}
+
+                <tr class="{% cycle 'even' 'odd' %} formset_row-{{ inline_form.prefix }}">
+                    {% for field in form.visible_fields %}
+                    <td>
+                        {% if forloop.first %}
+                            {% for hidden in form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+                        {% endif %}
+                        {{ field|as_crispy_field }}
+                    </td>
+                    {% endfor %}
+                </tr>
+        {% endfor %}
+    </table>
+{% else %}
+    {% crispy inline_form %}
+{% endif %}
