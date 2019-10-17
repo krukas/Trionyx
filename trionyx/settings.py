@@ -11,6 +11,7 @@ All Trionyx base settings
 import json
 import logging
 import os
+from pkg_resources import iter_entry_points
 
 from django.core.exceptions import ImproperlyConfigured
 from kombu import Queue, Exchange
@@ -43,8 +44,11 @@ ALLOWED_HOSTS = get_env_var('ALLOWED_HOSTS', [])
 SECRET_KEY = get_env_var('SECRET_KEY')
 
 INSTALLED_APPS = [
-    # Trionyx apps
+    # Trionyx core app
     'trionyx.trionyx',
+
+    # Add installed trionyx apps
+    *[entry_point.module_name for entry_point in iter_entry_points(group='trionyx.app', name=None)],
 
     # Django apps
     'django.contrib.auth',

@@ -5,7 +5,9 @@ trionyx.urls
 :copyright: 2017 by Maikel Martens
 :license: GPLv3
 """
+import importlib
 import inspect
+from pkg_resources import iter_entry_points
 from django.conf import settings
 from django.apps import apps
 from django.conf.urls import include
@@ -37,6 +39,13 @@ def model_url(model, view_name, code=None):
 urlpatterns = [
     path('', include('trionyx.trionyx.urls', namespace='trionyx')),
 ]
+
+# Add installed apps urls
+for entry_point in iter_entry_points(group='trionyx.app', name=None):
+    if importlib.util.find_spec(entry_point.module_name + '.urls'):
+        urlpatterns.append(
+            path('', include(entry_point.module_name + '.urls'))
+        )
 
 if settings.DEBUG:
     urlpatterns += static(
