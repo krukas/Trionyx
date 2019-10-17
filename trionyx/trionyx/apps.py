@@ -69,8 +69,9 @@ class Config(BaseConfig):
             for module in modules:
                 try:
                     import_module('{}.{}'.format(app.module.__package__, module))
-                except ImportError:
-                    pass
+                except ImportError as e:
+                    if str(e) != "No module named '{}.{}'".format(app.module.__package__, module):
+                        raise e
 
     class User:
         """User config"""

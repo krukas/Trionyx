@@ -11,9 +11,71 @@ import inspect
 from collections import defaultdict
 
 from django.forms import *  # noqa F403
+from django.forms import ModelForm as DjangoModelForm
 from django.db.models import NOT_PROVIDED
+from django.db import transaction
 
 from trionyx.config import models_config
+
+
+class ModelForm(DjangoModelForm):
+
+    def get_inline_forms(self):
+        """Get inline forms"""
+        if not hasattr(self, '__inline_forms'):
+            self.__inline_forms = {}
+            for key, options in getattr(self, 'inline_forms', {}).items():
+                kwargs = {
+                    'prefix': key,
+                }
+
+                fk_name = options.get('fk_name', 'instance')
+                if fk_name == 'instance':
+                    kwargs['instance'] = self.instance
+                else:
+                    kwargs['instance'] = getattr(self.instance, key, None)
+                    kwargs['initial'] = {
+                        fk_name: self.instance
+                    }
+
+                self.__inline_forms[key] = options['form'](self.data if self.data else None, **kwargs)
+
+        return self.__inline_forms
+
+    def is_valid(self):
+        valid = super().is_valid()
+
+        for key, form in self.get_inline_forms().items():
+            valid = valid and form.is_valid()
+
+        return valid
+
+    def save(self, commit=True):
+        object_updated = False
+        config = models_config.get_config(self._meta.model)
+        fields = [field.name for field in config.get_fields()]
+        with transaction.atomic():
+            obj = super().save(commit)
+
+            for key, form in self.get_inline_forms().items():
+                fk_name = self.inline_forms[key].get('fk_name', 'instance')
+                if fk_name == 'instance':
+                    form.instance = obj
+                    form.save(commit)
+                else:
+                    inline_obj = form.save(False)
+                    if inline_obj:
+                        setattr(inline_obj, fk_name, obj)
+                        if commit:
+                            inline_obj.save()
+
+                        if key in fields:
+                            setattr(obj, key, inline_obj)
+                            object_updated = True
+
+        if object_updated and commit:
+            obj.save()
+        return obj
 
 
 class FormRegister:

@@ -139,22 +139,22 @@ class TimePicker(DateTimePicker):
     glyphicon = 'glyphicon-time'
 
 
-class Formset(LayoutObject):
+class InlineForm(LayoutObject):
     """Layout renderer for inline forms"""
 
-    template = 'trionyx/forms/formset.html'
+    template = 'trionyx/forms/inlineform.html'
 
-    def __init__(self, formset_name_in_context, template=None):
+    def __init__(self, form_name, template=None):
         """Init Formset"""
-        self.formset_name_in_context = formset_name_in_context
-        self.fields = []
+        self.form_name = form_name
         if template:
             self.template = template
 
     def render(self, form, form_style, context, template_pack=TEMPLATE_PACK):
         """Render form"""
-        formset = context[self.formset_name_in_context]
-        return render_to_string(self.template, {'formset': formset})
+        return render_to_string(self.template, {
+            'inline_form': form.get_inline_forms()[self.form_name]
+        }, utils.get_current_request())
 
 
 class Filters:
