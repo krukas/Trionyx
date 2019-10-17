@@ -11,7 +11,7 @@ jobs:
       - run: sudo chown -R circleci:circleci /usr/local/bin
       - run: sudo chown -R circleci:circleci /usr/local/lib/python3.5/site-packages
       - restore_cache:
-          key: python-{{ .Branch }}-{{ checksum "setup.py" }}
+          key: python3-{{ .Branch }}-{{ checksum "setup.py" }}
       - run:
           command: |
             sudo pip3 install -e .
@@ -19,7 +19,7 @@ jobs:
             sudo pip3 install "celery[redis]"
             sudo pip3 install codecov
       - save_cache:
-          key: python-{{ .Branch }}-{{ checksum "setup.py" }}
+          key: python3-{{ .Branch }}-{{ checksum "setup.py" }}
           paths:
             - "/usr/local/bin"
             - "/usr/local/lib/python3.5/site-packages"
