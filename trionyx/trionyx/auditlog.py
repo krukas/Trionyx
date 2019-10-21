@@ -18,6 +18,7 @@ from trionyx.trionyx.models import AuditLogEntry
 from trionyx.utils import get_current_request
 from trionyx.trionyx.layouts import auditlog as auditlog_layout
 from trionyx.views import tabs
+from trionyx.renderer import renderer
 
 logger = logging.getLogger(__name__)
 
@@ -35,7 +36,7 @@ def model_instance_diff(old, new):
         new_value = get_field_value(new, field)
 
         if old_value != new_value:
-            diff[field.name] = (smart_text(old_value), smart_text(new_value))
+            diff[field.name] = (renderer.render_field(old, field.name), renderer.render_field(new, field.name))
 
     return diff if diff else None
 
@@ -47,20 +48,21 @@ def get_field_value(obj, field):
             value = field.to_python(getattr(obj, field.name, None))
             if value is not None and settings.USE_TZ and not timezone.is_naive(value):
                 value = timezone.make_naive(value, timezone=timezone.utc)
+            return value
         except ObjectDoesNotExist:
-            value = field.default if field.default is not models.NOT_PROVIDED else None
-    if isinstance(field, models.DecimalField):
+            pass
+    elif isinstance(field, models.DecimalField):
         try:
-            value = smart_text(float(getattr(obj, field.name, None)))
+            return field.to_python(getattr(obj, field.name, None))
         except TypeError:
-            value = field.default if field.default is not models.NOT_PROVIDED else None
+            pass
     else:
         try:
-            value = smart_text(getattr(obj, field.name, None))
+            return smart_text(getattr(obj, field.name, None))
         except ObjectDoesNotExist:
-            value = field.default if field.default is not models.NOT_PROVIDED else None
+            pass
 
-    return value
+    return field.default if field.default is not models.NOT_PROVIDED else None
 
 
 def create_log(instance, changes, action):
