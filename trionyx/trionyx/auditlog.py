@@ -36,7 +36,7 @@ def model_instance_diff(old, new):
         new_value = get_field_value(new, field)
 
         if old_value != new_value:
-            diff[field.name] = (renderer.render_field(old, field.name), renderer.render_field(new, field.name))
+            diff[field.name] = (get_rendered_value(config.model, field.name, old_value), get_rendered_value(config.model, field.name, new_value))
 
     return diff if diff else None
 
@@ -58,11 +58,16 @@ def get_field_value(obj, field):
             pass
     else:
         try:
-            return smart_text(getattr(obj, field.name, None))
+            return getattr(obj, field.name, None)
         except ObjectDoesNotExist:
             pass
 
     return field.default if field.default is not models.NOT_PROVIDED else None
+
+
+def get_rendered_value(ModelClass, field_name, value):
+        model = ModelClass(**{field_name:value})
+        return renderer.render_field(model, field_name)
 
 
 def create_log(instance, changes, action):
