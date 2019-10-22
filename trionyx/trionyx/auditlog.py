@@ -9,7 +9,6 @@ import logging
 
 from django.conf import settings
 from django.utils import timezone
-from django.utils.encoding import smart_text
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.signals import pre_save, post_save, post_delete
 from trionyx import models
@@ -36,7 +35,10 @@ def model_instance_diff(old, new):
         new_value = get_field_value(new, field)
 
         if old_value != new_value:
-            diff[field.name] = (get_rendered_value(config.model, field.name, old_value), get_rendered_value(config.model, field.name, new_value))
+            diff[field.name] = (
+                get_rendered_value(config.model, field.name, old_value),
+                get_rendered_value(config.model, field.name, new_value),
+            )
 
     return diff if diff else None
 
@@ -66,8 +68,9 @@ def get_field_value(obj, field):
 
 
 def get_rendered_value(ModelClass, field_name, value):
-        model = ModelClass(**{field_name:value})
-        return renderer.render_field(model, field_name)
+    """Render value for given model class and field"""
+    model = ModelClass(**{field_name: value})
+    return renderer.render_field(model, field_name)
 
 
 def create_log(instance, changes, action):
