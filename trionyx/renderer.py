@@ -21,6 +21,8 @@ from trionyx import models
 def datetime_value_renderer(value, **options):
     """Render datetime value with django formats, default is SHORT_DATETIME_FORMAT"""
     datetime_format = options.get('datetime_format', 'SHORT_DATETIME_FORMAT')
+    if timezone.is_naive(value):
+        value = timezone.make_aware(value)
     return formats.date_format(timezone.localtime(value), datetime_format)
 
 
