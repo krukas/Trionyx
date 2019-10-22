@@ -7,6 +7,7 @@ Core forms for Trionyx
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
+import logging
 import inspect
 from collections import defaultdict
 
@@ -16,6 +17,8 @@ from django.db.models import NOT_PROVIDED
 from django.db import transaction
 
 from trionyx.config import models_config
+
+logger = logging.getLogger(__name__)
 
 
 class ModelForm(DjangoModelForm):
@@ -63,9 +66,11 @@ class ModelForm(DjangoModelForm):
             for key, form in self.get_inline_forms().items():
                 fk_name = self.inline_forms[key].get('fk_name', 'instance')
                 if fk_name == 'instance':
+                    logger.debug('Save inline form {} as FormSet, commit: {}'.format(key, commit))
                     form.instance = obj
                     form.save(commit)
                 else:
+                    logger.debug('Save inline form {} as Form, commit: {}'.format(key, commit))
                     inline_obj = form.save(False)
                     if inline_obj:
                         setattr(inline_obj, fk_name, obj)
@@ -73,6 +78,7 @@ class ModelForm(DjangoModelForm):
                             inline_obj.save()
 
                         if key in fields:
+                            logger.debug(' * Set inline form object on parent form as: {}'.format(key))
                             setattr(obj, key, inline_obj)
                             object_updated = True
 
