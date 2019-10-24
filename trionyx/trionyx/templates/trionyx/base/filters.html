@@ -1,9 +1,11 @@
+{% load i18n %}
+
 <script type="text/x-template" id="trionyx-filters-component">
     <div>
         <div class="row">
             <div class="col-lg-4">
                 <div class="form-group">
-                    <label>Field</label>
+                    <label>{% trans "Field" %}</label>
                     <select v-model="filterField" class="form-control" ref="selectFilterField">
                         <option v-for="field in fieldOptions" v-bind:value="field.name">
                             [[field.label]]
@@ -14,22 +16,22 @@
 
             <div class="col-lg-4">
                 <div class="form-group">
-                    <label>Operator</label>
+                    <label>{% trans "Operator" %}</label>
                     <select v-model="filterOperator" class="form-control" ref="selectFilterOperator" autocomplete="off">
-                        <option value="==">Equal</option>
-                        <option value="!=">Not Equal</option>
-                        <option value="<">Less than</option>
-                        <option value="<=">Less than or equal</option>
-                        <option value=">">Greater than</option>
-                        <option value=">=">Greater than or equal</option>
-                        <option value="null">Is null</option>
+                        <option value="==">{% trans "Equal" %}</option>
+                        <option value="!=">{% trans "Not Equal" %}</option>
+                        <option value="<">{% trans "Less than" %}</option>
+                        <option value="<=">{% trans "Less than or equal" %}</option>
+                        <option value=">">{% trans "Greater than" %}</option>
+                        <option value=">=">{% trans "Greater than or equal" %}</option>
+                        <option value="null">{% trans "Is null" %}</option>
                     </select>
                 </div>
             </div>
 
             <div class="col-lg-4">
                 <div class="form-group">
-                    <label>Filter by</label>
+                    <label>{% trans "Filter by" %}</label>
                     <input type="text" v-model="filterValue" v-if="filterValueInputType == 'text'" class="form-control" ref="filterValueText" autocomplete="off" />
                     <div v-if="filterValueInputType == 'select'" >
                         <select v-model="filterSelectValue" class="form-control" ref="selectFilterValue">
@@ -42,7 +44,7 @@
             </div>
         </div>
 
-        <span class="btn btn-success btn-block" v-on:click="clickAddFilter()">Add filter</span>
+        <span class="btn btn-success btn-block" v-on:click="clickAddFilter()">{% trans "Add filter" %}</span>
         <div class="trionyx-filters">
             <div v-for="filter in renderedFilters" class="filter filter-block">
                 [[filter.field]] [[filter.operator]] [[filter.renderedValue]]

@@ -20,6 +20,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.views.generic import TemplateView
 from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.utils.translation import ugettext_lazy as _
 
 from trionyx.views import UpdateView, DetailTabView, DialogView
 from trionyx.trionyx.models import User
@@ -210,8 +211,8 @@ class DashboardView(TemplateView):
             'widget_templates': [widget().template for index, widget in widgets.items()],
             'widgets': [{
                 'code': widget.code,
-                'name': widget.name,
-                'description': widget.description,
+                'name': str(widget.name),
+                'description': str(widget.description),
                 'image': static(widget().image),
                 'config_fields': widget().config_fields,
                 'default_w': widget.default_width,
@@ -289,13 +290,13 @@ class WidgetConfigDialog(DialogView):
             }
 
         return {
-            'title': 'Widget config',
+            'title': _('Widget config'),
             'content': self.render_to_string('trionyx/dialog/widget_config.html', {
                 'form': form,
                 'title': self.request.POST.get('title'),
                 'refresh': self.request.POST.get('refresh'),
             }),
-            'submit_label': 'Done',
+            'submit_label': _('Save'),
             'config': config
         }
 

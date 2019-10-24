@@ -7,12 +7,13 @@ trionyx.trionyx.layouts
 """
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
+from django.utils.translation import ugettext_lazy as _
 from rest_framework.authtoken.models import Token
 from trionyx.layout import (
     Container, Row, Column10, Column2, Column12, Column6, Panel, DescriptionList, TableDescription, Img, Table, Html
 )
 from trionyx.renderer import datetime_value_renderer
-from trionyx.trionyx.models import AuditLogEntry
+from trionyx.trionyx.models import AuditLogEntry, LogEntry
 from trionyx.views import tabs
 from .renderers import render_level
 
@@ -20,12 +21,12 @@ from .renderers import render_level
 @tabs.register('trionyx.profile')
 def account_overview(obj):
     """Create layout for user profile"""
-    token, _ = Token.objects.get_or_create(user=obj)
+    token, created = Token.objects.get_or_create(user=obj)
     return Container(
         Row(
             Column2(
                 Panel(
-                    'Avatar',
+                    _('Avatar'),
                     Img(src="{}{}".format(
                         settings.MEDIA_URL if obj.avatar else settings.STATIC_URL,
                         obj.avatar if obj.avatar else 'img/avatar.png'
@@ -35,7 +36,7 @@ def account_overview(obj):
             ),
             Column10(
                 Panel(
-                    'Account information',
+                    _('Account information'),
                     DescriptionList(
                         'email',
                         'first_name',
@@ -44,12 +45,14 @@ def account_overview(obj):
                 ),
                 Panel(
                     # TODO Add token reset button
-                    'API',
+                    _('Settings'),
                     DescriptionList(
+                        'language',
+                        'timezone',
                         {
-                            'label': 'Token',
+                            'label': _('API Token'),
                             'value': token.key,
-                        }
+                        },
                     ),
                 )
             ),
@@ -60,12 +63,12 @@ def account_overview(obj):
 @tabs.register('trionyx.user')
 def trionyx_user(obj):
     """Create layout for admin user"""
-    token, _ = Token.objects.get_or_create(user=obj)
+    token, created = Token.objects.get_or_create(user=obj)
     return Container(
         Row(
             Column2(
                 Panel(
-                    'Avatar',
+                    _('Avatar'),
                     Img(src="{}{}".format(
                         settings.MEDIA_URL if obj.avatar else settings.STATIC_URL,
                         obj.avatar if obj.avatar else 'img/avatar.png'
@@ -75,7 +78,7 @@ def trionyx_user(obj):
             ),
             Column10(
                 Panel(
-                    'Account information',
+                    _('Account information'),
                     DescriptionList(
                         'email',
                         'first_name',
@@ -89,12 +92,12 @@ def trionyx_user(obj):
                     ),
                 ),
                 Panel(
-                    'permissions',
+                    _('Permissions'),
                     Table(
                         obj.user_permissions.select_related('content_type'),
                         {
                             'field': 'name',
-                            'label': 'Permission',
+                            'label': _('Permission'),
                             'renderer': lambda value, data_object, *args, **kwargs: str(data_object)
                         }
                     ),
@@ -110,7 +113,7 @@ def auth_group(obj):
     return [
         Column12(
             Panel(
-                'info',
+                _('Info'),
                 TableDescription(
                     'name'
                 )
@@ -118,7 +121,7 @@ def auth_group(obj):
         ),
         Column12(
             Panel(
-                'permissions',
+                _('Permissions'),
                 Table(
                     obj.permissions.select_related('content_type'),
                     {
@@ -139,15 +142,15 @@ def trionyx_log(obj):
         Row(
             Column6(
                 Panel(
-                    'Log info',
+                    _('Log info'),
                     TableDescription(
                         {
-                            'label': 'Level',
+                            'label': _('Level'),
                             'value': render_level(obj)
                         },
                         'message',
                         {
-                            'label': 'Location',
+                            'label': _('Location'),
                             'value': '{}:{}'.format(obj.file_path, obj.file_line)
                         },
                         'last_event',
@@ -155,7 +158,7 @@ def trionyx_log(obj):
                     )
                 ),
                 Panel(
-                    'Backtrace',
+                    _('Backtrace'),
                     Html(
                         '<pre>{}</pre>'.format(obj.traceback) if obj.traceback
                         else '<div class="alert alert-info" style="margin: 0;border-radius: 0;">No traceback</div>'
@@ -164,12 +167,13 @@ def trionyx_log(obj):
             ),
             Column6(
                 Panel(
-                    'Last log entries',
+                    _('Last log entries'),
                     Table(
                         obj.entries.select_related('user').order_by('-id')[:25],
                         'log_time',
                         'user',
                         'user_agent',
+                        object=LogEntry()
                     )
                 )
             )
@@ -183,7 +187,7 @@ def auditlog(obj):
     return [
         Column12(
             Panel(
-                '{action} on {date} by {user}'.format(
+                _('{action} on {date} by {user}').format(
                     action=auditlog.get_action_display(),
                     date=datetime_value_renderer(auditlog.created_at),
                     user=auditlog.user if auditlog.user else 'System'
@@ -191,15 +195,15 @@ def auditlog(obj):
                 Table(
                     [[field, *changes] for field, changes in auditlog.changes.items()],
                     {
-                        'label': 'Field',
+                        'label': _('Field'),
                         'width': '10%',
                     },
                     {
-                        'label': 'Old value',
+                        'label': _('Old value'),
                         'width': '45%',
                     },
                     {
-                        'label': 'New value',
+                        'label': _('New value'),
                         'width': '45%',
                     },
                 )

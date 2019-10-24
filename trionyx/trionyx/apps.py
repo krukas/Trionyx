@@ -16,6 +16,7 @@ from trionyx.config import models_config
 from trionyx.menu import app_menu
 from trionyx.trionyx.search import auto_register_search_models
 from trionyx.log import enable_db_logger
+from django.utils.translation import ugettext_lazy as _
 
 from .renderers import render_level
 
@@ -57,11 +58,12 @@ class Config(BaseConfig):
 
         # Add admin menu items
         from trionyx.urls import model_url
-        app_menu.add_item('dashboard', 'Dashboard', url='/', icon='fa fa-dashboard', order=1)
-        app_menu.add_item('admin', 'Admin', icon='fa fa-cogs', order=9000, permission='is_superuser')
-        app_menu.add_item('admin/users', 'Users', url=model_url('trionyx.user', 'list'), order=9010, permission='is_superuser')
-        app_menu.add_item('admin/groups', 'Permission groups', url=model_url('auth.group', 'list'), order=9010, permission='is_superuser')
-        app_menu.add_item('admin/logs', 'Logs', url=model_url('trionyx.log', 'list'), order=9090, permission='is_superuser')
+        app_menu.add_item('dashboard', _('Dashboard'), url='/', icon='fa fa-dashboard', order=1)
+        app_menu.add_item('admin', _('Admin'), icon='fa fa-cogs', order=9000, permission='is_superuser')
+        app_menu.add_item('admin/users', _('Users'), url=model_url('trionyx.user', 'list'), order=9010, permission='is_superuser')
+        app_menu.add_item(
+            'admin/groups', _('Permission groups'), url=model_url('auth.group', 'list'), order=9010, permission='is_superuser')
+        app_menu.add_item('admin/logs', _('Logs'), url=model_url('trionyx.log', 'list'), order=9090, permission='is_superuser')
 
     def auto_load_app_modules(self, modules):
         """Auto load app modules"""
@@ -98,7 +100,7 @@ class Config(BaseConfig):
         list_fields = [
             {
                 'field': 'level',
-                'label': 'Level',
+                'label': _('Level'),
                 'renderer': render_level
             }
         ]

@@ -16,6 +16,12 @@ from pkg_resources import iter_entry_points
 from django.core.exceptions import ImproperlyConfigured
 from kombu import Queue, Exchange
 
+
+def gettext_noop(s):
+    """Return same string, Dummy function to find translatable strings with makemessages"""
+    return s
+
+
 try:
     with open(os.path.abspath(os.environ.get('TRIONYX_CONFIG', 'environment.json'))) as f:
         trionyx_config = json.loads(f.read())
@@ -69,10 +75,20 @@ INSTALLED_APPS = [
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
 LANGUAGE_CODE = 'en-us'
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Etc/GMT'
 USE_I18N = True
 USE_L10N = True
 USE_TZ = True
+
+LANGUAGES = [
+    ('en-us', gettext_noop('English')),
+    ('nl', gettext_noop('Dutch')),
+]
+
+if os.environ.get('TRIONYX_DEV', False):
+    LOCALE_PATHS = (
+        os.path.join(os.path.dirname(__file__), 'trionyx', 'locale'),
+    )
 
 # ==============================================================================
 # Project URLS and media settings
@@ -96,6 +112,7 @@ MIDDLEWARE = (
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'trionyx.trionyx.middleware.LocalizationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     'trionyx.trionyx.middleware.LoginRequiredMiddleware',
@@ -254,11 +271,12 @@ TX_THEME_COLOR = 'purple'
 def TX_DEFAULT_DASHBOARD():
     """Return default dashboard"""
     from django.contrib.contenttypes.models import ContentType
+    from django.utils.translation import ugettext as _
     return [
         {
             "code": "auditlog",
             "config": {
-                "title": "Action history",
+                "title": _("Action history"),
                 "color": "light-blue",
                 "show": "all",
                 "refresh": "0"
@@ -271,7 +289,7 @@ def TX_DEFAULT_DASHBOARD():
         {
             "code": "total_summary",
             "config": {
-                "title": "Unique users today",
+                "title": _("Unique users today"),
                 "color": "purple",
                 "model": ContentType.objects.get_by_natural_key('trionyx', 'user').id,
                 "field": "__count__",
@@ -288,7 +306,7 @@ def TX_DEFAULT_DASHBOARD():
         {
             "code": "total_summary",
             "config": {
-                "title": "New users this week",
+                "title": _("New users this week"),
                 "color": "green",
                 "refresh": "15",
                 "icon": "fa fa-user-plus",
@@ -305,7 +323,7 @@ def TX_DEFAULT_DASHBOARD():
         {
             "code": "total_summary",
             "config": {
-                "title": "User count",
+                "title": _("User count"),
                 "color": "yellow",
                 "refresh": "0",
                 "icon": "fa fa-users",

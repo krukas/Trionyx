@@ -315,7 +315,7 @@ function TrionyxDialog(url, options) {
     self.setFooter = function(data){
         footer.html('');
         footer.append(
-            $('<button type="button" class="btn btn-default pull-left" data-dismiss="modal">Close</button>')
+            $('<button type="button" class="btn btn-default pull-left" data-dismiss="modal">' + window.trionyx_translations.close + '</button>')
         ).append(
             $('<img src="/static/img/spinners/spinner2.gif" style="display:none; margin-right: 10px" />')
         );

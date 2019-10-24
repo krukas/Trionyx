@@ -1,3 +1,5 @@
+{% load i18n %}
+
 <p>
-    Are you sure you want to delete {{ model_name }}: {{ object }}
+    {% blocktrans %}Are you sure you want to delete {{ model_name }}: {{ object }}{% endblocktrans %}
 </p>

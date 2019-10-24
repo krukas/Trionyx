@@ -1,11 +1,11 @@
 {% extends "trionyx/base.html" %}
-{% load crispy_forms_tags %}
+{% load crispy_forms_tags i18n %}
 
 {% block title %}
     {% if title %}
         {{ title }}
     {% else %}
-        Update {{ object }}
+        {% trans "Update" %} {{ object }}
     {% endif %}
 {% endblock %}
 
@@ -24,18 +24,18 @@
 
 {% block header_buttons %}
     {% if cancel_url %}
-        <a href="{% url cancel_url %}" class="btn bg-theme">Cancel</a>
+        <a href="{% url cancel_url %}" class="btn bg-theme">{% trans "Cancel" %}</a>
     {% else %}
-        <a href="{{ object_url }}" class="btn bg-theme">Cancel</a>
+        <a href="{{ object_url }}" class="btn bg-theme">{% trans "Cancel" %}</a>
     {% endif %}
-    <input type="submit" value="{% if submit_value %}{{ submit_value }}{% else %}Update{% endif %}" class="btn btn-success"/>
+    <input type="submit" value="{% if submit_value %}{{ submit_value }}{% else %}{% trans "Update" %}{% endif %}" class="btn btn-success"/>
 {% endblock %}
 
 
 {% block content %}
     <div class="info-box">
         <div class="box-header with-border">
-            <h3 class="box-title">Update {{ object }}</h3>
+            <h3 class="box-title">{% trans "Update" %} {{ object }}</h3>
         </div>
         <div class="box-body">
             {% csrf_token %}

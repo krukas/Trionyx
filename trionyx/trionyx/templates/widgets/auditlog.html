@@ -1,3 +1,4 @@
+{% load i18n %}
 <script type="text/x-template" id="widget-auditlog-template">
     <div :class="widgetClass">
         <div class="box-header with-border">
@@ -9,10 +10,10 @@
             <table class="table no-margin">
               <thead>
               <tr>
-                <th style="width: 40px">User</th>
-                <th style="width: 40px">Action</th>
-                <th>Object</th>
-                <th style="width: 150px">Time</th>
+                <th style="width: 40px">{% trans "User" %}</th>
+                <th style="width: 40px">{% trans "Action" %}</th>
+                <th>{% trans "Object" %}</th>
+                <th style="width: 150px">{% trans "Time" %}</th>
               </tr>
               </thead>
               <tbody>

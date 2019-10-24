@@ -68,3 +68,16 @@ lint:
 
 test: lint
 	$(COVERAGE) run manage.py test tests
+
+
+
+locales_update:
+	@( \
+	    . env/bin/activate; \
+	    python$(PY_VERSION) manage.py makemessages -l 'en_US' -i 'env/*' --no-obsolete; \
+	    python$(PY_VERSION) manage.py makemessages -l 'nl_NL' -i 'env/*' --no-obsolete; \
+    )
+
+
+locales_compile:
+	@(. env/bin/activate; python$(PY_VERSION) manage.py compilemessages -l en_US -l nl_NL)
