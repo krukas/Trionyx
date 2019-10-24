@@ -85,11 +85,6 @@ LANGUAGES = [
     ('nl', gettext_noop('Dutch')),
 ]
 
-if os.environ.get('TRIONYX_DEV', False):
-    LOCALE_PATHS = (
-        os.path.join(os.path.dirname(__file__), 'trionyx', 'locale'),
-    )
-
 # ==============================================================================
 # Project URLS and media settings
 # ==============================================================================
