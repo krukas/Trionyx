@@ -35,25 +35,32 @@ def account_overview(obj):
                 ),
             ),
             Column10(
-                Panel(
-                    _('Account information'),
-                    DescriptionList(
-                        'email',
-                        'first_name',
-                        'last_name',
-                    ),
+                Column6(
+                    Panel(
+                        _('Account information'),
+                        DescriptionList(
+                            'email',
+                            'first_name',
+                            'last_name',
+                        ),
+                    )
                 ),
-                Panel(
-                    # TODO Add token reset button
-                    _('Settings'),
-                    DescriptionList(
-                        'language',
-                        'timezone',
-                        {
-                            'label': _('API Token'),
-                            'value': token.key,
-                        },
-                    ),
+                Column6(
+                    Panel(
+                        # TODO Add token reset button
+                        _('Settings'),
+                        DescriptionList(
+                            {
+                                'label': _('Language'),
+                                'value': _(obj.get_language_display()),
+                            },
+                            'timezone',
+                            {
+                                'label': _('API Token'),
+                                'value': token.key,
+                            },
+                        ),
+                    )
                 )
             ),
         )
