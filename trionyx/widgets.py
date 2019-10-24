@@ -15,6 +15,7 @@ from trionyx.renderer import renderer
 from trionyx.config import models_config
 from trionyx.trionyx.forms import AuditlogWidgetForm, TotalSummaryWidgetForm
 from trionyx.models import Sum, filter_queryset_with_user_filters
+from django.utils.translation import ugettext_lazy as _
 
 
 widgets = {}
@@ -128,8 +129,8 @@ class AuditlogWidget(BaseWidget):
     """Auditlog widget"""
 
     code = 'auditlog'
-    name = 'Latest actions'
-    description = 'Show the latest tracked actions done by users and the system'
+    name = _('Latest actions')
+    description = _('Show the latest tracked actions done by users and the system')
     config_form_class = AuditlogWidgetForm
     default_height = 22
 
@@ -152,7 +153,7 @@ class AuditlogWidget(BaseWidget):
 
         return [
             {
-                'user_full_name': log.user.get_full_name() if log.user else 'System',
+                'user_full_name': log.user.get_full_name() if log.user else _('System'),
                 'user_avatar': log.user.avatar.url if log.user and log.user.avatar else static('img/avatar.png'),
                 'action': renderer.render_field(log, 'action'),
                 'object': '({}) {}'.format(
@@ -169,8 +170,8 @@ class TotalSummaryWidget(BaseWidget):
     """Total summary widget"""
 
     code = 'total_summary'
-    name = 'Total summary'
-    description = 'Show total for given field on given period'
+    name = _('Total summary')
+    description = _('Show total for given field on given period')
     config_form_class = TotalSummaryWidgetForm
     default_height = 5
 

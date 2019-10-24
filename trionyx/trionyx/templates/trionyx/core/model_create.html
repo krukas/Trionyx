@@ -1,11 +1,11 @@
 {% extends "trionyx/base.html" %}
-{% load crispy_forms_tags %}
+{% load crispy_forms_tags i18n %}
 
 {% block title %}
     {% if title %}
         {{ title }}
     {% else %}
-        Create {{ model_verbose_name }}
+        {% trans "Create" %} {{ model_verbose_name }}
     {% endif %}
 {% endblock %}
 
@@ -23,15 +23,15 @@
 
 
 {% block header_buttons %}
-    <a href="{{ cancel_url }}" class="btn bg-theme">Cancel</a>
-    <input type="submit" value="{% if submit_value %}{{ submit_value }}{% else %}Create{% endif %}" class="btn btn-success"/>
+    <a href="{{ cancel_url }}" class="btn bg-theme">{% trans "Cancel" %}</a>
+    <input type="submit" value="{% if submit_value %}{{ submit_value }}{% else %}{% trans "Create" %}{% endif %}" class="btn btn-success"/>
 {% endblock %}
 
 
 {% block content %}
     <div class="info-box">
         <div class="box-header with-border">
-            <h3 class="box-title">Create {{ model_verbose_name }}</h3>
+            <h3 class="box-title">{% trans "Create" %} {{ model_verbose_name }}</h3>
         </div>
         <div class="box-body">
             {% csrf_token %}

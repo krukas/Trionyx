@@ -1,15 +1,17 @@
+{% load i18n %}
+
 <div id="trionyx-global-search-app">
 
     <span v-on:click="open()" class="header-global-search">
-        <i class="fa fa-search"></i> Type anywhere to <strong>search</strong>
+        <i class="fa fa-search"></i> {% blocktrans %}Type anywhere to <strong>search</strong>{% endblocktrans %}
     </span>
 
     <div class="global-search-container" v-if="show" v-cloak="">
         <span v-on:click="close()" class="fa fa-close close-button"></span>
 
-        <input v-model="search" class="no-border overlay-search" placeholder="Search..." autocomplete="off" spellcheck="false" autofocus>
+        <input v-model="search" class="no-border overlay-search" placeholder="{% trans "Search" %}..." autocomplete="off" spellcheck="false" autofocus>
 
-        <div class="text-bold global-search-results">Search results</div>
+        <div class="text-bold global-search-results">{% trans "Search results" %}</div>
 
         <div class="global-search-results-wrapper">
             <div v-for="modelResults in results" class="col-lg-3 col-sm-6">

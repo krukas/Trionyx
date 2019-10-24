@@ -1,5 +1,6 @@
 {% load static %}
 {% load compress %}
+{% load i18n %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -131,6 +132,12 @@
     {% block extra_js %}{% endblock %}
 
 {% endcompress %}
+
+<script>
+    window.trionyx_translations = {
+        close: '{% trans 'Close' %}',
+    }
+</script>
 
 {% include 'trionyx/base/filters.html' %}
 

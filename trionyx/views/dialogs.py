@@ -11,6 +11,7 @@ import json
 from django.views.generic import View
 from django.http import JsonResponse
 from django.template.loader import render_to_string
+from django.utils.translation import ugettext_lazy as _
 
 from trionyx.views.mixins import ModelClassMixin
 from trionyx.forms.helper import FormHelper
@@ -74,7 +75,7 @@ class DialogView(View, ModelClassMixin):
 
         if not self.has_permission(request):
             return self.render_te_response({
-                'title': 'No access',
+                'title': _('No access'),
             })
         return self.render_te_response(self.display_dialog(*args, **kwargs))
 
@@ -89,7 +90,7 @@ class DialogView(View, ModelClassMixin):
 
         if not self.has_permission(request):
             return self.render_te_response({
-                'title': 'No access',
+                'title': _('No access'),
             })
         return self.render_te_response(self.handle_dialog(*args, **kwargs))
 
@@ -105,7 +106,7 @@ class DialogView(View, ModelClassMixin):
             try:
                 self.object = self.model.objects.get(pk=kwargs.pop('pk'))
             except Exception:
-                raise Exception("Could not load {}".format(self.model.__name__.lower()))
+                raise Exception(_("Could not load {model}").format(model=self.model.__name__.lower()))
             setattr(self, self.model.__name__.lower(), self.object)
 
         return kwargs
@@ -174,7 +175,7 @@ class LayoutDialog(DialogView):
         try:
             content = layouts.get_layout(code, self.object, self.request)
         except Exception:
-            content = 'Layout does not exists'
+            content = _('Layout does not exists')
 
         return {
             'title': str(self.object),
@@ -190,13 +191,13 @@ class UpdateDialog(DialogView):
     template = 'trionyx/dialog/model_form.html'
     """Template for dialog content"""
 
-    title = "Update {model_name}: {object}"
+    title = _("Update {model_name}: {object}")
     """Dialog title model_name and object, variable are given"""
 
-    submit_label = 'save'
+    submit_label = _('save')
     """Dialog submit label value"""
 
-    success_message = '{model_name} ({object}) is successfully updated'
+    success_message = _('{model_name} ({object}) is successfully updated')
     """Success message on successfully form saved"""
 
     def get_form_class(self):
@@ -253,9 +254,9 @@ class CreateDialog(UpdateDialog):
 
     permission_type = 'add'
 
-    title = "Create {model_name}"
-    submit_label = 'create'
-    success_message = '{model_name} ({object}) is successfully created'
+    title = _("Create {model_name}")
+    submit_label = _('create')
+    success_message = _('{model_name} ({object}) is successfully created')
 
     def get_form_class(self):
         """Get create form class"""
@@ -273,13 +274,13 @@ class DeleteDialog(DialogView):
     template = 'trionyx/dialog/model_delete.html'
     """Template for dialog content"""
 
-    title = "Delete {model_name}: {object}"
+    title = _("Delete {model_name}: {object}")
     """Dialog title model_name and object, variable are given"""
 
-    submit_label = 'delete'
+    submit_label = _('delete')
     """Dialog submit label value"""
 
-    success_message = '{model_name} ({object}) is successfully deleted'
+    success_message = _('{model_name} ({object}) is successfully deleted')
     """Success message on successfully deleted"""
 
     def display_dialog(self, *args, **kwargs):
@@ -316,8 +317,9 @@ class DeleteDialog(DialogView):
             })
         except Exception:
             response.update({
-                'content': """<p class="alert alert-danger">Something went wrong on deleting {}</p>""".format(
-                    self.get_model_config().model_name.capitalize()
+                'content': """<p class="alert alert-danger">{}</p>""".format(
+                    _('Something went wrong on deleting {model_name}').format(
+                        model_name=self.get_model_config().model_name.capitalize())
                 )
             })
 

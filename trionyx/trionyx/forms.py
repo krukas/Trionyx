@@ -43,12 +43,13 @@ class ProfileUpdateForm(forms.ModelForm):
     def __init__(self, instance=None, *args, **kwargs):
         """Init user form"""
         super().__init__(*args, instance=instance, **kwargs)
+        self.fields['language'].choices = [(key, _(value)) for key, value in self.fields['language'].choices]
         self.helper = FormHelper()
         self.helper.layout = Layout(
             'email',
             Div(
                 Fieldset(
-                    'Personal info',
+                    _('Personal info'),
                     'first_name',
                     'last_name',
                     css_class="col-md-6",
@@ -59,10 +60,20 @@ class ProfileUpdateForm(forms.ModelForm):
                 ),
                 css_class="row"
             ),
-            Fieldset(
-                'Change password',
-                'new_password1',
-                'new_password2',
+            Div(
+                Fieldset(
+                    _('Change password'),
+                    'new_password1',
+                    'new_password2',
+                    css_class='col-md-6'
+                ),
+                Fieldset(
+                    _('Settings'),
+                    'language',
+                    'timezone',
+                    css_class='col-md-6'
+                ),
+                css_class='row'
             ),
         )
 
@@ -70,7 +81,7 @@ class ProfileUpdateForm(forms.ModelForm):
         """Meta description for form"""
 
         model = User
-        fields = ['new_password1', 'new_password2', 'email', 'first_name', 'last_name', 'avatar']
+        fields = ['new_password1', 'new_password2', 'email', 'first_name', 'last_name', 'avatar', 'language', 'timezone']
 
     def clean_new_password2(self):
         """Validate password when set"""
@@ -126,14 +137,14 @@ class UserCreateForm(forms.ModelForm):
         self.helper.layout = Layout(
             Div(
                 Fieldset(
-                    'Login',
+                    _('Login'),
                     'email',
                     'new_password1',
                     'new_password2',
                     css_class="col-md-6",
                 ),
                 Fieldset(
-                    'Personal info',
+                    _('Personal info'),
                     'first_name',
                     'last_name',
                     css_class="col-md-6",
@@ -203,14 +214,14 @@ class UserUpdateForm(forms.ModelForm):
             'email',
             Div(
                 Fieldset(
-                    'Personal info',
+                    _('Personal info'),
                     'first_name',
                     'last_name',
                     'avatar',
                     css_class="col-md-6",
                 ),
                 Fieldset(
-                    'Permissions',
+                    _('Permissions'),
                     'is_active',
                     'is_superuser',
                     'user_permissions',
@@ -220,7 +231,7 @@ class UserUpdateForm(forms.ModelForm):
                 css_class="row"
             ),
             Fieldset(
-                'Change password',
+                _('Change password'),
                 'new_password1',
                 'new_password2',
             ),
@@ -290,36 +301,36 @@ class AuditlogWidgetForm(forms.Form):
     """Auditlog widget form"""
 
     SHOW_CHOICES = [
-        ('all', 'All'),
-        ('user', 'Users only'),
-        ('system', 'Systems only'),
+        ('all', _('All')),
+        ('user', _('Users only')),
+        ('system', _('Systems only')),
     ]
 
-    show = forms.ChoiceField(choices=SHOW_CHOICES)
+    show = forms.ChoiceField(label=_('Show'), choices=SHOW_CHOICES)
 
 
 class TotalSummaryWidgetForm(forms.Form):
     """Total summary widget form"""
 
     PERIOD_CHOICES = [
-        ('all', 'All'),
-        ('year', 'Current year'),
-        ('month', 'Current month'),
-        ('week', 'Current week'),
-        ('day', 'Current day'),
-        ('365days', 'Last 365 days'),
-        ('30days', 'Last 30 days'),
-        ('7days', 'Last 7 days'),
+        ('all', _('All')),
+        ('year', _('Current year')),
+        ('month', _('Current month')),
+        ('week', _('Current week')),
+        ('day', _('Current day')),
+        ('365days', _('Last 365 days')),
+        ('30days', _('Last 30 days')),
+        ('7days', _('Last 7 days')),
     ]
 
-    icon = forms.ChoiceField(choices=ICON_CHOICES)
+    icon = forms.ChoiceField(label=_('Icon'), choices=ICON_CHOICES)
 
-    model = forms.ChoiceField(choices=[], required=False)
-    field = forms.CharField()
+    model = forms.ChoiceField(label=_('Model'), choices=[], required=False)
+    field = forms.CharField(label=_('Field'))
 
-    period = forms.ChoiceField(choices=PERIOD_CHOICES)
-    period_field = forms.CharField(required=False)
-    filters = forms.CharField(required=False)
+    period = forms.ChoiceField(label=_('Period'), choices=PERIOD_CHOICES)
+    period_field = forms.CharField(label=_('Period field'), required=False)
+    filters = forms.CharField(label=_('Filters'), required=False)
 
     def __init__(self, *args, **kwargs):
         """Init form"""
@@ -384,7 +395,7 @@ class TotalSummaryWidgetForm(forms.Form):
                 css_class="row"
             ),
             Fieldset(
-                'Filters',
+                _('Filters'),
                 Filters('filters', content_type_input_id='id_model'),
             )
         )

@@ -7,13 +7,19 @@ trionyx.trionyx.models
 """
 import hashlib
 import traceback
-
+from contextlib import contextmanager
 
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.contrib.contenttypes import fields
 from django.utils import timezone
+from django.conf import settings
+from django.utils import translation
+from django.utils.translation import ugettext_lazy as _
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 from trionyx import models
 from trionyx.utils import get_current_request
+from trionyx.data import TIMEZONES
 
 
 # =============================================================================
@@ -53,20 +59,39 @@ class UserManager(BaseUserManager, models.BaseManager):
         return super().get_queryset().filter(is_active=True)
 
 
+def default_language():
+    """Return default language from settings, prevent new migrations if setting changed"""
+    return settings.LANGUAGE_CODE
+
+
+def default_timezone():
+    """Return default timezone from settings, prevent new migrations if setting changed"""
+    return settings.TIME_ZONE
+
+
 class User(models.BaseModel, AbstractBaseUser, PermissionsMixin):
     """User model"""
 
-    email = models.EmailField(max_length=255, unique=True)
-    first_name = models.CharField(max_length=64, blank=True, default='')
-    last_name = models.CharField(max_length=64, blank=True, default='')
-    is_active = models.BooleanField(default=True)
-    date_joined = models.DateTimeField(default=timezone.now)
-    last_online = models.DateTimeField(blank=None, null=True)
-    avatar = models.ImageField(blank=True, upload_to='avatars/', default='')
+    email = models.EmailField(_('Email'), max_length=255, unique=True)
+    first_name = models.CharField(_('First name'), max_length=64, blank=True, default='')
+    last_name = models.CharField(_('Last name'), max_length=64, blank=True, default='')
+    is_active = models.BooleanField(_('Active'), default=True)
+    date_joined = models.DateTimeField(_('Date joined'), default=timezone.now)
+    last_online = models.DateTimeField(_('Last online'), blank=None, null=True)
+    avatar = models.ImageField(_('Avatar'), blank=True, upload_to='avatars/', default='')
+
+    language = models.CharField(_('Language'), max_length=6, choices=settings.LANGUAGES, default=default_language)
+    timezone = models.CharField(_('Timezone'), max_length=32, choices=TIMEZONES, default=default_timezone)
 
     USERNAME_FIELD = 'email'
 
     objects = UserManager()
+
+    class Meta:
+        """Model meta description"""
+
+        verbose_name = _('User')
+        verbose_name_plural = _('Users')
 
     def get_full_name(self):
         """Get full username if no name is set email is given"""
@@ -87,6 +112,36 @@ class User(models.BaseModel, AbstractBaseUser, PermissionsMixin):
     def get_attribute(self, code, default=None):
         """Get user attribute"""
         return UserAttribute.objects.get_attribute(self, code, default)
+
+    @contextmanager
+    def locale_override(self):
+        """Override locale settings to user settings"""
+        with translation.override(self.language), timezone.override(self.timezone):
+            yield
+
+    def send_email(self, subject, body='', html_template=None, template_context=None, files=None):
+        """Send email to user"""
+        if not body and not html_template:
+            raise Exception('You must supply a body or/and html_template')
+
+        with self.locale_override():
+            message = EmailMultiAlternatives(
+                subject=subject,
+                body=body,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[self.email]
+            )
+
+            if html_template:
+                message.attach_alternative(
+                    render_to_string(html_template, template_context if template_context else {}),
+                    "text/html")
+
+        if files:
+            for file in files:
+                message.attach(file.name, file.read())
+
+        return message.send()
 
 
 class UserAttributeManager(models.Manager):
@@ -174,35 +229,47 @@ class Log(models.BaseModel):
     NOTSET = 0
 
     LEVEL_CHOICES = [
-        (CRITICAL, 'Critical'),
-        (ERROR, 'Error'),
-        (WARNING, 'Warning'),
-        (INFO, 'Info'),
-        (DEBUG, 'Debug'),
-        (NOTSET, 'Not set'),
+        (CRITICAL, _('Critical')),
+        (ERROR, _('Error')),
+        (WARNING, _('Warning')),
+        (INFO, _('Info')),
+        (DEBUG, _('Debug')),
+        (NOTSET, _('Not set')),
     ]
 
-    log_hash = models.CharField(max_length=32)
-    level = models.IntegerField(choices=LEVEL_CHOICES)
-    message = models.TextField()
-    file_path = models.CharField(max_length=256)
-    file_line = models.IntegerField()
-    traceback = models.TextField(default='')
+    log_hash = models.CharField(_('Log hash'), max_length=32)
+    level = models.IntegerField(_('Level'), choices=LEVEL_CHOICES)
+    message = models.TextField(_('Message'))
+    file_path = models.CharField(_('File path'), max_length=256)
+    file_line = models.IntegerField(_('File line'))
+    traceback = models.TextField(_('Traceback'), default='')
 
-    last_event = models.DateTimeField()
-    log_count = models.IntegerField(default=1)
+    last_event = models.DateTimeField(_('Last event'))
+    log_count = models.IntegerField(_('Log count'), default=1)
 
     objects = LogManager()
+
+    class Meta:
+        """Model meta description"""
+
+        verbose_name = _('Log')
+        verbose_name_plural = _('Logs')
 
 
 class LogEntry(models.Model):
     """Log entry event"""
 
     log = models.ForeignKey(Log, models.CASCADE, related_name='entries')
-    log_time = models.DateTimeField()
+    log_time = models.DateTimeField(_('Log time'))
 
-    user = models.ForeignKey(User, models.SET_NULL, null=True, blank=True)
-    user_agent = models.TextField(default='')
+    user = models.ForeignKey(User, models.SET_NULL, null=True, blank=True, verbose_name=_('User'))
+    user_agent = models.TextField(_('User agent'), default='')
+
+    class Meta:
+        """Model meta description"""
+
+        verbose_name = _('Log entry')
+        verbose_name_plural = _('Log entries')
 
 
 class AuditLogEntry(models.BaseModel):
@@ -213,9 +280,9 @@ class AuditLogEntry(models.BaseModel):
     ACTION_DELETED = 30
 
     action_choices = [
-        (ACTION_ADDED, 'Added'),
-        (ACTION_CHANGED, 'Changed'),
-        (ACTION_DELETED, 'Deleted'),
+        (ACTION_ADDED, _('Added')),
+        (ACTION_CHANGED, _('Changed')),
+        (ACTION_DELETED, _('Deleted')),
     ]
 
     content_type = models.ForeignKey('contenttypes.ContentType', models.CASCADE, related_name='+')

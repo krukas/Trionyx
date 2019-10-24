@@ -12,6 +12,7 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.conf import settings
 from django.utils import timezone
+from django.utils import translation
 
 LOCAL_DATA = threading.local()
 
@@ -76,5 +77,21 @@ class LastLoginMiddleware:
         if request.user.is_authenticated and (not request.user.last_online or request.user.last_online <= minute_ago):
             request.user.last_online = timezone.now()
             request.user.save(update_fields=['last_online'])
+
+        return self.get_response(request)
+
+
+class LocalizationMiddleware:
+    """Localize request to user settings"""
+
+    def __init__(self, get_response):
+        """Init"""
+        self.get_response = get_response
+
+    def __call__(self, request):
+        """Set localization"""
+        if request.user.is_authenticated:
+            translation.activate(request.user.language)
+            timezone.activate(request.user.timezone)
 
         return self.get_response(request)

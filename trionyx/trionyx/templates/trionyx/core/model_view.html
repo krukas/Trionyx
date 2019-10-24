@@ -6,7 +6,7 @@
 
 {% block header_buttons %}
     {% if back_url %}
-        <a href="{{ back_url }}" class="btn bg-theme">Back</a>
+        <a href="{{ back_url }}" class="btn bg-theme">{% trans "Back" %}</a>
     {% endif %}
 
     {% for button in view_header_buttons %}
@@ -20,10 +20,10 @@
     {% endfor %}
 
     {% if delete_url and delete_permission %}
-        <a href="{{ delete_url }}" class="btn bg-theme">Delete</a>
+        <a href="{{ delete_url }}" class="btn bg-theme">{% trans "Delete" %}</a>
     {% endif %}
     {% if edit_url and change_permission %}
-        <a href="{{ edit_url }}" class="btn bg-theme">Edit</a>
+        <a href="{{ edit_url }}" class="btn bg-theme">{% trans "Edit" %}</a>
     {% endif %}
 
 {% endblock %}
@@ -58,7 +58,7 @@
         </div>
     {% else %}
         <p class="alert alert-warning">
-            There are no layouts registered for {{ object }}.
+            {% blocktrans %}There are no layouts registered for {{ object }}.{% endblocktrans %}
         </p>
     {% endif %}
 {% endblock %}

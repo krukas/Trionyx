@@ -1,5 +1,5 @@
 {% extends "trionyx/base.html" %}
-{% load static %}
+{% load static i18n %}
 
 {% block title %}
     {{ title }}
@@ -10,7 +10,7 @@
 
 {% block header_buttons %}
     {% if create_permission %}
-        <a href="{{ create_url }}" class="btn bg-theme">Create</a>
+        <a href="{{ create_url }}" class="btn bg-theme">{% trans "Create" %}</a>
     {% endif %}
 {% endblock %}
 
@@ -19,7 +19,7 @@
     <div class="info-box" id="app-model-list" v-cloak>
         <div class="box-header">
             <div class="input-group input-group-sm" style="width: 150px;">
-                <input type="text" name="table_search" class="form-control pull-right" placeholder="Search" v-model="search" v-on:keyup="searchLoad()">
+                <input type="text" name="table_search" class="form-control pull-right" placeholder="{% trans "Search" %}" v-model="search" v-on:keyup="searchLoad()">
                 <div class="input-group-btn">
                     <button type="submit" class="btn btn-default btn-flat" v-on:click="searchLoad()"><i class="fa fa-search"></i></button>
                 </div>
@@ -55,7 +55,7 @@
         <!-- /.box-header -->
         <div class="box-body no-padding table-responsive">
             <div class="alert alert-info" v-if="items.length == 0" style="margin-bottom: 0px">
-                There are no {{ title }}
+                {% trans "There are no" %} {{ title }}
             </div>
             <table class="table table-striped" v-if="items.length > 0">
                 <thead>
@@ -81,13 +81,13 @@
             </table>
         </div>
         <div class="box-footer clearfix" v-if="items.length > 0">
-            Showing [[fromItemCount]] to [[toItemCount]] of [[count]] items
+            {% trans "Showing [[fromItemCount]] to [[toItemCount]] of [[count]] items" %}
             <select v-model="pageSize" id="select-pageSize">
                 <option>10</option>
                 <option>25</option>
                 <option>50</option>
             </select>
-            per page
+            {% trans "per page" %}
 
             <ul class="pagination pagination-sm no-margin pull-right">
                 <li v-if="previousPage > 0"><a v-on:click="toPage(previousPage)">«</a></li>
@@ -102,7 +102,7 @@
         <div id="fields-popover-content" class="hidden">
             <div style="max-height: 250px; overflow-y: scroll">
                 <div class="col-md-12">
-                    <input id="fields-popover-search" placeholder="search" class="form-control">
+                    <input id="fields-popover-search" placeholder="{% trans "search" %}" class="form-control">
                 </div>
                 <div v-for="field in fields" class="col-md-6">
                     <label>
@@ -118,7 +118,7 @@
             <div class="modal-dialog " role="document">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 class="modal-title">Filters
+                        <h4 class="modal-title">{% trans "Filters" %}
                             <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                 <span aria-hidden="true">×</span>
                             </button>

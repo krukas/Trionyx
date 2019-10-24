@@ -11,6 +11,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models.signals import pre_save, post_save, post_delete
+from django.utils.translation import ugettext_lazy as _
 from trionyx import models
 from trionyx.config import models_config
 from trionyx.trionyx.models import AuditLogEntry
@@ -132,6 +133,6 @@ def init_auditlog():
         pre_save.connect(log_change, sender=config.model, dispatch_uid=(log_change, config.model, pre_save))
         post_delete.connect(log_delete, sender=config.model, dispatch_uid=(log_delete, config.model, post_delete))
 
-        @tabs.register(config.model, code='history', order=999)
+        @tabs.register(config.model, code='history', name=_('History'), order=999)
         def layout(obj):
             return auditlog_layout(obj)

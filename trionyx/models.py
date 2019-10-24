@@ -14,6 +14,7 @@ from django.urls import reverse
 from jsonfield import JSONField  # noqa F401
 from django.contrib import messages
 from django.utils import timezone
+from django.utils.translation import ugettext_lazy as _
 
 from trionyx.config import models_config
 from trionyx import utils
@@ -48,19 +49,20 @@ class BaseModel(Model):  # noqa F405
 
     objects = BaseManager()
 
-    created_at = DateTimeField(auto_now_add=True)  # noqa F405
+    created_at = DateTimeField(_('Created at'), auto_now_add=True)  # noqa F405
     """Created at field, date is set when model is created"""
 
-    updated_at = DateTimeField(auto_now=True)  # noqa F405
+    updated_at = DateTimeField(_('Updated at'), auto_now=True)  # noqa F405
     """Update at field, date is set when model is saved"""
 
-    deleted = BooleanField(default=False)  # noqa F405
+    deleted = BooleanField(_('Deleted'), default=False)  # noqa F405
     """Deleted field, object is soft deleted"""
 
-    created_by = ForeignKey('trionyx.User', SET_NULL, default=None, blank=True, null=True, related_name='+')
+    created_by = ForeignKey(
+        'trionyx.User', SET_NULL, default=None, blank=True, null=True, related_name='+', verbose_name=_('Created by'))
     """Created by field"""
 
-    verbose_name = TextField(default='', blank=True)
+    verbose_name = TextField(_('Verbose name'), default='', blank=True)
     """Verbose name field"""
 
     class Meta:

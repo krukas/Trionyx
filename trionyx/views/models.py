@@ -29,6 +29,7 @@ from django.core.paginator import Paginator
 from django.contrib import messages
 from watson import search as watson
 from django.contrib.contenttypes.models import ContentType
+from django.utils.translation import ugettext_lazy as _
 
 from trionyx.views.mixins import ModelClassMixin, SessionValueMixin, ModelPermissionMixin
 from trionyx.forms.helper import FormHelper
@@ -568,7 +569,7 @@ class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
     def form_valid(self, form):
         """Add success message"""
         response = super().form_valid(form)
-        messages.success(self.request, "Successfully saved ({})".format(self.object))
+        messages.success(self.request, _("Successfully saved ({})").format(self.object))
         return response
 
     def form_invalid(self, form):
@@ -654,7 +655,7 @@ class CreateView(ModelPermissionMixin, DjangoCreateView, ModelClassMixin):
     def form_valid(self, form):
         """Add success message"""
         response = super().form_valid(form)
-        messages.success(self.request, "Successfully created ({})".format(self.object))
+        messages.success(self.request, _("Successfully created ({})").format(self.object))
         return response
 
     def form_invalid(self, form):
@@ -701,7 +702,7 @@ class DeleteView(ModelPermissionMixin, DjangoDeleteView, ModelClassMixin):
 
     def get_success_url(self):
         """Get success url"""
-        messages.success(self.request, "Successfully deleted ({})".format(self.object))
+        messages.success(self.request, _("Successfully deleted ({})").format(self.object))
         if self.success_url:
             return reverse(self.success_url)
 

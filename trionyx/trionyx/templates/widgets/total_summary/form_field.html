@@ -1,7 +1,8 @@
 {% load trionyx %}
+{% load i18n %}
 
 <div class="form-group">
-    <label for="id_all" class="control-label">Field</label>
+    <label for="id_all" class="control-label">{% trans 'Field' %}</label>
     <div class="controls ">
         <select name="field" id="widget-field" class="form-control"></select>
     </div>
@@ -12,12 +13,12 @@
     function txSummaryFieldsUpdate() {
         $('#widget-field').select2().empty();
         $('#widget-field').select2({
-            data: [{id: '__count__', text: ' -- Count records ---'}].concat(summaryFields[$('#id_model').val()]),
+            data: [{id: '__count__', text: ' -- {% trans 'Count records' %} ---'}].concat(summaryFields[$('#id_model').val()]),
         });
     };
 
     $('#widget-field').select2({
-        data: [{id: '__count__', text: '--- Count records ---'}],
+        data: [{id: '__count__', text: '--- {% trans 'Count records' %} ---'}],
     });
 
     $('#id_model').on('change', function(){

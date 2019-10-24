@@ -10,6 +10,7 @@ from collections import defaultdict
 
 from trionyx.config import models_config
 from trionyx.layout import Layout, Column12, Panel, DescriptionList, Component
+from django.utils.translation import ugettext_lazy as _
 
 from .models import (  # noqa F401
     ListView, ListJsendView, ListExportView, ListChoicesJsendView, DetailTabView,
@@ -98,6 +99,9 @@ class TabRegister:
         :return:
         """
         model_alias = self.get_model_alias(model_alias)
+
+        if code == 'general' and not name:
+            name = _('General')
 
         def wrapper(create_layout):
             item = TabItem(

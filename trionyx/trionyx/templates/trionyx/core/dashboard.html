@@ -1,9 +1,10 @@
 {% extends 'trionyx/base.html' %}
 {% load static %}
 {% load trionyx %}
+{% load i18n %}
 
-{% block title %}Dashboard{% endblock %}
-{% block page_title %}Dashboard{% endblock %}
+{% block title %}{% trans "Dashboard" %}{% endblock %}
+{% block page_title %}{% trans "Dashboard" %}{% endblock %}
 
 
 {% block extra_css %}
@@ -109,8 +110,8 @@
 
 
 {% block header_buttons %}
-    <button id="dashboard-edit" class="btn bg-theme" onclick="clickDashboardEdit(this)">Edit</button>
-    <button id="dashboard-save" class="btn btn-success hide" onclick="clickDashboardSave(this)">Save</button>
+    <button id="dashboard-edit" class="btn bg-theme" onclick="clickDashboardEdit(this)">{% trans "Edit" %}</button>
+    <button id="dashboard-save" class="btn btn-success hide" onclick="clickDashboardSave(this)">{% trans "Save" %}</button>
 {% endblock %}
 
 
@@ -170,7 +171,7 @@
                       <div class="modal-header">
                         <button type="button" class="close" aria-label="Close">
                           <span aria-hidden="true" @click="showNewModal = false">×</span></button>
-                        <h4 class="modal-title">Add Widget</h4>
+                        <h4 class="modal-title">{% trans "Add Widget" %}</h4>
                       </div>
                       <div class="modal-body">
                           <div class="row">
@@ -189,7 +190,7 @@
                           </div>
                       </div>
                       <div class="modal-footer">
-                        <button type="button" class="btn btn-default pull-right" @click="showNewModal = false">Close</button>
+                        <button type="button" class="btn btn-default pull-right" @click="showNewModal = false">{% trans "Close" %}</button>
                       </div>
                     </div>
                   </div>
