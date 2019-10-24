@@ -7,12 +7,16 @@ trionyx.trionyx.models
 """
 import hashlib
 import traceback
+from contextlib import contextmanager
 
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.contrib.contenttypes import fields
 from django.utils import timezone
 from django.conf import settings
+from django.utils import translation
 from django.utils.translation import ugettext_lazy as _
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 from trionyx import models
 from trionyx.utils import get_current_request
 from trionyx.data import TIMEZONES
@@ -108,6 +112,36 @@ class User(models.BaseModel, AbstractBaseUser, PermissionsMixin):
     def get_attribute(self, code, default=None):
         """Get user attribute"""
         return UserAttribute.objects.get_attribute(self, code, default)
+
+    @contextmanager
+    def locale_override(self):
+        """Override locale settings to user settings"""
+        with translation.override(self.language), timezone.override(self.timezone):
+            yield
+
+    def send_email(self, subject, body='', html_template=None, template_context=None, files=None):
+        """Send email to user"""
+        if not body and not html_template:
+            raise Exception('You must supply a body or/and html_template')
+
+        with self.locale_override():
+            message = EmailMultiAlternatives(
+                subject=subject,
+                body=body,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[self.email]
+            )
+
+            if html_template:
+                message.attach_alternative(
+                    render_to_string(html_template, template_context if template_context else {}),
+                    "text/html")
+
+        if files:
+            for file in files:
+                message.attach(file.name, file.read())
+
+        return message.send()
 
 
 class UserAttributeManager(models.Manager):
