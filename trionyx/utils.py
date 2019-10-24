@@ -5,17 +5,50 @@ trionyx.utils
 :copyright: 2017 by Maikel Martens
 :license: GPLv3
 """
+import time
 import logging
 import random
 import string
 import importlib
+import hashlib
 from functools import reduce
 
 from django.conf import settings
 from django.utils import translation
 from django.utils import formats
+from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
+
+
+class CacheLock:
+    """CacheLock uses the django cache to give a lock for given keys"""
+
+    def __init__(self, *keys, timeout=None):
+        """Init CacheLock"""
+        self.keys = keys
+        self.timeout = timeout
+
+    @property
+    def cache_key(self):
+        """Cache key"""
+        return 'trionyx-cache-lock-{key}'.format(
+            key=hashlib.md5(''.join([str(k) for k in self.keys]).encode()).hexdigest()
+        )
+
+    def __enter__(self):
+        """Acquire lock"""
+        run_time = 0
+        wait_time = 0.1
+        while not cache.add(self.cache_key, 'true', 999999):
+            if self.timeout and run_time > self.timeout:
+                raise TimeoutError()
+            time.sleep(wait_time)
+            run_time += wait_time
+
+    def __exit__(self, type, value, traceback):
+        """Clear cache lock"""
+        cache.delete(self.cache_key)
 
 
 def random_string(size):
