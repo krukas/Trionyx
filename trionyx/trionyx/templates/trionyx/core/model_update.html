@@ -17,7 +17,7 @@
     {% endif %}
 {% endblock %}
 
-{% block extra_css %}
+{% block extra_head %}
     {% if form.css_files %}
         {% for css in form.css_files %}
             <link rel="stylesheet" type="text/css" href="{% static css %}">
@@ -60,7 +60,7 @@
     </form>
 {% endblock %}
 
-{% block extra_js %}
+{% block extra_foot %}
     {% if form.js_files %}
         {% for js in form.js_files %}
             <script src="{% static js %}"></script>
