@@ -33,7 +33,7 @@ class Config(BaseConfig):
     """Trionyx core config app"""
 
     name = 'trionyx.trionyx'
-    verbose_name = 'Trionyx'
+    verbose_name = _('System')
 
     no_menu = True
 

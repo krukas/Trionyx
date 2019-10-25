@@ -1,4 +1,13 @@
-{% load crispy_forms_tags %}
+{% load crispy_forms_tags static %}
+
+
+{% if form.css_files %}
+    {% for css in form.css_files %}
+        <link rel="stylesheet" type="text/css" href="{% static css %}">
+    {% endfor %}
+{% endif %}
+
+
 
 {% if success_message %}
     <div class="alert alert-dismissable alert-success">
@@ -8,3 +17,10 @@
 {% endif %}
 
 {% crispy form %}
+
+
+{% if form.js_files %}
+    {% for js in form.js_files %}
+        <script src="{% static js %}"></script>
+    {% endfor %}
+{% endif %}

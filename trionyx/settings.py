@@ -352,7 +352,31 @@ TX_CORE_MODEL_CONFIGS = {
     'auth.group': {
         'list_default_fields': ['name'],
         'disable_search_index': False,
-    }
+    },
+    'watson.searchentry': {
+        'hide_permissions': True,
+    },
+    'trionyx.userattribute': {
+        'hide_permissions': True,
+    },
+    'trionyx.logentry': {
+        'hide_permissions': True,
+    },
+    'trionyx.auditlogentry': {
+        'hide_permissions': True,
+    },
+    'sessions.session': {
+        'hide_permissions': True,
+    },
+    'contenttypes.contenttype': {
+        'hide_permissions': True,
+    },
+    'authtoken.token': {
+        'hide_permissions': True,
+    },
+    'auth.permission': {
+        'hide_permissions': True,
+    },
 }
 
 TX_DB_LOG_LEVEL = logging.WARNING

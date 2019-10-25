@@ -10,7 +10,8 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
 from rest_framework.authtoken.models import Token
 from trionyx.layout import (
-    Container, Row, Column10, Column2, Column12, Column6, Panel, DescriptionList, TableDescription, Img, Table, Html
+    Container, Row, Column10, Column2, Column12, Column6,
+    Panel, DescriptionList, TableDescription, Img, Table, Html, HtmlTemplate
 )
 from trionyx.renderer import datetime_value_renderer
 from trionyx.trionyx.models import AuditLogEntry, LogEntry
@@ -70,6 +71,7 @@ def account_overview(obj):
 @tabs.register('trionyx.user')
 def trionyx_user(obj):
     """Create layout for admin user"""
+    from trionyx.trionyx.views import create_permission_jstree
     token, created = Token.objects.get_or_create(user=obj)
     return Container(
         Row(
@@ -96,17 +98,21 @@ def trionyx_user(obj):
                         'is_active',
                         'is_superuser',
                         'groups',
+                        {
+                            'label': _('API Token'),
+                            'value': token.key,
+                        },
                     ),
                 ),
                 Panel(
                     _('Permissions'),
-                    Table(
-                        obj.user_permissions.select_related('content_type'),
-                        {
-                            'field': 'name',
-                            'label': _('Permission'),
-                            'renderer': lambda value, data_object, *args, **kwargs: str(data_object)
-                        }
+                    HtmlTemplate(
+                        template_name='trionyx/base/permissions.html',
+                        context={
+                            'permission_jstree': create_permission_jstree(obj.user_permissions.all(), disabled=True),
+                        },
+                        css_files=['plugins/jstree/themes/default/style.css'],
+                        js_files=['plugins/jstree/jstree.min.js'],
                     ),
                 ),
             ),
@@ -117,6 +123,7 @@ def trionyx_user(obj):
 @tabs.register('auth.group')
 def auth_group(obj):
     """Create layout for permission group"""
+    from trionyx.trionyx.views import create_permission_jstree
     return [
         Column12(
             Panel(
@@ -129,13 +136,13 @@ def auth_group(obj):
         Column12(
             Panel(
                 _('Permissions'),
-                Table(
-                    obj.permissions.select_related('content_type'),
-                    {
-                        'field': 'name',
-                        'label': 'Permission',
-                        'renderer': lambda value, data_object, *args, **kwargs: str(data_object)
-                    }
+                HtmlTemplate(
+                    template_name='trionyx/base/permissions.html',
+                    context={
+                        'permission_jstree': create_permission_jstree(obj.permissions.all(), disabled=True),
+                    },
+                    css_files=['plugins/jstree/themes/default/style.css'],
+                    js_files=['plugins/jstree/jstree.min.js'],
                 ),
             ),
         )

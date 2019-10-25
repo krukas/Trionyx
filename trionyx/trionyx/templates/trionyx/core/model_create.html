@@ -1,5 +1,5 @@
 {% extends "trionyx/base.html" %}
-{% load crispy_forms_tags i18n %}
+{% load crispy_forms_tags i18n static %}
 
 {% block title %}
     {% if title %}
@@ -14,6 +14,14 @@
         {{ title }}
     {% else %}
         {{ object }}
+    {% endif %}
+{% endblock %}
+
+{% block extra_css %}
+    {% if form.css_files %}
+        {% for css in form.css_files %}
+            <link rel="stylesheet" type="text/css" href="{% static css %}">
+        {% endfor %}
     {% endif %}
 {% endblock %}
 
@@ -45,6 +53,14 @@
 
 {% block content_bottom %}
     </form>
+{% endblock %}
+
+{% block extra_js %}
+    {% if form.js_files %}
+        {% for js in form.js_files %}
+            <script src="{% static js %}"></script>
+        {% endfor %}
+    {% endif %}
 {% endblock %}
 
 

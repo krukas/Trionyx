@@ -1,0 +1,37 @@
+{% load i18n trionyx %}
+
+<label>{% trans 'Permissions' %}</label>
+
+<select multiple id="id_permissions" name="{{ field_name }}" style="display: none">
+    {% for id in permission_ids %}
+        <option value="{{ id }}">{{ id }}</option>
+    {% endfor %}
+</select>
+
+<div id="permissions-jstree"></div>
+
+<script>
+    window.addEventListener("load", function () {
+        var jstreeItems = {{ permission_jstree|jsonify }};
+
+        $('#permissions-jstree').jstree({
+            core: {
+                data: jstreeItems,
+            },
+            plugins: ["wholerow", "checkbox", "sort"],
+        });
+
+        $('#permissions-jstree').on("changed.jstree", function(event, data){
+            var ids = [];
+            var selected = $.jstree.reference("#permissions-jstree").get_selected();
+
+            $.each(jstreeItems, function (index, item) {
+                if (item.permission_id && selected.indexOf(item.id) !== -1) {
+                    ids.push(item.permission_id);
+                }
+            });
+            $("#id_permissions").val(ids);
+        });
+    });
+
+</script>

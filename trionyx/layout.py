@@ -76,8 +76,33 @@ class Layout:
 
     def render(self, request=None):
         """Render layout for given request"""
-        # TODO Collect and all JS and CSS resources
-        return render_to_string('trionyx/layout.html', {'layout': self}, request)
+        return render_to_string('trionyx/layout.html', {
+            'layout': self,
+            'css_files': self.collect_css_files(),
+            'js_files': self.collect_js_files(),
+        }, request)
+
+    def collect_css_files(self, component=None):
+        """Collect all css files"""
+        component = component if component else self
+        files = getattr(component, 'css_files', None)
+        files = files if files else []
+
+        for comp in component.components:
+            files.extend(self.collect_css_files(comp))
+
+        return list(set(files))
+
+    def collect_js_files(self, component=None):
+        """Collect all js files"""
+        component = component if component else self
+        files = getattr(component, 'js_files', None)
+        files = files if files else []
+
+        for comp in component.components:
+            files.extend(self.collect_js_files(comp))
+
+        return list(set(files))
 
     def set_object(self, object):
         """
@@ -385,6 +410,26 @@ class ComponentFieldsMixin:
 # =============================================================================
 # Simple HTML tags
 # =============================================================================
+class HtmlTemplate(Component):
+    """HtmlTemplate render django html template"""
+
+    def __init__(self, template_name, context=None, css_files=None, js_files=None):
+        """Initialize HtmlTemplate"""
+        super().__init__()
+        self.template_name = template_name
+        self.context = context
+        self.css_files = css_files if css_files else []
+        self.js_files = js_files if js_files else []
+
+    def render(self, context, request=None):
+        """Render component"""
+        context['component'] = self
+        context.update(self.context)
+        self.context = context
+        self.request = request
+        return render_to_string(self.template_name, context, request)
+
+
 class HtmlTagWrapper(Component):
     """HtmlTagWrapper wraps given component in given html tag"""
 

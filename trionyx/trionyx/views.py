@@ -12,6 +12,7 @@ from collections import OrderedDict
 from django.http import HttpResponse
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.auth import logout as django_logout
+from django.contrib.auth.models import Permission
 from django.shortcuts import redirect
 from django.urls import reverse
 from django_jsend import JsendView
@@ -114,6 +115,74 @@ class ViewUserAccountView(DetailTabView):
     def get_back_url(self):
         """Hide back url"""
         return None
+
+
+def create_permission_jstree(selected=None, disabled=False):
+    """Create permission jstree"""
+    selected = selected if selected else []
+    jstree = []
+
+    added_apps = ['auth']
+    added_models = []
+    for permission in Permission.objects.select_related('content_type').all():
+        model_config = models_config.get_config(permission.content_type.model_class())
+
+        if model_config.hide_permissions:
+            continue
+
+        if model_config.disable_add and permission.codename == 'add_{}'.format(model_config.model_name):
+            continue
+
+        if model_config.disable_change and permission.codename == 'change_{}'.format(model_config.model_name):
+            continue
+
+        if model_config.disable_delete and permission.codename == 'delete_{}'.format(model_config.model_name):
+            continue
+
+        if model_config.app_label not in added_apps:
+            jstree.append({
+                'id': model_config.app_label,
+                'parent': '#',
+                'text': model_config.get_app_verbose_name(),
+                'state': {
+                    'disabled': disabled,
+                }
+            })
+            added_apps.append(model_config.app_label)
+
+        parent = [model_config.app_label if model_config.app_label != 'auth' else 'trionyx']
+
+        if model_config.model_name not in added_models:
+            jstree.append({
+                'id': '.'.join([*parent, model_config.model_name]),
+                'parent': '.'.join(parent),
+                'text': model_config.get_verbose_name_plural(),
+                'state': {
+                    'disabled': disabled,
+                }
+            })
+            added_models.append(model_config.model_name)
+
+        parent.append(model_config.model_name)
+        name = {
+            'view_{}'.format(model_config.model_name): _('View'),
+            'add_{}'.format(model_config.model_name): _('Add'),
+            'change_{}'.format(model_config.model_name): _('Change'),
+            'delete_{}'.format(model_config.model_name): _('Delete'),
+        }.get(permission.codename, permission.name)
+
+        jstree.append({
+            'id': '.'.join([*parent, permission.codename]),
+            'parent': '.'.join(parent),
+            'text': str(name),
+            'state': {
+                'selected': permission in selected,
+                'disabled': disabled,
+            },
+            'permission_id': permission.id,
+        })
+
+    return jstree
 
 
 # =============================================================================
