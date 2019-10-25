@@ -110,8 +110,8 @@
 
 
 {% block header_buttons %}
-    <button id="dashboard-edit" class="btn bg-theme" onclick="clickDashboardEdit(this)">{% trans "Edit" %}</button>
-    <button id="dashboard-save" class="btn btn-success hide" onclick="clickDashboardSave(this)">{% trans "Save" %}</button>
+    <button id="dashboard-edit" class="btn btn-flat bg-theme" onclick="clickDashboardEdit(this)">{% trans "Edit" %}</button>
+    <button id="dashboard-save" class="btn btn-flat btn-success hide" onclick="clickDashboardSave(this)">{% trans "Save" %}</button>
 {% endblock %}
 
 
@@ -156,13 +156,13 @@
                             <i class="fa fa-circle text-black" @click="updateWidgetConfig(widget, 'color', 'black')"></i>
                         </div>
                     </div>
-                    <span class="btn btn-info widget-edit" @click="openWidgetConfigDialog(widget, this)"><i class="fa fa-edit"></i></span>
-                    <span class="btn btn-danger widget-remove" @click="removeWidget(widget)"><i class="fa fa-trash"></i></span>
+                    <span class="btn btn-flat btn-info widget-edit" @click="openWidgetConfigDialog(widget, this)"><i class="fa fa-edit"></i></span>
+                    <span class="btn btn-flat btn-danger widget-remove" @click="removeWidget(widget)"><i class="fa fa-trash"></i></span>
                 </div>
             </grid-item>
         </grid-layout>
 
-        <button v-if="edit" @click="showNewModal = true" class="btn btn-lg btn-success widget-add"><i class="fa fa-plus-circle"></i></button>
+        <button v-if="edit" @click="showNewModal = true" class="btn btn-flat btn-lg btn-success widget-add"><i class="fa fa-plus-circle"></i></button>
         <div v-if="showNewModal">
             <transition name="modal">
                 <div class="modal new-widget-modal" style="display: block">
@@ -190,7 +190,7 @@
                           </div>
                       </div>
                       <div class="modal-footer">
-                        <button type="button" class="btn btn-default pull-right" @click="showNewModal = false">{% trans "Close" %}</button>
+                        <button type="button" class="btn btn-flat btn-default pull-right" @click="showNewModal = false">{% trans "Close" %}</button>
                       </div>
                     </div>
                   </div>

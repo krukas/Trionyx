@@ -472,7 +472,10 @@ class Button(Html):
     """
 
     tag = 'button'
-    valid_attr = ['onClick']
+    valid_attr = ['onClick', 'class']
+    attr = {
+        'class': 'btn btn-flat btn-default'
+    }
 
     def __init__(self, label, link_url=None, dialog_url=None, dialog_options=None, **options):
         """Init button"""

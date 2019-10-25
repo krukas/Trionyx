@@ -6,24 +6,24 @@
 
 {% block header_buttons %}
     {% if back_url %}
-        <a href="{{ back_url }}" class="btn bg-theme">{% trans "Back" %}</a>
+        <a href="{{ back_url }}" class="btn btn-flat bg-theme">{% trans "Back" %}</a>
     {% endif %}
 
     {% for button in view_header_buttons %}
         <a
            href="{% if button.modal %}#{% else %}{{ button.url }}{% endif %}"
            {% if button.modal %}onClick="openDialog('{{ button.url }}')"{% endif %}
-           class="btn {{ button.type }}"
+           class="btn btn-flat {{ button.type }}"
         >
             {{ button.label }}
         </a>
     {% endfor %}
 
     {% if delete_url and delete_permission %}
-        <a href="{{ delete_url }}" class="btn bg-theme">{% trans "Delete" %}</a>
+        <a href="{{ delete_url }}" class="btn btn-flat bg-theme">{% trans "Delete" %}</a>
     {% endif %}
     {% if edit_url and change_permission %}
-        <a href="{{ edit_url }}" class="btn bg-theme">{% trans "Edit" %}</a>
+        <a href="{{ edit_url }}" class="btn btn-flat bg-theme">{% trans "Edit" %}</a>
     {% endif %}
 
 {% endblock %}
