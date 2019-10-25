@@ -665,13 +665,6 @@ table .dragtable-col-placeholder:first {
     visibility: hidden;
 }
 
-.dragtable-drag-handle {
-    display: none;
-    position: absolute;
-    padding: 10px;
-    margin-top: -10px;
-}
-
 th:hover .dragtable-drag-handle {
     display: inline;
 }
