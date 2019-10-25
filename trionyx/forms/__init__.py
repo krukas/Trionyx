@@ -24,6 +24,12 @@ logger = logging.getLogger(__name__)
 class ModelForm(DjangoModelForm):
     """Trionyx ModelForm"""
 
+    css_files = []
+    """CSS files that need to be loaded"""
+
+    js_files = []
+    """JS files that need to be loaded"""
+
     def get_inline_forms(self):
         """Get inline forms"""
         if not hasattr(self, '__inline_forms'):

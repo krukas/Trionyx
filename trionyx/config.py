@@ -152,9 +152,13 @@ class ModelConfig:
     auditlog_ignore_fields = None
     """Auditlog fields to be ignored"""
 
+    hide_permissions = False
+    """Dont show model in permissions tree, prevent clutter from internal models"""
+
     def __init__(self, model, MetaConfig=None):
         """Init config"""
         self.model = model
+        self.app_config = apps.get_app_config(model._meta.app_label)
         self.app_label = model._meta.app_label
         self.model_name = model._meta.model_name
         self.__changed = {}
@@ -180,6 +184,22 @@ class ModelConfig:
             return super().__getattr__(item)
         except AttributeError:
             return None
+
+    def get_app_verbose_name(self, title=True):
+        """Get app verbose name"""
+        return str(self.app_config.verbose_name).title() if title else str(self.app_config.verbose_name)
+
+    def get_verbose_name(self, title=True):
+        """Get class verbose name"""
+        return str(
+            self.model._meta.verbose_name
+        ).title() if title else str(self.model._meta.verbose_name).lower()
+
+    def get_verbose_name_plural(self, title=True):
+        """Get class plural verbose name"""
+        return str(
+            self.model._meta.verbose_name_plural
+        ).title() if title else str(self.model._meta.verbose_name_plural).lower()
 
     @property
     def is_trionyx_model(self):

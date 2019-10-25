@@ -1,5 +1,5 @@
 {% extends "trionyx/base.html" %}
-{% load crispy_forms_tags i18n %}
+{% load crispy_forms_tags i18n static %}
 
 {% block title %}
     {% if title %}
@@ -17,6 +17,14 @@
     {% endif %}
 {% endblock %}
 
+{% block extra_css %}
+    {% if form.css_files %}
+        {% for css in form.css_files %}
+            <link rel="stylesheet" type="text/css" href="{% static css %}">
+        {% endfor %}
+    {% endif %}
+{% endblock %}
+
 {% block content_top %}
     <form role="form" action="" method="post" enctype="multipart/form-data" novalidate style="display: inline">
 {% endblock %}
@@ -24,11 +32,11 @@
 
 {% block header_buttons %}
     {% if cancel_url %}
-        <a href="{% url cancel_url %}" class="btn bg-theme">{% trans "Cancel" %}</a>
+        <a href="{% url cancel_url %}" class="btn btn-flat bg-theme">{% trans "Cancel" %}</a>
     {% else %}
-        <a href="{{ object_url }}" class="btn bg-theme">{% trans "Cancel" %}</a>
+        <a href="{{ object_url }}" class="btn btn-flat bg-theme">{% trans "Cancel" %}</a>
     {% endif %}
-    <input type="submit" value="{% if submit_value %}{{ submit_value }}{% else %}{% trans "Update" %}{% endif %}" class="btn btn-success"/>
+    <input type="submit" value="{% if submit_value %}{{ submit_value }}{% else %}{% trans "Save" %}{% endif %}" class="btn btn-flat btn-success"/>
 {% endblock %}
 
 
@@ -44,9 +52,18 @@
 
         </div>
     </div>
+
 {% endblock %}
 
 
 {% block content_bottom %}
     </form>
+{% endblock %}
+
+{% block extra_js %}
+    {% if form.js_files %}
+        {% for js in form.js_files %}
+            <script src="{% static js %}"></script>
+        {% endfor %}
+    {% endif %}
 {% endblock %}

@@ -2,6 +2,11 @@ body {
     background-color: #ecf0f5;;
 }
 
+/* Flat */
+.panel, .alert, .box, .info-box {
+    border-radius: 0 !important;
+}
+
 /*****************************************************************************/
 /* Theme colors*/
 /*****************************************************************************/
@@ -663,13 +668,6 @@ table .dragtable-col-placeholder:first {
 .dragtable-col-placeholder * {
     opacity: 0.0;
     visibility: hidden;
-}
-
-.dragtable-drag-handle {
-    display: none;
-    position: absolute;
-    padding: 10px;
-    margin-top: -10px;
 }
 
 th:hover .dragtable-drag-handle {

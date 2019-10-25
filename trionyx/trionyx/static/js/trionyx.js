@@ -315,14 +315,14 @@ function TrionyxDialog(url, options) {
     self.setFooter = function(data){
         footer.html('');
         footer.append(
-            $('<button type="button" class="btn btn-default pull-left" data-dismiss="modal">' + window.trionyx_translations.close + '</button>')
+            $('<button type="button" class="btn btn-flat btn-default pull-left" data-dismiss="modal">' + window.trionyx_translations.close + '</button>')
         ).append(
             $('<img src="/static/img/spinners/spinner2.gif" style="display:none; margin-right: 10px" />')
         );
 
         if (data.submit_label) {
             footer.append(
-                $('<input type="submit" class="btn btn-success" value="' + data.submit_label + '"/>')
+                $('<input type="submit" class="btn btn-flat btn-success" value="' + data.submit_label + '"/>')
             );
         }
     };

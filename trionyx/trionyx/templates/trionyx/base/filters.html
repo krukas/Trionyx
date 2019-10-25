@@ -44,10 +44,10 @@
             </div>
         </div>
 
-        <span class="btn btn-success btn-block" v-on:click="clickAddFilter()">{% trans "Add filter" %}</span>
+        <span class="btn btn-flat btn-success btn-block" v-on:click="clickAddFilter()">{% trans "Add filter" %}</span>
         <div class="trionyx-filters">
             <div v-for="filter in renderedFilters" class="filter filter-block">
-                [[filter.field]] [[filter.operator]] [[filter.renderedValue]]
+                [[filter.label]] [[filter.operator]] [[filter.renderedValue]]
                 <span v-on:click="clickRemoveFilter(filter)">×</span>
             </div>
         </div>
@@ -92,6 +92,7 @@
                         return filter;
                     }
                     var field = self.fields[filter.field];
+                    filter.label = field.label;
 
                     if (['related', 'bool'].indexOf(field.type) !== -1 || field.choices.length > 0 || filter.operator === 'null'){
                         var choices = field.choices;

@@ -1,0 +1,22 @@
+{% load trionyx %}
+
+<div id="permissions-jstree"></div>
+
+<script>
+    function trionyxLoadJstree() {
+        $('#permissions-jstree').jstree({
+            core: {
+                data: {{ permission_jstree|jsonify }},
+            },
+            plugins: ["wholerow", "sort"],
+        });
+    }
+
+    if (document.readyState === "complete") {
+        trionyxLoadJstree();
+    } else {
+        window.addEventListener("load", function () {
+            trionyxLoadJstree();
+        });
+    }
+</script>

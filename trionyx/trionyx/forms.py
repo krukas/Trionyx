@@ -7,9 +7,8 @@ trionyx.trionyx.forms
 """
 from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import password_validation
-from django.contrib.auth.models import Group, Permission
+from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
-from django.db.models import Q
 
 from trionyx import forms
 from trionyx.forms.layout import Layout, Fieldset, Div, HtmlTemplate, Filters
@@ -189,6 +188,14 @@ class UserCreateForm(forms.ModelForm):
 class UserUpdateForm(forms.ModelForm):
     """User update form"""
 
+    css_files = [
+        'plugins/jstree/themes/default/style.css'
+    ]
+
+    js_files = [
+        'plugins/jstree/jstree.min.js'
+    ]
+
     error_messages = {
         'password_mismatch': _("The two password fields didn't match."),
     }
@@ -209,31 +216,48 @@ class UserUpdateForm(forms.ModelForm):
     def __init__(self, instance=None, *args, **kwargs):
         """Init user form"""
         super().__init__(*args, instance=instance, **kwargs)
+        from trionyx.trionyx.views import create_permission_jstree
+
+        selected_permissions = []
+        if self.instance:
+            selected_permissions = self.instance.user_permissions.all()
+        elif 'user_permissions' in self.initial:
+            selected_permissions = self.initial['user_permissions']
+
+        jstree = create_permission_jstree(selected_permissions)
+
         self.helper = FormHelper()
         self.helper.layout = Layout(
             'email',
             Div(
-                Fieldset(
-                    _('Personal info'),
-                    'first_name',
-                    'last_name',
-                    'avatar',
+                Div(
+                    Fieldset(
+                        _('Personal info'),
+                        'first_name',
+                        'last_name',
+                        'avatar',
+                    ),
+                    Fieldset(
+                        _('Change password'),
+                        'new_password1',
+                        'new_password2',
+                    ),
                     css_class="col-md-6",
                 ),
                 Fieldset(
                     _('Permissions'),
                     'is_active',
                     'is_superuser',
-                    'user_permissions',
                     'groups',
+                    HtmlTemplate('trionyx/forms/permissions.html', {
+                        'field_name': 'user_permissions',
+                        'permission_jstree': jstree,
+                        'permission_ids': filter(None, [
+                            item['permission_id'] for item in jstree if 'permission_id' in item]),
+                    }),
                     css_class="col-md-6",
                 ),
                 css_class="row"
-            ),
-            Fieldset(
-                _('Change password'),
-                'new_password1',
-                'new_password2',
             ),
         )
 
@@ -277,17 +301,39 @@ class UserUpdateForm(forms.ModelForm):
 class GroupForm(forms.ModelForm):
     """Group form"""
 
+    css_files = [
+        'plugins/jstree/themes/default/style.css'
+    ]
+
+    js_files = [
+        'plugins/jstree/jstree.min.js'
+    ]
+
     def __init__(self, *args, **kwargs):
         """Init GroupForm"""
         super().__init__(*args, **kwargs)  # populates the post
-        self.fields['permissions'].queryset = Permission.objects.exclude(
-            content_type__in=ContentType.objects.filter(
-                Q(app_label__in=['contenttypes', 'sessions', 'watson'])
-                | Q(app_label='auth') & Q(model='permission')  # noqa w503
-                | Q(app_label='trionyx') & Q(model='auditlogentry')  # noqa w503
-                | Q(app_label='trionyx') & Q(model='logentry')  # noqa w503
-                | Q(app_label='trionyx') & Q(model='userattribute')  # noqa w503
-            )
+        from trionyx.trionyx.views import create_permission_jstree
+
+        selected_permissions = []
+        if self.instance:
+            try:
+                selected_permissions = self.instance.permissions.all()
+            except ValueError:
+                if 'permissions' in self.initial:
+                    selected_permissions = self.initial['permissions']
+        elif 'permissions' in self.initial:
+            selected_permissions = self.initial['permissions']
+
+        jstree = create_permission_jstree(selected_permissions)
+
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            'name',
+            HtmlTemplate('trionyx/forms/permissions.html', {
+                'field_name': 'permissions',
+                'permission_jstree': jstree,
+                'permission_ids': filter(None, [item['permission_id'] for item in jstree if 'permission_id' in item]),
+            })
         )
 
     class Meta:

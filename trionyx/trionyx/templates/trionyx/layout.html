@@ -1,4 +1,12 @@
-{% load trionyx %}
+{% load trionyx static %}
+
+{% for css in css_files %}
+    <link rel="stylesheet" type="text/css" href="{% static css %}">
+{% endfor %}
+
+{% for js in js_files %}
+    <script src="{% static js %}"></script>
+{% endfor %}
 
 {% for component in layout.components %}
     {% render_component component %}

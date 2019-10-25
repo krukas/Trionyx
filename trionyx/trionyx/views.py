@@ -12,6 +12,7 @@ from collections import OrderedDict
 from django.http import HttpResponse
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.auth import logout as django_logout
+from django.contrib.auth.models import Permission
 from django.shortcuts import redirect
 from django.urls import reverse
 from django_jsend import JsendView
@@ -28,6 +29,7 @@ from trionyx.config import models_config
 from trionyx.widgets import widgets
 from trionyx import utils
 from trionyx.forms.helper import FormHelper
+from trionyx.models import filter_queryset_with_user_filters
 
 logger = logging.getLogger(__name__)
 
@@ -113,6 +115,77 @@ class ViewUserAccountView(DetailTabView):
     def get_back_url(self):
         """Hide back url"""
         return None
+
+
+def create_permission_jstree(selected=None, disabled=False):
+    """Create permission jstree"""
+    selected = selected if selected else []
+    jstree = []
+
+    added_apps = ['auth']
+    added_models = []
+    for permission in Permission.objects.select_related('content_type').all():
+        if not permission.content_type.model_class():
+            continue
+
+        model_config = models_config.get_config(permission.content_type.model_class())
+
+        if model_config.hide_permissions:
+            continue
+
+        if model_config.disable_add and permission.codename == 'add_{}'.format(model_config.model_name):
+            continue
+
+        if model_config.disable_change and permission.codename == 'change_{}'.format(model_config.model_name):
+            continue
+
+        if model_config.disable_delete and permission.codename == 'delete_{}'.format(model_config.model_name):
+            continue
+
+        if model_config.app_label not in added_apps:
+            jstree.append({
+                'id': model_config.app_label,
+                'parent': '#',
+                'text': model_config.get_app_verbose_name(),
+                'state': {
+                    'disabled': disabled,
+                }
+            })
+            added_apps.append(model_config.app_label)
+
+        parent = [model_config.app_label if model_config.app_label != 'auth' else 'trionyx']
+
+        if model_config.model_name not in added_models:
+            jstree.append({
+                'id': '.'.join([*parent, model_config.model_name]),
+                'parent': '.'.join(parent),
+                'text': model_config.get_verbose_name_plural(),
+                'state': {
+                    'disabled': disabled,
+                }
+            })
+            added_models.append(model_config.model_name)
+
+        parent.append(model_config.model_name)
+        name = {
+            'view_{}'.format(model_config.model_name): _('View'),
+            'add_{}'.format(model_config.model_name): _('Add'),
+            'change_{}'.format(model_config.model_name): _('Change'),
+            'delete_{}'.format(model_config.model_name): _('Delete'),
+        }.get(permission.codename, permission.name)
+
+        jstree.append({
+            'id': '.'.join([*parent, permission.codename]),
+            'parent': '.'.join(parent),
+            'text': str(name),
+            'state': {
+                'selected': permission in selected,
+                'disabled': disabled,
+            },
+            'permission_id': permission.id,
+        })
+
+    return jstree
 
 
 # =============================================================================
@@ -303,3 +376,48 @@ class WidgetConfigDialog(DialogView):
     def handle_dialog(self, code, *args, **kwargs):
         """Handle widget config"""
         return self.display_dialog(code)
+
+
+# Mass actions
+class MassDeleteDialog(DialogView):
+    """Mass delete dialog"""
+
+    def display_dialog(self, *args, **kwargs):
+        """Handle mass delete"""
+        query = self.get_model_class().objects.get_queryset()
+
+        if self.request.POST.get('all', '0') == '1':
+            query = filter_queryset_with_user_filters(query, json.loads(self.request.POST.get('filters', '[]')))
+        else:
+            query = query.filter(id__in=[int(id) for id in filter(None, self.request.POST.get('ids', '').split(','))])
+
+        count = query.count()
+        if '__post__' in self.request.POST:
+            try:
+                query.delete()
+            except Exception:
+                return {
+                    'title': _('Something went wrong on deleting the items'),
+                }
+            return {
+                'deleted': True,
+            }
+        else:
+            return {
+                'title': _('Deleting {count} {model_name} items').format(
+                    count=count,
+                    model_name=self.get_model_config().get_verbose_name(False)
+                ),
+                'content': self.render_to_string('trionyx/dialog/mass_delete.html', {
+                    'count': count,
+                    'model_name': self.get_model_config().get_verbose_name(False),
+                    'all': self.request.POST.get('all', '0'),
+                    'filters': self.request.POST.get('filters', '[]'),
+                    'ids': self.request.POST.get('ids', ''),
+                }),
+                'submit_label': _('Delete') if count else None,
+            }
+
+    def handle_dialog(self, *args, **kwargs):
+        """Handle mass delete"""
+        return self.display_dialog()
