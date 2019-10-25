@@ -10,29 +10,54 @@
 
 {% block header_buttons %}
     {% if create_permission %}
-        <a href="{{ create_url }}" class="btn bg-theme">{% trans "Create" %}</a>
+        <a href="{{ create_url }}" class="btn btn-flat bg-theme">{% trans "Create" %}</a>
     {% endif %}
 {% endblock %}
 
 {% block extra_css %}
     <style>
+        .dragtable-no-drag:hover .dragtable-drag-handle {
+            display: none !important;
+        }
         .model-list > thead > tr > th {
             position: relative;
-            padding-right: 16px;
+            padding-right: 20px;
         }
 
         .model-list > thead > tr > th > i.fa {
             position: absolute;
-            right: 0px;
+            right: 4px;
             bottom: 8px;
         }
         .dragtable-drag-handle {
             display: none;
             position: absolute;
             padding: 10px;
-            right: 6px;
+            right: 10px;
             opacity: 0.9;
             bottom: -5px;
+        }
+
+        .btn-group.mass-action-group > .btn.dropdown-toggle {
+            padding-right: 2px;
+            padding-left: 2px;
+        }
+        .model-list-filters {
+            padding: 0;
+            background-color: #f8f8f8;
+            border-top: 1px solid #eee;
+        }
+        .model-list-filters .trionyx-filters {
+            padding-top: 0 !important;
+        }
+
+        .model-list-pagination {
+            float: right;
+        }
+
+        .model-list-pagination .btn,
+        .model-list-pagination .select2-container {
+            margin-bottom: 2px;
         }
     </style>
 {% endblock %}
@@ -41,17 +66,10 @@
 {% block content %}
     <div class="info-box" id="app-model-list" v-cloak>
         <div class="box-header">
-            <div class="input-group input-group-sm" style="width: 150px;">
+            <div class="input-group input-group" style="width: 175px;">
                 <input type="text" name="table_search" class="form-control pull-right" placeholder="{% trans "Search" %}" v-model="search" v-on:keyup="searchLoad()">
                 <div class="input-group-btn">
                     <button type="submit" class="btn btn-default btn-flat" v-on:click="searchLoad()"><i class="fa fa-search"></i></button>
-                </div>
-            </div>
-
-            <div class="trionyx-filters">
-                <div v-for="filter in renderedActiveFilters" class="filter filter-block">
-                    [[filter.field]] [[filter.operator]] [[filter.renderedValue]]
-                    <span v-on:click="clickRemoveFilter(filter)">×</span>
                 </div>
             </div>
 
@@ -63,17 +81,68 @@
                     <input type="hidden" name="selected_fields" v-model="selected_fields">
                     <input type="hidden" name="sort" v-model="sort">
                     <input type="hidden" name="search" v-model="search">
-                    <button type="button" class="btn btn-default hidden-xs" onclick="$('#listfiltersmodal').modal({backdrop: 'static', keyboard: false}, 'show');">
+                    <button type="button" class="btn btn-flat btn-default hidden-xs" onclick="$('#listfiltersmodal').modal({backdrop: 'static', keyboard: false}, 'show');">
                         <i class="fa fa-filter"></i>
                     </button>
-                    <button type="submit" class="btn btn-default hidden-xs" v-if="downloadUrl != ''">
+                    <button type="submit" class="btn btn-flat btn-default hidden-xs" v-if="downloadUrl != ''">
                         <i class="fa fa-download"></i>
                     </button>
                 </form>
             </div>
-            <button id="fields-popover" type="button" class="btn btn-default pull-right hidden-xs" data-placement="bottom" data-toggle="popover" title="Fields" >
+            <button id="fields-popover" type="button" class="btn btn-flat btn-default pull-right hidden-xs" data-placement="bottom" data-toggle="popover" title="Fields" >
                 <i class="fa fa-columns" style="font-size: 16px"></i>
             </button>
+
+            <div style="padding-top: 12px">
+                <div class="btn-group" style="margin-right: 10px">
+                  <button type="button" class="btn btn-flat btn-default">{% trans 'Actions' %}</button>
+                  <button type="button" class="btn btn-flat btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="#">{% trans 'Delete' %}</a></li>
+                    <li><a href="#">{% trans 'Update' %}</a></li>
+                  </ul>
+                </div>
+
+                {% trans '[[count]] items found' %} <span v-if="massActionSelected">({% trans '[[massActionSelected]] selected' %})</span>
+
+                <div class="model-list-pagination">
+                    <select v-model="pageSize" id="select-pageSize">
+                        <option>10</option>
+                        <option>25</option>
+                        <option>50</option>
+                    </select>
+                    {% trans "per page" %}
+
+                    <button
+                        class="btn btn-default btn-flat"
+                        style="margin-left: 15px; margin-right: 5px"
+                        v-bind:disabled="previousPage == 0"
+                        v-on:click="toPage(previousPage)"
+                    >
+                        <i class="glyphicon glyphicon-chevron-left"></i>
+                    </button>
+                    <input class="form-control" style="display: inline-block; width: 50px" v-on:change="pageChange()" v-model="editPage" />
+                        {% trans 'of [[numPages]]' %}
+                    <button
+                        class="btn btn-default btn-flat"
+                        style="margin-left: 5px;"
+                        v-bind:disabled="nextPage == 0"
+                        v-on:click="toPage(nextPage)"
+                    >
+                        <i class="glyphicon glyphicon-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <div class="box-header model-list-filters" v-if="renderedActiveFilters.length > 0">
+            <div class="trionyx-filters">
+                <div v-for="filter in renderedActiveFilters" class="filter filter-block">
+                    [[filter.field]] [[filter.operator]] [[filter.renderedValue]]
+                    <span v-on:click="clickRemoveFilter(filter)">×</span>
+                </div>
+            </div>
         </div>
         <!-- /.box-header -->
         <div class="box-body no-padding table-responsive">
@@ -83,7 +152,23 @@
             <table class="table table-striped model-list" v-if="items.length > 0">
                 <thead>
                     <tr>
-                        <th style="width: 10px" data-header="NR">#<span class="dragtable-drag-handle"></span></th>
+                        <th class="dragtable-no-drag" style="width: 45px; padding-right: 0;">
+                            <div class="btn-group btn-group-xs mass-action-group">
+                              <button type="button" class="btn btn-flat btn-default">
+                                  <i class="fa no-margin" v-bind:class="massActionIconClass"></i>
+                              </button>
+                              <button type="button" class="btn btn-flat btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                <span class="caret"></span>
+                              </button>
+                              <ul class="dropdown-menu" role="menu">
+                                <li><a href="#" v-on:click="massActionSelectAll()">{% trans 'Select All' %}</a></li>
+                                <li><a href="#" v-on:click="massActionDeselectAll()">{% trans 'Deselect All' %}</a></li>
+                                <li><a href="#" v-on:click="massActionSelectAllOnPage()">{% trans 'Select All on this page' %}</a></li>
+                              </ul>
+                            </div>
+                            <span class="dragtable-drag-handle"></span>
+                        </th>
+                        <th class="dragtable-drag-boundary dragtable-no-drag" style="width: 10px" data-header="NR">#<span class="dragtable-drag-handle"></span></th>
                         <th v-for="header in headers" v-on:click="clickSort(header.field)" v-bind:data-header="header.field">
                             [[ header.label ]]
                             <span class="dragtable-drag-handle">
@@ -97,29 +182,19 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr v-for="item in enumeratedItems" v-on:click="clickItem(item)">
-                        <td v-for="column in item.row_data" v-html="column" />
+                    <tr v-for="item in enumeratedItems">
+                        <td>
+                            <input
+                                type="checkbox"
+                                v-model="item.selected"
+                                true-value="1"
+                                false-value="0"
+                            />
+                        </td>
+                        <td v-for="column in item.row_data" v-html="column" v-on:click="clickItem(item)" />
                     </tr>
                 </tbody>
             </table>
-        </div>
-        <div class="box-footer clearfix" v-if="items.length > 0">
-            {% trans "Showing [[fromItemCount]] to [[toItemCount]] of [[count]] items" %}
-            <select v-model="pageSize" id="select-pageSize">
-                <option>10</option>
-                <option>25</option>
-                <option>50</option>
-            </select>
-            {% trans "per page" %}
-
-            <ul class="pagination pagination-sm no-margin pull-right">
-                <li v-if="previousPage > 0"><a v-on:click="toPage(previousPage)">«</a></li>
-                <li v-for="pageNumber in pages" v-bind:class="{ active: pageNumber == page }">
-                    <a v-on:click="toPage(pageNumber)">[[pageNumber]]</a>
-                </li>
-
-                <li v-if="nextPage > 0"><a v-on:click="toPage(nextPage)">»</a></li>
-              </ul>
         </div>
 
         <div id="fields-popover-content" class="hidden">
@@ -176,6 +251,7 @@
 
                 csrfmiddlewaretoken: getCookie('csrftoken'),
                 page: 1,
+                editPage: 1,
                 pageSize: 10,
                 initialPageSize: 0,
                 numPages: 0,
@@ -185,6 +261,7 @@
                 selected_fields: '',
                 currentFields: [],
                 search: '',
+                massActionAllSelected: false,
 
                 activeFilters: [],
                 renderedActiveFilters: [],
@@ -213,28 +290,26 @@
                         return a.label.localeCompare(b.label);
                     });
                 },
-                pages: function() {
-                    var paginatePages = 3;
-
-                    var startPage = this.page - paginatePages;
-                    startPage = startPage > 0 ? startPage : 1;
-
-                    var endPage = this.page + paginatePages;
-                    endPage = endPage <= this.numPages ? endPage : this.numPages;
-
-                    return Array.apply(null, Array(endPage - startPage + 1)).map((item, index) => startPage + index);
-                },
                 nextPage: function() {
-                    return self.page < this.numPages ? this.page + 1 : 0;
+                    return this.page < this.numPages ? this.page + 1 : 0;
                 },
                 previousPage: function() {
                     return this.page > 1 ? this.page -1 : 0;
                 },
-                fromItemCount: function (){
-                    return this.page * this.pageSize - this.pageSize + 1;
+                massActionSelected: function() {
+                    if (this.massActionAllSelected) {
+                        return this.count;
+                    }
+                    return this.items.reduce((value, item) => value + (item.selected === '1' ? 1 : 0), 0);
                 },
-                toItemCount: function() {
-                    return this.page * this.pageSize;
+                massActionIconClass: function () {
+                    if (this.massActionAllSelected) {
+                        return 'fa-check-square-o';
+                    } else if(this.massActionSelected > 0) {
+                        return 'fa-minus-square-o';
+                    } else {
+                        return 'fa-square-o';
+                    }
                 },
             },
             
@@ -268,6 +343,18 @@
                 },
                 toPage: function (page) {
                     this.page = page;
+                    this.load();
+                },
+                pageChange: function() {
+                    if (this.editPage < 1) {
+                        this.editPage = 1;
+                        this.page = 1;
+                    } else if (this.editPage > this.numPages) {
+                        this.editPage = this.numPages;
+                        this.page = this.numPages;
+                    } else {
+                        this.page = this.editPage;
+                    }
                     this.load();
                 },
                 clickItem: function(item) {
@@ -313,8 +400,12 @@
                            self.initialPageSize = data.page_size;
                         }
 
-                        self.items = data.items;
+                        self.items = data.items.map(function(item){
+                            item.selected = false;
+                            return item
+                        });
                         self.page = data.page;
+                        self.editPage = data.page;
                         self.pageSize = data.page_size;
                         self.numPages = data.num_pages;
                         self.sort = data.sort;
@@ -335,6 +426,28 @@
                         }, 100);
                     });
                 },
+
+                massActionSelectAll: function () {
+                    this.massActionAllSelected = true;
+                    this.items.map(function (item) {
+                        item.selected = '1';
+                        return item;
+                    });
+                },
+                massActionSelectAllOnPage: function () {
+                    this.massActionAllSelected = false;
+                    this.items.map(function (item) {
+                        item.selected = '1';
+                        return item;
+                    });
+                },
+                massActionDeselectAll: function () {
+                    this.massActionAllSelected = false;
+                    this.items.map(function (item) {
+                        item.selected = '0';
+                        return item;
+                    });
+                }
             },
 
             created() {

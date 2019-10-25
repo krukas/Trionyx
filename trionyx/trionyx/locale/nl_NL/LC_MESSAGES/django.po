@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-24 14:28+0000\n"
-"PO-Revision-Date: 2019-10-24 16:27+0200\n"
+"POT-Creation-Date: 2019-10-25 12:07+0000\n"
+"PO-Revision-Date: 2019-10-25 14:09+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -197,7 +197,7 @@ msgid "Period field"
 msgstr "Periode veld"
 
 #: trionyx/trionyx/forms.py:333 trionyx/trionyx/forms.py:398
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:121
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:219
 msgid "Filters"
 msgstr "Filters"
 
@@ -448,7 +448,7 @@ msgid "Type anywhere to <strong>search</strong>"
 msgstr "Typ ergens om <strong> zoeken </strong>"
 
 #: trionyx/trionyx/templates/trionyx/base/global_search.html:12
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:22
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:70
 msgid "Search"
 msgstr "Zoeken"
 
@@ -499,6 +499,7 @@ msgstr "Terug"
 #: trionyx/trionyx/templates/trionyx/core/layout_view.html:12
 #: trionyx/trionyx/templates/trionyx/core/model_delete.html:8
 #: trionyx/trionyx/templates/trionyx/core/model_delete.html:31
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:103
 #: trionyx/trionyx/templates/trionyx/core/model_view.html:23
 msgid "Delete"
 msgstr "Verwijder"
@@ -535,27 +536,53 @@ msgstr "Annuleren"
 msgid "Are you sure you want to delete (%(object)s)"
 msgstr "Weet u zeker dat u (%(object)s) wilt verwijderen"
 
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:58
-msgid "There are no"
-msgstr "Er zijn geen"
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:98
+#| msgid "Action"
+msgid "Actions"
+msgstr "Acties"
 
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:84
-msgid "Showing [[fromItemCount]] to [[toItemCount]] of [[count]] items"
-msgstr "Toont [[fromItemCount]] tot [[toItemCount]] van [[count]] items"
-
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:90
-msgid "per page"
-msgstr "per pagina"
-
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:105
-msgid "search"
-msgstr "zoeken"
-
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:104
 #: trionyx/trionyx/templates/trionyx/core/model_update.html:8
 #: trionyx/trionyx/templates/trionyx/core/model_update.html:31
 #: trionyx/trionyx/templates/trionyx/core/model_update.html:38
 msgid "Update"
 msgstr "Bijwerken"
+
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:108
+msgid "[[count]] items found"
+msgstr "[[count]] items gevonden"
+
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:108
+msgid "[[massActionSelected]] selected"
+msgstr "[[massActionSelected]] geselecteerd"
+
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:116
+msgid "per page"
+msgstr "per pagina"
+
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:127
+msgid "of [[numPages]]"
+msgstr "van [[numPages]]"
+
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:150
+msgid "There are no"
+msgstr "Er zijn geen"
+
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:164
+msgid "Select All"
+msgstr "Selecteer alles"
+
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:165
+msgid "Deselect All"
+msgstr "Deselecteer alles"
+
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:166
+msgid "Select All on this page"
+msgstr "Selecteer Alles op deze pagina"
+
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:203
+msgid "search"
+msgstr "zoeken"
 
 #: trionyx/trionyx/templates/trionyx/core/model_view.html:61
 #, python-format

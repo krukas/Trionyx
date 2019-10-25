@@ -158,7 +158,7 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
 
         if request_fields and ','.join(current_fields) != request_fields:
             # TODO validate fields
-            current_fields = request_fields.split(',')
+            current_fields = list(filter(lambda f: f != 'NR', request_fields.split(',')))
             self.request.user.set_attribute(field_attribute, current_fields)
         elif request_fields:
             current_fields = request_fields.split(',')
