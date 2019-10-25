@@ -125,6 +125,9 @@ def create_permission_jstree(selected=None, disabled=False):
     added_apps = ['auth']
     added_models = []
     for permission in Permission.objects.select_related('content_type').all():
+        if not permission.content_type.model_class():
+            continue
+
         model_config = models_config.get_config(permission.content_type.model_class())
 
         if model_config.hide_permissions:
