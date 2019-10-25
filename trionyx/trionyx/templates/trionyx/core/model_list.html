@@ -139,7 +139,7 @@
         <div class="box-header model-list-filters" v-if="renderedActiveFilters.length > 0">
             <div class="trionyx-filters">
                 <div v-for="filter in renderedActiveFilters" class="filter filter-block">
-                    [[filter.field]] [[filter.operator]] [[filter.renderedValue]]
+                    [[filter.label]] [[filter.operator]] [[filter.renderedValue]]
                     <span v-on:click="clickRemoveFilter(filter)">×</span>
                 </div>
             </div>
