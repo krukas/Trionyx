@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-25 12:07+0000\n"
-"PO-Revision-Date: 2019-10-25 14:09+0200\n"
+"POT-Creation-Date: 2019-10-25 15:44+0000\n"
+"PO-Revision-Date: 2019-10-25 17:49+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -197,7 +197,7 @@ msgid "Period field"
 msgstr "Periode veld"
 
 #: trionyx/trionyx/forms.py:333 trionyx/trionyx/forms.py:398
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:219
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:218
 msgid "Filters"
 msgstr "Filters"
 
@@ -483,7 +483,7 @@ msgid "Edit"
 msgstr "Bewerk"
 
 #: trionyx/trionyx/templates/trionyx/core/dashboard.html:114
-#: trionyx/trionyx/views.py:299
+#: trionyx/trionyx/views.py:300
 msgid "Save"
 msgstr "Opslaan"
 
@@ -501,6 +501,7 @@ msgstr "Terug"
 #: trionyx/trionyx/templates/trionyx/core/model_delete.html:31
 #: trionyx/trionyx/templates/trionyx/core/model_list.html:103
 #: trionyx/trionyx/templates/trionyx/core/model_view.html:23
+#: trionyx/trionyx/views.py:346
 msgid "Delete"
 msgstr "Verwijder"
 
@@ -537,16 +538,8 @@ msgid "Are you sure you want to delete (%(object)s)"
 msgstr "Weet u zeker dat u (%(object)s) wilt verwijderen"
 
 #: trionyx/trionyx/templates/trionyx/core/model_list.html:98
-#| msgid "Action"
 msgid "Actions"
 msgstr "Acties"
-
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:104
-#: trionyx/trionyx/templates/trionyx/core/model_update.html:8
-#: trionyx/trionyx/templates/trionyx/core/model_update.html:31
-#: trionyx/trionyx/templates/trionyx/core/model_update.html:38
-msgid "Update"
-msgstr "Bijwerken"
 
 #: trionyx/trionyx/templates/trionyx/core/model_list.html:108
 msgid "[[count]] items found"
@@ -564,30 +557,49 @@ msgstr "per pagina"
 msgid "of [[numPages]]"
 msgstr "van [[numPages]]"
 
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:150
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:149
 msgid "There are no"
 msgstr "Er zijn geen"
 
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:164
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:163
 msgid "Select All"
 msgstr "Selecteer alles"
 
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:165
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:164
 msgid "Deselect All"
 msgstr "Deselecteer alles"
 
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:166
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:165
 msgid "Select All on this page"
 msgstr "Selecteer Alles op deze pagina"
 
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:203
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:202
 msgid "search"
 msgstr "zoeken"
+
+#: trionyx/trionyx/templates/trionyx/core/model_update.html:8
+#: trionyx/trionyx/templates/trionyx/core/model_update.html:31
+#: trionyx/trionyx/templates/trionyx/core/model_update.html:38
+msgid "Update"
+msgstr "Bijwerken"
 
 #: trionyx/trionyx/templates/trionyx/core/model_view.html:61
 #, python-format
 msgid "There are no layouts registered for %(object)s."
 msgstr "Er zijn geen lay-outs geregistreerd voor %(object)s."
+
+#: trionyx/trionyx/templates/trionyx/dialog/mass_delete.html:8
+#, python-format
+#| msgid "Are you sure you want to delete %(model_name)s: %(object)s"
+msgid "Are you sure you want to delete %(count)s %(model_name)s items?"
+msgstr "Weet u zeker dat u %(count)s %(model_name)s items wilt verwijderen?"
+
+#: trionyx/trionyx/templates/trionyx/dialog/mass_delete.html:11
+msgid ""
+"There are no items selected to be deleted, please select one or more items"
+msgstr ""
+"Er zijn geen items geselecteerd om te verwijderen. Selecteer een of meer "
+"items"
 
 #: trionyx/trionyx/templates/trionyx/dialog/model_delete.html:4
 #, python-format
@@ -643,9 +655,20 @@ msgstr "Tel records"
 msgid "Period Field"
 msgstr "Periodeveld"
 
-#: trionyx/trionyx/views.py:293
+#: trionyx/trionyx/views.py:294
 msgid "Widget config"
 msgstr "Widget configuratie"
+
+#: trionyx/trionyx/views.py:328
+#| msgid "Something went wrong on deleting {model_name}"
+msgid "Something went wrong on deleting the items"
+msgstr "Er is iets misgegaan bij het verwijderen van de items"
+
+#: trionyx/trionyx/views.py:335
+#, python-brace-format
+#| msgid "Delete {model_name}: {object}"
+msgid "Deleting {count} {model_name} items"
+msgstr "Het verwijderen van {count} {model_name} items"
 
 #: trionyx/views/__init__.py:104
 msgid "General"
@@ -711,15 +734,15 @@ msgstr "{model_name} ({object}) is succesvol verwijderd"
 msgid "Something went wrong on deleting {model_name}"
 msgstr "Er is iets misgegaan bij het verwijderen van {model_name}"
 
-#: trionyx/views/models.py:572
+#: trionyx/views/models.py:577
 msgid "Successfully saved ({})"
 msgstr "Succesvol opgeslagen ({})"
 
-#: trionyx/views/models.py:658
+#: trionyx/views/models.py:663
 msgid "Successfully created ({})"
 msgstr "Met succes gemaakt ({})"
 
-#: trionyx/views/models.py:705
+#: trionyx/views/models.py:710
 msgid "Successfully deleted ({})"
 msgstr "Met succes verwijderd ({})"
 

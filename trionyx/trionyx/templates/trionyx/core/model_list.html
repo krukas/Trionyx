@@ -57,7 +57,7 @@
 
         .model-list-pagination .btn,
         .model-list-pagination .select2-container {
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
     </style>
 {% endblock %}
@@ -65,7 +65,7 @@
 
 {% block content %}
     <div class="info-box" id="app-model-list" v-cloak>
-        <div class="box-header">
+        <div class="box-header" style="padding-bottom: 0;">
             <div class="input-group input-group" style="width: 175px;">
                 <input type="text" name="table_search" class="form-control pull-right" placeholder="{% trans "Search" %}" v-model="search" v-on:keyup="searchLoad()">
                 <div class="input-group-btn">
@@ -92,48 +92,47 @@
             <button id="fields-popover" type="button" class="btn btn-flat btn-default pull-right hidden-xs" data-placement="bottom" data-toggle="popover" title="Fields" >
                 <i class="fa fa-columns" style="font-size: 16px"></i>
             </button>
-
-            <div style="padding-top: 12px">
-                <div class="btn-group" style="margin-right: 10px">
-                  <button type="button" class="btn btn-flat btn-default" data-toggle="dropdown" aria-expanded="false">{% trans 'Actions' %}</button>
-                  <button type="button" class="btn btn-flat btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                    <span class="caret"></span>
-                  </button>
-                  <ul class="dropdown-menu" role="menu">
-                    <li><a href="#" v-on:click="massActionDelete()">{% trans 'Delete' %}</a></li>
+        </div>
+        <div class="box-header" style="padding-bottom: 7px">
+            <div class="btn-group" style="margin-right: 10px">
+              <button type="button" class="btn btn-flat btn-default" data-toggle="dropdown" aria-expanded="false">{% trans 'Actions' %}</button>
+              <button type="button" class="btn btn-flat btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="#" v-on:click="massActionDelete()">{% trans 'Delete' %}</a></li>
 {#                    <li><a href="#">{% trans 'Update' %}</a></li>#}
-                  </ul>
-                </div>
+              </ul>
+            </div>
 
-                {% trans '[[count]] items found' %} <span v-if="massActionSelected">({% trans '[[massActionSelected]] selected' %})</span>
+            {% trans '[[count]] items found' %} <span v-if="massActionSelected">({% trans '[[massActionSelected]] selected' %})</span>
 
-                <div class="model-list-pagination">
-                    <select v-model="pageSize" id="select-pageSize">
-                        <option>10</option>
-                        <option>25</option>
-                        <option>50</option>
-                    </select>
-                    {% trans "per page" %}
+            <div class="model-list-pagination">
+                <select v-model="pageSize" id="select-pageSize">
+                    <option>10</option>
+                    <option>25</option>
+                    <option>50</option>
+                </select>
+                {% trans "per page" %}
 
-                    <button
-                        class="btn btn-default btn-flat"
-                        style="margin-left: 15px; margin-right: 5px"
-                        v-bind:disabled="previousPage == 0"
-                        v-on:click="toPage(previousPage)"
-                    >
-                        <i class="glyphicon glyphicon-chevron-left"></i>
-                    </button>
-                    <input class="form-control" style="display: inline-block; width: 50px" v-on:change="pageChange()" v-model="editPage" />
-                        {% trans 'of [[numPages]]' %}
-                    <button
-                        class="btn btn-default btn-flat"
-                        style="margin-left: 5px;"
-                        v-bind:disabled="nextPage == 0"
-                        v-on:click="toPage(nextPage)"
-                    >
-                        <i class="glyphicon glyphicon-chevron-right"></i>
-                    </button>
-                </div>
+                <button
+                    class="btn btn-default btn-flat"
+                    style="margin-left: 15px; margin-right: 5px"
+                    v-bind:disabled="previousPage == 0"
+                    v-on:click="toPage(previousPage)"
+                >
+                    <i class="glyphicon glyphicon-chevron-left"></i>
+                </button>
+                <input class="form-control" style="display: inline-block; width: 50px" v-on:change="pageChange()" v-model="editPage" />
+                    {% trans 'of [[numPages]]' %}
+                <button
+                    class="btn btn-default btn-flat"
+                    style="margin-left: 5px;"
+                    v-bind:disabled="nextPage == 0"
+                    v-on:click="toPage(nextPage)"
+                >
+                    <i class="glyphicon glyphicon-chevron-right"></i>
+                </button>
             </div>
         </div>
         <div class="box-header model-list-filters" v-if="renderedActiveFilters.length > 0">

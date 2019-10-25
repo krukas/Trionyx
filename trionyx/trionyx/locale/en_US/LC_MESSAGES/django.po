@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-25 12:07+0000\n"
+"POT-Creation-Date: 2019-10-25 15:44+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -196,7 +196,7 @@ msgid "Period field"
 msgstr ""
 
 #: trionyx/trionyx/forms.py:333 trionyx/trionyx/forms.py:398
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:219
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:218
 msgid "Filters"
 msgstr ""
 
@@ -480,7 +480,7 @@ msgid "Edit"
 msgstr ""
 
 #: trionyx/trionyx/templates/trionyx/core/dashboard.html:114
-#: trionyx/trionyx/views.py:299
+#: trionyx/trionyx/views.py:300
 msgid "Save"
 msgstr ""
 
@@ -498,6 +498,7 @@ msgstr ""
 #: trionyx/trionyx/templates/trionyx/core/model_delete.html:31
 #: trionyx/trionyx/templates/trionyx/core/model_list.html:103
 #: trionyx/trionyx/templates/trionyx/core/model_view.html:23
+#: trionyx/trionyx/views.py:346
 msgid "Delete"
 msgstr ""
 
@@ -537,13 +538,6 @@ msgstr ""
 msgid "Actions"
 msgstr ""
 
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:104
-#: trionyx/trionyx/templates/trionyx/core/model_update.html:8
-#: trionyx/trionyx/templates/trionyx/core/model_update.html:31
-#: trionyx/trionyx/templates/trionyx/core/model_update.html:38
-msgid "Update"
-msgstr ""
-
 #: trionyx/trionyx/templates/trionyx/core/model_list.html:108
 msgid "[[count]] items found"
 msgstr ""
@@ -560,29 +554,45 @@ msgstr ""
 msgid "of [[numPages]]"
 msgstr ""
 
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:150
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:149
 msgid "There are no"
 msgstr ""
 
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:164
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:163
 msgid "Select All"
 msgstr ""
 
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:165
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:164
 msgid "Deselect All"
 msgstr ""
 
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:166
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:165
 msgid "Select All on this page"
 msgstr ""
 
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:203
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:202
 msgid "search"
+msgstr ""
+
+#: trionyx/trionyx/templates/trionyx/core/model_update.html:8
+#: trionyx/trionyx/templates/trionyx/core/model_update.html:31
+#: trionyx/trionyx/templates/trionyx/core/model_update.html:38
+msgid "Update"
 msgstr ""
 
 #: trionyx/trionyx/templates/trionyx/core/model_view.html:61
 #, python-format
 msgid "There are no layouts registered for %(object)s."
+msgstr ""
+
+#: trionyx/trionyx/templates/trionyx/dialog/mass_delete.html:8
+#, python-format
+msgid "Are you sure you want to delete %(count)s %(model_name)s items?"
+msgstr ""
+
+#: trionyx/trionyx/templates/trionyx/dialog/mass_delete.html:11
+msgid ""
+"There are no items selected to be deleted, please select one or more items"
 msgstr ""
 
 #: trionyx/trionyx/templates/trionyx/dialog/model_delete.html:4
@@ -639,8 +649,17 @@ msgstr ""
 msgid "Period Field"
 msgstr ""
 
-#: trionyx/trionyx/views.py:293
+#: trionyx/trionyx/views.py:294
 msgid "Widget config"
+msgstr ""
+
+#: trionyx/trionyx/views.py:328
+msgid "Something went wrong on deleting the items"
+msgstr ""
+
+#: trionyx/trionyx/views.py:335
+#, python-brace-format
+msgid "Deleting {count} {model_name} items"
 msgstr ""
 
 #: trionyx/views/__init__.py:104
@@ -707,15 +726,15 @@ msgstr ""
 msgid "Something went wrong on deleting {model_name}"
 msgstr ""
 
-#: trionyx/views/models.py:572
+#: trionyx/views/models.py:577
 msgid "Successfully saved ({})"
 msgstr ""
 
-#: trionyx/views/models.py:658
+#: trionyx/views/models.py:663
 msgid "Successfully created ({})"
 msgstr ""
 
-#: trionyx/views/models.py:705
+#: trionyx/views/models.py:710
 msgid "Successfully deleted ({})"
 msgstr ""
 
