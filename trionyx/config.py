@@ -181,6 +181,18 @@ class ModelConfig:
         except AttributeError:
             return None
 
+    def get_verbose_name(self, title=True):
+        """Get class verbose name"""
+        return str(
+            self.model._meta.verbose_name
+        ).title() if title else str(self.model._meta.verbose_name).lower()
+
+    def get_verbose_name_plural(self, title=True):
+        """Get class plural verbose name"""
+        return str(
+            self.model._meta.verbose_name_plural
+        ).title() if title else str(self.model._meta.verbose_name_plural).lower()
+
     @property
     def is_trionyx_model(self):
         """Check if config is for Trionyx model"""

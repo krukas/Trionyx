@@ -95,13 +95,13 @@
 
             <div style="padding-top: 12px">
                 <div class="btn-group" style="margin-right: 10px">
-                  <button type="button" class="btn btn-flat btn-default">{% trans 'Actions' %}</button>
+                  <button type="button" class="btn btn-flat btn-default" data-toggle="dropdown" aria-expanded="false">{% trans 'Actions' %}</button>
                   <button type="button" class="btn btn-flat btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
                     <span class="caret"></span>
                   </button>
                   <ul class="dropdown-menu" role="menu">
-                    <li><a href="#">{% trans 'Delete' %}</a></li>
-                    <li><a href="#">{% trans 'Update' %}</a></li>
+                    <li><a href="#" v-on:click="massActionDelete()">{% trans 'Delete' %}</a></li>
+{#                    <li><a href="#">{% trans 'Update' %}</a></li>#}
                   </ul>
                 </div>
 
@@ -154,7 +154,7 @@
                     <tr>
                         <th class="dragtable-no-drag" style="width: 45px; padding-right: 0;">
                             <div class="btn-group btn-group-xs mass-action-group">
-                              <button type="button" class="btn btn-flat btn-default">
+                              <button type="button" class="btn btn-flat btn-default" data-toggle="dropdown" aria-expanded="false">
                                   <i class="fa no-margin" v-bind:class="massActionIconClass"></i>
                               </button>
                               <button type="button" class="btn btn-flat btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
@@ -302,6 +302,17 @@
                     }
                     return this.items.reduce((value, item) => value + (item.selected === '1' ? 1 : 0), 0);
                 },
+                massActionIds: function() {
+                    if (this.massActionAllSelected) {
+                        return [];
+                    }
+
+                    return this.items.map(function (item) {
+                        return  item.selected === '1'? item.id : null;
+                    }).filter(function (id) {
+                        return typeof(id) === 'number';
+                    });
+                },
                 massActionIconClass: function () {
                     if (this.massActionAllSelected) {
                         return 'fa-check-square-o';
@@ -447,7 +458,28 @@
                         item.selected = '0';
                         return item;
                     });
-                }
+                },
+
+                massActionDelete: function () {
+                    var self = this;
+                    openDialog(
+                        config.massDeleteUrl,
+                        {
+                            post: {
+                                filters: JSON.stringify(this.activeFilters),
+                                all: this.massActionAllSelected ? '1' : '0',
+                                ids: this.massActionIds.join(','),
+                            },
+                            callback: function (data, dialog) {
+                                if ('deleted' in data && data.deleted) {
+                                    dialog.close();
+                                    self.page = 1;
+                                    self.load();
+                                }
+                            }
+                        }
+                    );
+                },
             },
 
             created() {
@@ -560,6 +592,7 @@
                     ajaxUrl: "{{ ajax_url }}",
                     downloadUrl: "{{ download_url }}",
                     contentTypeId: {{ content_type_id }},
+                    massDeleteUrl: "{{ mass_delete_url }}",
                 });
             });
         });

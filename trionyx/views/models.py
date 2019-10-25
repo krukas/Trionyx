@@ -81,6 +81,10 @@ class ListView(ModelPermissionMixin, TemplateView, ModelClassMixin):
         """Get create url"""
         return reverse('trionyx:model-create', kwargs=self.kwargs)
 
+    def get_mass_delete_url(self):
+        """Get mass delete url"""
+        return reverse('trionyx:model-mass-delete', kwargs=self.kwargs)
+
     def get_context_data(self, **kwargs):
         """Add context data to view"""
         context = super().get_context_data(**kwargs)
@@ -90,6 +94,7 @@ class ListView(ModelPermissionMixin, TemplateView, ModelClassMixin):
             'ajax_url': self.get_ajax_url(),
             'download_url': self.get_download_url(),
             'create_url': self.get_create_url(),
+            'mass_delete_url': self.get_mass_delete_url(),
             'create_permission': self.request.user.has_perm('{app_label}.add_{model_name}'.format(
                 app_label=self.get_model_config().app_label,
                 model_name=self.get_model_config().model_name,

@@ -28,6 +28,7 @@ from trionyx.config import models_config
 from trionyx.widgets import widgets
 from trionyx import utils
 from trionyx.forms.helper import FormHelper
+from trionyx.models import filter_queryset_with_user_filters
 
 logger = logging.getLogger(__name__)
 
@@ -303,3 +304,48 @@ class WidgetConfigDialog(DialogView):
     def handle_dialog(self, code, *args, **kwargs):
         """Handle widget config"""
         return self.display_dialog(code)
+
+
+# Mass actions
+class MassDeleteDialog(DialogView):
+    """Mass delete dialog"""
+
+    def display_dialog(self, *args, **kwargs):
+        """Handle mass delete"""
+        query = self.get_model_class().objects.get_queryset()
+
+        if self.request.POST.get('all', '0') == '1':
+            query = filter_queryset_with_user_filters(query, json.loads(self.request.POST.get('filters', '[]')))
+        else:
+            query = query.filter(id__in=[int(id) for id in filter(None, self.request.POST.get('ids', '').split(','))])
+
+        count = query.count()
+        if '__post__' in self.request.POST:
+            try:
+                query.delete()
+            except Exception:
+                return {
+                    'title': _('Something went wrong on deleting the items'),
+                }
+            return {
+                'deleted': True,
+            }
+        else:
+            return {
+                'title': _('Deleting {count} {model_name} items').format(
+                    count=count,
+                    model_name=self.get_model_config().get_verbose_name(False)
+                ),
+                'content': self.render_to_string('trionyx/dialog/mass_delete.html', {
+                    'count': count,
+                    'model_name': self.get_model_config().get_verbose_name(False),
+                    'all': self.request.POST.get('all', '0'),
+                    'filters': self.request.POST.get('filters', '[]'),
+                    'ids': self.request.POST.get('ids', ''),
+                }),
+                'submit_label': _('Delete') if count else None,
+            }
+
+    def handle_dialog(self, *args, **kwargs):
+        """Handle mass delete"""
+        return self.display_dialog()

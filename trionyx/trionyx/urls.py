@@ -61,6 +61,9 @@ urlpatterns = [
         name='model-dialog-edit-custom'
     ),
     path('dialog/model/<str:app>/<str:model>/<int:pk>/delete/', core_views.DeleteDialog.as_view(), name='model-dialog-delete'),
+
+    # Mass actions
+    path('mass/<str:app>/<str:model>/delete', views.MassDeleteDialog.as_view(), name='model-mass-delete')
 ]
 
 if settings.DEBUG:

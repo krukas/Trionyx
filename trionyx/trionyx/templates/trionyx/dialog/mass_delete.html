@@ -1,0 +1,12 @@
+{% load i18n %}
+{% if count %}
+    <input type="hidden" name="__post__"/>
+    <input type="hidden" name="all" value="{{ all }}"/>
+    <input type="hidden" name="filters" value="{{ filters }}"/>
+    <input type="hidden" name="ids" value="{{ ids }}"/>
+    <div class="alert alert-warning">
+        {% blocktrans %}Are you sure you want to delete {{ count }} {{ model_name }} items?{% endblocktrans %}
+    </div>
+{% else %}
+    {% trans 'There are no items selected to be deleted, please select one or more items' %}
+{% endif %}
