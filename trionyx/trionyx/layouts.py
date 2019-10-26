@@ -72,6 +72,15 @@ def account_overview(obj):
 def trionyx_user(obj):
     """Create layout for admin user"""
     from trionyx.trionyx.views import create_permission_jstree
+    from django.contrib.auth.models import Permission
+    permissions = []
+    if obj.is_superuser:
+        permissions = Permission.objects.all()
+    else:
+        permissions.extend(list(obj.user_permissions.all()))
+        for group in obj.groups.all():
+            permissions.extend(list(group.permissions.all()))
+
     token, created = Token.objects.get_or_create(user=obj)
     return Container(
         Row(
@@ -105,11 +114,11 @@ def trionyx_user(obj):
                     ),
                 ),
                 Panel(
-                    _('Permissions'),
+                    _('All active permissions'),
                     HtmlTemplate(
                         template_name='trionyx/base/permissions.html',
                         context={
-                            'permission_jstree': create_permission_jstree(obj.user_permissions.all(), disabled=True),
+                            'permission_jstree': create_permission_jstree(permissions, disabled=True),
                         },
                         css_files=['plugins/jstree/themes/default/style.css'],
                         js_files=['plugins/jstree/jstree.min.js'],
