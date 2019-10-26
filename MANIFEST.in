@@ -6,3 +6,4 @@ include trionyx/quickstart/project/config/*
 
 recursive-include trionyx/trionyx/templates/ *
 recursive-include trionyx/trionyx/static/ *
+recursive-include trionyx/trionyx/locale/ *
