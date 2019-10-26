@@ -15,14 +15,17 @@
       - system layout can lock filter, sort, columns
     - User layouts
   - Mass actions (update/delete)
+    - ~~Delete~~
+    - Update
+    - Custom (eq update status or publish)
   - Custom attributes?
 - ~~Save verbose_name as field~~
   - ~~Change choices field to values_list('id', 'verbose_name')~~
 - Replace crispy form with trionyx own layout/components
-- component collect all js/css files
-- Add translations
+- ~~component collect all js/css files~~
+- ~~Add translations~~
 - ~~Audit log for user changed models~~
-  - Add created_by to model
+  - ~~Add created_by to model~~
 - ~~Add permission check for generic views~~
 - ~~User management~~
   - ~~CRUD users~~
