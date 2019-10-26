@@ -9,16 +9,42 @@
 - Add support for inline formsets
 - Add rest API support
 - Add option to add extra buttons to header
+- Add search to list fields select popover
+- Add Dashboard
+- Add Audtilog dashboard widget
+- Add model field summary widget
+- Add auto import Trionyx apps with pip entries
+- Add data choices lists for countries/currencies/timezones
+- Add language support + add Dutch translations
+- Add user timezone support
+- Add CacheLock contectmanager
+- Add locale_overide and send_email to user
+- Add mass select selector to list view
+- Add mass delete action
+- Add Load js/css from forms and components
+- Add view and edit permissions with jstree
 
 #### Changed
 - Set fallback for user profile name and avatar
+- Improve header visibility
+- Make filters separate vuejs component + function to filter queryset
+- Improve theme colors and make theme square
+- Update AdminLTE+plugins and Vue.js and in DEBUG use development vuejs
+- Refactor inline forms + support single inline form
+- Auditlog values are rendered with renderer
+- Changed pagination UX
+- Show filter label instead of field name
 
 #### Fixed
 - Project create settings BASE_DIR was incorrect 
 - Menu item with empty filtered childs is shown
 - Make verbose_name field not required
 - Global search is activated on CTRL commands
-
+- Auditlog delete record has no name
+- Created by was not set
+- Auditlog gives false positives for Decimal fields
+- Render date: localtime() cannot be applied to a naive datetime
+- Fix model list dragging + fix drag and sort align
 
 ### [0.2.0] - 04-06-2019 
 

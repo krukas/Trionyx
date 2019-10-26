@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-25 19:11+0000\n"
+"POT-Creation-Date: 2019-10-26 08:24+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -87,7 +87,7 @@ msgstr ""
 msgid "Logs"
 msgstr ""
 
-#: trionyx/trionyx/apps.py:103 trionyx/trionyx/layouts.py:162
+#: trionyx/trionyx/apps.py:103 trionyx/trionyx/layouts.py:171
 #: trionyx/trionyx/models.py:241
 msgid "Level"
 msgstr ""
@@ -96,121 +96,120 @@ msgstr ""
 msgid "History"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:27 trionyx/trionyx/forms.py:117
-#: trionyx/trionyx/forms.py:201
+#: trionyx/trionyx/forms.py:26 trionyx/trionyx/forms.py:116
+#: trionyx/trionyx/forms.py:200
 msgid "The two password fields didn't match."
 msgstr ""
 
-#: trionyx/trionyx/forms.py:30 trionyx/trionyx/forms.py:120
-#: trionyx/trionyx/forms.py:204
+#: trionyx/trionyx/forms.py:29 trionyx/trionyx/forms.py:119
+#: trionyx/trionyx/forms.py:203
 msgid "New password"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:37 trionyx/trionyx/forms.py:127
-#: trionyx/trionyx/forms.py:211
+#: trionyx/trionyx/forms.py:36 trionyx/trionyx/forms.py:126
+#: trionyx/trionyx/forms.py:210
 msgid "New password confirmation"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:52 trionyx/trionyx/forms.py:147
-#: trionyx/trionyx/forms.py:236
+#: trionyx/trionyx/forms.py:51 trionyx/trionyx/forms.py:146
+#: trionyx/trionyx/forms.py:235
 msgid "Personal info"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:65 trionyx/trionyx/forms.py:242
+#: trionyx/trionyx/forms.py:64 trionyx/trionyx/forms.py:241
 msgid "Change password"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:71 trionyx/trionyx/layouts.py:52
+#: trionyx/trionyx/forms.py:70 trionyx/trionyx/layouts.py:52
 msgid "Settings"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:140
+#: trionyx/trionyx/forms.py:139
 msgid "Login"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:249 trionyx/trionyx/layouts.py:108
-#: trionyx/trionyx/layouts.py:138
+#: trionyx/trionyx/forms.py:248 trionyx/trionyx/layouts.py:147
 #: trionyx/trionyx/templates/trionyx/forms/permissions.html:3
 msgid "Permissions"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:346 trionyx/trionyx/forms.py:358
+#: trionyx/trionyx/forms.py:350 trionyx/trionyx/forms.py:362
 msgid "All"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:347
+#: trionyx/trionyx/forms.py:351
 msgid "Users only"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:348
+#: trionyx/trionyx/forms.py:352
 msgid "Systems only"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:351
+#: trionyx/trionyx/forms.py:355
 msgid "Show"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:359
+#: trionyx/trionyx/forms.py:363
 msgid "Current year"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:360
+#: trionyx/trionyx/forms.py:364
 msgid "Current month"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:361
+#: trionyx/trionyx/forms.py:365
 msgid "Current week"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:362
+#: trionyx/trionyx/forms.py:366
 msgid "Current day"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:363
+#: trionyx/trionyx/forms.py:367
 msgid "Last 365 days"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:364
+#: trionyx/trionyx/forms.py:368
 msgid "Last 30 days"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:365
+#: trionyx/trionyx/forms.py:369
 msgid "Last 7 days"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:368
+#: trionyx/trionyx/forms.py:372
 msgid "Icon"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:370
+#: trionyx/trionyx/forms.py:374
 msgid "Model"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:371 trionyx/trionyx/layouts.py:212
+#: trionyx/trionyx/forms.py:375 trionyx/trionyx/layouts.py:221
 #: trionyx/trionyx/templates/trionyx/base/filters.html:8
 #: trionyx/trionyx/templates/widgets/total_summary/form_field.html:5
 msgid "Field"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:373
+#: trionyx/trionyx/forms.py:377
 msgid "Period"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:374
+#: trionyx/trionyx/forms.py:378
 msgid "Period field"
 msgstr ""
 
-#: trionyx/trionyx/forms.py:375 trionyx/trionyx/forms.py:440
+#: trionyx/trionyx/forms.py:379 trionyx/trionyx/forms.py:444
 #: trionyx/trionyx/templates/trionyx/core/model_list.html:218
 msgid "Filters"
 msgstr ""
 
-#: trionyx/trionyx/layouts.py:30 trionyx/trionyx/layouts.py:80
+#: trionyx/trionyx/layouts.py:30 trionyx/trionyx/layouts.py:89
 #: trionyx/trionyx/models.py:81
 msgid "Avatar"
 msgstr ""
 
-#: trionyx/trionyx/layouts.py:41 trionyx/trionyx/layouts.py:90
+#: trionyx/trionyx/layouts.py:41 trionyx/trionyx/layouts.py:99
 msgid "Account information"
 msgstr ""
 
@@ -218,40 +217,44 @@ msgstr ""
 msgid "Language"
 msgstr ""
 
-#: trionyx/trionyx/layouts.py:60 trionyx/trionyx/layouts.py:102
+#: trionyx/trionyx/layouts.py:60 trionyx/trionyx/layouts.py:111
 msgid "API Token"
 msgstr ""
 
-#: trionyx/trionyx/layouts.py:130 trionyx/trionyx/models.py:235
+#: trionyx/trionyx/layouts.py:117
+msgid "All active permissions"
+msgstr ""
+
+#: trionyx/trionyx/layouts.py:139 trionyx/trionyx/models.py:235
 msgid "Info"
 msgstr ""
 
-#: trionyx/trionyx/layouts.py:159
+#: trionyx/trionyx/layouts.py:168
 msgid "Log info"
 msgstr ""
 
-#: trionyx/trionyx/layouts.py:167
+#: trionyx/trionyx/layouts.py:176
 msgid "Location"
 msgstr ""
 
-#: trionyx/trionyx/layouts.py:175
+#: trionyx/trionyx/layouts.py:184
 msgid "Backtrace"
 msgstr ""
 
-#: trionyx/trionyx/layouts.py:184
+#: trionyx/trionyx/layouts.py:193
 msgid "Last log entries"
 msgstr ""
 
-#: trionyx/trionyx/layouts.py:204
+#: trionyx/trionyx/layouts.py:213
 #, python-brace-format
 msgid "{action} on {date} by {user}"
 msgstr ""
 
-#: trionyx/trionyx/layouts.py:216
+#: trionyx/trionyx/layouts.py:225
 msgid "Old value"
 msgstr ""
 
-#: trionyx/trionyx/layouts.py:220
+#: trionyx/trionyx/layouts.py:229
 msgid "New value"
 msgstr ""
 
@@ -481,7 +484,8 @@ msgid "Edit"
 msgstr ""
 
 #: trionyx/trionyx/templates/trionyx/core/dashboard.html:114
-#: trionyx/trionyx/views.py:369
+#: trionyx/trionyx/templates/trionyx/core/model_update.html:39
+#: trionyx/trionyx/views.py:372
 msgid "Save"
 msgstr ""
 
@@ -499,7 +503,7 @@ msgstr ""
 #: trionyx/trionyx/templates/trionyx/core/model_delete.html:31
 #: trionyx/trionyx/templates/trionyx/core/model_list.html:103
 #: trionyx/trionyx/templates/trionyx/core/model_view.html:23
-#: trionyx/trionyx/views.py:171 trionyx/trionyx/views.py:415
+#: trionyx/trionyx/views.py:174 trionyx/trionyx/views.py:418
 msgid "Delete"
 msgstr ""
 
@@ -576,7 +580,6 @@ msgid "search"
 msgstr ""
 
 #: trionyx/trionyx/templates/trionyx/core/model_update.html:8
-#: trionyx/trionyx/templates/trionyx/core/model_update.html:39
 #: trionyx/trionyx/templates/trionyx/core/model_update.html:46
 msgid "Update"
 msgstr ""
@@ -650,27 +653,27 @@ msgstr ""
 msgid "Period Field"
 msgstr ""
 
-#: trionyx/trionyx/views.py:168
+#: trionyx/trionyx/views.py:171
 msgid "View"
 msgstr ""
 
-#: trionyx/trionyx/views.py:169
+#: trionyx/trionyx/views.py:172
 msgid "Add"
 msgstr ""
 
-#: trionyx/trionyx/views.py:170
+#: trionyx/trionyx/views.py:173
 msgid "Change"
 msgstr ""
 
-#: trionyx/trionyx/views.py:363
+#: trionyx/trionyx/views.py:366
 msgid "Widget config"
 msgstr ""
 
-#: trionyx/trionyx/views.py:397
+#: trionyx/trionyx/views.py:400
 msgid "Something went wrong on deleting the items"
 msgstr ""
 
-#: trionyx/trionyx/views.py:404
+#: trionyx/trionyx/views.py:407
 #, python-brace-format
 msgid "Deleting {count} {model_name} items"
 msgstr ""
