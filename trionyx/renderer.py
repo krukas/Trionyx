@@ -98,9 +98,6 @@ class Renderer:
         if renderer:
             return renderer(value, **options)
 
-        if isinstance(value, models.BaseModel):
-            value = str(value)
-
         return self.render_value(value, **options)
 
 

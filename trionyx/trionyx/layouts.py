@@ -8,6 +8,7 @@ trionyx.trionyx.layouts
 from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
+from django.utils import timezone
 from rest_framework.authtoken.models import Token
 from trionyx.layout import (
     Container, Row, Column10, Column2, Column12, Column6,
@@ -197,6 +198,64 @@ def trionyx_log(obj):
                         'user',
                         'user_agent',
                         object=LogEntry()
+                    )
+                )
+            )
+        )
+    )
+
+
+def progress_renderer(value, *args, **kwargs):
+    """Render progressbar"""
+    return """<div class="progress">
+        <div
+            class="progress-bar progress-bar-theme"
+            role="progressbar"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            aria-valuenow="{progress}"
+            style="width: {progress}%"
+        >
+            {progress}%
+        </div>
+    </div>""".format(
+        progress=value,
+    )
+
+
+@tabs.register('trionyx.task')
+def task(obj):
+    """Render task layout"""
+    return Container(
+        Row(
+            Column6(
+                Panel(
+                    _('General'),
+                    TableDescription(
+                        'description',
+                        'status',
+                        'user',
+                        'started_at',
+                        {
+                            'field': 'execution_time',
+                            'renderer': lambda value, **options: str(timezone.timedelta(seconds=value)),
+                        },
+                        'result',
+                    )
+                )
+            ),
+            Column6(
+                Panel(
+                    _('Process'),
+                    TableDescription(
+                        {
+                            'field': 'progress',
+                            'renderer': progress_renderer,
+                        },
+                        {
+                            'field': 'progress_output',
+                            'renderer': lambda value, **options: '<br/>'.join(value),
+                        }
                     )
                 )
             )

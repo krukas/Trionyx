@@ -11,14 +11,16 @@ from importlib import import_module
 
 from django.apps import AppConfig
 from django.apps import apps
+from django.utils import timezone
 
 from trionyx.config import models_config
 from trionyx.menu import app_menu
 from trionyx.trionyx.search import auto_register_search_models
 from trionyx.log import enable_db_logger
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.staticfiles.templatetags.staticfiles import static
 
-from .renderers import render_level
+from .renderers import render_level, render_progress, render_status
 
 
 class BaseConfig(AppConfig):
@@ -65,6 +67,14 @@ class Config(BaseConfig):
             'admin/groups', _('Permission groups'), url=model_url('auth.group', 'list'), order=9010, permission='is_superuser')
         app_menu.add_item('admin/logs', _('Logs'), url=model_url('trionyx.log', 'list'), order=9090, permission='is_superuser')
 
+        # Add User renderer
+        from trionyx.trionyx.models import User
+        from trionyx.renderer import renderer
+        renderer.register(User, lambda value, **options: """<img src="{url}" class="avatar-sm"> {user}""".format(
+            url=value.avatar.url if value.avatar else static('img/avatar.png'),
+            user=str(value)
+        ))
+
     def auto_load_app_modules(self, modules):
         """Auto load app modules"""
         for app in apps.get_app_configs():
@@ -107,6 +117,38 @@ class Config(BaseConfig):
 
     class AuditLogEntry:
         """AuditlogEntry config"""
+
+        disable_search_index = True
+
+        disable_add = True
+        disable_change = True
+        disable_delete = True
+
+        auditlog_disable = True
+        api_disable = True
+
+    class Task:
+        """Task config"""
+
+        verbose_name = '{description}'
+
+        list_default_fields = ['created_at', 'description', 'user', 'status', 'progress', 'started_at', 'execution_time', 'result']
+        list_default_sort = '-last_event'
+
+        list_fields = [
+            {
+                'field': 'status',
+                'renderer': render_status,
+            },
+            {
+                'field': 'progress',
+                'renderer': render_progress,
+            },
+            {
+                'field': 'execution_time',
+                'renderer': lambda obj, *args, **options: str(timezone.timedelta(seconds=obj.execution_time)),
+            },
+        ]
 
         disable_search_index = True
 

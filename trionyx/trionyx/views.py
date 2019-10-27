@@ -24,7 +24,7 @@ from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.utils.translation import ugettext_lazy as _
 
 from trionyx.views import UpdateView, DetailTabView, DialogView
-from trionyx.trionyx.models import User
+from trionyx.trionyx.models import User, Task
 from trionyx.config import models_config
 from trionyx.widgets import widgets
 from trionyx import utils
@@ -256,6 +256,36 @@ class FilterFieldsJsendView(JsendView):
         }
 
 
+class UserTasksJsend(JsendView):
+    """User tasks view"""
+
+    def handle_request(self, request):
+        """Get user open tasks"""
+        tasks = []
+
+        tasks.extend([
+            task for task in Task.objects.filter(
+                user=request.user,
+                status__in=[Task.QUEUE, Task.LOCKED, Task.RUNNING]
+            ).order_by('started_at')
+        ])
+
+        tasks.extend([
+            task for task in Task.objects.filter(user=request.user, status=Task.SCHEDULED).order_by('scheduled_at')
+        ])
+
+        return [
+            {
+                'id': task.id,
+                'status': task.status,
+                'status_display': task.get_status_display(),
+                'description': task.description,
+                'progress': task.progress,
+                'url': task.get_absolute_url(),
+            } for task in tasks
+        ]
+
+
 # =============================================================================
 # Dashboard
 # =============================================================================
@@ -381,6 +411,21 @@ class WidgetConfigDialog(DialogView):
 # Mass actions
 class MassDeleteDialog(DialogView):
     """Mass delete dialog"""
+
+    permission_type = 'delete'
+
+    def has_permission(self, request):
+        """Check permission"""
+        config = self.get_model_config()
+
+        if config.disable_delete:
+            return False
+
+        return request.user.has_perm('{app_label}.{type}_{model_name}'.format(
+            app_label=config.app_label,
+            type=self.permission_type,
+            model_name=config.model_name,
+        ).lower())
 
     def display_dialog(self, *args, **kwargs):
         """Handle mass delete"""

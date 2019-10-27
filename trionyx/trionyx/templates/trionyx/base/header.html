@@ -20,6 +20,46 @@
         <div class="navbar-custom-menu">
             <ul class="nav navbar-nav">
 
+                <li id="trionyx-app-tasks" class="dropdown tasks-menu">
+                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
+                      <i class="fa fa-tasks"></i>
+                      <span class="label label-danger" v-cloak="">[[openTasks]]</span>
+                    </a>
+                    <ul class="dropdown-menu">
+                      <li>
+                        <!-- inner menu: contains the actual data -->
+                        <ul class="menu">
+                            <li v-if="openTasks == 0">
+                                <div class="alert alert-info no-margin">{% trans 'No scheduled or running tasks' %}</div>
+                            </li>
+                          <li v-for="task in tasks"><!-- Task item -->
+                            <a v-bind:href="task.url">
+                              <h3>
+                                [[task.status_display]]: [[task.description]]
+                                <small class="pull-right"> [[task.progress]]%</small>
+                              </h3>
+                              <div class="progress xs">
+                                <div
+                                    class="progress-bar progress-bar-theme"
+                                    role="progressbar"
+                                    aria-valuemin="0"
+                                    aria-valuemax="100"
+                                    v-bind:aria-valuenow="task.progress"
+                                    v-bind:style="{ width: task.progress + '%' }"
+                                >
+                                  <span class="sr-only">[[task.progress]]% {% trans 'Complete' %}</span>
+                                </div>
+                              </div>
+                            </a>
+                          </li>
+                        </ul>
+                      </li>
+                      <li class="footer">
+                        <a href="{% url 'trionyx:model-list' 'trionyx' 'task' %}">{% trans 'View all tasks' %}</a>
+                      </li>
+                    </ul>
+                </li>
+
                 <!-- User Account: style can be found in dropdown.less -->
                 <li class="dropdown user user-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">

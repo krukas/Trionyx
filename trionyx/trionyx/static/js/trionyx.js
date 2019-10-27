@@ -232,6 +232,61 @@ function initGlobalSearch(searchUrl) {
     });
 }
 
+/* Tasks */
+function initTrionyxTasks(taskUrl) {
+    return new Vue({
+        el: '#trionyx-app-tasks',
+        delimiters: ['[[', ']]'],
+        data: {
+            taskUrl: taskUrl,
+            ajaxCall: null,
+
+            tasks: [],
+        },
+        computed: {
+            openTasks: function () {
+                return this.tasks.length;
+            }
+        },
+        methods: {
+            load: function() {
+                var self = this;
+
+                $.ajax({
+                    type: 'GET',
+                    url: this.taskUrl,
+                }).done(function(response) {
+                    if (response.status !== 'success') {
+                        return;
+                    }
+
+                    self.tasks = response.data;
+                    var timeout = 60;
+
+                    var runningTasks = self.tasks.reduce(function (value, task) {
+                        if (task.status === 30 || task.status === 40) {
+                            return value + 1;
+                        }
+
+                        return value;
+                    }, 0);
+
+                    if (runningTasks > 0) {
+                        timeout = 1;
+                    }
+
+                    setTimeout(function () {
+                        self.load();
+                    }, 1000 * timeout);
+                });
+            }
+        },
+        created: function() {
+            this.load();
+        },
+    });
+}
+
 /* Dialog */
 function openDialog(url, options) {
     new TrionyxDialog(url, options);

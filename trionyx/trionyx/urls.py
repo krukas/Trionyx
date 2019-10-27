@@ -27,6 +27,9 @@ urlpatterns = [
     # Global search
     path('global-search', views.GlobalSearchJsendView.as_view(), name='global-search'),
 
+    # Tasks
+    path('user-tasks', views.UserTasksJsend.as_view(), name='user-tasks'),
+
     # Dashboard
     path('', views.DashboardView.as_view(), name='dashboard'),
     path('dashboard/save/', views.SaveDashboardJsendView.as_view(), name='dashboard-save'),
