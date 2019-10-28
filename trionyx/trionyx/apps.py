@@ -13,7 +13,7 @@ from django.apps import AppConfig
 from django.apps import apps
 from django.utils import timezone
 
-from trionyx.config import models_config
+from trionyx.config import models_config, ModelConfig
 from trionyx.menu import app_menu
 from trionyx.trionyx.search import auto_register_search_models
 from trionyx.log import enable_db_logger
@@ -26,7 +26,7 @@ from .renderers import render_level, render_progress, render_status
 class BaseConfig(AppConfig):
     """Base app config"""
 
-    def get_model_config(self, model):
+    def get_model_config(self, model) -> ModelConfig:
         """Get model config for given model"""
         return models_config.get_config(model)
 
@@ -85,14 +85,14 @@ class Config(BaseConfig):
                     if str(e) != "No module named '{}.{}'".format(app.module.__package__, module):
                         raise e
 
-    class User:
+    class User(ModelConfig):
         """User config"""
 
         list_default_fields = ['created_at', 'email', 'first_name', 'last_name', 'is_active', 'is_superuser']
         auditlog_ignore_fields = ['last_online', 'last_login']
         verbose_name = '{email}'
 
-    class Log:
+    class Log(ModelConfig):
         """Log config"""
 
         verbose_name = '{message}'
@@ -115,7 +115,7 @@ class Config(BaseConfig):
             }
         ]
 
-    class AuditLogEntry:
+    class AuditLogEntry(ModelConfig):
         """AuditlogEntry config"""
 
         disable_search_index = True
@@ -127,7 +127,7 @@ class Config(BaseConfig):
         auditlog_disable = True
         api_disable = True
 
-    class Task:
+    class Task(ModelConfig):
         """Task config"""
 
         verbose_name = '{description}'

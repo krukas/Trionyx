@@ -5,16 +5,19 @@ trionyx.views.mixins
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
+from typing import Optional
+
 from django.apps import apps
+from django.db.models import Model
 from django.core.exceptions import PermissionDenied
 
-from trionyx.config import models_config
+from trionyx.config import models_config, ModelConfig
 
 
 class ModelClassMixin:
     """Mixen for getting model class"""
 
-    def get_model_class(self):
+    def get_model_class(self) -> Optional[Model]:
         """Get model class"""
         if getattr(self, 'model', None):
             return self.model
@@ -27,7 +30,7 @@ class ModelClassMixin:
         else:
             return None
 
-    def get_model_config(self):
+    def get_model_config(self) -> Optional[ModelConfig]:
         """Get Trionyx model config"""
         if not hasattr(self, '__config'):
             setattr(self, '__config', models_config.get_config(self.get_model_class()))
