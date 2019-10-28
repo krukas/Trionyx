@@ -32,6 +32,7 @@ def render_progress(model, *args, **kwargs):
 def render_status(model, *args, **kwargs):
     """Render level as label"""
     mapping = {
+        10: 'warning',
         50: 'success',
         99: 'danger',
     }

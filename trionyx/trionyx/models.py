@@ -319,7 +319,7 @@ class Task(models.BaseModel):
         (QUEUE, _('Queue')),
         (LOCKED, _('Locked')),
         (RUNNING, _('Running')),
-        (COMPLETE, _('Complete')),
+        (COMPLETE, _('Completed')),
         (FAILED, _('Failed')),
     )
 

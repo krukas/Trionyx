@@ -245,10 +245,25 @@ function initTrionyxTasks(taskUrl) {
         },
         computed: {
             openTasks: function () {
-                return this.tasks.length;
+                return this.tasks.reduce(function (value, task) {
+                    if (task.status === 10 || task.status === 20 || task.status === 30 || task.status === 40) {
+                        return value + 1;
+                    }
+                    return value;
+                }, 0);
             }
         },
         methods: {
+            getLabelClass(task) {
+                if (task.status === 10) {
+                    return 'label-warning';
+                } else if (task.status === 50) {
+                    return 'label-success';
+                } else if (task.status === 99) {
+                    return 'label-danger';
+                }
+                return 'label-info';
+            },
             load: function() {
                 var self = this;
 
@@ -264,7 +279,7 @@ function initTrionyxTasks(taskUrl) {
                     var timeout = 60;
 
                     var runningTasks = self.tasks.reduce(function (value, task) {
-                        if (task.status === 30 || task.status === 40) {
+                        if (task.status === 20 || task.status === 30 || task.status === 40) {
                             return value + 1;
                         }
 

@@ -268,15 +268,22 @@ class UserTasksJsend(JsendView):
         tasks = []
 
         tasks.extend([
-            task for task in Task.objects.filter(
-                user=request.user,
-                status__in=[Task.QUEUE, Task.LOCKED, Task.RUNNING]
-            ).order_by('started_at')
+            task for task in Task.objects.filter(user=request.user, status=Task.SCHEDULED).order_by('-scheduled_at')
         ])
 
         tasks.extend([
-            task for task in Task.objects.filter(user=request.user, status=Task.SCHEDULED).order_by('scheduled_at')
+            task for task in Task.objects.filter(
+                user=request.user,
+                status__in=[Task.QUEUE, Task.LOCKED, Task.RUNNING]
+            ).order_by('-started_at')
         ])
+
+        if len(tasks) < 10:
+            tasks.extend([
+                task for task in Task.objects.filter(
+                    user=request.user, status__in=[Task.COMPLETE, Task.FAILED]
+                ).order_by('-started_at')[: 10 - len(tasks)]
+            ])
 
         return [
             {

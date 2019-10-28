@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-28 12:48+0000\n"
+"POT-Creation-Date: 2019-10-28 13:28+0000\n"
 "PO-Revision-Date: 2019-10-28 13:48+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -403,9 +403,8 @@ msgid "Running"
 msgstr "Draait"
 
 #: trionyx/trionyx/models.py:322
-#: trionyx/trionyx/templates/trionyx/base/header.html:50
-msgid "Complete"
-msgstr "Compleet"
+msgid "Completed"
+msgstr "Voltooid"
 
 #: trionyx/trionyx/models.py:323
 msgid "Failed"
@@ -471,11 +470,11 @@ msgstr "Taak"
 msgid "Tasks"
 msgstr "Taken"
 
-#: trionyx/trionyx/tasks.py:30
+#: trionyx/trionyx/tasks.py:28
 msgid "Task unexpectedly stopped"
 msgstr "Taak is onverwacht gestopt"
 
-#: trionyx/trionyx/tasks.py:62
+#: trionyx/trionyx/tasks.py:60
 msgid "Could not update the following items {}"
 msgstr "Kan de volgende items {} niet bijwerken"
 
@@ -574,23 +573,23 @@ msgstr "Zoekresultaten"
 msgid "Toggle navigation"
 msgstr "Toggle navigatie"
 
-#: trionyx/trionyx/templates/trionyx/base/header.html:33
-msgid "No scheduled or running tasks"
-msgstr "Geen geplande of actieve taken"
+#: trionyx/trionyx/templates/trionyx/base/header.html:48
+msgid "Complete"
+msgstr "Compleet"
 
-#: trionyx/trionyx/templates/trionyx/base/header.html:58
+#: trionyx/trionyx/templates/trionyx/base/header.html:56
 msgid "View all tasks"
 msgstr "Bekijk alle taken"
 
-#: trionyx/trionyx/templates/trionyx/base/header.html:78
+#: trionyx/trionyx/templates/trionyx/base/header.html:76
 msgid "Member since"
 msgstr "Lid sinds"
 
-#: trionyx/trionyx/templates/trionyx/base/header.html:85
+#: trionyx/trionyx/templates/trionyx/base/header.html:83
 msgid "Profile"
 msgstr "Profiel"
 
-#: trionyx/trionyx/templates/trionyx/base/header.html:90
+#: trionyx/trionyx/templates/trionyx/base/header.html:88
 msgid "Sign out"
 msgstr "Afmelden"
 
@@ -607,7 +606,7 @@ msgstr "Bewerken"
 #: trionyx/trionyx/templates/trionyx/core/dashboard.html:114
 #: trionyx/trionyx/templates/trionyx/core/model_mass_update.html:18
 #: trionyx/trionyx/templates/trionyx/core/model_update.html:39
-#: trionyx/trionyx/views.py:406
+#: trionyx/trionyx/views.py:413
 msgid "Save"
 msgstr "Opslaan"
 
@@ -625,7 +624,7 @@ msgstr "Terug"
 #: trionyx/trionyx/templates/trionyx/core/model_delete.html:31
 #: trionyx/trionyx/templates/trionyx/core/model_list.html:105
 #: trionyx/trionyx/templates/trionyx/core/model_view.html:23
-#: trionyx/trionyx/views.py:178 trionyx/trionyx/views.py:467
+#: trionyx/trionyx/views.py:178 trionyx/trionyx/views.py:474
 msgid "Delete"
 msgstr "Verwijderen"
 
@@ -803,29 +802,29 @@ msgstr "Bekijken"
 msgid "Add"
 msgstr "Toevoegen"
 
-#: trionyx/trionyx/views.py:400
+#: trionyx/trionyx/views.py:407
 msgid "Widget config"
 msgstr "Widget configuratie"
 
-#: trionyx/trionyx/views.py:449
+#: trionyx/trionyx/views.py:456
 msgid "Something went wrong on deleting the items"
 msgstr "Er is iets misgegaan bij het verwijderen van de items"
 
-#: trionyx/trionyx/views.py:456
+#: trionyx/trionyx/views.py:463
 #, python-brace-format
 msgid "Deleting {count} {model_name} items"
 msgstr "Het verwijderen van {count} {model_name} items"
 
-#: trionyx/trionyx/views.py:488
+#: trionyx/trionyx/views.py:497
 msgid "You must make a selection"
 msgstr "U moet een selectie maken"
 
-#: trionyx/trionyx/views.py:541
+#: trionyx/trionyx/views.py:550
 #, python-brace-format
 msgid "Mass update {count} {model_name}"
 msgstr "Massa update {count} {model_name}"
 
-#: trionyx/trionyx/views.py:549
+#: trionyx/trionyx/views.py:558
 #, python-brace-format
 msgid "Successfully started task for updating {count} {model_name}"
 msgstr ""

@@ -29,13 +29,11 @@
                       <li>
                         <!-- inner menu: contains the actual data -->
                         <ul class="menu">
-                            <li v-if="openTasks == 0">
-                                <div class="alert alert-info no-margin">{% trans 'No scheduled or running tasks' %}</div>
-                            </li>
                           <li v-for="task in tasks"><!-- Task item -->
                             <a v-bind:href="task.url">
                               <h3>
-                                [[task.status_display]]: [[task.description]]
+                                  <span class="label" v-bind:class="getLabelClass(task)">[[task.status_display]]</span>
+                                  [[task.description]]
                                 <small class="pull-right"> [[task.progress]]%</small>
                               </h3>
                               <div class="progress xs">

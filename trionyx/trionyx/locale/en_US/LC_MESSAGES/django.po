@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-28 12:48+0000\n"
+"POT-Creation-Date: 2019-10-28 13:28+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -402,8 +402,7 @@ msgid "Running"
 msgstr ""
 
 #: trionyx/trionyx/models.py:322
-#: trionyx/trionyx/templates/trionyx/base/header.html:50
-msgid "Complete"
+msgid "Completed"
 msgstr ""
 
 #: trionyx/trionyx/models.py:323
@@ -470,11 +469,11 @@ msgstr ""
 msgid "Tasks"
 msgstr ""
 
-#: trionyx/trionyx/tasks.py:30
+#: trionyx/trionyx/tasks.py:28
 msgid "Task unexpectedly stopped"
 msgstr ""
 
-#: trionyx/trionyx/tasks.py:62
+#: trionyx/trionyx/tasks.py:60
 msgid "Could not update the following items {}"
 msgstr ""
 
@@ -571,23 +570,23 @@ msgstr ""
 msgid "Toggle navigation"
 msgstr ""
 
-#: trionyx/trionyx/templates/trionyx/base/header.html:33
-msgid "No scheduled or running tasks"
+#: trionyx/trionyx/templates/trionyx/base/header.html:48
+msgid "Complete"
 msgstr ""
 
-#: trionyx/trionyx/templates/trionyx/base/header.html:58
+#: trionyx/trionyx/templates/trionyx/base/header.html:56
 msgid "View all tasks"
 msgstr ""
 
-#: trionyx/trionyx/templates/trionyx/base/header.html:78
+#: trionyx/trionyx/templates/trionyx/base/header.html:76
 msgid "Member since"
 msgstr ""
 
-#: trionyx/trionyx/templates/trionyx/base/header.html:85
+#: trionyx/trionyx/templates/trionyx/base/header.html:83
 msgid "Profile"
 msgstr ""
 
-#: trionyx/trionyx/templates/trionyx/base/header.html:90
+#: trionyx/trionyx/templates/trionyx/base/header.html:88
 msgid "Sign out"
 msgstr ""
 
@@ -604,7 +603,7 @@ msgstr ""
 #: trionyx/trionyx/templates/trionyx/core/dashboard.html:114
 #: trionyx/trionyx/templates/trionyx/core/model_mass_update.html:18
 #: trionyx/trionyx/templates/trionyx/core/model_update.html:39
-#: trionyx/trionyx/views.py:406
+#: trionyx/trionyx/views.py:413
 msgid "Save"
 msgstr ""
 
@@ -622,7 +621,7 @@ msgstr ""
 #: trionyx/trionyx/templates/trionyx/core/model_delete.html:31
 #: trionyx/trionyx/templates/trionyx/core/model_list.html:105
 #: trionyx/trionyx/templates/trionyx/core/model_view.html:23
-#: trionyx/trionyx/views.py:178 trionyx/trionyx/views.py:467
+#: trionyx/trionyx/views.py:178 trionyx/trionyx/views.py:474
 msgid "Delete"
 msgstr ""
 
@@ -798,29 +797,29 @@ msgstr ""
 msgid "Add"
 msgstr ""
 
-#: trionyx/trionyx/views.py:400
+#: trionyx/trionyx/views.py:407
 msgid "Widget config"
 msgstr ""
 
-#: trionyx/trionyx/views.py:449
+#: trionyx/trionyx/views.py:456
 msgid "Something went wrong on deleting the items"
 msgstr ""
 
-#: trionyx/trionyx/views.py:456
+#: trionyx/trionyx/views.py:463
 #, python-brace-format
 msgid "Deleting {count} {model_name} items"
 msgstr ""
 
-#: trionyx/trionyx/views.py:488
+#: trionyx/trionyx/views.py:497
 msgid "You must make a selection"
 msgstr ""
 
-#: trionyx/trionyx/views.py:541
+#: trionyx/trionyx/views.py:550
 #, python-brace-format
 msgid "Mass update {count} {model_name}"
 msgstr ""
 
-#: trionyx/trionyx/views.py:549
+#: trionyx/trionyx/views.py:558
 #, python-brace-format
 msgid "Successfully started task for updating {count} {model_name}"
 msgstr ""
