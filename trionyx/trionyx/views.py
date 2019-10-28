@@ -9,7 +9,7 @@ import json
 import logging
 from collections import OrderedDict
 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.auth import logout as django_logout
 from django.contrib.auth.models import Permission
@@ -22,14 +22,18 @@ from django.views.generic import TemplateView
 from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.utils.translation import ugettext_lazy as _
+from django.contrib import messages
 
 from trionyx.views import UpdateView, DetailTabView, DialogView
+from trionyx.views.mixins import ModelClassMixin, ModelPermissionMixin
 from trionyx.trionyx.models import User, Task
 from trionyx.config import models_config
 from trionyx.widgets import widgets
 from trionyx import utils
 from trionyx.forms.helper import FormHelper
+from trionyx.forms import form_register, modelform_factory
 from trionyx.models import filter_queryset_with_user_filters
+from trionyx.trionyx.tasks import MassUpdateTask
 
 logger = logging.getLogger(__name__)
 
@@ -466,3 +470,126 @@ class MassDeleteDialog(DialogView):
     def handle_dialog(self, *args, **kwargs):
         """Handle mass delete"""
         return self.display_dialog()
+
+
+class MassUpdateView(ModelPermissionMixin, TemplateView, ModelClassMixin):
+    """Mass update view"""
+
+    template_name = 'trionyx/core/model_mass_update.html'
+    permission_type = 'change'
+
+    def get(self, *args, **kwargs):
+        """Render mass update form"""
+        context = self.get_context_data(**kwargs)
+        all = self.request.GET.get('all', '0')
+        ids = self.request.GET.get('ids', '')
+        filters = self.request.GET.get('filters', '[]')
+        query = self.get_queryset(all, ids, filters)
+
+        if not query:
+            messages.error(self.request, _('You must make a selection'))
+            return HttpResponseRedirect(reverse('trionyx:model-list', kwargs=self.kwargs))
+
+        context.update({
+            'model_name': self.get_model_config().get_verbose_name(),
+            'model_name_plural': self.get_model_config().get_verbose_name_plural(),
+            'cancel_url': reverse('trionyx:model-list', kwargs=self.kwargs),
+            'all': all,
+            'ids': ids,
+            'filters': filters,
+            'count': query.count(),
+            'form': self.get_form(),
+            'checked_fields': [],
+        })
+        return self.render_to_response(context)
+
+    def post(self, *args, **kwargs):
+        """Handle mass update form"""
+        all = self.request.POST.get('trionyx_all', '0')
+        ids = self.request.POST.get('trionyx_ids', '')
+        filters = self.request.POST.get('trionyx_filters', '[]')
+        query = self.get_queryset(all, ids, filters)
+
+        form = self.get_form(self.request.POST)
+
+        if not form.is_valid():
+            context = self.get_context_data(**kwargs)
+            context.update({
+                'model_name': self.get_model_config().get_verbose_name(),
+                'model_name_plural': self.get_model_config().get_verbose_name_plural(),
+                'cancel_url': reverse('trionyx:model-list', kwargs=self.kwargs),
+                'all': all,
+                'ids': ids,
+                'filters': filters,
+                'count': query.count(),
+                'form': form,
+                'checked_fields': form.checked_fields,
+            })
+            return self.render_to_response(context)
+
+        # Get data from form
+        data = {}
+        for field in form.fields:
+            if self.request.POST.get('change_{}'.format(field), False):
+                data[field] = form.cleaned_data[field]
+
+        # Start update task
+        MassUpdateTask().delay(
+            all=all,
+            ids=ids,
+            filters=filters,
+            data=data,
+
+            task_description=_('Mass update {count} {model_name}').format(
+                count=query.count(),
+                model_name=self.get_model_config().get_verbose_name_plural(),
+            ),
+            task_model=self.get_model_class(),
+        )
+
+        # Add message
+        messages.success(self.request, _('Successfully started task for updating {count} {model_name}').format(
+            count=query.count(),
+            model_name=self.get_model_config().get_verbose_name_plural(),
+        ))
+
+        # return to list view
+        return HttpResponseRedirect(reverse('trionyx:model-list', kwargs=self.kwargs))
+
+    def get_queryset(self, all, ids, filters):
+        """Get queryset"""
+        query = self.get_model_class().objects.get_queryset()
+
+        if all == '1':
+            return filter_queryset_with_user_filters(query, json.loads(filters))
+        else:
+            return query.filter(id__in=[int(id) for id in filter(None, ids.split(','))])
+
+    def get_form(self, data=None):
+        """Get form class"""
+        model_config = self.get_model_config()
+        fields = []
+
+        model_fields = [f.name for f in model_config.get_fields()]
+        forms = form_register.get_all_forms(self.get_model_class())
+        if forms:  # Only use fields that ara also in forms
+            for Form in forms:
+                fields.extend([name for name in Form().base_fields if name in model_fields])
+                fields.extend([name for name in Form().declared_fields if name in model_fields])
+        else:
+            fields = [f.name for f in model_config.get_fields()]
+
+        FormClass = modelform_factory(self.get_model_class(), fields=sorted(list(set(fields))))
+        form = FormClass(data)
+
+        # Disable fields that are not checked for change
+        form.checked_fields = []
+        for field in form.fields:
+            form.fields[field].required = False
+            if not (data and data.get('change_{}'.format(field), False)):
+                form.fields[field].widget.attrs['readonly'] = True
+                form.fields[field].widget.attrs['disabled'] = True
+            else:
+                form.checked_fields.append(field)
+
+        return form

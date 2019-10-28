@@ -12,6 +12,7 @@ import celery
 from celery import shared_task, current_app  # noqa F401
 from celery.utils import uuid
 from django.utils import timezone
+from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
 
@@ -48,7 +49,7 @@ class BaseTask(celery.Task, metaclass=TaskMetaClass):
         self.__task, _ = Task.objects.get_or_create(celery_task_id=self.request.id)
 
         if self.__task.object_id and self.task_lock:
-            with CacheLock('TASK_LOCK', self.__task.object_type_id, self.__task.object_id):
+            with CacheLock('TASK_LOCK', self.__task.object_type_id, self.__task.object_id, timeout=settings.CELERY_TASK_TIME_LIMIT + 60):
                 return self._run(*args, **kwargs)
         else:
             return self._run(*args, **kwargs)
@@ -60,10 +61,15 @@ class BaseTask(celery.Task, metaclass=TaskMetaClass):
         self.__task.save()
 
         try:
-            result = super().__call__(*args, **kwargs)
-
-            if not result:
-                result = _('Task completed')
+            if self.__task.user:
+                with self.__task.user.locale_override():
+                    result = super().__call__(*args, **kwargs)
+                    if not result:
+                        result = str(_('Task completed'))
+            else:
+                result = super().__call__(*args, **kwargs)
+                if not result:
+                    result = _('Task completed')
 
             duration = timezone.now() - self.__task.started_at
             self.__task.execution_time = int(duration.total_seconds())
@@ -132,3 +138,9 @@ class BaseTask(celery.Task, metaclass=TaskMetaClass):
     def get_object(self):
         """Return task object"""
         return self.__task.object
+
+    def get_model(self):
+        """Return task model"""
+        if self.__task.object_type:
+            return self.__task.object_type.model_class()
+        return None

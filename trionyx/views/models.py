@@ -85,6 +85,10 @@ class ListView(ModelPermissionMixin, TemplateView, ModelClassMixin):
         """Get mass delete url"""
         return reverse('trionyx:model-mass-delete', kwargs=self.kwargs)
 
+    def get_mass_update_url(self):
+        """Get mass delete url"""
+        return reverse('trionyx:model-mass-update', kwargs=self.kwargs)
+
     def get_context_data(self, **kwargs):
         """Add context data to view"""
         context = super().get_context_data(**kwargs)
@@ -95,10 +99,19 @@ class ListView(ModelPermissionMixin, TemplateView, ModelClassMixin):
             'download_url': self.get_download_url(),
             'create_url': self.get_create_url(),
             'mass_delete_url': self.get_mass_delete_url(),
+            'mass_update_url': self.get_mass_update_url(),
             'create_permission': self.request.user.has_perm('{app_label}.add_{model_name}'.format(
                 app_label=self.get_model_config().app_label,
                 model_name=self.get_model_config().model_name,
-            ).lower()) and not self.get_model_config().disable_add
+            ).lower()) and not self.get_model_config().disable_add,
+            'change_permission': self.request.user.has_perm('{app_label}.change_{model_name}'.format(
+                app_label=self.get_model_config().app_label,
+                model_name=self.get_model_config().model_name,
+            ).lower()) and not self.get_model_config().disable_change,
+            'delete_permission': self.request.user.has_perm('{app_label}.delete_{model_name}'.format(
+                app_label=self.get_model_config().app_label,
+                model_name=self.get_model_config().model_name,
+            ).lower()) and not self.get_model_config().disable_delete
         })
         return context
 

@@ -131,6 +131,10 @@ class FormRegister:
         """Get form based on code"""
         return self.forms.get(self.get_model_alias(model), dict()).get(code)['form']
 
+    def get_all_forms(self, model):
+        """Get all forms for model"""
+        return [config['form'] for code, config in self.forms.get(self.get_model_alias(model), dict()).items()]
+
     def get_create_form(self, model):
         """Get default create form"""
         form = self._get_model_form_by_config(model, 'default_create')

@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-27 21:54+0000\n"
-"PO-Revision-Date: 2019-10-27 23:00+0100\n"
+"POT-Creation-Date: 2019-10-28 12:48+0000\n"
+"PO-Revision-Date: 2019-10-28 13:48+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -62,11 +62,11 @@ msgstr "Nieuwe gebruikers deze week"
 msgid "User count"
 msgstr "Aantal gebruikers"
 
-#: trionyx/tasks.py:35
+#: trionyx/tasks.py:43
 msgid "Base Task"
 msgstr "Basistaak"
 
-#: trionyx/tasks.py:61
+#: trionyx/tasks.py:68 trionyx/tasks.py:72
 msgid "Task completed"
 msgstr "Taak volbracht"
 
@@ -194,8 +194,9 @@ msgstr "Icoon"
 msgid "Model"
 msgstr "Model"
 
-#: trionyx/trionyx/forms.py:375 trionyx/trionyx/layouts.py:277
+#: trionyx/trionyx/forms.py:375 trionyx/trionyx/layouts.py:280
 #: trionyx/trionyx/templates/trionyx/base/filters.html:8
+#: trionyx/trionyx/templates/trionyx/core/model_mass_update.html:36
 #: trionyx/trionyx/templates/widgets/total_summary/form_field.html:5
 msgid "Field"
 msgstr "Veld"
@@ -209,7 +210,7 @@ msgid "Period field"
 msgstr "Periode veld"
 
 #: trionyx/trionyx/forms.py:379 trionyx/trionyx/forms.py:444
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:218
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:228
 msgid "Filters"
 msgstr "Filters"
 
@@ -254,25 +255,24 @@ msgstr "Backtrace"
 msgid "Last log entries"
 msgstr "Laatste loggegevens"
 
-#: trionyx/trionyx/layouts.py:230 trionyx/views/__init__.py:104
+#: trionyx/trionyx/layouts.py:233 trionyx/views/__init__.py:104
 msgid "General"
 msgstr "Algemeen"
 
-#: trionyx/trionyx/layouts.py:246
-#| msgid "No access"
+#: trionyx/trionyx/layouts.py:249
 msgid "Process"
 msgstr "Verwerken"
 
-#: trionyx/trionyx/layouts.py:269
+#: trionyx/trionyx/layouts.py:272
 #, python-brace-format
 msgid "{action} on {date} by {user}"
 msgstr "{action} op {date} door {user}"
 
-#: trionyx/trionyx/layouts.py:281
+#: trionyx/trionyx/layouts.py:284
 msgid "Old value"
 msgstr "Oude waarde"
 
-#: trionyx/trionyx/layouts.py:285
+#: trionyx/trionyx/layouts.py:288
 msgid "New value"
 msgstr "Nieuwe waarde"
 
@@ -436,7 +436,6 @@ msgid "Scheduled at"
 msgstr "Gepland op"
 
 #: trionyx/trionyx/models.py:335
-#| msgid "Created at"
 msgid "started at"
 msgstr "begon om"
 
@@ -449,32 +448,36 @@ msgid "Result"
 msgstr "Resultaat"
 
 #: trionyx/trionyx/models.py:339
-#| msgid "Created by"
 msgid "Started by"
 msgstr "Gestart door"
 
-#: trionyx/trionyx/models.py:340
-#| msgid "Object"
+#: trionyx/trionyx/models.py:346
 msgid "Object type"
 msgstr "Object type"
 
-#: trionyx/trionyx/models.py:341
-#| msgid "Object"
+#: trionyx/trionyx/models.py:348
 msgid "Object ID"
 msgstr "Object ID"
 
-#: trionyx/trionyx/models.py:343
-#| msgid "Object"
+#: trionyx/trionyx/models.py:350
 msgid "Object name"
 msgstr "Object naam"
 
-#: trionyx/trionyx/models.py:348
+#: trionyx/trionyx/models.py:355
 msgid "Task"
 msgstr "Taak"
 
-#: trionyx/trionyx/models.py:349
+#: trionyx/trionyx/models.py:356
 msgid "Tasks"
 msgstr "Taken"
+
+#: trionyx/trionyx/tasks.py:30
+msgid "Task unexpectedly stopped"
+msgstr "Taak is onverwacht gestopt"
+
+#: trionyx/trionyx/tasks.py:62
+msgid "Could not update the following items {}"
+msgstr "Kan de volgende items {} niet bijwerken"
 
 #: trionyx/trionyx/templates/403.html:4 trionyx/trionyx/templates/403.html:5
 msgid "403 Access Denied/Forbidden"
@@ -602,8 +605,9 @@ msgid "Edit"
 msgstr "Bewerken"
 
 #: trionyx/trionyx/templates/trionyx/core/dashboard.html:114
+#: trionyx/trionyx/templates/trionyx/core/model_mass_update.html:18
 #: trionyx/trionyx/templates/trionyx/core/model_update.html:39
-#: trionyx/trionyx/views.py:402
+#: trionyx/trionyx/views.py:406
 msgid "Save"
 msgstr "Opslaan"
 
@@ -619,9 +623,9 @@ msgstr "Terug"
 #: trionyx/trionyx/templates/trionyx/core/layout_view.html:12
 #: trionyx/trionyx/templates/trionyx/core/model_delete.html:8
 #: trionyx/trionyx/templates/trionyx/core/model_delete.html:31
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:103
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:105
 #: trionyx/trionyx/templates/trionyx/core/model_view.html:23
-#: trionyx/trionyx/views.py:174 trionyx/trionyx/views.py:463
+#: trionyx/trionyx/views.py:178 trionyx/trionyx/views.py:467
 msgid "Delete"
 msgstr "Verwijderen"
 
@@ -647,6 +651,7 @@ msgstr "Aanmaken"
 #: trionyx/trionyx/templates/trionyx/core/model_create.html:34
 #: trionyx/trionyx/templates/trionyx/core/model_delete.html:27
 #: trionyx/trionyx/templates/trionyx/core/model_delete.html:29
+#: trionyx/trionyx/templates/trionyx/core/model_mass_update.html:17
 #: trionyx/trionyx/templates/trionyx/core/model_update.html:35
 #: trionyx/trionyx/templates/trionyx/core/model_update.html:37
 msgid "Cancel"
@@ -657,50 +662,67 @@ msgstr "Annuleren"
 msgid "Are you sure you want to delete (%(object)s)"
 msgstr "Weet u zeker dat u (%(object)s) wilt verwijderen"
 
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:98
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:99
 msgid "Actions"
 msgstr "Acties"
 
 #: trionyx/trionyx/templates/trionyx/core/model_list.html:108
-msgid "[[count]] items found"
-msgstr "[[count]] items gevonden"
-
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:108
-msgid "[[massActionSelected]] selected"
-msgstr "[[massActionSelected]] geselecteerd"
-
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:116
-msgid "per page"
-msgstr "per pagina"
-
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:127
-msgid "of [[numPages]]"
-msgstr "van [[numPages]]"
-
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:149
-msgid "There are no"
-msgstr "Er zijn geen"
-
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:163
-msgid "Select All"
-msgstr "Selecteer alles"
-
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:164
-msgid "Deselect All"
-msgstr "Deselecteer alles"
-
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:165
-msgid "Select All on this page"
-msgstr "Selecteer Alles op deze pagina"
-
-#: trionyx/trionyx/templates/trionyx/core/model_list.html:202
-msgid "search"
-msgstr "zoeken"
-
 #: trionyx/trionyx/templates/trionyx/core/model_update.html:8
 #: trionyx/trionyx/templates/trionyx/core/model_update.html:46
 msgid "Update"
 msgstr "Bijwerken"
+
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:114
+msgid "[[count]] items found"
+msgstr "[[count]] items gevonden"
+
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:114
+msgid "[[massActionSelected]] selected"
+msgstr "[[massActionSelected]] geselecteerd"
+
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:122
+msgid "per page"
+msgstr "per pagina"
+
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:133
+msgid "of [[numPages]]"
+msgstr "van [[numPages]]"
+
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:155
+msgid "There are no"
+msgstr "Er zijn geen"
+
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:170
+msgid "Select All"
+msgstr "Selecteer alles"
+
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:171
+msgid "Deselect All"
+msgstr "Deselecteer alles"
+
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:172
+msgid "Select All on this page"
+msgstr "Selecteer Alles op deze pagina"
+
+#: trionyx/trionyx/templates/trionyx/core/model_list.html:212
+msgid "search"
+msgstr "zoeken"
+
+#: trionyx/trionyx/templates/trionyx/core/model_mass_update.html:5
+#: trionyx/trionyx/templates/trionyx/core/model_mass_update.html:9
+#, python-format
+msgid "Mass update %(model_name_plural)s"
+msgstr "Massa update %(model_name_plural)s"
+
+#: trionyx/trionyx/templates/trionyx/core/model_mass_update.html:24
+#, python-format
+msgid "Updating %(count)s %(model_name_plural)s"
+msgstr "Bijwerken van %(count)s %(model_name_plural)s"
+
+#: trionyx/trionyx/templates/trionyx/core/model_mass_update.html:35
+#: trionyx/trionyx/views.py:177
+msgid "Change"
+msgstr "Wijzigen"
 
 #: trionyx/trionyx/templates/trionyx/core/model_view.html:61
 #, python-format
@@ -773,30 +795,41 @@ msgstr "Tel records"
 msgid "Period Field"
 msgstr "Periodeveld"
 
-#: trionyx/trionyx/views.py:171
+#: trionyx/trionyx/views.py:175
 msgid "View"
 msgstr "Bekijken"
 
-#: trionyx/trionyx/views.py:172
+#: trionyx/trionyx/views.py:176
 msgid "Add"
 msgstr "Toevoegen"
 
-#: trionyx/trionyx/views.py:173
-msgid "Change"
-msgstr "Wijzigen"
-
-#: trionyx/trionyx/views.py:396
+#: trionyx/trionyx/views.py:400
 msgid "Widget config"
 msgstr "Widget configuratie"
 
-#: trionyx/trionyx/views.py:445
+#: trionyx/trionyx/views.py:449
 msgid "Something went wrong on deleting the items"
 msgstr "Er is iets misgegaan bij het verwijderen van de items"
 
-#: trionyx/trionyx/views.py:452
+#: trionyx/trionyx/views.py:456
 #, python-brace-format
 msgid "Deleting {count} {model_name} items"
 msgstr "Het verwijderen van {count} {model_name} items"
+
+#: trionyx/trionyx/views.py:488
+msgid "You must make a selection"
+msgstr "U moet een selectie maken"
+
+#: trionyx/trionyx/views.py:541
+#, python-brace-format
+msgid "Mass update {count} {model_name}"
+msgstr "Massa update {count} {model_name}"
+
+#: trionyx/trionyx/views.py:549
+#, python-brace-format
+msgid "Successfully started task for updating {count} {model_name}"
+msgstr ""
+"Met succes een taak  gestart voor het bijwerken van {count} {model_name}"
 
 #: trionyx/views/dialogs.py:78 trionyx/views/dialogs.py:93
 msgid "No access"
@@ -858,15 +891,15 @@ msgstr "{model_name} ({object}) is succesvol verwijderd"
 msgid "Something went wrong on deleting {model_name}"
 msgstr "Er is iets misgegaan bij het verwijderen van {model_name}"
 
-#: trionyx/views/models.py:577
+#: trionyx/views/models.py:590
 msgid "Successfully saved ({})"
 msgstr "Succesvol opgeslagen ({})"
 
-#: trionyx/views/models.py:663
+#: trionyx/views/models.py:676
 msgid "Successfully created ({})"
 msgstr "Met succes gemaakt ({})"
 
-#: trionyx/views/models.py:710
+#: trionyx/views/models.py:723
 msgid "Successfully deleted ({})"
 msgstr "Met succes verwijderd ({})"
 

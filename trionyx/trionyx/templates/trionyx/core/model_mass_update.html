@@ -1,0 +1,85 @@
+{% extends "trionyx/base.html" %}
+{% load crispy_forms_tags i18n static %}
+
+{% block title %}
+    {% blocktrans %}Mass update {{ model_name_plural }}{% endblocktrans %}
+{% endblock %}
+
+{% block page_title %}
+    {% blocktrans %}Mass update {{ model_name_plural }}{% endblocktrans %}
+{% endblock %}
+
+{% block content_top %}
+    <form role="form" id="trionyx-mass-update-form" action="" method="post" enctype="multipart/form-data" novalidate style="display: inline">
+{% endblock %}
+
+{% block header_buttons %}
+    <a href="{{ cancel_url }}" class="btn btn-flat bg-theme">{% trans "Cancel" %}</a>
+    <input type="submit" value="{% trans "Save" %}" class="btn btn-flat btn-success"/>
+{% endblock %}
+
+{% block content %}
+    <div class="info-box">
+        <div class="box-header with-border">
+            <h3 class="box-title">{% blocktrans %}Updating {{ count }} {{ model_name_plural }}{% endblocktrans %}</h3>
+        </div>
+        <div class="box-body no-padding">
+            {% csrf_token %}
+            <input type="hidden" name="trionyx_all" value="{{ all }}">
+            <input type="hidden" name="trionyx_ids" value="{{ ids }}">
+            <input type="hidden" name="trionyx_filters" value="{{ filters }}">
+
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th style="width: 40px">{% trans 'Change' %}</th>
+                        <th>{% trans 'Field' %}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for field in form.visible_fields %}
+                        <tr>
+                            <td>
+                                <input
+                                    autocomplete="off"
+                                    type="checkbox"
+                                    id="id-change-{{ field.name }}"
+                                    name="change_{{ field.name }}"
+                                    value="1"
+                                    onclick="trionyxClickChange('{{ field.name }}')"
+                                    {% if field.name in checked_fields %}checked{% endif %}
+                                >
+                            </td>
+                            <td>{{ field|as_crispy_field }}</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+{% endblock %}
+
+
+{% block content_bottom %}
+    </form>
+{% endblock %}
+
+{% block extra_foot %}
+    <script>
+        function trionyxClickChange(name){
+            var checkbox = $('#id-change-' + name);
+            var field = $('#id_' + name);
+
+            field.prop("disabled", !checkbox.is(':checked'));
+            field.prop("readonly", !checkbox.is(':checked'));
+        }
+
+        $('#trionyx-mass-update-form input').each(function(index, input){
+            var field = $(input);
+
+
+
+            console.log(field.attr('name'), field.is(':disabled'), field.attr('readonly') === "readonly");
+        })
+    </script>
+{% endblock %}
