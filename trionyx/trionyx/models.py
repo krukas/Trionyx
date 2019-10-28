@@ -9,6 +9,8 @@ import hashlib
 import traceback
 from contextlib import contextmanager
 
+from celery import current_app
+from celery.app.control import Control
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.contrib.contenttypes import fields
 from django.utils import timezone
@@ -300,3 +302,63 @@ class AuditLogEntry(models.BaseModel):
         indexes = [
             models.Index(fields=['content_type', 'object_id']),
         ]
+
+
+class Task(models.BaseModel):
+    """Task model"""
+
+    SCHEDULED = 10
+    QUEUE = 20
+    LOCKED = 30
+    RUNNING = 40
+    COMPLETE = 50
+    FAILED = 99
+
+    STATUS_CHOICES = (
+        (SCHEDULED, _('Scheduled')),
+        (QUEUE, _('Queue')),
+        (LOCKED, _('Locked')),
+        (RUNNING, _('Running')),
+        (COMPLETE, _('Completed')),
+        (FAILED, _('Failed')),
+    )
+
+    celery_task_id = models.CharField(max_length=64, unique=True)
+    status = models.IntegerField(_('Status'), choices=STATUS_CHOICES, default=QUEUE)
+    identifier = models.CharField(_('Identifier'), max_length=255, default='not_set')
+    description = models.TextField(_('Description'), default='')
+
+    progress = models.PositiveIntegerField(_('Progress'), default=0)
+    progress_output = models.JSONField(_('Progress output'), default=list)
+
+    scheduled_at = models.DateTimeField(_('Scheduled at'), blank=True, null=True)
+    started_at = models.DateTimeField(_('started at'), blank=True, null=True)
+    execution_time = models.IntegerField(_('Execution time'), default=0)
+    result = models.TextField(_('Result'), blank=True, default='')
+
+    user = models.ForeignKey(User, models.SET_NULL, blank=True, null=True, verbose_name=_('Started by'))
+    object_type = models.ForeignKey(
+        'contenttypes.ContentType',
+        models.SET_NULL,
+        blank=True,
+        null=True,
+        related_name='+',
+        verbose_name=_('Object type')
+    )
+    object_id = models.BigIntegerField(_('Object ID'), blank=True, null=True)
+    object = fields.GenericForeignKey('object_type', 'object_id')
+    object_verbose_name = models.TextField(_('Object name'), blank=True, default='')
+
+    class Meta:
+        """Model meta description"""
+
+        verbose_name = _('Task')
+        verbose_name_plural = _('Tasks')
+
+    def cancel_celery_task(self, kill=False):
+        """
+        Make sure we cancel the task (if in queue/scheduled).
+        :param: kill Also kill the task if it's running, defaults to False.
+        """
+        celery_control = Control(current_app)
+        celery_control.revoke(task_id=self.celery_task_id, terminate=kill)

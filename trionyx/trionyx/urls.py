@@ -27,6 +27,9 @@ urlpatterns = [
     # Global search
     path('global-search', views.GlobalSearchJsendView.as_view(), name='global-search'),
 
+    # Tasks
+    path('user-tasks', views.UserTasksJsend.as_view(), name='user-tasks'),
+
     # Dashboard
     path('', views.DashboardView.as_view(), name='dashboard'),
     path('dashboard/save/', views.SaveDashboardJsendView.as_view(), name='dashboard-save'),
@@ -63,7 +66,8 @@ urlpatterns = [
     path('dialog/model/<str:app>/<str:model>/<int:pk>/delete/', core_views.DeleteDialog.as_view(), name='model-dialog-delete'),
 
     # Mass actions
-    path('mass/<str:app>/<str:model>/delete', views.MassDeleteDialog.as_view(), name='model-mass-delete')
+    path('mass/<str:app>/<str:model>/delete', views.MassDeleteDialog.as_view(), name='model-mass-delete'),
+    path('mass/<str:app>/<str:model>/update', views.MassUpdateView.as_view(), name='model-mass-update'),
 ]
 
 if settings.DEBUG:

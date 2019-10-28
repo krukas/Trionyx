@@ -84,6 +84,15 @@
                     return a.label.localeCompare(b.label);
                 });
             },
+            json: function(){
+                return JSON.stringify(this.filters.map(function(filter){
+                   return {
+                       field: filter.field,
+                       operator: filter.operator,
+                       value: filter.value,
+                   }
+                }));
+            },
             renderedFilters: function(){
                 var self = this;
                 return this.filters.map(function(filter){

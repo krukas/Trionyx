@@ -126,6 +126,7 @@
         $(document).ready(function () {
             $('.sidebar-menu').tree();
             initGlobalSearch("{% url 'trionyx:global-search' %}");
+            initTrionyxTasks("{% url 'trionyx:user-tasks' %}");
         });
     </script>
 

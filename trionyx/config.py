@@ -6,10 +6,12 @@ trionyx.config
 :license: GPLv3
 """
 import inspect
+from typing import Optional, Generator, Union
 
 from django.apps import apps
 from django.urls import reverse
 from django.conf import settings
+from django.db.models import Field, Model
 
 TX_MODEL_CONFIGS = settings.TX_CORE_MODEL_CONFIGS
 TX_MODEL_CONFIGS.update(settings.TX_MODEL_CONFIGS)
@@ -155,7 +157,7 @@ class ModelConfig:
     hide_permissions = False
     """Dont show model in permissions tree, prevent clutter from internal models"""
 
-    def __init__(self, model, MetaConfig=None):
+    def __init__(self, model: Model, MetaConfig=None):
         """Init config"""
         self.model = model
         self.app_config = apps.get_app_config(model._meta.app_label)
@@ -185,33 +187,33 @@ class ModelConfig:
         except AttributeError:
             return None
 
-    def get_app_verbose_name(self, title=True):
+    def get_app_verbose_name(self, title: bool = True) -> str:
         """Get app verbose name"""
         return str(self.app_config.verbose_name).title() if title else str(self.app_config.verbose_name)
 
-    def get_verbose_name(self, title=True):
+    def get_verbose_name(self, title: bool = True) -> str:
         """Get class verbose name"""
         return str(
             self.model._meta.verbose_name
         ).title() if title else str(self.model._meta.verbose_name).lower()
 
-    def get_verbose_name_plural(self, title=True):
+    def get_verbose_name_plural(self, title: bool = True) -> str:
         """Get class plural verbose name"""
         return str(
             self.model._meta.verbose_name_plural
         ).title() if title else str(self.model._meta.verbose_name_plural).lower()
 
     @property
-    def is_trionyx_model(self):
+    def is_trionyx_model(self) -> bool:
         """Check if config is for Trionyx model"""
         from trionyx.models import BaseModel
         return isinstance(self.model(), BaseModel)
 
-    def has_config(self, name):
+    def has_config(self, name: str) -> bool:
         """Check if config is set"""
         return name in self.__changed
 
-    def get_fields(self, inlcude_base=False, include_id=False):
+    def get_fields(self, inlcude_base: bool = False, include_id: bool = False):
         """Get model fields"""
         for field in self.model._meta.fields:
             if field.name == 'deleted':
@@ -222,15 +224,15 @@ class ModelConfig:
                 continue
             yield field
 
-    def get_absolute_url(self, model):
+    def get_absolute_url(self, model: Model) -> str:
         """Get model url"""
         return reverse('trionyx:model-view', kwargs={
             'app': model._meta.app_label,
             'model': model._meta.model_name,
-            'pk': model.id
+            'pk': model.pk
         })
 
-    def get_list_fields(self):
+    def get_list_fields(self) -> [dict]:
         """Get all list fields"""
         from trionyx.renderer import renderer
         model_fields = {f.name: f for f in self.get_fields(True, True)}
@@ -271,7 +273,7 @@ class ModelConfig:
 
         return list_fields
 
-    def get_field_type(self, field):
+    def get_field_type(self, field: Field) -> str:
         """Get field type base on model field class"""
         from trionyx import models
         if isinstance(field, (models.CharField, models.TextField, models.EmailField)):
@@ -313,13 +315,13 @@ class Models:
             for key, value in config.items():
                 setattr(self.configs[model_name], key, value)
 
-    def get_config(self, model):
+    def get_config(self, model: Union[str, Model]) -> Optional[ModelConfig]:
         """Get config for given model"""
         if not inspect.isclass(model) and not isinstance(model, str):
             model = model.__class__
         return self.configs.get(self.get_model_name(model))
 
-    def get_all_configs(self, trionyx_models_only=True):
+    def get_all_configs(self, trionyx_models_only: bool = True) -> Generator[ModelConfig, None, None]:
         """Get all model configs"""
         from trionyx.models import BaseModel
 
@@ -329,13 +331,13 @@ class Models:
 
             yield config
 
-    def get_model_name(self, model):
+    def get_model_name(self, model: Union[str, Model]) -> str:
         """Get model name for given model"""
         if isinstance(model, str):
             return model
         return '{}.{}'.format(model._meta.app_label, model._meta.model_name)
 
-    def get_all_models(self, user=None, trionyx_models_only=True):
+    def get_all_models(self, user: Optional["trionyx.trionyx.models.User"] = None, trionyx_models_only: bool = True):
         """Get all user models"""
         for config in self.get_all_configs(trionyx_models_only):
             if config.app_label == 'trionyx' and config.model_name in ['session', 'auditlogentry', 'log', 'logentry', 'userattribute']:

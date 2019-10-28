@@ -38,6 +38,7 @@ class Command(BaseCommand):
                     '.select2-container--default .select2-selection--multiple .select2-selection__choice',
                     '.bootstrap-datetimepicker-widget table td.active',
                     '.box.box-solid.box-theme > .box-header',
+                    '.progress-bar-theme',
                 ]
             },
             'border': {

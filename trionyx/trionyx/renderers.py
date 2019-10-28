@@ -21,3 +21,23 @@ def render_level(model, *args, **kwargs):
         mapping.get(model.level, 'secondary'),
         model.get_level_display().upper()
     )
+
+
+def render_progress(model, *args, **kwargs):
+    """Render progress"""
+    from trionyx.trionyx.layouts import progress_renderer
+    return progress_renderer(model.progress)
+
+
+def render_status(model, *args, **kwargs):
+    """Render level as label"""
+    mapping = {
+        10: 'warning',
+        50: 'success',
+        99: 'danger',
+    }
+
+    return '<span class="label label-{}">{}</span>'.format(
+        mapping.get(model.status, 'info'),
+        model.get_status_display().upper()
+    )

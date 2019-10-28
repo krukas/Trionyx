@@ -94,19 +94,25 @@
             </button>
         </div>
         <div class="box-header" style="padding-bottom: 7px">
-            <div class="btn-group" style="margin-right: 10px">
-              <button type="button" class="btn btn-flat btn-default" data-toggle="dropdown" aria-expanded="false">{% trans 'Actions' %}</button>
-              <button type="button" class="btn btn-flat btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                <span class="caret"></span>
-              </button>
-              <ul class="dropdown-menu" role="menu">
-                <li><a href="#" v-on:click="massActionDelete()">{% trans 'Delete' %}</a></li>
-{#                    <li><a href="#">{% trans 'Update' %}</a></li>#}
-              </ul>
-            </div>
-
-            {% trans '[[count]] items found' %} <span v-if="massActionSelected">({% trans '[[massActionSelected]] selected' %})</span>
-
+            {% if delete_permission or change_permission %}
+                <div class="btn-group" style="margin-right: 10px">
+                  <button type="button" class="btn btn-flat btn-default" data-toggle="dropdown" aria-expanded="false">{% trans 'Actions' %}</button>
+                  <button type="button" class="btn btn-flat btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                    <span class="caret"></span>
+                  </button>
+                  <ul class="dropdown-menu" role="menu">
+                      {% if delete_permission %}
+                        <li><a href="#" v-on:click="massActionDelete()">{% trans 'Delete' %}</a></li>
+                      {% endif %}
+                      {% if change_permission %}
+                        <li><a href="#" v-on:click="massActionUpdate()">{% trans 'Update' %}</a></li>
+                      {% endif %}
+                  </ul>
+                </div>
+            {% endif %}
+            <span style="line-height: 37px">
+                {% trans '[[count]] items found' %} <span v-if="massActionSelected">({% trans '[[massActionSelected]] selected' %})</span>
+            </span>
             <div class="model-list-pagination">
                 <select v-model="pageSize" id="select-pageSize">
                     <option>10</option>
@@ -151,22 +157,24 @@
             <table class="table table-striped model-list" v-if="items.length > 0">
                 <thead>
                     <tr>
-                        <th class="dragtable-no-drag" style="width: 45px; padding-right: 0;">
-                            <div class="btn-group btn-group-xs mass-action-group">
-                              <button type="button" class="btn btn-flat btn-default" data-toggle="dropdown" aria-expanded="false">
-                                  <i class="fa no-margin" v-bind:class="massActionIconClass"></i>
-                              </button>
-                              <button type="button" class="btn btn-flat btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                                <span class="caret"></span>
-                              </button>
-                              <ul class="dropdown-menu" role="menu">
-                                <li><a href="#" v-on:click="massActionSelectAll()">{% trans 'Select All' %}</a></li>
-                                <li><a href="#" v-on:click="massActionDeselectAll()">{% trans 'Deselect All' %}</a></li>
-                                <li><a href="#" v-on:click="massActionSelectAllOnPage()">{% trans 'Select All on this page' %}</a></li>
-                              </ul>
-                            </div>
-                            <span class="dragtable-drag-handle"></span>
-                        </th>
+                        {% if delete_permission or change_permission %}
+                            <th class="dragtable-no-drag" style="width: 45px; padding-right: 0;">
+                                <div class="btn-group btn-group-xs mass-action-group">
+                                  <button type="button" class="btn btn-flat btn-default" data-toggle="dropdown" aria-expanded="false">
+                                      <i class="fa no-margin" v-bind:class="massActionIconClass"></i>
+                                  </button>
+                                  <button type="button" class="btn btn-flat btn-default dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
+                                    <span class="caret"></span>
+                                  </button>
+                                  <ul class="dropdown-menu" role="menu">
+                                    <li><a href="#" v-on:click="massActionSelectAll()">{% trans 'Select All' %}</a></li>
+                                    <li><a href="#" v-on:click="massActionDeselectAll()">{% trans 'Deselect All' %}</a></li>
+                                    <li><a href="#" v-on:click="massActionSelectAllOnPage()">{% trans 'Select All on this page' %}</a></li>
+                                  </ul>
+                                </div>
+                                <span class="dragtable-drag-handle"></span>
+                            </th>
+                        {% endif %}
                         <th class="dragtable-drag-boundary dragtable-no-drag" style="width: 10px" data-header="NR">#<span class="dragtable-drag-handle"></span></th>
                         <th v-for="header in headers" v-on:click="clickSort(header.field)" v-bind:data-header="header.field">
                             [[ header.label ]]
@@ -182,14 +190,16 @@
                 </thead>
                 <tbody>
                     <tr v-for="item in enumeratedItems">
-                        <td>
-                            <input
-                                type="checkbox"
-                                v-model="item.selected"
-                                true-value="1"
-                                false-value="0"
-                            />
-                        </td>
+                        {% if delete_permission or change_permission %}
+                            <td>
+                                <input
+                                    type="checkbox"
+                                    v-model="item.selected"
+                                    true-value="1"
+                                    false-value="0"
+                                />
+                            </td>
+                        {% endif %}
                         <td v-for="column in item.row_data" v-html="column" v-on:click="clickItem(item)" />
                     </tr>
                 </tbody>
@@ -382,12 +392,13 @@
                     var self = this;
                     this.loading = true;
                     initial = typeof initial !== 'undefined' ? initial : false;
+                    var filters = typeof this.$refs.trionyxFilters !== 'undefined' ? this.$refs.trionyxFilters.json : '[]';
                     var data = {
                         page: this.page,
                         page_size: this.pageSize,
                         sort: this.sort,
                         selected_fields: this.currentFields.join(','),
-                        filters: JSON.stringify(this.activeFilters),
+                        filters: filters,
                         search: this.search,
                     };
 
@@ -465,7 +476,7 @@
                         config.massDeleteUrl,
                         {
                             post: {
-                                filters: JSON.stringify(this.activeFilters),
+                                filters: this.$refs.trionyxFilters.json,
                                 all: this.massActionAllSelected ? '1' : '0',
                                 ids: this.massActionIds.join(','),
                             },
@@ -478,6 +489,14 @@
                             }
                         }
                     );
+                },
+
+                massActionUpdate: function(){
+                    url = config.massUpdateUrl + '?all=' + (this.massActionAllSelected ? '1' : '0');
+                    url += '&ids=' + this.massActionIds.join(',');
+                    url += '&filters=' + this.$refs.trionyxFilters.json;
+
+                    window.location = url;
                 },
             },
 
@@ -592,6 +611,7 @@
                     downloadUrl: "{{ download_url }}",
                     contentTypeId: {{ content_type_id }},
                     massDeleteUrl: "{{ mass_delete_url }}",
+                    massUpdateUrl: "{{ mass_update_url }}",
                 });
             });
         });

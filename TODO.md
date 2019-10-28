@@ -16,7 +16,7 @@
     - User layouts
   - Mass actions (update/delete)
     - ~~Delete~~
-    - Update
+    - ~~Update~~
     - Custom (eq update status or publish)
   - Custom attributes?
 - ~~Save verbose_name as field~~

@@ -17,18 +17,19 @@ body {
 .skin-blue .select2-container--default .select2-selection--multiple .select2-selection__choice,
 .skin-blue .bootstrap-datetimepicker-widget table td.active,
 .skin-blue .box.box-solid.box-theme > .box-header,
+.skin-blue .progress-bar-theme,
 .skin-blue-light .bg-theme,
 .skin-blue-light .nav-pills > li.active > a,
 .skin-blue-light .pagination > li.active > a,
 .skin-blue-light .select2-container--default .select2-results__option--highlighted[aria-selected],
 .skin-blue-light .select2-container--default .select2-selection--multiple .select2-selection__choice,
 .skin-blue-light .bootstrap-datetimepicker-widget table td.active,
-.skin-blue-light .box.box-solid.box-theme > .box-header
+.skin-blue-light .box.box-solid.box-theme > .box-header,
+.skin-blue-light .progress-bar-theme
 {
     background-color: #0073b7 !important;
     color: #ffffff !important;
 }
-
 
 .skin-blue .select2-container--default.select2-container--focus .select2-selection--multiple,
 .skin-blue .select2-container--default .select2-search--dropdown .select2-search__field,
@@ -48,7 +49,6 @@ body {
     border-color: #0073b7 !important;
 }
 
-
 .skin-blue .text-theme,
 .skin-blue .bootstrap-datetimepicker-widget a,
 .skin-blue-light .text-theme,
@@ -57,7 +57,6 @@ body {
     color: #0073b7 !important;
 }
 
-
 .skin-yellow .bg-theme,
 .skin-yellow .nav-pills > li.active > a,
 .skin-yellow .pagination > li.active > a,
@@ -65,18 +64,19 @@ body {
 .skin-yellow .select2-container--default .select2-selection--multiple .select2-selection__choice,
 .skin-yellow .bootstrap-datetimepicker-widget table td.active,
 .skin-yellow .box.box-solid.box-theme > .box-header,
+.skin-yellow .progress-bar-theme,
 .skin-yellow-light .bg-theme,
 .skin-yellow-light .nav-pills > li.active > a,
 .skin-yellow-light .pagination > li.active > a,
 .skin-yellow-light .select2-container--default .select2-results__option--highlighted[aria-selected],
 .skin-yellow-light .select2-container--default .select2-selection--multiple .select2-selection__choice,
 .skin-yellow-light .bootstrap-datetimepicker-widget table td.active,
-.skin-yellow-light .box.box-solid.box-theme > .box-header
+.skin-yellow-light .box.box-solid.box-theme > .box-header,
+.skin-yellow-light .progress-bar-theme
 {
     background-color: #f39c12 !important;
     color: #ffffff !important;
 }
-
 
 .skin-yellow .select2-container--default.select2-container--focus .select2-selection--multiple,
 .skin-yellow .select2-container--default .select2-search--dropdown .select2-search__field,
@@ -96,7 +96,6 @@ body {
     border-color: #f39c12 !important;
 }
 
-
 .skin-yellow .text-theme,
 .skin-yellow .bootstrap-datetimepicker-widget a,
 .skin-yellow-light .text-theme,
@@ -105,7 +104,6 @@ body {
     color: #f39c12 !important;
 }
 
-
 .skin-green .bg-theme,
 .skin-green .nav-pills > li.active > a,
 .skin-green .pagination > li.active > a,
@@ -113,18 +111,19 @@ body {
 .skin-green .select2-container--default .select2-selection--multiple .select2-selection__choice,
 .skin-green .bootstrap-datetimepicker-widget table td.active,
 .skin-green .box.box-solid.box-theme > .box-header,
+.skin-green .progress-bar-theme,
 .skin-green-light .bg-theme,
 .skin-green-light .nav-pills > li.active > a,
 .skin-green-light .pagination > li.active > a,
 .skin-green-light .select2-container--default .select2-results__option--highlighted[aria-selected],
 .skin-green-light .select2-container--default .select2-selection--multiple .select2-selection__choice,
 .skin-green-light .bootstrap-datetimepicker-widget table td.active,
-.skin-green-light .box.box-solid.box-theme > .box-header
+.skin-green-light .box.box-solid.box-theme > .box-header,
+.skin-green-light .progress-bar-theme
 {
     background-color: #00a65a !important;
     color: #ffffff !important;
 }
-
 
 .skin-green .select2-container--default.select2-container--focus .select2-selection--multiple,
 .skin-green .select2-container--default .select2-search--dropdown .select2-search__field,
@@ -144,7 +143,6 @@ body {
     border-color: #00a65a !important;
 }
 
-
 .skin-green .text-theme,
 .skin-green .bootstrap-datetimepicker-widget a,
 .skin-green-light .text-theme,
@@ -153,7 +151,6 @@ body {
     color: #00a65a !important;
 }
 
-
 .skin-purple .bg-theme,
 .skin-purple .nav-pills > li.active > a,
 .skin-purple .pagination > li.active > a,
@@ -161,18 +158,19 @@ body {
 .skin-purple .select2-container--default .select2-selection--multiple .select2-selection__choice,
 .skin-purple .bootstrap-datetimepicker-widget table td.active,
 .skin-purple .box.box-solid.box-theme > .box-header,
+.skin-purple .progress-bar-theme,
 .skin-purple-light .bg-theme,
 .skin-purple-light .nav-pills > li.active > a,
 .skin-purple-light .pagination > li.active > a,
 .skin-purple-light .select2-container--default .select2-results__option--highlighted[aria-selected],
 .skin-purple-light .select2-container--default .select2-selection--multiple .select2-selection__choice,
 .skin-purple-light .bootstrap-datetimepicker-widget table td.active,
-.skin-purple-light .box.box-solid.box-theme > .box-header
+.skin-purple-light .box.box-solid.box-theme > .box-header,
+.skin-purple-light .progress-bar-theme
 {
     background-color: #605ca8 !important;
     color: #ffffff !important;
 }
-
 
 .skin-purple .select2-container--default.select2-container--focus .select2-selection--multiple,
 .skin-purple .select2-container--default .select2-search--dropdown .select2-search__field,
@@ -192,7 +190,6 @@ body {
     border-color: #605ca8 !important;
 }
 
-
 .skin-purple .text-theme,
 .skin-purple .bootstrap-datetimepicker-widget a,
 .skin-purple-light .text-theme,
@@ -201,7 +198,6 @@ body {
     color: #605ca8 !important;
 }
 
-
 .skin-red .bg-theme,
 .skin-red .nav-pills > li.active > a,
 .skin-red .pagination > li.active > a,
@@ -209,18 +205,19 @@ body {
 .skin-red .select2-container--default .select2-selection--multiple .select2-selection__choice,
 .skin-red .bootstrap-datetimepicker-widget table td.active,
 .skin-red .box.box-solid.box-theme > .box-header,
+.skin-red .progress-bar-theme,
 .skin-red-light .bg-theme,
 .skin-red-light .nav-pills > li.active > a,
 .skin-red-light .pagination > li.active > a,
 .skin-red-light .select2-container--default .select2-results__option--highlighted[aria-selected],
 .skin-red-light .select2-container--default .select2-selection--multiple .select2-selection__choice,
 .skin-red-light .bootstrap-datetimepicker-widget table td.active,
-.skin-red-light .box.box-solid.box-theme > .box-header
+.skin-red-light .box.box-solid.box-theme > .box-header,
+.skin-red-light .progress-bar-theme
 {
     background-color: #dd4b39 !important;
     color: #ffffff !important;
 }
-
 
 .skin-red .select2-container--default.select2-container--focus .select2-selection--multiple,
 .skin-red .select2-container--default .select2-search--dropdown .select2-search__field,
@@ -240,7 +237,6 @@ body {
     border-color: #dd4b39 !important;
 }
 
-
 .skin-red .text-theme,
 .skin-red .bootstrap-datetimepicker-widget a,
 .skin-red-light .text-theme,
@@ -249,7 +245,6 @@ body {
     color: #dd4b39 !important;
 }
 
-
 .skin-black .bg-theme,
 .skin-black .nav-pills > li.active > a,
 .skin-black .pagination > li.active > a,
@@ -257,18 +252,19 @@ body {
 .skin-black .select2-container--default .select2-selection--multiple .select2-selection__choice,
 .skin-black .bootstrap-datetimepicker-widget table td.active,
 .skin-black .box.box-solid.box-theme > .box-header,
+.skin-black .progress-bar-theme,
 .skin-black-light .bg-theme,
 .skin-black-light .nav-pills > li.active > a,
 .skin-black-light .pagination > li.active > a,
 .skin-black-light .select2-container--default .select2-results__option--highlighted[aria-selected],
 .skin-black-light .select2-container--default .select2-selection--multiple .select2-selection__choice,
 .skin-black-light .bootstrap-datetimepicker-widget table td.active,
-.skin-black-light .box.box-solid.box-theme > .box-header
+.skin-black-light .box.box-solid.box-theme > .box-header,
+.skin-black-light .progress-bar-theme
 {
     background-color: #111111 !important;
     color: #ffffff !important;
 }
-
 
 .skin-black .select2-container--default.select2-container--focus .select2-selection--multiple,
 .skin-black .select2-container--default .select2-search--dropdown .select2-search__field,
@@ -288,7 +284,6 @@ body {
     border-color: #111111 !important;
 }
 
-
 .skin-black .text-theme,
 .skin-black .bootstrap-datetimepicker-widget a,
 .skin-black-light .text-theme,
@@ -296,8 +291,6 @@ body {
 {
     color: #111111 !important;
 }
-
-
 
 
 /*****************************************************************************/
@@ -331,6 +324,13 @@ dl {
 .avatar {
     height: 35px;
     width: 35px;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
+.avatar-sm {
+    height: 25px;
+    width: 25px;
     object-fit: cover;
     border-radius: 50%;
 }

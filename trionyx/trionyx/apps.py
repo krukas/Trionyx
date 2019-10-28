@@ -11,20 +11,22 @@ from importlib import import_module
 
 from django.apps import AppConfig
 from django.apps import apps
+from django.utils import timezone
 
-from trionyx.config import models_config
+from trionyx.config import models_config, ModelConfig
 from trionyx.menu import app_menu
 from trionyx.trionyx.search import auto_register_search_models
 from trionyx.log import enable_db_logger
 from django.utils.translation import ugettext_lazy as _
+from django.contrib.staticfiles.templatetags.staticfiles import static
 
-from .renderers import render_level
+from .renderers import render_level, render_progress, render_status
 
 
 class BaseConfig(AppConfig):
     """Base app config"""
 
-    def get_model_config(self, model):
+    def get_model_config(self, model) -> ModelConfig:
         """Get model config for given model"""
         return models_config.get_config(model)
 
@@ -65,6 +67,14 @@ class Config(BaseConfig):
             'admin/groups', _('Permission groups'), url=model_url('auth.group', 'list'), order=9010, permission='is_superuser')
         app_menu.add_item('admin/logs', _('Logs'), url=model_url('trionyx.log', 'list'), order=9090, permission='is_superuser')
 
+        # Add User renderer
+        from trionyx.trionyx.models import User
+        from trionyx.renderer import renderer
+        renderer.register(User, lambda value, **options: """<img src="{url}" class="avatar-sm"> {user}""".format(
+            url=value.avatar.url if value.avatar else static('img/avatar.png'),
+            user=str(value)
+        ))
+
     def auto_load_app_modules(self, modules):
         """Auto load app modules"""
         for app in apps.get_app_configs():
@@ -75,14 +85,14 @@ class Config(BaseConfig):
                     if str(e) != "No module named '{}.{}'".format(app.module.__package__, module):
                         raise e
 
-    class User:
+    class User(ModelConfig):
         """User config"""
 
         list_default_fields = ['created_at', 'email', 'first_name', 'last_name', 'is_active', 'is_superuser']
         auditlog_ignore_fields = ['last_online', 'last_login']
         verbose_name = '{email}'
 
-    class Log:
+    class Log(ModelConfig):
         """Log config"""
 
         verbose_name = '{message}'
@@ -105,8 +115,40 @@ class Config(BaseConfig):
             }
         ]
 
-    class AuditLogEntry:
+    class AuditLogEntry(ModelConfig):
         """AuditlogEntry config"""
+
+        disable_search_index = True
+
+        disable_add = True
+        disable_change = True
+        disable_delete = True
+
+        auditlog_disable = True
+        api_disable = True
+
+    class Task(ModelConfig):
+        """Task config"""
+
+        verbose_name = '{description}'
+
+        list_default_fields = ['created_at', 'description', 'user', 'status', 'progress', 'started_at', 'execution_time', 'result']
+        list_default_sort = '-last_event'
+
+        list_fields = [
+            {
+                'field': 'status',
+                'renderer': render_status,
+            },
+            {
+                'field': 'progress',
+                'renderer': render_progress,
+            },
+            {
+                'field': 'execution_time',
+                'renderer': lambda obj, *args, **options: str(timezone.timedelta(seconds=obj.execution_time)),
+            },
+        ]
 
         disable_search_index = True
 

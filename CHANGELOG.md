@@ -23,6 +23,8 @@
 - Add mass delete action
 - Add Load js/css from forms and components
 - Add view and edit permissions with jstree
+- Add mass update action
+- Add BaseTask for tracking background task progress
 
 #### Changed
 - Set fallback for user profile name and avatar
