@@ -1,4 +1,4 @@
-### [DEVELOP]
+### [1.0.0] - 29-10-2019
 
 **Compatibility breaking changes: Migrations are cleared**
 
@@ -31,6 +31,7 @@
 - Add support for related fields in list and auto add related to queryset
 - Add layout component find/add/delete
 - Add model overwrites support that are set with settings
+- Add renderers for email/url/bool/list
 
 #### Changed
 - Set fallback for user profile name and avatar
@@ -53,6 +54,7 @@
 - Auditlog gives false positives for Decimal fields
 - Render date: localtime() cannot be applied to a naive datetime
 - Fix model list dragging + fix drag and sort align
+- Fixed None value is rendered as the string None
 
 ### [0.2.0] - 04-06-2019 
 
