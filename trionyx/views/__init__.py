@@ -6,9 +6,10 @@ trionyx.views
 :license: GPLv3
 """
 import inspect
+import logging
 from collections import defaultdict
 
-from trionyx.config import models_config
+from trionyx.config import models_config, TX_MODEL_OVERWRITES
 from trionyx.layout import Layout, Column12, Panel, DescriptionList, Component
 from django.utils.translation import ugettext_lazy as _
 
@@ -19,6 +20,8 @@ from .models import (  # noqa F401
 from .dialogs import (  # noqa F401
     DialogView, UpdateDialog, CreateDialog, LayoutDialog, DeleteDialog
 )
+
+logger = logging.getLogger(__name__)
 
 
 class LayoutRegister:
@@ -164,16 +167,18 @@ class TabRegister:
 
     def get_model_alias(self, model_alias):
         """Get model alias if class then convert to alias string"""
-        from trionyx.models import BaseModel
-        if inspect.isclass(model_alias) and issubclass(model_alias, BaseModel):
+        from trionyx.models import Model
+        if inspect.isclass(model_alias) and issubclass(model_alias, Model):
             config = models_config.get_config(model_alias)
-            return '{}.{}'.format(config.app_label, config.model_name)
-        return model_alias
+            name = '{}.{}'.format(config.app_label, config.model_name).lower()
+        else:
+            name = model_alias.lower()
+        return TX_MODEL_OVERWRITES.get(name, name)
 
     def auto_generate_missing_tabs(self):
         """Auto generate tabs for models with no tabs"""
         for config in models_config.get_all_configs(False):
-            model_alias = '{}.{}'.format(config.app_label, config.model_name)
+            model_alias = self.get_model_alias(config.model)
             if model_alias not in self.tabs:
                 @self.register(model_alias, order=10)
                 def general_layout(obj):
@@ -222,7 +227,13 @@ class TabItem:
             layout = Layout(*layout)
 
         for update_layout in self.layout_updates:
-            update_layout(layout, object)
+            try:
+                update_layout(layout, object)
+            except Exception as e:
+                logger.error('Could not update layout for {}: {}'.format(
+                    self.code,
+                    str(e)
+                ))
         layout.set_object(object)
         return layout
 

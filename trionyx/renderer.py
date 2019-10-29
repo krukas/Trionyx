@@ -39,6 +39,19 @@ def price_value_renderer(value, currency=None, **options):
     return format_currency(value if value else 0.0, currency, locale=utils.get_current_locale())
 
 
+def bool_value_renderer(value, **options):
+    """Render boolean value"""
+    return '<i class="fa {} {}"></i>'.format(
+        'fa-check-square-o' if value else 'fa-square-o',
+        'text-success' if value else 'text-danger'
+    )
+
+
+def list_value_renderer(value, **options):
+    """Render list value"""
+    return ', '.join(value)
+
+
 def related_field_renderer(value, **options):
     """Render list of related items"""
     return ', '.join(str(obj) for obj in value.all())
@@ -50,6 +63,16 @@ def file_field_renderer(file, **options):
         return ''
 
     return '<a href="{file.url}" target="_blank">{name}</a>'.format(file=file, name=os.path.basename(file.path))
+
+
+def url_field_renderer(value, **options):
+    """Render url field"""
+    return '<a href="{url}" target="_blank">{url}</a>'.format(url=value) if value else ''
+
+
+def email_field_renderer(value, **options):
+    """Render email field"""
+    return '<a href="mailto:{email}" target="_blank">{email}</a>'.format(email=value) if value else ''
 
 
 class LazyFieldRenderer:
@@ -80,7 +103,7 @@ class Renderer:
 
     def render_value(self, value, **options):
         """Render value"""
-        renderer = self.renderers.get(type(value), lambda value, **options: str(value))
+        renderer = self.renderers.get(type(value), lambda value, **options: str(value) if value else '')
         return renderer(value, **options)
 
     def render_field(self, obj, field_name, **options):
@@ -112,7 +135,11 @@ renderer = Renderer({
     Decimal: number_value_renderer,
     float: number_value_renderer,
     int: number_value_renderer,
+    bool: bool_value_renderer,
+    list: list_value_renderer,
     models.PriceField: price_value_renderer,
     models.ManyToManyField: related_field_renderer,
     models.FileField: file_field_renderer,
+    models.URLField: url_field_renderer,
+    models.EmailField: email_field_renderer,
 })

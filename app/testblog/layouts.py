@@ -64,3 +64,7 @@ def post_overview(obj):
             )
         )
     ]
+
+@tabs.register_update('trionyx.user', 'general')
+def tasks_update(layout, obj):
+    layout.add_component(Panel('Inserted'), path='container.row.column10[1].panels')

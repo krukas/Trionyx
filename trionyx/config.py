@@ -16,6 +16,7 @@ from django.db.models import Field, Model
 
 TX_MODEL_CONFIGS = settings.TX_CORE_MODEL_CONFIGS
 TX_MODEL_CONFIGS.update(settings.TX_MODEL_CONFIGS)
+TX_MODEL_OVERWRITES = {key.lower(): value.lower() for key, value in settings.TX_MODEL_OVERWRITES.items()}
 
 
 class ModelConfig:
@@ -341,6 +342,20 @@ class Models:
                     config.disable_search_index = True
                 self.configs[self.get_model_name(model)] = config
 
+        # Merge not set configs from overwrites
+        for old, new in TX_MODEL_OVERWRITES.items():
+            old_config = self.configs[old]
+            new_config = self.configs[new]
+
+            for key, value in old_config.__dict__.items():
+                if (
+                    key.startswith('_')
+                    or key in ['model', 'app_config', 'app_label', 'model_name']
+                    or new_config.has_config(key)
+                ):
+                    continue
+                setattr(new_config, key, value)
+
         # Update configs from settings
         for model_name, config in TX_MODEL_CONFIGS.items():
             for key, value in config.items():
@@ -365,8 +380,8 @@ class Models:
     def get_model_name(self, model: Union[str, Model]) -> str:
         """Get model name for given model"""
         if isinstance(model, str):
-            return model
-        return '{}.{}'.format(model._meta.app_label, model._meta.model_name)
+            return model.lower()
+        return '{}.{}'.format(model._meta.app_label, model._meta.model_name).lower()
 
     def get_all_models(self, user: Optional["trionyx.trionyx.models.User"] = None, trionyx_models_only: bool = True):
         """Get all user models"""

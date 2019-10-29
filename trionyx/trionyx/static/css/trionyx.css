@@ -326,6 +326,7 @@ dl {
     width: 35px;
     object-fit: cover;
     border-radius: 50%;
+    margin: 3px;
 }
 
 .avatar-sm {
@@ -333,6 +334,7 @@ dl {
     width: 25px;
     object-fit: cover;
     border-radius: 50%;
+    margin: 3px;
 }
 
 /*****************************************************************************/

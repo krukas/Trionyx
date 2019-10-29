@@ -10,13 +10,15 @@ from django.contrib.auth import password_validation
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
 
+from trionyx.models import get_class
 from trionyx import forms
 from trionyx.forms.layout import Layout, Fieldset, Div, HtmlTemplate, Filters
 from trionyx.forms.helper import FormHelper
-from trionyx.trionyx.models import User
 from trionyx.trionyx.icons import ICON_CHOICES
 from trionyx.config import models_config
 from trionyx import utils
+
+User = get_class('trionyx.User')
 
 
 class ProfileUpdateForm(forms.ModelForm):
