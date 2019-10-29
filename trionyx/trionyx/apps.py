@@ -133,7 +133,6 @@ class Config(BaseConfig):
         verbose_name = '{description}'
 
         list_default_fields = ['created_at', 'description', 'user', 'status', 'progress', 'started_at', 'execution_time', 'result']
-        list_default_sort = '-last_event'
 
         list_fields = [
             {

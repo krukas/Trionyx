@@ -8,6 +8,7 @@ trionyx.renderer
 import os
 from datetime import datetime
 from decimal import Decimal
+from functools import reduce
 
 from django.conf import settings
 from django.core.exceptions import FieldDoesNotExist
@@ -84,9 +85,14 @@ class Renderer:
 
     def render_field(self, obj, field_name, **options):
         """Render field"""
+        field_parts = field_name.split('__')
+        if len(field_parts) > 1:
+            field_name = field_parts[-1]
+            obj = reduce(lambda obj, name: getattr(obj, name), field_parts[:-1], obj)
+
         try:
             field = obj._meta.get_field(field_name)
-        except FieldDoesNotExist:
+        except (FieldDoesNotExist, AttributeError):
             return getattr(obj, field_name, '')
 
         if hasattr(field, 'choices') and getattr(field, 'choices'):

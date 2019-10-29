@@ -247,13 +247,13 @@ class FilterFieldsJsendView(JsendView):
 
         return {
             'id': request.GET.get('id'),
-            'choices_url': model_url(config.model, 'list-choices'),
             'fields': {
                 name: {
                     'name': name,
                     'label': str(field['label']),
                     'type': field['type'],
                     'choices': field['choices'],
+                    'choices_url': field.get('choices_url', None)
                 }
                 for name, field in config.get_list_fields().items()
             }
