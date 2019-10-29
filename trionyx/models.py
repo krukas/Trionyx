@@ -111,7 +111,7 @@ class BaseModel(Model):  # noqa F405
         model_name = type(self).__name__
         verbose_name = models_config.get_config(self).verbose_name
         return verbose_name.format(model_name=model_name, app_label=app_label, **{
-            field.name: LazyFieldRenderer(self, field.name)
+            field.name: LazyFieldRenderer(self, field.name, no_html=True)
             for field in models_config.get_config(self).get_fields(True, True)
         })
 

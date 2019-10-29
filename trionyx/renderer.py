@@ -41,6 +41,9 @@ def price_value_renderer(value, currency=None, **options):
 
 def bool_value_renderer(value, **options):
     """Render boolean value"""
+    if options.get('no_html', False):
+        return value
+
     return '<i class="fa {} {}"></i>'.format(
         'fa-check-square-o' if value else 'fa-square-o',
         'text-success' if value else 'text-danger'
@@ -62,16 +65,23 @@ def file_field_renderer(file, **options):
     if not file:
         return ''
 
+    if options.get('no_html', False):
+        return file.url
+
     return '<a href="{file.url}" target="_blank">{name}</a>'.format(file=file, name=os.path.basename(file.path))
 
 
 def url_field_renderer(value, **options):
     """Render url field"""
+    if options.get('no_html', False):
+        return value
     return '<a href="{url}" target="_blank">{url}</a>'.format(url=value) if value else ''
 
 
 def email_field_renderer(value, **options):
     """Render email field"""
+    if options.get('no_html', False):
+        return value
     return '<a href="mailto:{email}" target="_blank">{email}</a>'.format(email=value) if value else ''
 
 
