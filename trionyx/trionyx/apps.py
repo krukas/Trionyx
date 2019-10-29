@@ -72,7 +72,7 @@ class Config(BaseConfig):
         from trionyx.renderer import renderer
         renderer.register(
             get_class('trionyx.User'),
-            lambda value, **options: """<img src="{url}" class="avatar-sm"> {user}""".format(
+            lambda value, **options: """<img src="{url}" class="avatar-sm" title="{user}">""".format(
                 url=value.avatar.url if value.avatar else static('img/avatar.png'),
                 user=str(value)
             ))

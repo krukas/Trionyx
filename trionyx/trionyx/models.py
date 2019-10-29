@@ -212,6 +212,7 @@ class LogManager(models.BaseManager):
             log=log,
             log_time=timezone.now(),
             user=request.user if request and not request.user.is_anonymous else None,
+            path=request.path if request else '',
             user_agent=request.META.get('HTTP_USER_AGENT') if request else '',
         )
 
@@ -265,6 +266,7 @@ class LogEntry(models.Model):
     log_time = models.DateTimeField(_('Log time'))
 
     user = models.ForeignKey(models.get_name(User), models.SET_NULL, null=True, blank=True, verbose_name=_('User'))
+    path = models.TextField(_('Path'), default='')
     user_agent = models.TextField(_('User agent'), default='')
 
     class Meta:

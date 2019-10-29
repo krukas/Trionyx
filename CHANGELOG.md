@@ -1,4 +1,7 @@
 ### [DEVELOP]
+
+**Compatibility breaking changes: Migrations are cleared**
+
 #### Added
 - Add get_current_request to utils
 - Add DB logger
@@ -25,6 +28,9 @@
 - Add view and edit permissions with jstree
 - Add mass update action
 - Add BaseTask for tracking background task progress
+- Add support for related fields in list and auto add related to queryset
+- Add layout component find/add/delete
+- Add model overwrites support that are set with settings
 
 #### Changed
 - Set fallback for user profile name and avatar

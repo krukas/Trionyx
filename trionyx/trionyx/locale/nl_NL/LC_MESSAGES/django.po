@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-10-28 13:28+0000\n"
-"PO-Revision-Date: 2019-10-28 13:48+0100\n"
+"POT-Creation-Date: 2019-10-29 19:16+0000\n"
+"PO-Revision-Date: 2019-10-29 20:17+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -18,23 +18,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Gtranslator 2.91.7\n"
 
-#: trionyx/models.py:52
+#: trionyx/models.py:66
 msgid "Created at"
 msgstr "Gemaakt om"
 
-#: trionyx/models.py:55
+#: trionyx/models.py:69
 msgid "Updated at"
 msgstr "Bijgewerkt om"
 
-#: trionyx/models.py:58 trionyx/trionyx/models.py:287
+#: trionyx/models.py:72 trionyx/trionyx/models.py:289
 msgid "Deleted"
 msgstr "Verwijderd"
 
-#: trionyx/models.py:62
+#: trionyx/models.py:77
 msgid "Created by"
 msgstr "Gemaakt door"
 
-#: trionyx/models.py:65
+#: trionyx/models.py:80
 msgid "Verbose name"
 msgstr "Uitgebreide naam"
 
@@ -62,11 +62,11 @@ msgstr "Nieuwe gebruikers deze week"
 msgid "User count"
 msgstr "Aantal gebruikers"
 
-#: trionyx/tasks.py:43
+#: trionyx/tasks.py:45
 msgid "Base Task"
 msgstr "Basistaak"
 
-#: trionyx/tasks.py:68 trionyx/tasks.py:72
+#: trionyx/tasks.py:70 trionyx/tasks.py:74
 msgid "Task completed"
 msgstr "Taak volbracht"
 
@@ -92,12 +92,12 @@ msgstr "Gebruikers"
 msgid "Permission groups"
 msgstr "Rechten groepen"
 
-#: trionyx/trionyx/apps.py:68 trionyx/trionyx/models.py:258
+#: trionyx/trionyx/apps.py:68 trionyx/trionyx/models.py:259
 msgid "Logs"
 msgstr "Logs"
 
-#: trionyx/trionyx/apps.py:113 trionyx/trionyx/layouts.py:172
-#: trionyx/trionyx/models.py:243
+#: trionyx/trionyx/apps.py:115 trionyx/trionyx/layouts.py:172
+#: trionyx/trionyx/models.py:244
 msgid "Level"
 msgstr "Niveau"
 
@@ -105,111 +105,111 @@ msgstr "Niveau"
 msgid "History"
 msgstr "Geschiedenis"
 
-#: trionyx/trionyx/forms.py:26 trionyx/trionyx/forms.py:116
-#: trionyx/trionyx/forms.py:200
+#: trionyx/trionyx/forms.py:28 trionyx/trionyx/forms.py:118
+#: trionyx/trionyx/forms.py:202
 msgid "The two password fields didn't match."
 msgstr "De twee wachtwoordvelden kwamen niet overeen."
 
-#: trionyx/trionyx/forms.py:29 trionyx/trionyx/forms.py:119
-#: trionyx/trionyx/forms.py:203
+#: trionyx/trionyx/forms.py:31 trionyx/trionyx/forms.py:121
+#: trionyx/trionyx/forms.py:205
 msgid "New password"
 msgstr "Nieuw wachtwoord"
 
-#: trionyx/trionyx/forms.py:36 trionyx/trionyx/forms.py:126
-#: trionyx/trionyx/forms.py:210
+#: trionyx/trionyx/forms.py:38 trionyx/trionyx/forms.py:128
+#: trionyx/trionyx/forms.py:212
 msgid "New password confirmation"
 msgstr "Bevestiging van nieuwe wachtwoord"
 
-#: trionyx/trionyx/forms.py:51 trionyx/trionyx/forms.py:146
-#: trionyx/trionyx/forms.py:235
+#: trionyx/trionyx/forms.py:53 trionyx/trionyx/forms.py:148
+#: trionyx/trionyx/forms.py:237
 msgid "Personal info"
 msgstr "Persoonlijke informatie"
 
-#: trionyx/trionyx/forms.py:64 trionyx/trionyx/forms.py:241
+#: trionyx/trionyx/forms.py:66 trionyx/trionyx/forms.py:243
 msgid "Change password"
 msgstr "Nieuw wachtwoord"
 
-#: trionyx/trionyx/forms.py:70 trionyx/trionyx/layouts.py:53
+#: trionyx/trionyx/forms.py:72 trionyx/trionyx/layouts.py:53
 msgid "Settings"
 msgstr "Instellingen"
 
-#: trionyx/trionyx/forms.py:139
+#: trionyx/trionyx/forms.py:141
 msgid "Login"
 msgstr "Log in"
 
-#: trionyx/trionyx/forms.py:248 trionyx/trionyx/layouts.py:148
+#: trionyx/trionyx/forms.py:250 trionyx/trionyx/layouts.py:148
 #: trionyx/trionyx/templates/trionyx/forms/permissions.html:3
 msgid "Permissions"
 msgstr "Rechten"
 
-#: trionyx/trionyx/forms.py:350 trionyx/trionyx/forms.py:362
+#: trionyx/trionyx/forms.py:352 trionyx/trionyx/forms.py:364
 msgid "All"
 msgstr "Allemaal"
 
-#: trionyx/trionyx/forms.py:351
+#: trionyx/trionyx/forms.py:353
 msgid "Users only"
 msgstr "Alleen gebruikers"
 
-#: trionyx/trionyx/forms.py:352
+#: trionyx/trionyx/forms.py:354
 msgid "Systems only"
 msgstr "Alleen systemen"
 
-#: trionyx/trionyx/forms.py:355
+#: trionyx/trionyx/forms.py:357
 msgid "Show"
 msgstr "Tonen"
 
-#: trionyx/trionyx/forms.py:363
+#: trionyx/trionyx/forms.py:365
 msgid "Current year"
 msgstr "Huidige jaar"
 
-#: trionyx/trionyx/forms.py:364
+#: trionyx/trionyx/forms.py:366
 msgid "Current month"
 msgstr "Huidige maand"
 
-#: trionyx/trionyx/forms.py:365
+#: trionyx/trionyx/forms.py:367
 msgid "Current week"
 msgstr "Huidige week"
 
-#: trionyx/trionyx/forms.py:366
+#: trionyx/trionyx/forms.py:368
 msgid "Current day"
 msgstr "Huidige dag"
 
-#: trionyx/trionyx/forms.py:367
+#: trionyx/trionyx/forms.py:369
 msgid "Last 365 days"
 msgstr "Laatste 365 dagen"
 
-#: trionyx/trionyx/forms.py:368
+#: trionyx/trionyx/forms.py:370
 msgid "Last 30 days"
 msgstr "Laatste 30 dagen"
 
-#: trionyx/trionyx/forms.py:369
+#: trionyx/trionyx/forms.py:371
 msgid "Last 7 days"
 msgstr "Laatste 7 dagen"
 
-#: trionyx/trionyx/forms.py:372
+#: trionyx/trionyx/forms.py:374
 msgid "Icon"
 msgstr "Icoon"
 
-#: trionyx/trionyx/forms.py:374
+#: trionyx/trionyx/forms.py:376
 msgid "Model"
 msgstr "Model"
 
-#: trionyx/trionyx/forms.py:375 trionyx/trionyx/layouts.py:280
+#: trionyx/trionyx/forms.py:377 trionyx/trionyx/layouts.py:281
 #: trionyx/trionyx/templates/trionyx/base/filters.html:8
 #: trionyx/trionyx/templates/trionyx/core/model_mass_update.html:36
 #: trionyx/trionyx/templates/widgets/total_summary/form_field.html:5
 msgid "Field"
 msgstr "Veld"
 
-#: trionyx/trionyx/forms.py:377
+#: trionyx/trionyx/forms.py:379
 msgid "Period"
 msgstr "Periode"
 
-#: trionyx/trionyx/forms.py:378
+#: trionyx/trionyx/forms.py:380
 msgid "Period field"
 msgstr "Periode veld"
 
-#: trionyx/trionyx/forms.py:379 trionyx/trionyx/forms.py:444
+#: trionyx/trionyx/forms.py:381 trionyx/trionyx/forms.py:446
 #: trionyx/trionyx/templates/trionyx/core/model_list.html:228
 msgid "Filters"
 msgstr "Filters"
@@ -235,7 +235,7 @@ msgstr "API Token"
 msgid "All active permissions"
 msgstr "Alle actieve rechten"
 
-#: trionyx/trionyx/layouts.py:140 trionyx/trionyx/models.py:237
+#: trionyx/trionyx/layouts.py:140 trionyx/trionyx/models.py:238
 msgid "Info"
 msgstr "Info"
 
@@ -255,24 +255,24 @@ msgstr "Backtrace"
 msgid "Last log entries"
 msgstr "Laatste loggegevens"
 
-#: trionyx/trionyx/layouts.py:233 trionyx/views/__init__.py:104
+#: trionyx/trionyx/layouts.py:234 trionyx/views/__init__.py:107
 msgid "General"
 msgstr "Algemeen"
 
-#: trionyx/trionyx/layouts.py:249
+#: trionyx/trionyx/layouts.py:250
 msgid "Process"
 msgstr "Verwerken"
 
-#: trionyx/trionyx/layouts.py:272
+#: trionyx/trionyx/layouts.py:273
 #, python-brace-format
 msgid "{action} on {date} by {user}"
 msgstr "{action} op {date} door {user}"
 
-#: trionyx/trionyx/layouts.py:284
+#: trionyx/trionyx/layouts.py:285
 msgid "Old value"
 msgstr "Oude waarde"
 
-#: trionyx/trionyx/layouts.py:288
+#: trionyx/trionyx/layouts.py:289
 msgid "New value"
 msgstr "Nieuwe waarde"
 
@@ -305,168 +305,172 @@ msgstr "Laatst online"
 msgid "Timezone"
 msgstr "Tijdzone"
 
-#: trionyx/trionyx/models.py:95 trionyx/trionyx/models.py:267
+#: trionyx/trionyx/models.py:95 trionyx/trionyx/models.py:268
 #: trionyx/trionyx/templates/widgets/auditlog.html:13
 msgid "User"
 msgstr "Gebruiker"
 
-#: trionyx/trionyx/models.py:234
+#: trionyx/trionyx/models.py:235
 msgid "Critical"
 msgstr "Kritisch"
 
-#: trionyx/trionyx/models.py:235
+#: trionyx/trionyx/models.py:236
 msgid "Error"
 msgstr "Fout"
 
-#: trionyx/trionyx/models.py:236
+#: trionyx/trionyx/models.py:237
 msgid "Warning"
 msgstr "Waarschuwing"
 
-#: trionyx/trionyx/models.py:238
+#: trionyx/trionyx/models.py:239
 msgid "Debug"
 msgstr "Debug"
 
-#: trionyx/trionyx/models.py:239
+#: trionyx/trionyx/models.py:240
 msgid "Not set"
 msgstr "Niet ingesteld"
 
-#: trionyx/trionyx/models.py:242
+#: trionyx/trionyx/models.py:243
 msgid "Log hash"
 msgstr "Log hash"
 
-#: trionyx/trionyx/models.py:244
+#: trionyx/trionyx/models.py:245
 msgid "Message"
 msgstr "Bericht"
 
-#: trionyx/trionyx/models.py:245
+#: trionyx/trionyx/models.py:246
 msgid "File path"
 msgstr "Bestandspad"
 
-#: trionyx/trionyx/models.py:246
+#: trionyx/trionyx/models.py:247
 msgid "File line"
 msgstr "Bestandsregel"
 
-#: trionyx/trionyx/models.py:247
+#: trionyx/trionyx/models.py:248
 msgid "Traceback"
 msgstr "Traceback"
 
-#: trionyx/trionyx/models.py:249
+#: trionyx/trionyx/models.py:250
 msgid "Last event"
 msgstr "Laatste evenement"
 
-#: trionyx/trionyx/models.py:250
+#: trionyx/trionyx/models.py:251
 msgid "Log count"
 msgstr "Aantal logs"
 
-#: trionyx/trionyx/models.py:257
+#: trionyx/trionyx/models.py:258
 msgid "Log"
 msgstr "Log"
 
-#: trionyx/trionyx/models.py:265
+#: trionyx/trionyx/models.py:266
 msgid "Log time"
 msgstr "Log tijd"
 
-#: trionyx/trionyx/models.py:268
+#: trionyx/trionyx/models.py:269
+msgid "Path"
+msgstr "Pad"
+
+#: trionyx/trionyx/models.py:270
 msgid "User agent"
 msgstr "User agent"
 
-#: trionyx/trionyx/models.py:273
+#: trionyx/trionyx/models.py:275
 msgid "Log entry"
 msgstr "Log entry"
 
-#: trionyx/trionyx/models.py:274
+#: trionyx/trionyx/models.py:276
 msgid "Log entries"
 msgstr "Log entries"
 
-#: trionyx/trionyx/models.py:285
+#: trionyx/trionyx/models.py:287
 msgid "Added"
 msgstr "Toegevoegd"
 
-#: trionyx/trionyx/models.py:286
+#: trionyx/trionyx/models.py:288
 msgid "Changed"
 msgstr "Gewijzigd"
 
-#: trionyx/trionyx/models.py:318
+#: trionyx/trionyx/models.py:320
 msgid "Scheduled"
 msgstr "Gepland"
 
-#: trionyx/trionyx/models.py:319
+#: trionyx/trionyx/models.py:321
 msgid "Queue"
 msgstr "Wachtrij"
 
-#: trionyx/trionyx/models.py:320
+#: trionyx/trionyx/models.py:322
 msgid "Locked"
 msgstr "Vergrendeld"
 
-#: trionyx/trionyx/models.py:321
+#: trionyx/trionyx/models.py:323
 msgid "Running"
 msgstr "Draait"
 
-#: trionyx/trionyx/models.py:322
+#: trionyx/trionyx/models.py:324
 msgid "Completed"
 msgstr "Voltooid"
 
-#: trionyx/trionyx/models.py:323
+#: trionyx/trionyx/models.py:325
 msgid "Failed"
 msgstr "Mislukt"
 
-#: trionyx/trionyx/models.py:327
+#: trionyx/trionyx/models.py:329
 msgid "Status"
 msgstr "Staat"
 
-#: trionyx/trionyx/models.py:328
+#: trionyx/trionyx/models.py:330
 msgid "Identifier"
 msgstr "Identifier"
 
-#: trionyx/trionyx/models.py:329
+#: trionyx/trionyx/models.py:331
 msgid "Description"
 msgstr "Beschrijving"
 
-#: trionyx/trionyx/models.py:331
+#: trionyx/trionyx/models.py:333
 msgid "Progress"
 msgstr "Voortgang"
 
-#: trionyx/trionyx/models.py:332
+#: trionyx/trionyx/models.py:334
 msgid "Progress output"
 msgstr "Uitvoer voortgang"
 
-#: trionyx/trionyx/models.py:334
+#: trionyx/trionyx/models.py:336
 msgid "Scheduled at"
 msgstr "Gepland op"
 
-#: trionyx/trionyx/models.py:335
+#: trionyx/trionyx/models.py:337
 msgid "started at"
 msgstr "begon om"
 
-#: trionyx/trionyx/models.py:336
+#: trionyx/trionyx/models.py:338
 msgid "Execution time"
 msgstr "Uitvoeringstijd"
 
-#: trionyx/trionyx/models.py:337
+#: trionyx/trionyx/models.py:339
 msgid "Result"
 msgstr "Resultaat"
 
-#: trionyx/trionyx/models.py:339
+#: trionyx/trionyx/models.py:343
 msgid "Started by"
 msgstr "Gestart door"
 
-#: trionyx/trionyx/models.py:346
+#: trionyx/trionyx/models.py:350
 msgid "Object type"
 msgstr "Object type"
 
-#: trionyx/trionyx/models.py:348
+#: trionyx/trionyx/models.py:352
 msgid "Object ID"
 msgstr "Object ID"
 
-#: trionyx/trionyx/models.py:350
+#: trionyx/trionyx/models.py:354
 msgid "Object name"
 msgstr "Object naam"
 
-#: trionyx/trionyx/models.py:355
+#: trionyx/trionyx/models.py:359
 msgid "Task"
 msgstr "Taak"
 
-#: trionyx/trionyx/models.py:356
+#: trionyx/trionyx/models.py:360
 msgid "Tasks"
 msgstr "Taken"
 
@@ -606,7 +610,7 @@ msgstr "Bewerken"
 #: trionyx/trionyx/templates/trionyx/core/dashboard.html:114
 #: trionyx/trionyx/templates/trionyx/core/model_mass_update.html:18
 #: trionyx/trionyx/templates/trionyx/core/model_update.html:39
-#: trionyx/trionyx/views.py:413
+#: trionyx/trionyx/views.py:414
 msgid "Save"
 msgstr "Opslaan"
 
@@ -624,7 +628,7 @@ msgstr "Terug"
 #: trionyx/trionyx/templates/trionyx/core/model_delete.html:31
 #: trionyx/trionyx/templates/trionyx/core/model_list.html:105
 #: trionyx/trionyx/templates/trionyx/core/model_view.html:23
-#: trionyx/trionyx/views.py:178 trionyx/trionyx/views.py:474
+#: trionyx/trionyx/views.py:181 trionyx/trionyx/views.py:475
 msgid "Delete"
 msgstr "Verwijderen"
 
@@ -719,7 +723,7 @@ msgid "Updating %(count)s %(model_name_plural)s"
 msgstr "Bijwerken van %(count)s %(model_name_plural)s"
 
 #: trionyx/trionyx/templates/trionyx/core/model_mass_update.html:35
-#: trionyx/trionyx/views.py:177
+#: trionyx/trionyx/views.py:180
 msgid "Change"
 msgstr "Wijzigen"
 
@@ -794,37 +798,37 @@ msgstr "Tel records"
 msgid "Period Field"
 msgstr "Periodeveld"
 
-#: trionyx/trionyx/views.py:175
+#: trionyx/trionyx/views.py:178
 msgid "View"
 msgstr "Bekijken"
 
-#: trionyx/trionyx/views.py:176
+#: trionyx/trionyx/views.py:179
 msgid "Add"
 msgstr "Toevoegen"
 
-#: trionyx/trionyx/views.py:407
+#: trionyx/trionyx/views.py:408
 msgid "Widget config"
 msgstr "Widget configuratie"
 
-#: trionyx/trionyx/views.py:456
+#: trionyx/trionyx/views.py:457
 msgid "Something went wrong on deleting the items"
 msgstr "Er is iets misgegaan bij het verwijderen van de items"
 
-#: trionyx/trionyx/views.py:463
+#: trionyx/trionyx/views.py:464
 #, python-brace-format
 msgid "Deleting {count} {model_name} items"
 msgstr "Het verwijderen van {count} {model_name} items"
 
-#: trionyx/trionyx/views.py:497
+#: trionyx/trionyx/views.py:498
 msgid "You must make a selection"
 msgstr "U moet een selectie maken"
 
-#: trionyx/trionyx/views.py:550
+#: trionyx/trionyx/views.py:551
 #, python-brace-format
 msgid "Mass update {count} {model_name}"
 msgstr "Massa update {count} {model_name}"
 
-#: trionyx/trionyx/views.py:558
+#: trionyx/trionyx/views.py:559
 #, python-brace-format
 msgid "Successfully started task for updating {count} {model_name}"
 msgstr ""
@@ -890,15 +894,15 @@ msgstr "{model_name} ({object}) is succesvol verwijderd"
 msgid "Something went wrong on deleting {model_name}"
 msgstr "Er is iets misgegaan bij het verwijderen van {model_name}"
 
-#: trionyx/views/models.py:590
+#: trionyx/views/models.py:600
 msgid "Successfully saved ({})"
 msgstr "Succesvol opgeslagen ({})"
 
-#: trionyx/views/models.py:676
+#: trionyx/views/models.py:686
 msgid "Successfully created ({})"
 msgstr "Met succes gemaakt ({})"
 
-#: trionyx/views/models.py:723
+#: trionyx/views/models.py:733
 msgid "Successfully deleted ({})"
 msgstr "Met succes verwijderd ({})"
 

@@ -196,6 +196,7 @@ def trionyx_log(obj):
                         obj.entries.select_related('user').order_by('-id')[:25],
                         'log_time',
                         'user',
+                        'path',
                         'user_agent',
                         object=LogEntry()
                     )
