@@ -16,8 +16,10 @@ from django.conf import settings
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
 
-from trionyx.trionyx.models import Task
+from trionyx.models import get_class
 from trionyx.utils import CacheLock, get_current_request
+
+Task = get_class('trionyx.Task')
 
 logger = logging.getLogger(__name__)
 

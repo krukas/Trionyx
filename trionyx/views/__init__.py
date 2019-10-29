@@ -8,7 +8,7 @@ trionyx.views
 import inspect
 from collections import defaultdict
 
-from trionyx.config import models_config
+from trionyx.config import models_config, TX_MODEL_OVERWRITES
 from trionyx.layout import Layout, Column12, Panel, DescriptionList, Component
 from django.utils.translation import ugettext_lazy as _
 
@@ -164,16 +164,18 @@ class TabRegister:
 
     def get_model_alias(self, model_alias):
         """Get model alias if class then convert to alias string"""
-        from trionyx.models import BaseModel
-        if inspect.isclass(model_alias) and issubclass(model_alias, BaseModel):
+        from trionyx.models import Model
+        if inspect.isclass(model_alias) and issubclass(model_alias, Model):
             config = models_config.get_config(model_alias)
-            return '{}.{}'.format(config.app_label, config.model_name)
-        return model_alias
+            name = '{}.{}'.format(config.app_label, config.model_name).lower()
+        else:
+            name = model_alias.lower()
+        return TX_MODEL_OVERWRITES.get(name, name)
 
     def auto_generate_missing_tabs(self):
         """Auto generate tabs for models with no tabs"""
         for config in models_config.get_all_configs(False):
-            model_alias = '{}.{}'.format(config.app_label, config.model_name)
+            model_alias = self.get_model_alias(config.model)
             if model_alias not in self.tabs:
                 @self.register(model_alias, order=10)
                 def general_layout(obj):

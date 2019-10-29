@@ -9,6 +9,7 @@ import operator
 from collections import defaultdict
 from functools import reduce
 
+from django.conf import settings
 from django.db.models import *  # noqa F403
 from django.urls import reverse
 from jsonfield import JSONField  # noqa F401
@@ -18,6 +19,19 @@ from django.utils.translation import ugettext_lazy as _
 
 from trionyx.config import models_config
 from trionyx import utils
+
+TX_MODEL_OVERWRITES = {key.lower(): value.lower() for key, value in settings.TX_MODEL_OVERWRITES.items()}
+
+
+def get_name(model):
+    """Get model name"""
+    name = models_config.get_model_name(model)
+    return TX_MODEL_OVERWRITES.get(name, name)
+
+
+def get_class(model):
+    """Get model class"""
+    return models_config.get_config(get_name(model)).model
 
 
 # =============================================================================
@@ -59,7 +73,8 @@ class BaseModel(Model):  # noqa F405
     """Deleted field, object is soft deleted"""
 
     created_by = ForeignKey(
-        'trionyx.User', SET_NULL, default=None, blank=True, null=True, related_name='+', verbose_name=_('Created by'))
+        get_name('trionyx.User'), SET_NULL, default=None, blank=True, null=True,
+        related_name='+', verbose_name=_('Created by'))
     """Created by field"""
 
     verbose_name = TextField(_('Verbose name'), default='', blank=True)

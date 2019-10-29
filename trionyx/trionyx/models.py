@@ -109,11 +109,11 @@ class User(models.BaseModel, AbstractBaseUser, PermissionsMixin):
 
     def set_attribute(self, code, value):
         """Set user attribute"""
-        UserAttribute.objects.set_attribute(self, code, value)
+        models.get_class(UserAttribute).objects.set_attribute(self, code, value)
 
     def get_attribute(self, code, default=None):
         """Get user attribute"""
-        return UserAttribute.objects.get_attribute(self, code, default)
+        return models.get_class(UserAttribute).objects.get_attribute(self, code, default)
 
     @contextmanager
     def locale_override(self):
@@ -164,7 +164,7 @@ class UserAttributeManager(models.Manager):
 class UserAttribute(models.Model):
     """User attribute to store system values for user"""
 
-    user = models.ForeignKey(User, models.CASCADE, related_name='attributes')
+    user = models.ForeignKey(models.get_name(User), models.CASCADE, related_name='attributes')
     code = models.CharField(max_length=128, null=False)
     value = models.JSONField()
 
@@ -264,7 +264,7 @@ class LogEntry(models.Model):
     log = models.ForeignKey(Log, models.CASCADE, related_name='entries')
     log_time = models.DateTimeField(_('Log time'))
 
-    user = models.ForeignKey(User, models.SET_NULL, null=True, blank=True, verbose_name=_('User'))
+    user = models.ForeignKey(models.get_name(User), models.SET_NULL, null=True, blank=True, verbose_name=_('User'))
     user_agent = models.TextField(_('User agent'), default='')
 
     class Meta:
@@ -292,7 +292,7 @@ class AuditLogEntry(models.BaseModel):
     content_object = fields.GenericForeignKey('content_type', 'object_id')
     object_verbose_name = models.TextField(default='', blank=True)
 
-    user = models.ForeignKey(User, models.SET_NULL, blank=True, null=True, related_name='+')
+    user = models.ForeignKey(models.get_name(User), models.SET_NULL, blank=True, null=True, related_name='+')
     action = models.IntegerField(choices=action_choices)
     changes = models.JSONField()
 
@@ -336,7 +336,9 @@ class Task(models.BaseModel):
     execution_time = models.IntegerField(_('Execution time'), default=0)
     result = models.TextField(_('Result'), blank=True, default='')
 
-    user = models.ForeignKey(User, models.SET_NULL, blank=True, null=True, verbose_name=_('Started by'))
+    user = models.ForeignKey(
+        models.get_name(User), models.SET_NULL, blank=True, null=True,
+        verbose_name=_('Started by'))
     object_type = models.ForeignKey(
         'contenttypes.ContentType',
         models.SET_NULL,

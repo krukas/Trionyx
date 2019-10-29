@@ -334,6 +334,16 @@ def TX_DEFAULT_DASHBOARD():
         }
     ]
 
+TX_MODEL_OVERWRITES = {}
+"""
+Config to overwrite models, its a dict where the key is the original `app_label.model_name` and value is the new one. 
+
+.. code-block:: python
+
+    TX_MODEL_OVERWRITES = {
+        'trionyx.User': 'local.User',
+    }
+"""
 
 TX_MODEL_CONFIGS = {}
 """
@@ -341,11 +351,12 @@ Dict with configs for non Trionyx model, example:
 
 .. code-block:: python
 
-    TX_MODEL_CONFIGS = 'auth.group': {
-        'list_default_fields': ['name'],
-        'disable_search_index': False,
+    TX_MODEL_CONFIGS = {
+        'auth.group': {
+            'list_default_fields': ['name'],
+            'disable_search_index': False,
+        }
     }
-
 """
 
 TX_CORE_MODEL_CONFIGS = {

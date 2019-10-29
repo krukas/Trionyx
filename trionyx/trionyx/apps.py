@@ -68,12 +68,14 @@ class Config(BaseConfig):
         app_menu.add_item('admin/logs', _('Logs'), url=model_url('trionyx.log', 'list'), order=9090, permission='is_superuser')
 
         # Add User renderer
-        from trionyx.trionyx.models import User
+        from trionyx.models import get_class
         from trionyx.renderer import renderer
-        renderer.register(User, lambda value, **options: """<img src="{url}" class="avatar-sm"> {user}""".format(
-            url=value.avatar.url if value.avatar else static('img/avatar.png'),
-            user=str(value)
-        ))
+        renderer.register(
+            get_class('trionyx.User'),
+            lambda value, **options: """<img src="{url}" class="avatar-sm"> {user}""".format(
+                url=value.avatar.url if value.avatar else static('img/avatar.png'),
+                user=str(value)
+            ))
 
     def auto_load_app_modules(self, modules):
         """Auto load app modules"""
@@ -150,6 +152,7 @@ class Config(BaseConfig):
         ]
 
         disable_search_index = True
+        menu_exclude = True
 
         disable_add = True
         disable_change = True
