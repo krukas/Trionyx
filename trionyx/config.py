@@ -106,7 +106,7 @@ class ModelConfig:
     list_select_related = None
     """Array of fields to add foreign-key relationships to query, use this for relations that are used in search or renderer"""
 
-    list_default_sort = '-id'
+    list_default_sort = '-pk'
     """Default sort field for list view"""
 
     api_fields = None
