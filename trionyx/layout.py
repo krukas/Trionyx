@@ -40,6 +40,8 @@ Layouts are defined and registered in layouts.py in an app.
 
 
 """
+import re
+
 from django import template
 from django.utils.functional import cached_property
 from django.template.loader import render_to_string
@@ -73,6 +75,59 @@ class Layout:
     def __len__(self):
         """Get component length"""
         return len(self.components)
+
+    def get_paths(self):
+        """Get all paths in layout for easy lookup"""
+        def generate_paths(component=None, path=None, index=None):
+            """Generate all paths in layout"""
+            path = [
+                *path,
+                str(component.__class__.__name__ + '-' + str(index)).lower()
+            ]
+            paths = {'.'.join(path): component}
+
+            for index, comp in enumerate(component.components):
+                paths.update(generate_paths(comp, path, index))
+            return paths
+
+        paths = {}
+        for index, comp in enumerate(self.components):
+            paths.update(generate_paths(comp, [], index))
+
+        # Can't cache paths because after one change the are not valid
+        return paths
+
+    def find_component_by_path(self, path):
+        """Find component by path, gives back component and parent"""
+        path_re = re.compile(r'([\wd]+)(\[(\d+)\])?')
+        new_path = []
+        for p in path.lower().split('.'):
+            match = path_re.match(p)
+            new_path.append('{}-{}'.format(
+                match.group(1),
+                match.group(3) if match.group(3) else 0
+            ))
+
+        paths = self.get_paths()
+        return (
+            paths.get('.'.join(new_path)),
+            paths.get('.'.join(new_path[:-1]))
+        )
+
+    def find_component_by_id(self, id=None, current_comp=None):
+        """Find component by id, gives back component and parent"""
+        current_comp = current_comp if current_comp else self
+
+        for comp in current_comp.components:
+            if id and comp.id == id:
+                return (comp, current_comp)
+
+        for comp in current_comp.components:
+            r_comp, r_parent = self.find_component_by_id(id=id, current_comp=comp)
+            if r_comp:
+                return (r_comp, r_parent)
+
+        return (None, None)
 
     def render(self, request=None):
         """Render layout for given request"""
@@ -118,35 +173,59 @@ class Layout:
         for component in self.components:
             component.set_object(self.object)
 
-    def add_component(self, component, after=None, before=None):
+    def add_component(self, component, id=None, path=None, before=False):
         """
-        Add component to existing layout can insert component before or after component path
+        Add component to existing layout can insert component before or after component
 
         :param component:
-        :param after: component code path
-        :param before: component code path
+        :param id: component id
+        :param path: component path, example: container.row.column6[1].panel
         :return:
         """
-        pass
+        if not id and not path:
+            if before:
+                self.components.append(component)
+            else:
+                self.components.insert(0, component)
 
-    def update_component(self, component_path, callback):
+        if id:
+            comp, parent = self.find_component_by_id(id)
+        else:
+            comp, parent = self.find_component_by_path(path)
+
+        if not comp:
+            raise Exception('Could not add component: Unknown path {} or id {}'.format(path, id))
+
+        if parent:
+            index = parent.components.index(comp) if before else parent.components.index(comp) + 1
+            parent.components.insert(index, component)
+        elif comp:
+            index = self.components.index(comp) if before else self.components.index(comp) + 1
+            self.components.insert(index, component)
+
+    def delete_component(self, id=None, path=None):
         """
-        Update component with given path, calls callback with component
+        Delete component for given path or id
 
-        :param component_path:
-        :param callback:
+        :param id: component id
+        :param path: component path, example: container.row.column6[1].panel
         :return:
         """
-        pass
+        if not id and not path:
+            raise Exception('You must supply an id or path')
 
-    def delete_component(self, component_path):
-        """
-        Delete component for given path
+        if id:
+            comp, parent = self.find_component_by_id(id)
+        else:
+            comp, parent = self.find_component_by_path(path)
 
-        :param component_path:
-        :return:
-        """
-        pass
+        if not comp:
+            raise Exception('Could not delete component: Unknown path {} or id {}'.format(path, id))
+
+        if parent:
+            parent.components.remove(comp)
+        elif comp:
+            self.components.remove(comp)
 
 
 class Component:
@@ -165,6 +244,7 @@ class Component:
         """Initialize Component"""
         self.id = options.get('id')
         self.components = list(filter(None, components))
+        self.parent = None
         self.object = options.get('object', False)
         self.context = {}
         self.request = None
@@ -257,6 +337,14 @@ class ComponentFieldsMixin:
 
     The items in the objects list can be a mix of Models, dicts or lists.
     """
+
+    def add_field(self, field, index=None):
+        """Add field"""
+        self.fields = list(self.fields)
+        if index is not None:
+            self.fields.insert(index, field)
+        else:
+            self.fields.append(field)
 
     def get_fields(self):
         """Get all fields"""

@@ -6,6 +6,7 @@ trionyx.views
 :license: GPLv3
 """
 import inspect
+import logging
 from collections import defaultdict
 
 from trionyx.config import models_config, TX_MODEL_OVERWRITES
@@ -19,6 +20,8 @@ from .models import (  # noqa F401
 from .dialogs import (  # noqa F401
     DialogView, UpdateDialog, CreateDialog, LayoutDialog, DeleteDialog
 )
+
+logger = logging.getLogger(__name__)
 
 
 class LayoutRegister:
@@ -224,7 +227,13 @@ class TabItem:
             layout = Layout(*layout)
 
         for update_layout in self.layout_updates:
-            update_layout(layout, object)
+            try:
+                update_layout(layout, object)
+            except Exception as e:
+                logger.error('Could not update layout for {}: {}'.format(
+                    self.code,
+                    str(e)
+                ))
         layout.set_object(object)
         return layout
 
