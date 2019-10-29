@@ -243,7 +243,7 @@
                 var choices = [];
                 this.ajaxCall = $.ajax({
                     type: 'GET',
-                    url: this.getContentType().choices_url + '?field=' + field,
+                    url: this.fields[field].choices_url + '?field=' + field,
                     async: false,
                 }).done(function(response){
                     if (response.status === 'success') {

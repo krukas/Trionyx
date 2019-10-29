@@ -185,6 +185,7 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
             config = self.get_model_config()
             current_fields = config.list_default_fields if config.list_default_fields else ['id']
 
+        # TODO check if all fields are still valid, filter out invalid and save
         self.current_fields = current_fields
         return current_fields
 
@@ -196,15 +197,24 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
         """Get qeuryset for model"""
         query = self.search_queryset()
         query = filter_queryset_with_user_filters(query, self.get_filters(), self.request)
+
+        fields = self.get_all_fields()
+        select_related = self.get_model_config().list_select_related if self.get_model_config().list_select_related else []
+        for field in self.get_current_fields():
+            field_parts = field.split('__')
+            if len(field_parts) > 1:
+                select_related.append('__'.join(field_parts[:-1]))
+            elif fields[field]['type'] == 'related':
+                select_related.append(field)
+
+        if select_related:
+            query = query.select_related(*set(select_related))
+
         return query.order_by(self.get_sort())
 
     def search_queryset(self):
         """Get search query set"""
         queryset = self.get_model_class().objects.get_queryset()
-
-        if self.get_model_config().list_select_related:
-            queryset = queryset.select_related(*self.get_model_config().list_select_related)
-
         return watson.filter(queryset, self.get_search(), ranking=False)
 
 

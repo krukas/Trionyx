@@ -6,6 +6,7 @@ trionyx.config
 :license: GPLv3
 """
 import inspect
+from functools import reduce
 from typing import Optional, Generator, Union
 
 from django.apps import apps
@@ -213,6 +214,10 @@ class ModelConfig:
         """Check if config is set"""
         return name in self.__changed
 
+    def get_field(self, field_name):
+        """Get model field by name"""
+        return self.model._meta.get_field(field_name)
+
     def get_fields(self, inlcude_base: bool = False, include_id: bool = False):
         """Get model fields"""
         for field in self.model._meta.fields:
@@ -223,6 +228,15 @@ class ModelConfig:
             if not inlcude_base and field.name in ['created_at', 'updated_at', 'created_by', 'verbose_name']:
                 continue
             yield field
+
+    def get_url(self, view_name: str, model: Model = None, code: str = None) -> str:
+        """Get url for model"""
+        from trionyx.urls import model_url
+        return model_url(
+            model if model else self.model,
+            view_name,
+            code
+        )
 
     def get_absolute_url(self, model: Model) -> str:
         """Get model url"""
@@ -240,28 +254,45 @@ class ModelConfig:
         def create_list_fields(config_fields, list_fields=None):
             list_fields = list_fields if list_fields else {}
 
-            for field in config_fields:
-                config = field
-                if isinstance(field, str):
-                    config = {'field': field}
+            for field_config in config_fields:
+                config = field_config
+                if isinstance(field_config, str):
+                    config = {'field': field_config}
 
                 if 'field' not in config:
                     raise Exception("Field config is missing field: {}".format(config))
+
+                field_model_config = self
+                field_parts = config['field'].split('__')
+
+                if len(field_parts) > 1:
+                    related_class = reduce(
+                        lambda obj, field: getattr(obj, field).field.related_model,
+                        field_parts[:-1],
+                        self.model)
+
+                    field_model_config = models_config.get_config(related_class)
+                    field = field_model_config.get_field(field_parts[-1])
+
+                    config['choices_url'] = self.get_url('list-choices')
+                elif config['field'] in model_fields:
+                    field = model_fields[config['field']]
+                else:
+                    field = None
+
                 if 'label' not in config:
-                    if config['field'] in model_fields:
-                        config['label'] = model_fields[config['field']].verbose_name
-                    else:
-                        config['label'] = config['field']
+                    label = field.verbose_name if field else config['field']
+                    label = '{} {}'.format(field_model_config.get_verbose_name(), label) if len(field_parts) > 1 else label
+                    config['label'] = label
+
                 if 'renderer' not in config:
                     config['renderer'] = renderer.render_field
 
-                if 'type' not in config and config['field'] in model_fields:
-                    config['type'] = self.get_field_type(
-                        self.model._meta.get_field(config['field'])
-                    )
+                if 'type' not in config and field:
+                    config['type'] = self.get_field_type(field)
 
-                if 'choices' not in config and config['field'] in model_fields:
-                    config['choices'] = self.model._meta.get_field(config['field']).choices
+                if 'choices' not in config and field:
+                    config['choices'] = field.choices
 
                 list_fields[config['field']] = config
             return list_fields
