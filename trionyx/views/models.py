@@ -30,7 +30,6 @@ from django.contrib import messages
 from watson import search as watson
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
-from django.core.exceptions import FieldDoesNotExist
 
 from trionyx.views.mixins import ModelClassMixin, SessionValueMixin, ModelPermissionMixin
 from trionyx.forms.helper import FormHelper

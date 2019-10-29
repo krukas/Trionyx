@@ -240,8 +240,6 @@ class FilterFieldsJsendView(JsendView):
 
     def handle_request(self, request, *args, **kwargs):
         """Get filter fields"""
-        from trionyx.urls import model_url
-
         modelClass = ContentType.objects.get_for_id(request.GET.get('id')).model_class()
         config = models_config.get_config(modelClass)
 
