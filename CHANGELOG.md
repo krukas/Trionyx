@@ -5,6 +5,7 @@
 
 #### Fixed
 - Delete dialog does not return `success` boolean
+- Fixed html component not rendering html and tag not closed
 
 
 ### [1.0.1] - 29-10-2019
