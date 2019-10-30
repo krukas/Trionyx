@@ -5,7 +5,6 @@ trionyx.trionyx.middleware
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
-import threading
 from re import compile
 
 from django.urls import reverse
@@ -14,7 +13,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils import translation
 
-LOCAL_DATA = threading.local()
+from trionyx.trionyx import LOCAL_DATA
 
 EXEMPT_URLS = [
     compile(reverse(settings.LOGIN_URL).lstrip('/')),

@@ -1,3 +1,9 @@
+### [1.0.3] - 30-10-2019
+#### Fixed
+- Fixed to early reverse lookup
+- Fixed not all quickstart files where included
+
+
 ### [1.0.2] - 30-10-2019
 #### Changed
 - Dialog form initial also uses GET params
