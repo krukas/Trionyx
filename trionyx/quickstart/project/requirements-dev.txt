@@ -1,0 +1,13 @@
+coverage
+flake8
+pydocstyle
+ipython
+jupyter
+Sphinx
+sphinx_rtd_theme
+
+#Debuging
+colorlog
+django-debug-toolbar
+django-extensions
+Werkzeug

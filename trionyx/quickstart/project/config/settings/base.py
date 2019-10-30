@@ -13,6 +13,9 @@ INSTALLED_APPS += [ # noqa F405
 
 ROOT_URLCONF = 'config.urls'
 
+LOCALE_PATHS = (
+    os.path.join(BASE_DIR, 'locale'),
+)
 
 # Celery beat schedule
 from trionyx.utils import create_celerybeat_schedule  # noqa E402

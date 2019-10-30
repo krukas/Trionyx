@@ -44,6 +44,13 @@ class Quickstart:
             'secret_key': utils.random_string(32)
         })
 
+        self.update_file(project_path, 'README.rst', {
+            'title': "{name}\n{heading}".format(
+                name=os.path.basename(project_path).capitalize(),
+                heading='=' * len(os.path.basename(project_path)),
+            )
+        })
+
     def create_app(self, apps_path, name):
         """
         Create Trionyx app in given path

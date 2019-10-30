@@ -1,9 +1,11 @@
+### Trionyx ###
+environment.json
+
 ### Django ###
 *.log
 *.pot
 *.pyc
 __pycache__/
-environment.json
 *.sqlite3
 media
 

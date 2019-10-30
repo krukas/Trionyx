@@ -1,3 +1,8 @@
+### [develop]
+#### Changed
+- Improved new project creation
+
+
 ### [1.0.3] - 30-10-2019
 #### Fixed
 - Fixed to early reverse lookup

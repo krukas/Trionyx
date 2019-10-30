@@ -33,6 +33,5 @@ class Command(BaseCommand):
                     name=options.get('name')
                 ))
             )
-        except FileExistsError as e:
-            print(e)
+        except FileExistsError:
             raise CommandError("App with same name already exists")
