@@ -2,6 +2,11 @@
 #### Changed
 - Dialog form initial also uses GET params
 - model_url accept GET params as dict
+- Improve Button component
+- ComponentFieldsMixin fields can now render a Component
+- Add option to Component to force update object
+- Base Component can be used as an holder for Components to be rendered
+- Add debug comments to Component output
 
 #### Fixed
 - Delete dialog does not return `success` boolean
