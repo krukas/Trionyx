@@ -1,3 +1,12 @@
+### [develop]
+#### Changed
+- Dialog form initial also uses GET params
+- model_url accept GET params as dict
+
+#### Fixed
+- Delete dialog does not return `success` boolean
+
+
 ### [1.0.1] - 29-10-2019
 #### Fixed
 - Fixed verbose name has HTML
