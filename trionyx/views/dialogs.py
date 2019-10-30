@@ -222,8 +222,13 @@ class UpdateDialog(DialogView):
         form = kwargs.pop('form_instance', None)
         success_message = kwargs.pop('success_message', None)
 
+        initial = {
+            **{key: value for key, value in self.request.GET.items()},
+            **kwargs
+        }
+
         if not form:
-            form = self.get_form_class()(initial=kwargs, instance=self.object)
+            form = self.get_form_class()(initial=initial, instance=self.object)
 
         if not hasattr(form, "helper"):
             form.helper = FormHelper(form)
@@ -323,14 +328,16 @@ class DeleteDialog(DialogView):
                 'content': self.success_message.format(
                     model_name=self.get_model_config().model_name.capitalize(),
                     object=object_name,
-                )
+                ),
+                'success': True,
             })
         except Exception:
             response.update({
                 'content': """<p class="alert alert-danger">{}</p>""".format(
                     _('Something went wrong on deleting {model_name}').format(
                         model_name=self.get_model_config().model_name.capitalize())
-                )
+                ),
+                'success': False,
             })
 
         return response

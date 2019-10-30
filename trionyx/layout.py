@@ -41,10 +41,14 @@ Layouts are defined and registered in layouts.py in an app.
 
 """
 import re
+import time
 
 from django import template
 from django.utils.functional import cached_property
 from django.template.loader import render_to_string
+from django.utils.safestring import mark_safe
+from django.conf import settings
+from django.db.models import QuerySet
 
 from trionyx import utils
 
@@ -229,7 +233,7 @@ class Layout:
 
 
 class Component:
-    """Base component"""
+    """Base component can be use as an holder for other components"""
 
     template_name = None
     """Component template to be rendered, default template only renders child components"""
@@ -258,14 +262,14 @@ class Component:
         """Generate random css id for component"""
         return 'component-{}'.format(utils.random_string(6))
 
-    def set_object(self, object):
+    def set_object(self, object, force=False):
         """
         Set object for rendering component and set object to all components
 
         :param object:
         :return:
         """
-        if self.object is False:
+        if self.object is False or force:
             self.object = object
         else:
             object = self.object
@@ -279,7 +283,42 @@ class Component:
         context['component'] = self
         self.context = context
         self.request = request
-        return render_to_string(self.template_name, context, request)
+
+        if settings.DEBUG:
+            path = [
+                *getattr(self, '_debug_path', []),
+                '{name}[{index}]'.format(
+                    name=str(self.__class__.__name__).lower(),
+                    index=getattr(self, '_debug_path_index', 0),
+                )
+            ]
+            self._debug_full_path = '.'.join(path)
+            for index, comp in enumerate(self.components):
+                comp._debug_path = path
+                comp._debug_path_index = index
+
+            start_time = time.time()
+
+        if self.template_name:
+            output = render_to_string(self.template_name, context, request)
+        else:
+            output = ''.join(comp.render(context, request) for comp in self.components)
+
+        if settings.DEBUG:
+            output = """
+                <!--{class_name}: {template_name}-->
+                <!--Path: {path}-->
+                <!--Render time: {render_time}-->
+                {output}
+            """.format(
+                class_name=".".join([self.__class__.__module__, self.__class__.__name__]),
+                template_name=self.template_name,
+                path=self._debug_full_path,
+                render_time=round(time.time() - start_time, 4),
+                output=output,
+            )
+
+        return mark_safe(output)
 
 
 class ComponentFieldsMixin:
@@ -294,6 +333,7 @@ class ComponentFieldsMixin:
     - **value**: Value to be rendered
     - **format**: String format for rendering field, default is '{0}'
     - **renderer**: Render function for rendering value, result will be given to format. (lambda value, **options: value)
+    - **component**: Render field with given component, row object will be set as the component object
 
     Based on the order the fields are in the list a __index__ is set with the list index,
     this is used for rendering a object that is a list.
@@ -373,8 +413,9 @@ class ComponentFieldsMixin:
             field['field'] = None
 
         if 'label' not in field and field['field']:
+            model = self.objects.model if isinstance(self.objects, QuerySet) else self.object
             try:
-                field['label'] = self.object._meta.get_field(field['field']).verbose_name.capitalize()
+                field['label'] = model._meta.get_field(field['field']).verbose_name.capitalize()
             except Exception:
                 field['label'] = field['field'].replace('_', '').capitalize()
         elif 'label' not in field:
@@ -446,6 +487,11 @@ class ComponentFieldsMixin:
     def render_field(self, field, data):
         """Render field for given data"""
         from trionyx.renderer import renderer
+
+        if 'component' in field:
+            component = field.get('component')
+            component.set_object(data, True)
+            return component.render(self.context)
 
         if 'value' in field:
             value = field['value']
@@ -554,6 +600,7 @@ class Html(HtmlTagWrapper):
     def __init__(self, html=None, **kwargs):
         """Init Html"""
         super().__init__(**kwargs)
+        kwargs['class'] = kwargs.pop('css_class', self.attr.get('class', ''))
         self.html = html
         for key, value in kwargs.items():
             if key in self.valid_attr:
@@ -595,6 +642,14 @@ class Input(Html):
             self.attr['value'] = ''
 
 
+class ButtonGroup(HtmlTagWrapper):
+    """Bootstrap button group"""
+
+    attr = {
+        'class': 'btn-group'
+    }
+
+
 class Button(Html):
     """
     Bootstrap button
@@ -607,24 +662,53 @@ class Button(Html):
     tag = 'button'
     valid_attr = ['onClick', 'class']
     attr = {
-        'class': 'btn btn-flat btn-default'
+        'class': 'btn btn-flat bg-theme'
     }
 
-    def __init__(self, label, link_url=None, dialog_url=None, dialog_options=None, **options):
+    def __init__(
+        self, label, url=None, model_url=None, model_params=None, model_code=None,
+        dialog=False, dialog_options=None, dialog_reload_tab=None, **options
+    ):
         """Init button"""
-        dialog_options = dialog_options if dialog_options else {}
-        if not options.get('onClick') and (link_url or dialog_url):
-            if link_url:
-                options['onClick'] = "window.location.href='{}'; return false;".format(link_url)
-            else:
-                options['onClick'] = "openDialog('{}', {}); return false;".format(dialog_url, self.format_dialog_options(dialog_options))
         super().__init__(html=label, **options)
+        self.url = url
+        self.model_url = model_url
+        self.model_code = model_code
+        self.model_params = model_params
+        self.dialog = dialog
+        self.dialog_options = dialog_options if dialog_options else {}
+        self.on_click = options.get('onClick', False)
 
-    def format_dialog_options(self, dialog_options):
+        if dialog_reload_tab:
+            self.dialog_options['callback'] = """function(data, dialog){{
+                if (data.success) {{
+                    dialog.close();
+                    trionyx_reload_tab('{tab}');
+                }}
+            }}""".format(tab=dialog_reload_tab)
+
+    def set_object(self, object):
+        """Set object and onClick"""
+        super().set_object(object)
+
+        if not self.on_click:
+            from trionyx.urls import model_url
+            url = model_url(
+                model=object,
+                view_name=self.model_url,
+                code=self.model_code,
+                params=self.model_params
+            ) if self.model_url else self.url
+            if self.dialog:
+                self.attr['onClick'] = "openDialog('{}', {}); return false;".format(url, self.format_dialog_options())
+            else:
+                self.attr['onClick'] = "window.location.href='{}'; return false;".format(url)
+
+    def format_dialog_options(self):
         """Fromat options to JS dict"""
         return '{{ {} }}'.format(','.join(
             ("{}:{}" if key == 'callback' else "{}:'{}'").format(key, value)
-            for key, value in dialog_options.items()))
+            for key, value in self.dialog_options.items()))
 
 
 # =============================================================================

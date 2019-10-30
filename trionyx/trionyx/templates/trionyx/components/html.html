@@ -1,8 +1,8 @@
 {% if component.tag %}
     {% if component.html %}
         <{{ component.tag }} {{ component.get_attr_text|safe }}>
-            {{ html|safe }}
-        </{{ component.tag }}
+            {{ component.html|safe }}
+        </{{ component.tag }}>
     {% else %}
         <{{ component.tag }} {{ component.get_attr_text|safe }}/>
     {% endif %}

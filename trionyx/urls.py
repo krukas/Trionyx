@@ -15,7 +15,7 @@ from django.conf.urls.static import static
 from django.urls import path, reverse, NoReverseMatch
 
 
-def model_url(model, view_name, code=None):
+def model_url(model, view_name, code=None, params=None):
     """Shortcut function for getting model url"""
     from trionyx.config import models_config
     view_name = 'trionyx:model-{}'.format(view_name)
@@ -33,7 +33,12 @@ def model_url(model, view_name, code=None):
             return reverse(view_name, kwargs=kwargs)
         except NoReverseMatch:
             kwargs.pop('pk')
-    return reverse(view_name, kwargs=kwargs)
+
+    url = reverse(view_name, kwargs=kwargs)
+    return url if not params else '{url}?{params}'.format(
+        url=url,
+        params='&'.join('{}={}'.format(key, value) for key, value in params.items())
+    )
 
 
 urlpatterns = [
