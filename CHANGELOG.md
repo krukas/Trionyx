@@ -1,4 +1,4 @@
-### [develop]
+### [1.0.2] - 30-10-2019
 #### Changed
 - Dialog form initial also uses GET params
 - model_url accept GET params as dict
