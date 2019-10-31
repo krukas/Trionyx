@@ -365,13 +365,20 @@ class Models:
         """Get config for given model"""
         if not inspect.isclass(model) and not isinstance(model, str):
             model = model.__class__
-        return self.configs.get(self.get_model_name(model))
+
+        name = self.get_model_name(model)
+        name = TX_MODEL_OVERWRITES.get(name) if name in TX_MODEL_OVERWRITES else name
+
+        return self.configs.get(name)
 
     def get_all_configs(self, trionyx_models_only: bool = True) -> Generator[ModelConfig, None, None]:
         """Get all model configs"""
         from trionyx.models import BaseModel
 
         for index, config in self.configs.items():
+            if self.get_model_name(config.model) in TX_MODEL_OVERWRITES:
+                continue
+
             if trionyx_models_only and not isinstance(config.model(), BaseModel):
                 continue
 

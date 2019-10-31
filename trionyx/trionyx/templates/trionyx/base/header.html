@@ -23,7 +23,7 @@
                 <li id="trionyx-app-tasks" class="dropdown tasks-menu">
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown" aria-expanded="true">
                       <i class="fa fa-tasks"></i>
-                      <span class="label label-danger" v-cloak="">[[openTasks]]</span>
+                      <span class="label label-danger" v-cloak="" v-if="openTasks">[[openTasks]]</span>
                     </a>
                     <ul class="dropdown-menu">
                       <li>

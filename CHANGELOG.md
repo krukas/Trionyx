@@ -1,3 +1,8 @@
+### [1.0.5] - 31-10-2019
+#### Fixed
+- Fixed model overwrite configs/forms/menu
+
+
 ### [1.0.4] - 31-10-2019
 #### Changed
 - Improved new project creation
