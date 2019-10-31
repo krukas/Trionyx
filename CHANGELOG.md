@@ -2,6 +2,9 @@
 #### Changed
 - Improved new project creation
 
+#### Fixed
+- Filter related choices are not shown
+
 
 ### [1.0.3] - 30-10-2019
 #### Fixed
