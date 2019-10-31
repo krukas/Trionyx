@@ -40,7 +40,7 @@ class Menu:
             model_order = 0
             for model in app.get_models():
                 config = models_config.get_config(model)
-                if config.menu_exclude:
+                if not config or config.menu_exclude:
                     continue
 
                 menu_icon = None

@@ -15,10 +15,13 @@ from django.forms import *  # noqa F403
 from django.forms import ModelForm as DjangoModelForm
 from django.db.models import NOT_PROVIDED
 from django.db import transaction
+from django.conf import settings
 
 from trionyx.config import models_config
 
 logger = logging.getLogger(__name__)
+
+TX_MODEL_OVERWRITES_REVERSE = {value.lower(): key.lower() for key, value in settings.TX_MODEL_OVERWRITES.items()}
 
 
 class ModelForm(DjangoModelForm):
@@ -104,7 +107,7 @@ class FormRegister:
         """Add form to register"""
         def wrapper(form):
             form_code = code if code else form.__name__.lower()
-            model_name = self.get_model_alias(model_alias if model_alias else form.Meta.model)
+            model_name = self.get_model_alias(model_alias if model_alias else form.Meta.model, False)
 
             if form_code in self.forms[model_name]:
                 raise Exception("Form {} already registered for model {}".format(code, model_name))
@@ -119,12 +122,13 @@ class FormRegister:
 
         return wrapper
 
-    def get_model_alias(self, model_alias):
+    def get_model_alias(self, model_alias, rewrite=True):
         """Get model alias if class then convert to alias string"""
-        from trionyx.models import BaseModel
-        if inspect.isclass(model_alias) and issubclass(model_alias, BaseModel):
-            config = models_config.get_config(model_alias)
-            return '{}.{}'.format(config.app_label, config.model_name)
+        from trionyx.models import Model
+        if inspect.isclass(model_alias) and issubclass(model_alias, Model):
+            if rewrite:
+                models_config.get_model_name(models_config.get_config(model_alias).model)
+            return models_config.get_model_name(model_alias)
         return model_alias
 
     def get_form(self, model, code):
@@ -156,6 +160,13 @@ class FormRegister:
         for _, form in self.forms.get(model_alias, dict()).items():
             if form[config]:
                 return form['form']
+
+        # Check for original form
+        if model_alias in TX_MODEL_OVERWRITES_REVERSE:
+            model_alias = TX_MODEL_OVERWRITES_REVERSE.get(model_alias)
+            for _, form in self.forms.get(model_alias, dict()).items():
+                if form[config]:
+                    return form['form']
         return None
 
     def _create_form(self, model, only_required=False):
