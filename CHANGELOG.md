@@ -1,4 +1,4 @@
-### [develop]
+### [1.0.4] - 31-10-2019
 #### Changed
 - Improved new project creation
 
