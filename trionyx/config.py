@@ -274,8 +274,6 @@ class ModelConfig:
 
                     field_model_config = models_config.get_config(related_class)
                     field = field_model_config.get_field(field_parts[-1])
-
-                    config['choices_url'] = self.get_url('list-choices')
                 elif config['field'] in model_fields:
                     field = model_fields[config['field']]
                 else:
@@ -294,6 +292,8 @@ class ModelConfig:
 
                 if 'choices' not in config and field:
                     config['choices'] = field.choices
+
+                config['choices_url'] = field_model_config.get_url('list-choices')
 
                 list_fields[config['field']] = config
             return list_fields

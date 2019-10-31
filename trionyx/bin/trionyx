@@ -57,12 +57,14 @@ Available commands are:
         try:
             quickstart = Quickstart()
             quickstart.create_project(os.path.join(os.getcwd(), args.name))
-        except FileExistsError as e:
-            print(e)
+            print(
+                '\n\033[32mProject created in \033[33m{name}\033[32m,'.format(name=args.name),
+                'cd into project folder and run\033[33m make first_setup\n'
+            )
+        except FileExistsError:
             print("Could not create project because a folder ({}) already exists".format(args.name))
             sys.exit(1)
-        except Exception as e:
-            print(e)
+        except Exception:
             print("Could not create project")
             sys.exit(1)
 

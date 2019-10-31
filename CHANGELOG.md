@@ -1,3 +1,17 @@
+### [1.0.4] - 31-10-2019
+#### Changed
+- Improved new project creation
+
+#### Fixed
+- Filter related choices are not shown
+
+
+### [1.0.3] - 30-10-2019
+#### Fixed
+- Fixed to early reverse lookup
+- Fixed not all quickstart files where included
+
+
 ### [1.0.2] - 30-10-2019
 #### Changed
 - Dialog form initial also uses GET params

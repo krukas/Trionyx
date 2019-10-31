@@ -1,9 +1,6 @@
 include README.rst
 
-include trionyx/quickstart/project/*
-include trionyx/quickstart/project/apps/*
-include trionyx/quickstart/project/config/*
-
+recursive-include trionyx/quickstart/ *
 recursive-include trionyx/trionyx/templates/ *
 recursive-include trionyx/trionyx/static/ *
 recursive-include trionyx/trionyx/locale/ *
