@@ -9,7 +9,7 @@ jobs:
     steps:
       - checkout
       - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.5/site-packages
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
       - restore_cache:
           key: python3-{{ .Branch }}-{{ checksum "setup.py" }}
       - run:
@@ -22,7 +22,7 @@ jobs:
           key: python3-{{ .Branch }}-{{ checksum "setup.py" }}
           paths:
             - "/usr/local/bin"
-            - "/usr/local/lib/python3.5/site-packages"
+            - "/usr/local/lib/python3.6/site-packages"
       - run:
           command: |
             flake8 trionyx
