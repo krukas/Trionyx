@@ -12,6 +12,7 @@ import string
 import importlib
 import hashlib
 from functools import reduce
+from typing import List, Any, Optional
 
 from django.conf import settings
 from django.utils import translation
@@ -24,13 +25,13 @@ logger = logging.getLogger(__name__)
 class CacheLock:
     """CacheLock uses the django cache to give a lock for given keys"""
 
-    def __init__(self, *keys, timeout=None):
+    def __init__(self, *keys: List[Any], timeout: Optional[int] = None):
         """Init CacheLock"""
         self.keys = keys
         self.timeout = timeout
 
     @property
-    def cache_key(self):
+    def cache_key(self) -> str:
         """Cache key"""
         return 'trionyx-cache-lock-{key}'.format(
             key=hashlib.md5(''.join([str(k) for k in self.keys]).encode()).hexdigest()
@@ -46,24 +47,24 @@ class CacheLock:
             time.sleep(wait_time)
             run_time += wait_time
 
-    def __exit__(self, type, value, traceback):
+    def __exit__(self, *args, **kwargs):
         """Clear cache lock"""
         cache.delete(self.cache_key)
 
 
-def random_string(size):
+def random_string(size: int) -> str:
     """Create random string containing ascii leters and digits, with the length of given size"""
     return ''.join(random.choice(string.ascii_letters + string.digits) for _ in range(size))
 
 
-def import_object_by_string(namespace):
+def import_object_by_string(namespace: str) -> Any:
     """Import object by complete namespace"""
     segments = namespace.split('.')
     module = importlib.import_module('.'.join(segments[:-1]))
     return getattr(module, segments[-1])
 
 
-def create_celerybeat_schedule(apps):
+def create_celerybeat_schedule(apps: List[str]) -> dict:
     """Create Celery beat schedule by get schedule from every installed app"""
     beat_schedule = {}
     for app in apps:

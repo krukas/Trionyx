@@ -8,10 +8,12 @@ Core apps package containing Appconfig
 :license: GPLv3
 """
 from importlib import import_module
+from typing import Optional, Union, List
 
 from django.apps import AppConfig
 from django.apps import apps
 from django.utils import timezone
+from django.db.models import Model
 
 from trionyx.config import models_config, ModelConfig
 from trionyx.menu import app_menu
@@ -26,7 +28,7 @@ from .renderers import render_level, render_progress, render_status
 class BaseConfig(AppConfig):
     """Base app config"""
 
-    def get_model_config(self, model) -> ModelConfig:
+    def get_model_config(self, model: Union[str, Model]) -> Optional[ModelConfig]:
         """Get model config for given model"""
         return models_config.get_config(model)
 
@@ -77,7 +79,7 @@ class Config(BaseConfig):
                 user=str(value)
             ))
 
-    def auto_load_app_modules(self, modules):
+    def auto_load_app_modules(self, modules: List[str]):
         """Auto load app modules"""
         for app in apps.get_app_configs():
             for module in modules:

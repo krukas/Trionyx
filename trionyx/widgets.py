@@ -6,10 +6,13 @@ trionyx.widgets
 :license: GPLv3
 """
 import json
+from typing import Dict, List, ClassVar
 
 from django.utils import timezone
+from django.http.request import HttpRequest
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.contrib.contenttypes.models import ContentType
+from django.forms import Form
 from trionyx.trionyx.models import AuditLogEntry
 from trionyx.renderer import renderer
 from trionyx.config import models_config
@@ -18,7 +21,7 @@ from trionyx.models import Sum, filter_queryset_with_user_filters
 from django.utils.translation import ugettext_lazy as _
 
 
-widgets = {}
+widgets: Dict[str, 'BaseWidget'] = {}
 
 
 class MetaClass(type):
@@ -79,40 +82,40 @@ class BaseWidget(metaclass=MetaClass):
 
     """
 
-    code = None
+    code: ClassVar[str]
     """Code for widget"""
 
-    name = None
+    name: ClassVar[str] = ''
     """Name for widget is also used as default title"""
 
-    description = None
+    description: ClassVar[str] = ''
     """Short description on what the widget does"""
 
-    config_form_class = None
+    config_form_class: ClassVar[Form]
     """Form class used to change the widget. The form cleaned_data is used as the config"""
 
-    default_width = 4
+    default_width: ClassVar[int] = 4
     """Default width of widget, is based on grid system with max 12 columns"""
 
-    default_height = 20
+    default_height: ClassVar[int] = 20
     """Default height of widget, each step is 10px"""
 
     @property
-    def template(self):
+    def template(self) -> str:
         """Template path `widgets/{code}.html` overwrite to set custom path"""
         return 'widgets/{code}.html'.format(code=self.code)
 
     @property
-    def image(self):
+    def image(self) -> str:
         """Image path `img/widgets/{code}.jpg` overwrite to set custom path"""
         return 'img/widgets/{code}.jpg'.format(code=self.code)
 
-    def get_data(self, request, config):
+    def get_data(self, request: HttpRequest, config: dict):
         """Get data for widget, function needs te be overwritten on widget implementation"""
         return None
 
     @property
-    def config_fields(self):
+    def config_fields(self) -> List[str]:
         """Get the config field names"""
         if not self.config_form_class:
             return []
@@ -134,7 +137,7 @@ class AuditlogWidget(BaseWidget):
     config_form_class = AuditlogWidgetForm
     default_height = 22
 
-    def get_data(self, request, config):
+    def get_data(self, request: HttpRequest, config: dict) -> List[dict]:
         """Get data for widget"""
         content_type_ids = [
             content_type.id for model, content_type
@@ -175,7 +178,7 @@ class TotalSummaryWidget(BaseWidget):
     config_form_class = TotalSummaryWidgetForm
     default_height = 5
 
-    def get_data(self, request, config):
+    def get_data(self, request: HttpRequest, config: dict) -> str:
         """Get data"""
         ModelClass = ContentType.objects.get_for_id(config['model']).model_class()
         query = ModelClass.objects.get_queryset()

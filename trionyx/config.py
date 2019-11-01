@@ -7,7 +7,7 @@ trionyx.config
 """
 import inspect
 from functools import reduce
-from typing import Optional, Generator, Union
+from typing import Optional, Generator, Union, List
 
 from django.apps import apps
 from django.urls import reverse
@@ -40,46 +40,46 @@ class ModelConfig:
 
     """
 
-    menu_name = None
+    menu_name: Optional[str] = None
     """Menu name, default is model verbose_name_plural"""
 
-    menu_order = None
+    menu_order: Optional[int] = None
     """Menu order"""
 
-    menu_exclude = False
+    menu_exclude: bool = False
     """Exclude model from menu"""
 
-    menu_root = False
+    menu_root: bool = False
     """Add menu item to root instead of under the app menu"""
 
-    menu_icon = None
+    menu_icon: Optional[str] = None
     """Menu css icon, is ony used when root menu item"""
 
-    global_search = True
+    global_search: bool = True
     """Enable global search for model"""
 
-    disable_search_index = False
+    disable_search_index: bool = False
     """Disable search index, use full for model with no list view but with allot of records"""
 
-    search_fields = ()
+    search_fields: List[str] = []
     """Fields to use for searching, default is all CharField and TextField"""
 
-    search_exclude_fields = ()
+    search_exclude_fields: List[str] = []
     """Fields you don't want to use for search"""
 
-    search_title = None
+    search_title: Optional[str] = None
     """
     Search title of model works the same as `verbose_name`, defaults to __str__.
     Is given high priority in search and is used in global search
     """
 
-    search_description = None
+    search_description: Optional[str] = None
     """
     Search description of model works the same as `verbose_name`, default is empty,
     Is given medium priority and is used in global search page
     """
 
-    list_fields = None
+    list_fields: Optional[List[dict]] = None
     """
     Customise the available fields for model list view, default all model fields are available.
 
@@ -100,22 +100,22 @@ class ModelConfig:
          ]
     """
 
-    list_default_fields = None
+    list_default_fields: Optional[List[str]] = None
     """Array of fields that default is used in form list"""
 
-    list_select_related = None
+    list_select_related: Optional[List[str]] = None
     """Array of fields to add foreign-key relationships to query, use this for relations that are used in search or renderer"""
 
-    list_default_sort = '-pk'
+    list_default_sort: str = '-pk'
     """Default sort field for list view"""
 
-    api_fields = None
+    api_fields: Optional[List[str]] = None
     """Fields used in API model serializer, fallback on fields used in create and edit forms"""
 
-    api_disable = False
+    api_disable: bool = False
     """Disable API for model"""
 
-    verbose_name = "{model_name}({id})"
+    verbose_name: str = "{model_name}({id})"
     """
     Verbose name used for displaying model, default value is "{model_name}({id})"
 
@@ -124,7 +124,7 @@ class ModelConfig:
         - model_name: Class name of model
     """
 
-    view_header_buttons = None
+    view_header_buttons: Optional[List[str]] = None
     """
     List with button configurations to be displayed in view header bar
 
@@ -141,19 +141,19 @@ class ModelConfig:
          ]
     """
 
-    disable_add = False
+    disable_add: bool = False
     """Disable add for this model"""
 
-    disable_change = False
+    disable_change: bool = False
     """Disable change for this model"""
 
-    disable_delete = False
+    disable_delete: bool = False
     """Disable delete for this model"""
 
-    auditlog_disable = False
+    auditlog_disable: bool = False
     """Disable auditlog for this model"""
 
-    auditlog_ignore_fields = None
+    auditlog_ignore_fields: Optional[List[str]] = None
     """Auditlog fields to be ignored"""
 
     hide_permissions = False

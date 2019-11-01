@@ -52,6 +52,8 @@ setup(
             'coverage',
             'flake8',
             'pydocstyle',
+            'mypy',
+            'django-stubs >= 1.2.0, < 1.3.0',
             'ipython',
             'Sphinx',
             'sphinx_rtd_theme',
