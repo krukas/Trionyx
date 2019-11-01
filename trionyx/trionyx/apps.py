@@ -8,7 +8,7 @@ Core apps package containing Appconfig
 :license: GPLv3
 """
 from importlib import import_module
-from typing import Optional, Union, List
+from typing import Optional, Union, List, Type
 
 from django.apps import AppConfig
 from django.apps import apps
@@ -28,7 +28,7 @@ from .renderers import render_level, render_progress, render_status
 class BaseConfig(AppConfig):
     """Base app config"""
 
-    def get_model_config(self, model: Union[str, Model]) -> Optional[ModelConfig]:
+    def get_model_config(self, model: Union[str, Type[Model]]) -> Optional[ModelConfig]:
         """Get model config for given model"""
         return models_config.get_config(model)
 
@@ -84,9 +84,9 @@ class Config(BaseConfig):
         for app in apps.get_app_configs():
             for module in modules:
                 try:
-                    import_module('{}.{}'.format(app.module.__package__, module))
+                    import_module('{}.{}'.format(getattr(app.module, '__package__'), module))
                 except ImportError as e:
-                    if str(e) != "No module named '{}.{}'".format(app.module.__package__, module):
+                    if str(e) != "No module named '{}.{}'".format(getattr(app.module, '__package__'), module):
                         raise e
 
     class User(ModelConfig):

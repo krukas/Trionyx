@@ -12,6 +12,7 @@ import json
 import logging
 import os
 from pkg_resources import iter_entry_points
+from typing import Dict, Any, Optional
 
 from django.core.exceptions import ImproperlyConfigured
 from kombu import Queue, Exchange
@@ -30,7 +31,7 @@ except FileNotFoundError:
         "Could not load Trionyx config file, is env variable TRIONYX_CONFIG correctly configuerd?")
 
 
-def get_env_var(setting, default=None, configs=trionyx_config):
+def get_env_var(setting: str, default: Optional[Any] = None, configs: Dict[str, Any] = trionyx_config) -> Any:
     """
     Get environment variable from the environment json file
 
@@ -102,7 +103,7 @@ WSGI_APPLICATION = 'wsgi.application'
 # ==============================================================================
 # Middleware
 # ==============================================================================
-MIDDLEWARE = (
+MIDDLEWARE = [
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -113,7 +114,7 @@ MIDDLEWARE = (
     'trionyx.trionyx.middleware.LoginRequiredMiddleware',
     'trionyx.trionyx.middleware.GlobalRequestMiddleware',
     'trionyx.trionyx.middleware.LastLoginMiddleware',
-)
+]
 
 # ==============================================================================
 # Auth / security
@@ -244,22 +245,22 @@ REST_FRAMEWORK = {
 # ==============================================================================
 # Trionyx settings
 # ==============================================================================
-TX_APP_NAME = 'Trionyx'
+TX_APP_NAME: str = 'Trionyx'
 """Full application name"""
 
-TX_LOGO_NAME_START = 'Tri'
+TX_LOGO_NAME_START: str = 'Tri'
 """The first characters of the name that are bold"""
 
-TX_LOGO_NAME_END = 'onyx'
+TX_LOGO_NAME_END: str = 'onyx'
 """The rest of the characters"""
 
-TX_LOGO_NAME_SMALL_START = 'T'
+TX_LOGO_NAME_SMALL_START: str = 'T'
 """The first character or characters of the small logo that is bold"""
 
-TX_LOGO_NAME_SMALL_END = 'X'
+TX_LOGO_NAME_SMALL_END: str = 'X'
 """The last character or characters of the small logo that is normal"""
 
-TX_THEME_COLOR = 'purple'
+TX_THEME_COLOR: str = 'purple'
 """The theme skin color (header). Aviable colors: blue, yellow, green, purple, red, black. All colors have a light version blue-light"""
 
 
@@ -335,7 +336,7 @@ def TX_DEFAULT_DASHBOARD():
     ]
 
 
-TX_MODEL_OVERWRITES = {}
+TX_MODEL_OVERWRITES: Dict[str, str] = {}
 """
 Config to overwrite models, its a dict where the key is the original `app_label.model_name` and value is the new one.
 
@@ -346,7 +347,7 @@ Config to overwrite models, its a dict where the key is the original `app_label.
     }
 """
 
-TX_MODEL_CONFIGS = {}
+TX_MODEL_CONFIGS: Dict[str, Dict[str, Any]] = {}
 """
 Dict with configs for non Trionyx model, example:
 
@@ -360,7 +361,7 @@ Dict with configs for non Trionyx model, example:
     }
 """
 
-TX_CORE_MODEL_CONFIGS = {
+TX_CORE_MODEL_CONFIGS: Dict[str, Dict[str, Any]] = {
     'auth.group': {
         'list_default_fields': ['name'],
         'disable_search_index': False,
@@ -391,5 +392,5 @@ TX_CORE_MODEL_CONFIGS = {
     },
 }
 
-TX_DB_LOG_LEVEL = logging.WARNING
+TX_DB_LOG_LEVEL: int = logging.WARNING
 """The DB log level for logging"""

@@ -79,7 +79,7 @@ class User(models.BaseModel, AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(_('Last name'), max_length=64, blank=True, default='')
     is_active = models.BooleanField(_('Active'), default=True)
     date_joined = models.DateTimeField(_('Date joined'), default=timezone.now)
-    last_online = models.DateTimeField(_('Last online'), blank=None, null=True)
+    last_online = models.DateTimeField(_('Last online'), blank=True, null=True)
     avatar = models.ImageField(_('Avatar'), blank=True, upload_to='avatars/', default='')
 
     language = models.CharField(_('Language'), max_length=6, choices=settings.LANGUAGES, default=default_language)
@@ -250,7 +250,7 @@ class Log(models.BaseModel):
     last_event = models.DateTimeField(_('Last event'))
     log_count = models.IntegerField(_('Log count'), default=1)
 
-    objects = LogManager()
+    objects = LogManager()  # type: ignore
 
     class Meta:
         """Model meta description"""

@@ -47,7 +47,7 @@ urlpatterns = [
 
 # Add installed apps urls
 for entry_point in iter_entry_points(group='trionyx.app', name=None):
-    if importlib.util.find_spec(entry_point.module_name + '.urls'):
+    if importlib.util.find_spec(entry_point.module_name + '.urls'):  # type: ignore
         urlpatterns.append(
             path('', include(entry_point.module_name + '.urls'))
         )

@@ -50,7 +50,7 @@ class PriceField(DecimalField):  # noqa F405
 # =============================================================================
 # Base models
 # =============================================================================
-class BaseManager(Manager):  # noqa F405
+class BaseManager(Manager):  # type: ignore # noqa F405
     """model base manager for all Trionyx models"""
 
     def get_queryset(self):
@@ -61,7 +61,7 @@ class BaseManager(Manager):  # noqa F405
 class BaseModel(Model):  # noqa F405
     """Base model for all Trionyx models"""
 
-    objects = BaseManager()
+    objects = BaseManager()  # type: ignore
 
     created_at = DateTimeField(_('Created at'), auto_now_add=True)  # noqa F405
     """Created at field, date is set when model is created"""

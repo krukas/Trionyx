@@ -77,12 +77,13 @@ def create_celerybeat_schedule(apps: List[str]) -> dict:
             except Exception:
                 continue
 
-        if not (hasattr(module, 'schedule') and isinstance(module.schedule, dict)):
+        module_schedule = getattr(module, 'schedule', None)
+        if not isinstance(module_schedule, dict):
             logger.warning('{} has no schedule or schedule is not a dict'.format(module.__name__))
             continue
 
         # Add cron queue option
-        for name, schedule in module.schedule.items():
+        for name, schedule in module_schedule.items():
             options = schedule.get('options', {})
             if 'queue' not in options:
                 options['queue'] = 'cron'

@@ -7,16 +7,19 @@ trionyx.config
 """
 import inspect
 from functools import reduce
-from typing import Optional, Generator, Union, List
+from typing import Optional, Generator, Union, List, Type, Dict, Any, TYPE_CHECKING
 
-from django.apps import apps
+from django.apps import apps, AppConfig
 from django.urls import reverse
 from django.conf import settings
 from django.db.models import Field, Model
 
+if TYPE_CHECKING:
+    from trionyx.trionyx.models import User  # noqa F401
+
 TX_MODEL_CONFIGS = settings.TX_CORE_MODEL_CONFIGS
 TX_MODEL_CONFIGS.update(settings.TX_MODEL_CONFIGS)
-TX_MODEL_OVERWRITES = {key.lower(): value.lower() for key, value in settings.TX_MODEL_OVERWRITES.items()}
+TX_MODEL_OVERWRITES: Dict[str, str] = {key.lower(): value.lower() for key, value in settings.TX_MODEL_OVERWRITES.items()}
 
 
 class ModelConfig:
@@ -159,13 +162,13 @@ class ModelConfig:
     hide_permissions = False
     """Dont show model in permissions tree, prevent clutter from internal models"""
 
-    def __init__(self, model: Model, MetaConfig=None):
+    def __init__(self, model: Type[Model], MetaConfig=None):
         """Init config"""
-        self.model = model
-        self.app_config = apps.get_app_config(model._meta.app_label)
-        self.app_label = model._meta.app_label
-        self.model_name = model._meta.model_name
-        self.__changed = {}
+        self.model: Type[Model] = model
+        self.app_config: AppConfig = apps.get_app_config(model._meta.app_label)
+        self.app_label: str = model._meta.app_label
+        self.model_name: Optional[str] = model._meta.model_name
+        self.__changed: Dict[str, Any] = {}
 
         if MetaConfig:
             for key, value in MetaConfig.__dict__.items():
@@ -247,7 +250,7 @@ class ModelConfig:
             'pk': model.pk
         })
 
-    def get_list_fields(self) -> [dict]:
+    def get_list_fields(self) -> List[dict]:
         """Get all list fields"""
         from trionyx.renderer import renderer
         model_fields = {f.name: f for f in self.get_fields(True, True)}
@@ -322,6 +325,7 @@ class ModelConfig:
             return 'date'
         elif isinstance(field, (models.ForeignKey, models.OneToOneField)):
             return 'related'
+        return '__unknown__'
 
 
 class Models:
@@ -361,15 +365,15 @@ class Models:
             for key, value in config.items():
                 setattr(self.configs[model_name], key, value)
 
-    def get_config(self, model: Union[str, Model]) -> Optional[ModelConfig]:
+    def get_config(self, model: Union[str, Type[Model]]) -> ModelConfig:
         """Get config for given model"""
-        if not inspect.isclass(model) and not isinstance(model, str):
+        if not inspect.isclass(model) and isinstance(model, Model):
             model = model.__class__
 
         name = self.get_model_name(model)
-        name = TX_MODEL_OVERWRITES.get(name) if name in TX_MODEL_OVERWRITES else name
+        name = TX_MODEL_OVERWRITES[name] if name in TX_MODEL_OVERWRITES else name
 
-        return self.configs.get(name)
+        return self.configs[name]
 
     def get_all_configs(self, trionyx_models_only: bool = True) -> Generator[ModelConfig, None, None]:
         """Get all model configs"""
@@ -384,13 +388,13 @@ class Models:
 
             yield config
 
-    def get_model_name(self, model: Union[str, Model]) -> str:
+    def get_model_name(self, model: Union[str, Type[Model]]) -> str:
         """Get model name for given model"""
         if isinstance(model, str):
             return model.lower()
         return '{}.{}'.format(model._meta.app_label, model._meta.model_name).lower()
 
-    def get_all_models(self, user: Optional["trionyx.trionyx.models.User"] = None, trionyx_models_only: bool = True):
+    def get_all_models(self, user: Optional['User'] = None, trionyx_models_only: bool = True):
         """Get all user models"""
         for config in self.get_all_configs(trionyx_models_only):
             if config.app_label == 'trionyx' and config.model_name in ['session', 'auditlogentry', 'log', 'logentry', 'userattribute']:

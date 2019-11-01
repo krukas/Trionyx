@@ -6,7 +6,7 @@ trionyx.widgets
 :license: GPLv3
 """
 import json
-from typing import Dict, List, ClassVar
+from typing import Dict, List, ClassVar, Type
 
 from django.utils import timezone
 from django.http.request import HttpRequest
@@ -91,7 +91,7 @@ class BaseWidget(metaclass=MetaClass):
     description: ClassVar[str] = ''
     """Short description on what the widget does"""
 
-    config_form_class: ClassVar[Form]
+    config_form_class: ClassVar[Type[Form]]
     """Form class used to change the widget. The form cleaned_data is used as the config"""
 
     default_width: ClassVar[int] = 4
@@ -120,9 +120,9 @@ class BaseWidget(metaclass=MetaClass):
         if not self.config_form_class:
             return []
 
-        fields = list(self.config_form_class().base_fields)
+        fields = list(self.config_form_class().base_fields)  # type: ignore
 
-        for field in list(self.config_form_class().declared_fields):
+        for field in list(self.config_form_class().declared_fields):  # type: ignore
             if field not in fields:
                 fields.append(field)
         return fields
@@ -160,7 +160,7 @@ class AuditlogWidget(BaseWidget):
                 'user_avatar': log.user.avatar.url if log.user and log.user.avatar else static('img/avatar.png'),
                 'action': renderer.render_field(log, 'action'),
                 'object': '({}) {}'.format(
-                    log.content_type.model_class()._meta.verbose_name.capitalize(),
+                    str(log.content_type.model_class()._meta.verbose_name).capitalize(),  # type: ignore
                     log.object_verbose_name),
                 'object_url': log.content_object.get_absolute_url() if log.content_object else '',
                 'created_at': renderer.render_field(log, 'created_at'),
@@ -181,6 +181,10 @@ class TotalSummaryWidget(BaseWidget):
     def get_data(self, request: HttpRequest, config: dict) -> str:
         """Get data"""
         ModelClass = ContentType.objects.get_for_id(config['model']).model_class()
+
+        if not ModelClass:
+            return ''
+
         query = ModelClass.objects.get_queryset()
 
         if config.get('filters'):
@@ -213,7 +217,7 @@ class TotalSummaryWidget(BaseWidget):
             }.get(config['period'], {}))
 
         if config.get('field', '__count__') == '__count__':
-            return query.count()
+            return renderer.render_value(query.count())
         else:
             result = query.aggregate(sum=Sum(config['field']))
             return renderer.render_field(ModelClass(**{config['field']: result['sum']}), config['field'])

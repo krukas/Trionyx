@@ -42,6 +42,7 @@ Layouts are defined and registered in layouts.py in an app.
 """
 import re
 import time
+from typing import List, Dict, Union, Any
 
 from django import template
 from django.utils.functional import cached_property
@@ -235,13 +236,13 @@ class Layout:
 class Component:
     """Base component can be use as an holder for other components"""
 
-    template_name = None
+    template_name: str = ''
     """Component template to be rendered, default template only renders child components"""
 
-    js_files = None
+    js_files: List[str] = []
     """List of required javascript files"""
 
-    css_files = None
+    css_files: List[str] = []
     """List of required css files"""
 
     def __init__(self, *components, **options):
@@ -324,7 +325,7 @@ class Component:
 class ComponentFieldsMixin:
     """Mixin for adding fields support and rendering of object(s) with fields."""
 
-    fields = []
+    fields: List[Union[str, Dict[str, Any]]] = []
     """
     List of fields to be rendered. Item can be a string or dict, default options:
 
@@ -354,7 +355,7 @@ class ComponentFieldsMixin:
         ]
     """
 
-    fields_options = {}
+    fields_options: Dict[str, Dict[str, Any]] = {}
     """
     Options available for the field, this is not required to set options on field.
 
@@ -370,7 +371,7 @@ class ComponentFieldsMixin:
 
     """
 
-    objects = []
+    objects: Union[str, list, QuerySet] = []
     """
     List of object to be rendered, this can be a QuerySet, list or string.
     When its a string it will get the attribute of the object.
@@ -569,10 +570,10 @@ class HtmlTagWrapper(Component):
 
     template_name = 'trionyx/components/html_tag.html'
 
-    tag = 'div'
+    tag: str = 'div'
     """Html tag nam"""
 
-    attr = None
+    attr: Dict[str, str] = {}
     """Dict with html attributes"""
 
     def __init__(self, *args, **kwargs):
@@ -592,9 +593,9 @@ class Html(HtmlTagWrapper):
     """Html single html tag"""
 
     template_name = 'trionyx/components/html.html'
-    tag = None
+    tag = ''
 
-    valid_attr = []
+    valid_attr: List[str] = []
     """Valid attributes that can be used"""
 
     def __init__(self, html=None, **kwargs):
