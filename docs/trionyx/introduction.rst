@@ -6,3 +6,5 @@ It's focus is for small company's that want to use business application instead 
 
 With Trionyx the developer/business can focus on there domain models,
 business rules and processes and Trionyx will take care of the interface.
+
+.. image:: /images/dashboard.jpg

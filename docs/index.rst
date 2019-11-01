@@ -10,14 +10,15 @@ Welcome to Trionyx's documentation!
    :maxdepth: 2
    :caption: Contents:
    
-   01-introduction
-   02-installation
-   03-settings
-   04-config
-   05-components
-   06-forms
-   07-celery
-   08-widgets
+   trionyx/introduction
+   trionyx/installation
+   trionyx/settings
+   trionyx/config
+   trionyx/components
+   trionyx/forms
+   trionyx/celery
+   trionyx/widgets
+   trionyx/reusable-apps
 
 
 
