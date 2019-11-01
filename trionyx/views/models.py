@@ -23,7 +23,6 @@ from django.views.generic import (
 )
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, StreamingHttpResponse
-from django_jsend import JsendView
 from django.urls import reverse
 from django.core.paginator import Paginator
 from django.contrib import messages
@@ -34,6 +33,7 @@ from django.utils.translation import ugettext_lazy as _
 from trionyx.views.mixins import ModelClassMixin, SessionValueMixin, ModelPermissionMixin
 from trionyx.forms.helper import FormHelper
 from trionyx.models import filter_queryset_with_user_filters
+from .ajax import JsendView
 
 logger = logging.getLogger(__name__)
 

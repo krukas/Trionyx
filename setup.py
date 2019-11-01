@@ -32,7 +32,6 @@ setup(
         # Django apps
         'django-crispy-forms >= 1.7.2, < 1.8',
         'django_compressor >= 2.3.0, < 2.4',
-        'django_jsend==0.4',
         'jsonfield2==3.0.2',
         'django-watson >= 1.5.0, < 1.6',
         'djangorestframework >= 3.10.0, < 3.11',
