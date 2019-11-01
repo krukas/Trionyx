@@ -28,5 +28,6 @@ jobs:
             flake8 trionyx
             pydocstyle trionyx
             flake8 tests
+            mypy
             coverage run manage.py test tests
       - run: codecov
