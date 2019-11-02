@@ -517,6 +517,10 @@ class MassUpdateView(ModelPermissionMixin, TemplateView, ModelClassMixin):
         filters = self.request.POST.get('trionyx_filters', '[]')
         query = self.get_queryset(all, ids, filters)
 
+        if not query:
+            messages.error(self.request, _('You must make a selection'))
+            return HttpResponseRedirect(reverse('trionyx:model-list', kwargs=self.kwargs))
+
         form = self.get_form(self.request.POST)
 
         if not form.is_valid():

@@ -221,7 +221,7 @@ class UserUpdateForm(forms.ModelForm):
         from trionyx.trionyx.views import create_permission_jstree
 
         selected_permissions = []
-        if self.instance:
+        if self.instance and self.instance.id:
             selected_permissions = self.instance.user_permissions.all()
         elif 'user_permissions' in self.initial:
             selected_permissions = self.initial['user_permissions']

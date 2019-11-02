@@ -247,7 +247,7 @@ class UpdateDialog(DialogView):
 
     def handle_dialog(self) -> Dict[str, Any]:
         """Handle form and save and set success message on valid form"""
-        form = self.get_form_class()(self.request.POST, instance=self.object)
+        form = self.get_form_class()(data=self.request.POST, instance=self.object)
 
         success_message = None
         if form.is_valid():

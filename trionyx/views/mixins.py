@@ -11,6 +11,7 @@ from django.apps import apps
 from django.db.models import Model
 from django.http.request import HttpRequest
 from django.core.exceptions import PermissionDenied
+from django.http import Http404
 
 from trionyx.config import models_config, ModelConfig
 
@@ -27,11 +28,14 @@ class ModelClassMixin:
         elif getattr(self, 'object', None):
             return getattr(self, 'object').__class__
         elif 'app' in kwargs and 'model' in kwargs:
-            return apps.get_model(kwargs.get('app'), kwargs.get('model'))  # type: ignore
+            try:
+                return apps.get_model(kwargs.get('app'), kwargs.get('model'))  # type: ignore
+            except LookupError:
+                raise Http404()
         elif hasattr(self, 'get_queryset'):
             return self.get_queryset().model  # type: ignore
         else:
-            return None
+            raise Http404()
 
     def get_model_config(self) -> ModelConfig:
         """Get Trionyx model config"""

@@ -4,6 +4,14 @@ import sys
 
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "app.settings")
+    from django.conf import settings
+
+    if 'test' in sys.argv:
+        settings.DEBUG = False
+        settings.TEMPLATE_DEBUG = False
+        settings.PASSWORD_HASHERS = [
+            'django.contrib.auth.hashers.MD5PasswordHasher',
+        ]
 
     try:
         from django.core.management import execute_from_command_line
