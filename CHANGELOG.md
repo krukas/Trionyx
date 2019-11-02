@@ -1,3 +1,8 @@
+### [develop]
+
+**Compatibility breaking changes: drop support for python 3.5**
+
+
 ### [1.0.5] - 31-10-2019
 #### Fixed
 - Fixed model overwrite configs/forms/menu

@@ -1,6 +1,13 @@
 version: 2
+workflows:
+  version: 2
+  test:
+    jobs:
+      - python3.6
+      - python3.7
+      - python3.8
 jobs:
-  build:
+  python3.6: &test-template
     docker:
       - image: circleci/python:3.6
         environment:
@@ -31,3 +38,11 @@ jobs:
             mypy
             coverage run manage.py test tests
       - run: codecov
+  python3.7:
+    <<: *test-template
+    docker:
+      - image: circleci/python:3.7
+  python3.8:
+    <<: *test-template
+    docker:
+      - image: circleci/python:3.8
