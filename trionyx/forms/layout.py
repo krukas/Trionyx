@@ -5,6 +5,7 @@ trionyx.forms.layout
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
+from crispy_forms.layout import TEMPLATE_PACK, Field, LayoutObject  # Imports to satisfy MyPy
 from crispy_forms.layout import *  # noqa F403
 from crispy_forms.bootstrap import *  # noqa F403
 from django.template.loader import render_to_string
@@ -45,7 +46,7 @@ class DateTimePicker(Field):
     locale = False
     """Locale of datetime picker default is active locale"""
 
-    format = False
+    format = ''
     """Date format, use python format: %Y-%m-%d %H:%M:%S"""
 
     day_view_header_format = 'MMMM YYYY'

@@ -15,7 +15,6 @@ from django.contrib.auth import logout as django_logout
 from django.contrib.auth.models import Permission
 from django.shortcuts import redirect
 from django.urls import reverse
-from django_jsend import JsendView
 from watson import search as watson
 from django.contrib.contenttypes.models import ContentType
 from django.views.generic import TemplateView
@@ -25,7 +24,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
 
 from trionyx.models import get_class
-from trionyx.views import UpdateView, DetailTabView, DialogView
+from trionyx.views import UpdateView, DetailTabView, DialogView, JsendView
 from trionyx.views.mixins import ModelClassMixin, ModelPermissionMixin
 from trionyx.config import models_config
 from trionyx.widgets import widgets
@@ -517,6 +516,10 @@ class MassUpdateView(ModelPermissionMixin, TemplateView, ModelClassMixin):
         ids = self.request.POST.get('trionyx_ids', '')
         filters = self.request.POST.get('trionyx_filters', '[]')
         query = self.get_queryset(all, ids, filters)
+
+        if not query:
+            messages.error(self.request, _('You must make a selection'))
+            return HttpResponseRedirect(reverse('trionyx:model-list', kwargs=self.kwargs))
 
         form = self.get_form(self.request.POST)
 

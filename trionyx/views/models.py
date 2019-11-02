@@ -23,7 +23,6 @@ from django.views.generic import (
 )
 from django.core.exceptions import PermissionDenied
 from django.http import Http404, StreamingHttpResponse
-from django_jsend import JsendView
 from django.urls import reverse
 from django.core.paginator import Paginator
 from django.contrib import messages
@@ -34,6 +33,7 @@ from django.utils.translation import ugettext_lazy as _
 from trionyx.views.mixins import ModelClassMixin, SessionValueMixin, ModelPermissionMixin
 from trionyx.forms.helper import FormHelper
 from trionyx.models import filter_queryset_with_user_filters
+from .ajax import JsendView
 
 logger = logging.getLogger(__name__)
 
@@ -354,10 +354,10 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
             Only overide this if you want to customize the layout of the page.
     """
 
-    model_alias = None
+    model_alias: str = ''
     """Model identifier, default is '<model app name>.<model name>'."""
 
-    title = None
+    title: str = ''
     """Page title if not set object __str__ is used"""
 
     def get_queryset(self):
@@ -538,13 +538,13 @@ class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
 
     template_name = 'trionyx/core/model_update.html'
 
-    title = None
+    title: str = ''
     """Title of page, default is: Update <object.__str__>"""
 
-    submit_value = None
+    submit_value: str = ''
     """Value of the form submit button"""
 
-    cancel_url = None
+    cancel_url: str = ''
     """Url code for cancel button, when not set object.get_absolute_url is used"""
 
     @property

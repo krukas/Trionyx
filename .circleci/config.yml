@@ -1,17 +1,26 @@
 version: 2
+workflows:
+  version: 2
+  test:
+    jobs:
+      - python3.6
+      - python3.7
+      - python3.8
 jobs:
-  build:
+  python3.6: &test-template
     docker:
-      - image: circleci/python:3.5
+      - image: circleci/python:3.6
         environment:
           CI_ENV: true
+          PYTHON_VERSION: python3.6
       - image: circleci/redis:5.0.3
     steps:
       - checkout
+      - run: echo "$PYTHON_VERSION" > _PYTHON_VERSION
       - run: sudo chown -R circleci:circleci /usr/local/bin
-      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.5/site-packages
+      - run: sudo chown -R circleci:circleci /usr/local/lib/$PYTHON_VERSION/site-packages
       - restore_cache:
-          key: python3-{{ .Branch }}-{{ checksum "setup.py" }}
+          key: cache-{{ checksum "_PYTHON_VERSION" }}-{{ .Branch }}-{{ checksum "setup.py" }}
       - run:
           command: |
             sudo pip3 install -e .
@@ -19,14 +28,29 @@ jobs:
             sudo pip3 install "celery[redis]"
             sudo pip3 install codecov
       - save_cache:
-          key: python3-{{ .Branch }}-{{ checksum "setup.py" }}
+          key: cache-{{ checksum "_PYTHON_VERSION" }}-{{ .Branch }}-{{ checksum "setup.py" }}
           paths:
             - "/usr/local/bin"
-            - "/usr/local/lib/python3.5/site-packages"
+            - "/usr/local/lib/{{ .Environment.PYTHON_VERSION }}/site-packages"
       - run:
           command: |
             flake8 trionyx
             pydocstyle trionyx
             flake8 tests
+            mypy
             coverage run manage.py test tests
       - run: codecov
+  python3.7:
+    <<: *test-template
+    docker:
+      - image: circleci/python:3.7
+        environment:
+          CI_ENV: true
+          PYTHON_VERSION: python3.7
+  python3.8:
+    <<: *test-template
+    docker:
+      - image: circleci/python:3.8
+        environment:
+          CI_ENV: true
+          PYTHON_VERSION: python3.8

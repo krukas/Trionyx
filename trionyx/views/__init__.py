@@ -9,9 +9,9 @@ import inspect
 import logging
 from collections import defaultdict
 
+from django.utils.translation import ugettext_lazy as _
 from trionyx.config import models_config, TX_MODEL_OVERWRITES
 from trionyx.layout import Layout, Column12, Panel, DescriptionList, Component
-from django.utils.translation import ugettext_lazy as _
 
 from .models import (  # noqa F401
     ListView, ListJsendView, ListExportView, ListChoicesJsendView, DetailTabView,
@@ -20,6 +20,8 @@ from .models import (  # noqa F401
 from .dialogs import (  # noqa F401
     DialogView, UpdateDialog, CreateDialog, LayoutDialog, DeleteDialog
 )
+
+from .ajax import JsendView  # noqa F401
 
 logger = logging.getLogger(__name__)
 

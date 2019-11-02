@@ -8,10 +8,10 @@ trionyx.trionyx.api.pagination
 from collections import OrderedDict
 from rest_framework.response import Response
 
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.pagination import PageNumberPagination as RestPageNumberPagination
 
 
-class PageNumberPagination(PageNumberPagination):
+class PageNumberPagination(RestPageNumberPagination):
     """Api Pagination class"""
 
     def get_paginated_response(self, data):

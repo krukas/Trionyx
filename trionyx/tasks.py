@@ -40,7 +40,7 @@ class TaskMetaClass(type):
 class BaseTask(celery.Task, metaclass=TaskMetaClass):
     """Trionyx BaseTask"""
 
-    name = None
+    name = ''
     task_queue = None
     task_description = _('Base Task')
     task_lock = True

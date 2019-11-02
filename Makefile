@@ -1,6 +1,7 @@
 PIP := env/bin/pip
 PY := env/bin/python
 FLAKE8 := env/bin/flake8
+MYPY := env/bin/mypy
 PYDOCSTYLE := env/bin/pydocstyle
 COVERAGE := env/bin/coverage
 
@@ -63,6 +64,7 @@ lint:
 	-$(FLAKE8) trionyx
 	-$(PYDOCSTYLE) trionyx
 	-$(FLAKE8) tests
+	-$(MYPY)
 
 
 

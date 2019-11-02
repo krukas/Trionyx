@@ -10,10 +10,11 @@ Core forms for Trionyx
 import logging
 import inspect
 from collections import defaultdict
+from typing import List
 
 from django.forms import *  # noqa F403
 from django.forms import ModelForm as DjangoModelForm
-from django.db.models import NOT_PROVIDED
+from django.db.models.fields import NOT_PROVIDED
 from django.db import transaction
 from django.conf import settings
 
@@ -24,13 +25,13 @@ logger = logging.getLogger(__name__)
 TX_MODEL_OVERWRITES_REVERSE = {value.lower(): key.lower() for key, value in settings.TX_MODEL_OVERWRITES.items()}
 
 
-class ModelForm(DjangoModelForm):
+class ModelForm(DjangoModelForm):  # type: ignore
     """Trionyx ModelForm"""
 
-    css_files = []
+    css_files: List[str] = []
     """CSS files that need to be loaded"""
 
-    js_files = []
+    js_files: List[str] = []
     """JS files that need to be loaded"""
 
     def get_inline_forms(self):

@@ -13,6 +13,7 @@ dist/
 *.iml
 static/CACHE/
 htmlcov/
+.mypy_cache/
 
 development.sqlite3
 .idea

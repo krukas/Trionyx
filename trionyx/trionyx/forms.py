@@ -12,7 +12,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from trionyx.models import get_class
 from trionyx import forms
-from trionyx.forms.layout import Layout, Fieldset, Div, HtmlTemplate, Filters
+from trionyx.forms.layout import Layout, Fieldset, Div, HtmlTemplate, Filters  # type: ignore
 from trionyx.forms.helper import FormHelper
 from trionyx.trionyx.icons import ICON_CHOICES
 from trionyx.config import models_config
@@ -221,7 +221,7 @@ class UserUpdateForm(forms.ModelForm):
         from trionyx.trionyx.views import create_permission_jstree
 
         selected_permissions = []
-        if self.instance:
+        if self.instance and self.instance.id:
             selected_permissions = self.instance.user_permissions.all()
         elif 'user_permissions' in self.initial:
             selected_permissions = self.initial['user_permissions']
