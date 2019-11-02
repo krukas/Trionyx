@@ -77,7 +77,7 @@ class BaseTask(celery.Task, metaclass=TaskMetaClass):
             self.__task.execution_time = int(duration.total_seconds())
             self.__task.result = str(result)
             self.__task.progress = 100
-            self.__task.status = Task.COMPLETE
+            self.__task.status = Task.COMPLETED
             self.__task.save()
         except Exception as e:
             logger.exception(e)

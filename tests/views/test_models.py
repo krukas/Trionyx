@@ -2,6 +2,7 @@ import io
 from django.test import TestCase
 
 from trionyx.trionyx.models import User
+from trionyx.config import models_config
 
 
 class ModelsTest(TestCase):
@@ -140,6 +141,20 @@ class ModelsTest(TestCase):
         data = response.json()
         self.assertEqual(response.status_code, 200)
         self.assertEqual(data['status'], 'error')
+
+    def test_custom_header_button_detailview(self):
+        config = models_config.get_config(User)
+        config.view_header_buttons = [
+            {
+                'label': 'TestCustom header button',
+                'url': 'trionyx:model-edit',
+            }
+        ]
+
+        response = self.client.get(self.get_user_url(self.test_user.id))
+
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, 'TestCustom header button')
 
     # create/update/delete
     def test_create_view(self):
