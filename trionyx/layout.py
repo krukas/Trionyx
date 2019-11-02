@@ -178,13 +178,14 @@ class Layout:
         for component in self.components:
             component.set_object(self.object)
 
-    def add_component(self, component, id=None, path=None, before=False):
+    def add_component(self, component, id=None, path=None, before=False, append=False):
         """
         Add component to existing layout can insert component before or after component
 
         :param component:
         :param id: component id
         :param path: component path, example: container.row.column6[1].panel
+        :param append: append component to selected component from id or path
         :return:
         """
         if not id and not path:
@@ -201,7 +202,12 @@ class Layout:
         if not comp:
             raise Exception('Could not add component: Unknown path {} or id {}'.format(path, id))
 
-        if parent:
+        if append:
+            if before:
+                comp.components.append(component)
+            else:
+                comp.components.insert(0, component)
+        elif parent:
             index = parent.components.index(comp) if before else parent.components.index(comp) + 1
             parent.components.insert(index, component)
         elif comp:
@@ -688,18 +694,22 @@ class Button(Html):
                 }}
             }}""".format(tab=dialog_reload_tab)
 
-    def set_object(self, object):
+    def set_object(self, obj):
         """Set object and onClick"""
-        super().set_object(object)
+        super().set_object(obj)
 
         if not self.on_click:
             from trionyx.urls import model_url
             url = model_url(
-                model=object,
+                model=obj,
                 view_name=self.model_url,
                 code=self.model_code,
                 params=self.model_params
             ) if self.model_url else self.url
+
+            if not url and hasattr(obj, 'get_absolute_url'):
+                url = obj.get_absolute_url()
+
             if self.dialog:
                 self.attr['onClick'] = "openDialog('{}', {}); return false;".format(url, self.format_dialog_options())
             else:

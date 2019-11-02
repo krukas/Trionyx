@@ -281,7 +281,7 @@ class UserTasksJsend(JsendView):
         if len(tasks) < 10:
             tasks.extend([
                 task for task in Task.objects.filter(
-                    user=request.user, status__in=[Task.COMPLETE, Task.FAILED]
+                    user=request.user, status__in=[Task.COMPLETED, Task.FAILED]
                 ).order_by('-started_at')[: 10 - len(tasks)]
             ])
 

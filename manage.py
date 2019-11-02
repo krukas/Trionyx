@@ -9,6 +9,7 @@ if __name__ == "__main__":
     if 'test' in sys.argv:
         settings.DEBUG = False
         settings.TEMPLATE_DEBUG = False
+        settings.CELERY_TASK_ALWAYS_EAGER = True
         settings.PASSWORD_HASHERS = [
             'django.contrib.auth.hashers.MD5PasswordHasher',
         ]

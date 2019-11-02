@@ -313,7 +313,7 @@ class Task(models.BaseModel):
     QUEUE = 20
     LOCKED = 30
     RUNNING = 40
-    COMPLETE = 50
+    COMPLETED = 50
     FAILED = 99
 
     STATUS_CHOICES = (
@@ -321,7 +321,7 @@ class Task(models.BaseModel):
         (QUEUE, _('Queue')),
         (LOCKED, _('Locked')),
         (RUNNING, _('Running')),
-        (COMPLETE, _('Completed')),
+        (COMPLETED, _('Completed')),
         (FAILED, _('Failed')),
     )
 
