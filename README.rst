@@ -36,10 +36,10 @@ Here are some of the features that comes with Trionyx:
 - Auto CRUD interface for your models, based on your permissions.
 - Customizable dashboard with default configurable widgets and can create you own widgets.
 - Advanced list view, with featured like
-    - Customizable columns and columns layout
-    - Search and Filters for all your fields
-    - Export to CSV
-    - Mass update and delete
+    * Customizable columns and columns layout
+    * Search and Filters for all your fields
+    * Export to CSV
+    * Mass update and delete
 - Build layout and forms without HTML.
 - Improved search and global search.
 - Support for background and tracked background tasks.
@@ -72,7 +72,7 @@ Contributing
 Bug reports, bug fixes, and new features are always welcome.
 Please raise issues on the `Trionyx github repository`_, and submit pull requests for any new code.
 
-You can run the test suite yourself with the following commands.
+You can run the test suite yourself with the following command:
 
     make test
 
@@ -87,7 +87,7 @@ This project is licensed under the GPLv3 License - see the LICENSE.txt file for 
 
 Change log
 ==========
-    You can find the changelog in the `CHANGELOG.md`_
+You can find the changelog in the `CHANGELOG.md`_
 
 .. _Django: https://www.djangoproject.com/
 .. _Celery: http://www.celeryproject.org/
