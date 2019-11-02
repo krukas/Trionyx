@@ -16,10 +16,11 @@ jobs:
       - image: circleci/redis:5.0.3
     steps:
       - checkout
+      - run: echo "$PYTHON_VERSION" > _PYTHON_VERSION
       - run: sudo chown -R circleci:circleci /usr/local/bin
       - run: sudo chown -R circleci:circleci /usr/local/lib/$PYTHON_VERSION/site-packages
       - restore_cache:
-          key: cache-{{ .Environment.PYTHON_VERSION }}-{{ .Branch }}-{{ checksum "setup.py" }}
+          key: cache-{{ checksum "_PYTHON_VERSION" }}-{{ .Branch }}-{{ checksum "setup.py" }}
       - run:
           command: |
             sudo pip3 install -e .
@@ -27,7 +28,7 @@ jobs:
             sudo pip3 install "celery[redis]"
             sudo pip3 install codecov
       - save_cache:
-          key: cache-{{ .Environment.PYTHON_VERSION }}-{{ .Branch }}-{{ checksum "setup.py" }}
+          key: cache-{{ checksum "_PYTHON_VERSION" }}-{{ .Branch }}-{{ checksum "setup.py" }}
           paths:
             - "/usr/local/bin"
             - "/usr/local/lib/{{ .Environment.PYTHON_VERSION }}/site-packages"
