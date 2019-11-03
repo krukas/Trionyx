@@ -136,7 +136,9 @@
 
 {% endcompress %}
 
-<script src="{% static summernote_language_js %}"></script>
+{% if current_locale != 'en_US' %}
+    <script src="{% static summernote_language_js %}"></script>
+{% endif %}
 
 <script>
     window.summernote_language = '{{ summernote_language }}';
