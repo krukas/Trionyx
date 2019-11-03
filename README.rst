@@ -34,7 +34,7 @@ Features
 Here are some of the features that comes with Trionyx:
 
 - Auto CRUD interface for your models, based on your permissions.
-- Customizable dashboard with default configurable widgets and can create you own widgets.
+- Customizable dashboard with default configurable widgets and easily create your own widgets.
 - Advanced list view, with featured like
     * Customizable columns and columns layout
     * Search and Filters for all your fields

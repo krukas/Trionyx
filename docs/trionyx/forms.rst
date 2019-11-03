@@ -1,9 +1,15 @@
 Forms
 =====
 
-Forms are rendered in Trionyx with crispy forms using the bootstrap3 template.
+Default Trionyx will generate a form for all fields without any layout.
+Forms can be created and registered in the `forms.py`.
 
-Example:
+.. autofunction:: trionyx.forms.register
+
+Layout
+------
+
+Forms are rendered in Trionyx with crispy forms using the bootstrap3 template.
 
 .. code:: python
 

@@ -12,6 +12,7 @@ Welcome to Trionyx's documentation!
    
    trionyx/introduction
    trionyx/installation
+   trionyx/getting-started
    trionyx/settings
    trionyx/config
    trionyx/components
