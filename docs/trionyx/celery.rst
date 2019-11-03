@@ -29,6 +29,7 @@ and with the default configuration you have 5 minutes to clean up a task.
 
 You can change the time limit with the settings `CELERY_TASK_SOFT_TIME_LIMIT` and `CELERY_TASK_TIME_LIMIT`
 
+.. _celery-create-task:
 
 Creating background task
 ------------------------
@@ -51,6 +52,8 @@ Example of a task with arguments:
     # Or you can run this task in the background by:
     send_email.delay('test@example.com')
 
+
+.. _celery-cron:
 
 Running task periodically (cron)
 --------------------------------

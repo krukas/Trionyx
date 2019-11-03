@@ -1,9 +1,8 @@
-from rest_framework import serializers
 from trionyx.trionyx.models import User
-from trionyx.api.serializers import register
+from trionyx.api import serializers
 
 
-@register(User)
+@serializers.register
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

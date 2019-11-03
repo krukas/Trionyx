@@ -148,9 +148,11 @@ def create_permission_jstree(selected=None, disabled=False):
         if model_config.disable_delete and permission.codename == 'delete_{}'.format(model_config.model_name):
             continue
 
+        parent = ['jstree']
+
         if model_config.app_label not in added_apps:
             jstree.append({
-                'id': model_config.app_label,
+                'id': '.'.join([*parent, model_config.app_label]),
                 'parent': '#',
                 'text': model_config.get_app_verbose_name(),
                 'state': {
@@ -159,7 +161,7 @@ def create_permission_jstree(selected=None, disabled=False):
             })
             added_apps.append(model_config.app_label)
 
-        parent = [model_config.app_label if model_config.app_label != 'auth' else 'trionyx']
+        parent.append(model_config.app_label if model_config.app_label != 'auth' else 'trionyx')
 
         if model_config.model_name not in added_models:
             jstree.append({

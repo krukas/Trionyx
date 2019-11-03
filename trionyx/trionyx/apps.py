@@ -109,7 +109,7 @@ class Config(BaseConfig):
         auditlog_disable = True
         api_disable = True
 
-        list_default_fields = ['message', 'level', 'last_event', 'log_count']
+        list_default_fields = ['level', 'last_event', 'log_count', 'message']
         list_default_sort = '-last_event'
         list_fields = [
             {

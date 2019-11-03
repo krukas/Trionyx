@@ -6,6 +6,7 @@ trionyx.trionyx.api.serializers
 :license: GPLv3
 """
 import inspect
+from rest_framework.serializers import *  # noqa F403
 
 from trionyx.config import models_config
 
@@ -17,18 +18,15 @@ class SerializerRegister:
         """Init class"""
         self.serializers = {}
 
-    def register(self, model_alias):
+    def register(self, serializer):
         """Add form to register"""
-        def wrapper(serializer):
-            model_name = self.get_model_alias(model_alias)
+        model_name = self.get_model_alias(serializer.Meta.model)
 
-            if model_name in self.serializers:
-                raise Exception("Serializer {} already registered for model {}".format(serializer, model_name))
+        if model_name in self.serializers:
+            raise Exception("Serializer {} already registered for model {}".format(serializer, model_name))
 
-            self.serializers[model_name] = serializer
-            return serializer
-
-        return wrapper
+        self.serializers[model_name] = serializer
+        return serializer
 
     def get_model_alias(self, model_alias):
         """Get model alias if class then convert to alias string"""

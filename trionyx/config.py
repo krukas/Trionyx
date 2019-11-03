@@ -36,7 +36,7 @@ class ModelConfig:
             ...
 
             # Example config for Category model
-            class Category:
+            class Category(ModelConfig):
                 verbose_name = '{name}'
                 list_default_fields = ['id', 'created_at', 'name']
                 list_search_fields = ['name', 'description']

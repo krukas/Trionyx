@@ -5,6 +5,7 @@
 # sphinx-quickstart on Fri Oct  6 11:15:27 2017.
 import sys
 import os
+from datetime import datetime
 
 sys.path.insert(0, os.path.abspath('..'))
 os.environ['DJANGO_SETTINGS_MODULE'] = 'app.settings'
@@ -38,7 +39,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Trionyx'
-copyright = '2017, Maikel Martens'
+copyright = '{year}, Maikel Martens'.format(year=datetime.now().year)
 author = 'Maikel Martens'
 
 # The version info for the project you're documenting, acts as replacement for
