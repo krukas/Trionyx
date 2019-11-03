@@ -27,6 +27,13 @@ function trionyxInitialize() {
             'showClose',
         ]));
     });
+    window.trionyx_locale
+
+    $('.summernote').summernote({
+        lang: window.summernote_language,
+        height: 200,
+        dialogsInBody: true,
+    });
 };
 
 function getDataOptions(node, validOptions) {

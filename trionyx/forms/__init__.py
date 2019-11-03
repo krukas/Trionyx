@@ -10,7 +10,7 @@ Core forms for Trionyx
 import logging
 import inspect
 from collections import defaultdict
-from typing import List
+from typing import List, Optional
 
 from django.forms import *  # noqa F403
 from django.forms import ModelForm as DjangoModelForm
@@ -97,6 +97,16 @@ class ModelForm(DjangoModelForm):  # type: ignore
         return obj
 
 
+class Wysiwyg(CharField):
+    """Wysiwyg summernote form field"""
+
+    def __init__(self, *args, **kwargs):
+        """Init field"""
+        if not kwargs.get('widget'):
+            kwargs['widget'] = Textarea(attrs={'class': 'summernote'})
+        super().__init__(*args, **kwargs)
+
+
 class FormRegister:
     """Class where forms can be registered"""
 
@@ -104,8 +114,31 @@ class FormRegister:
         """Init"""
         self.forms = defaultdict(dict)
 
-    def add_form(self, code=None, model_alias=None, default_create=False, default_edit=False, minimal=False):
-        """Add form to register"""
+    def register(
+        self, code: Optional[str] = None, model_alias: Optional[str] = None,
+        default_create: Optional[bool] = False, default_edit: Optional[bool] = False, minimal: Optional[bool] = False
+    ):
+        """Register form for given model_alias,
+        if no model_alias is given the Meta.model is used to generate the model alias.
+
+        :param str code: Code to identify form
+        :param str model_alias: Alias for a model (if not provided the Meta.model is used)
+        :param bool default_create: Use this form for create
+        :param bool default_edit: Use this form for editing
+        :param bool minimal: Use this form for minimal create
+
+        .. code-block:: python
+
+            # <app>/forms.py
+            from trionyx import forms
+
+            @forms.register(default_create=True, default_edit=True)
+            class UserForm(forms.ModelForm):
+
+                class Meta:
+                    model = User
+
+        """
         def wrapper(form):
             form_code = code if code else form.__name__.lower()
             model_name = self.get_model_alias(model_alias if model_alias else form.Meta.model, False)
@@ -182,4 +215,4 @@ class FormRegister:
 
 
 form_register = FormRegister()
-register = form_register.add_form
+register = form_register.register

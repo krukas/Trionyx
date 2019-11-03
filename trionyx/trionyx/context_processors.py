@@ -14,6 +14,7 @@ from trionyx.models import get_class
 
 def trionyx(request):
     """Add trionyx context data"""
+    locale, *_ = utils.get_current_locale().split('_')
     return {
         'DEBUG': settings.DEBUG,
         'TX_APP_NAME': settings.TX_APP_NAME,
@@ -31,4 +32,6 @@ def trionyx(request):
         'datetime_input_format': utils.datetime_format_to_momentjs(utils.get_datetime_input_format()),
         'date_input_format': utils.datetime_format_to_momentjs(utils.get_datetime_input_format(date_only=True)),
         'current_locale': utils.get_current_locale(),
+        'summernote_language': '{}-{}'.format(locale, locale.upper()),
+        'summernote_language_js': 'plugins/summernote/lang/summernote-{}-{}.min.js'.format(locale, locale.upper()),
     }
