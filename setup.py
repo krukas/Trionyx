@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from setuptools import setup
 from setuptools import find_packages
 from trionyx import __version__
@@ -57,5 +58,5 @@ setup(
             'Sphinx',
             'sphinx_rtd_theme',
         ]
-    }
+    },
 )
