@@ -56,6 +56,24 @@ from trionyx import utils
 register = template.Library()
 
 
+class Colors:
+    """Colors"""
+
+    THEME = 'theme'
+    LIGHT_BLUE = 'light-blue'
+    AQUA = 'aqua'
+    GREEN = 'green'
+    YELLOW = 'yellow'
+    RED = 'red'
+    GRAY = 'gray'
+    NAVY = 'navy'
+    TEAL = 'teal'
+    PURPLE = 'purple'
+    ORANGE = 'orange'
+    MAROON = 'maroon'
+    BLACK = 'black'
+
+
 class Layout:
     """Layout object that holds components"""
 
@@ -281,9 +299,15 @@ class Component:
         else:
             object = self.object
 
+        self.updated()
+
         # Pass object along to child components for rendering
         for component in self.components:
-            component.set_object(object)
+            component.set_object(object, force)
+
+    def updated(self):
+        """Object updated hook method that is called when component is updated with object"""
+        pass
 
     def render(self, context, request=None):
         """Render component"""
@@ -495,11 +519,6 @@ class ComponentFieldsMixin:
         """Render field for given data"""
         from trionyx.renderer import renderer
 
-        if 'component' in field:
-            component = field.get('component')
-            component.set_object(data, True)
-            return component.render(self.context)
-
         if 'value' in field:
             value = field['value']
         elif isinstance(data, object) and field['field'] and hasattr(data, field['field']):
@@ -517,7 +536,7 @@ class ComponentFieldsMixin:
         if 'renderer' in field:
             value = field['renderer'](value, data_object=data, **options)
         elif isinstance(value, Component):
-            value.set_object(self.object)
+            value.set_object(self.object, True)
             value = value.render(self.context.copy(), self.request)
         else:
             value = renderer.render_value(value, data_object=data, **options)
@@ -582,10 +601,29 @@ class HtmlTagWrapper(Component):
     attr: Dict[str, str] = {}
     """Dict with html attributes"""
 
+    valid_attr: List[str] = []
+    """Valid attributes that can be used"""
+
+    color_class: str = ''
+    """When color is set the will be used as class example: btn btn-{color}"""
+
     def __init__(self, *args, **kwargs):
         """Initialize HtmlTagWrapper"""
         super().__init__(*args, **kwargs)
         self.attr = self.attr.copy() if self.attr else {}
+
+        if 'css_class' in kwargs:
+            kwargs['class'] = kwargs.pop('css_class')
+        elif 'color' in kwargs:
+            self.attr['class'] = self.color_class.format(color=kwargs['color'])
+            kwargs.pop('class', None)
+        elif self.color_class:
+            self.attr['class'] = self.color_class.format(color=Colors.THEME)
+            kwargs.pop('class', None)
+
+        for key, value in kwargs.items():
+            if key in self.valid_attr:
+                self.attr[key] = value
 
     def get_attr_text(self):
         """Get html attr text to render in template"""
@@ -595,89 +633,17 @@ class HtmlTagWrapper(Component):
         ])
 
 
-class Html(HtmlTagWrapper):
-    """Html single html tag"""
+class OnclickTag(HtmlTagWrapper):
+    """HTML tag with onlick for url or dialog"""
 
-    template_name = 'trionyx/components/html.html'
-    tag = ''
-
-    valid_attr: List[str] = []
-    """Valid attributes that can be used"""
-
-    def __init__(self, html=None, **kwargs):
-        """Init Html"""
-        super().__init__(**kwargs)
-        kwargs['class'] = kwargs.pop('css_class', self.attr.get('class', ''))
-        self.html = html
-        for key, value in kwargs.items():
-            if key in self.valid_attr:
-                self.attr[key] = value
-
-
-class Img(Html):
-    """Img tag"""
-
-    tag = 'img'
-    valid_attr = ['src', 'width']
-    attr = {
-        'width': '100%',
-    }
-
-
-class Input(Html):
-    """Input tag"""
-
-    template_name = 'trionyx/components/input.html'
-
-    valid_attr = ['name', 'value', 'type', 'placeholder', 'class']
-    attr = {
-        'type': 'text',
-        'class': 'form-control',
-    }
-
-    def __init__(self, form_field=None, has_error=False, **kwargs):
-        """Init input"""
-        super().__init__(None, **kwargs)
-        self.has_error = has_error
-
-        if form_field:
-            self.attr['name'] = form_field.name
-            self.attr['value'] = form_field.value()
-            self.has_error = form_field.errors
-
-        if 'value' in self.attr and self.attr['value'] is None:
-            self.attr['value'] = ''
-
-
-class ButtonGroup(HtmlTagWrapper):
-    """Bootstrap button group"""
-
-    attr = {
-        'class': 'btn-group'
-    }
-
-
-class Button(Html):
-    """
-    Bootstrap button
-
-    - link_url
-    - dialog_url
-    - onClick
-    """
-
-    tag = 'button'
-    valid_attr = ['onClick', 'class']
-    attr = {
-        'class': 'btn btn-flat bg-theme'
-    }
+    valid_attr = ['onClick']
 
     def __init__(
-        self, label, url=None, model_url=None, model_params=None, model_code=None,
+        self, *components, url=None, model_url=None, model_params=None, model_code=None,
         dialog=False, dialog_options=None, dialog_reload_tab=None, **options
     ):
-        """Init button"""
-        super().__init__(html=label, **options)
+        """Init tag"""
+        super().__init__(*components, **options)
         self.url = url
         self.model_url = model_url
         self.model_code = model_code
@@ -694,21 +660,19 @@ class Button(Html):
                 }}
             }}""".format(tab=dialog_reload_tab)
 
-    def set_object(self, obj):
-        """Set object and onClick"""
-        super().set_object(obj)
-
+    def updated(self):
+        """Set onClick url based on object"""
         if not self.on_click:
             from trionyx.urls import model_url
             url = model_url(
-                model=obj,
+                model=self.object,
                 view_name=self.model_url,
                 code=self.model_code,
                 params=self.model_params
             ) if self.model_url else self.url
 
-            if not url and hasattr(obj, 'get_absolute_url'):
-                url = obj.get_absolute_url()
+            if not url and hasattr(self.object, 'get_absolute_url'):
+                url = self.object.get_absolute_url()
 
             if self.dialog:
                 self.attr['onClick'] = "openDialog('{}', {}); return false;".format(url, self.format_dialog_options())
@@ -720,6 +684,28 @@ class Button(Html):
         return '{{ {} }}'.format(','.join(
             ("{}:{}" if key == 'callback' else "{}:'{}'").format(key, value)
             for key, value in self.dialog_options.items()))
+
+
+class Html(HtmlTagWrapper):
+    """Renders html in a tag when set"""
+
+    template_name = 'trionyx/components/html.html'
+    tag = ''
+
+    def __init__(self, html=None, **kwargs):
+        """Init Html"""
+        super().__init__(**kwargs)
+        self.html = html
+
+
+class Img(Html):
+    """Img tag"""
+
+    tag = 'img'
+    valid_attr = ['src', 'width', 'class']
+    attr = {
+        'width': '100%',
+    }
 
 
 # =============================================================================
@@ -822,6 +808,105 @@ class Column12(Column):
 # =============================================================================
 # Bootstrap elements
 # =============================================================================
+class Badge(Html):
+    """Bootstrap badge"""
+
+    tag = 'span'
+    valid_attr = ['class']
+    color_class = 'badge bg-{color}'
+
+    def __init__(self, field=None, html=None, **kwargs):
+        """Init badge"""
+        self.field = field
+        super().__init__(html, **kwargs)
+
+    def updated(self):
+        """Set HTML with rendered field"""
+        from trionyx.renderer import renderer
+        self.html = renderer.render_field(self.object, self.field) if self.field else self.html
+
+
+class Alert(Html):
+    """Bootstrap alert"""
+
+    INFO = 'info'
+    SUCCESS = 'success'
+    WARNING = 'warning'
+    DANGER = 'danger'
+
+    tag = 'div'
+    color_class = 'alert alert-{color}'
+
+    def __init__(self, html, alert='success', no_margin=False, **options):
+        """Init alert"""
+        options.pop('color', None)
+        super().__init__(html, color=alert, **options)
+        if no_margin:
+            self.attr['class'] += ' no-margin'
+
+
+class ButtonGroup(HtmlTagWrapper):
+    """Bootstrap button group"""
+
+    valid_attr = ['class']
+
+    attr = {
+        'class': 'btn-group'
+    }
+
+
+class Button(OnclickTag):
+    """Bootstrap button"""
+
+    tag = 'button'
+    valid_attr = ['onClick', 'class']
+    color_class = 'btn btn-flat bg-{color}'
+
+    def __init__(self, label, **options):
+        """Init button"""
+        super().__init__(Html(label), **options)
+
+
+class Thumbnail(OnclickTag):
+    """Bootstrap Thumbnail"""
+
+    tag = 'a'
+
+    attr = {
+        'href': '#',
+        'class': 'thumbnail'
+    }
+
+    def __init__(self, src, **options):
+        """Init thumbnail"""
+        super().__init__(Img(src=src), **options)
+
+
+class Input(Html):
+    """Input tag"""
+
+    template_name = 'trionyx/components/input.html'
+
+    valid_attr = ['name', 'value', 'type', 'placeholder', 'class']
+    attr = {
+        'type': 'text',
+        'class': 'form-control',
+    }
+
+    def __init__(self, form_field=None, has_error=False, **kwargs):
+        """Init input"""
+        super().__init__(None, **kwargs)
+        self.has_error = has_error
+
+        if form_field:
+            self.attr['name'] = form_field.name
+            self.attr['value'] = form_field.value()
+            self.has_error = form_field.errors
+
+        if 'value' in self.attr and self.attr['value'] is None:
+            self.attr['value'] = ''
+
+
 class Panel(Component):
     """
     Bootstrap panel available options
