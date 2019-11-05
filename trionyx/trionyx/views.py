@@ -300,6 +300,20 @@ class UserTasksJsend(JsendView):
 
 
 # =============================================================================
+# Sidebar
+# =============================================================================
+class SidebarJsend(JsendView):
+    """Model sidebar view"""
+
+    def handle_request(self, request, app, model, pk, code):
+        """Return given sidebar"""
+        from trionyx.views import sidebars
+        config = models_config.get_config(f'{app}.{model}')
+        obj = config.model.objects.get(id=pk)
+        return sidebars.get_sidebar(config.model, code)(obj)
+
+
+# =============================================================================
 # Dashboard
 # =============================================================================
 class DashboardView(TemplateView):

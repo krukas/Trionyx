@@ -56,6 +56,50 @@ class LayoutRegister:
         return layout.render(request)
 
 
+class SidebarRegister:
+    """Register sidebars"""
+
+    def __init__(self):
+        """Init"""
+        self.sidebars = {}
+
+    def register(self, model_alias, code=None):
+        """Add sidebar to register
+
+        The function must return a dict that can contain the following data:
+
+        - **title**: Title of the sidebar
+        - **content**: Html content to display in sidebar
+        - **fixed_content (optional)**: Html content that is fixed displayed under the title
+        - **theme (optional)**: Theme of sidebar can be light or dark
+        - **actions (optional)**: List[Dict] of actions  that are displayed in dropdown.
+            - **label**: Action label
+            - **url**: Url used for action link
+            - **dialog** Action link url is an dialog
+            - **dialog_options**: Dialog options
+            - **reload**: On dialog success reload sidebar
+        """
+        model_alias = models_config.get_model_name(model_alias) if model_alias else ''
+
+        if (model_alias, code) in self.sidebars:
+            raise Exception(f'There is already a sidebar for model: {model_alias} and code: {code}')
+
+        def wrapper(create_sidebar):
+            self.sidebars[(model_alias, code)] = create_sidebar
+            return create_sidebar
+
+        return wrapper
+
+    def get_sidebar(self, model_alias, code=None):
+        """Get sidebar"""
+        model_alias = models_config.get_model_name(model_alias) if model_alias else ''
+
+        if (model_alias, code) not in self.sidebars:
+            raise Exception(f'Sidebar does not exists for model: {model_alias} and code: {code}')
+
+        return self.sidebars[(model_alias, code)]
+
+
 class TabRegister:
     """Class where tab layout can be registered"""
 
@@ -252,3 +296,4 @@ class TabItem:
 
 tabs = TabRegister()
 layouts = LayoutRegister()
+sidebars = SidebarRegister()

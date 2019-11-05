@@ -1,4 +1,4 @@
-from trionyx.views import tabs, layouts
+from trionyx.views import tabs, layouts, sidebars
 from trionyx.layout import *
 from trionyx.urls import model_url
 
@@ -28,6 +28,15 @@ def post_overview(obj):
                                 'callback': "function(){trionyx_reload_tab('general')}"
                             },
                             color=Colors.TEAL,
+                        )
+                    },
+                    {
+                        'label': 'Sidebar',
+                        'value': Button(
+                            'Sidebar',
+                            model_url='sidebar',
+                            model_code='item',
+                            sidebar=True,
                         )
                     },
                 )
@@ -126,3 +135,25 @@ def post_overview(obj):
 @tabs.register_update('trionyx.user', 'general')
 def tasks_update(layout, obj):
     layout.add_component(Panel('Inserted'), path='container.row.column10[1].panel')
+
+
+@sidebars.register(Post, 'item')
+def item_sidebar(obj):
+    layout = post_overview(obj)
+
+
+    return {
+        'title': str(obj),
+        'fixed_content': 'Some fixed content 2',
+        'content': 'Real content <br>' * 100,
+        'theme': 'light',
+        'actions': [
+            {
+                'label': 'Edit',
+                'url': model_url(obj, 'dialog-edit'),
+                'dialog': True,
+                'dialog_options': {},
+                'reload': True,
+            }
+        ]
+    }

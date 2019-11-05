@@ -65,6 +65,9 @@ urlpatterns = [
     ),
     path('dialog/model/<str:app>/<str:model>/<int:pk>/delete/', core_views.DeleteDialog.as_view(), name='model-dialog-delete'),
 
+    # Sidebar
+    path('sidebar/model/<str:app>/<str:model>/<int:pk>/<str:code>/', views.SidebarJsend.as_view(), name='model-sidebar'),
+
     # Mass actions
     path('mass/<str:app>/<str:model>/delete/', views.MassDeleteDialog.as_view(), name='model-mass-delete'),
     path('mass/<str:app>/<str:model>/update/', views.MassUpdateView.as_view(), name='model-mass-update'),

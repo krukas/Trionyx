@@ -640,7 +640,7 @@ class OnclickTag(HtmlTagWrapper):
 
     def __init__(
         self, *components, url=None, model_url=None, model_params=None, model_code=None,
-        dialog=False, dialog_options=None, dialog_reload_tab=None, **options
+        sidebar=False, dialog=False, dialog_options=None, dialog_reload_tab=None, dialog_reload_sidebar=False, **options
     ):
         """Init tag"""
         super().__init__(*components, **options)
@@ -648,6 +648,7 @@ class OnclickTag(HtmlTagWrapper):
         self.model_url = model_url
         self.model_code = model_code
         self.model_params = model_params
+        self.sidebar = sidebar
         self.dialog = dialog
         self.dialog_options = dialog_options if dialog_options else {}
         self.on_click = options.get('onClick', False)
@@ -659,6 +660,13 @@ class OnclickTag(HtmlTagWrapper):
                     trionyx_reload_tab('{tab}');
                 }}
             }}""".format(tab=dialog_reload_tab)
+        elif dialog_reload_sidebar:
+            self.dialog_options['callback'] = """function(data, dialog){
+                if (data.success) {
+                    dialog.close();
+                    reloadSidebar();
+                }
+            }"""
 
     def updated(self):
         """Set onClick url based on object"""
@@ -676,6 +684,8 @@ class OnclickTag(HtmlTagWrapper):
 
             if self.dialog:
                 self.attr['onClick'] = "openDialog('{}', {}); return false;".format(url, self.format_dialog_options())
+            elif self.sidebar:
+                self.attr['onClick'] = "openSidebar('{}'); return false;".format(url)
             else:
                 self.attr['onClick'] = "window.location.href='{}'; return false;".format(url)
 
