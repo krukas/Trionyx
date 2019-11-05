@@ -2,6 +2,23 @@
 
 **Compatibility breaking changes: drop support for python 3.5**
 
+#### Added
+- Add generic model sidebar
+- Add Summernote wysiwyg editor
+- Add more tests and MyPy
+- Add getting started guide to docs and improve README
+- Add more bootstrap components
+
+#### Changed
+- Drop support for python 3.5
+- Improve api serializer registration
+- Improve list view column sizes
+- Move from vitualenv to venv
+
+#### Fixed
+- Cant go to tab if code is same as code in jstree
+- Several small fixes and changes
+
 
 ### [1.0.5] - 31-10-2019
 #### Fixed
