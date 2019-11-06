@@ -479,6 +479,9 @@ function openSidebar(url) {
         $actionsUl.html('');
         $.each(actions, function (index, action) {
            var button = $("<a href='#'>" + action.label + "</a>");
+           if ('class' in action) {
+               button.addClass(action.class);
+           }
            button.on('click', function () {
                if (action.dialog) {
                    var options = action.dialog_options;
@@ -495,6 +498,10 @@ function openSidebar(url) {
                    window.location.href = action.url;
                }
            });
+
+           if ('divider' in action && action.divider) {
+               $actionsUl.append($('<li class="divider"></li>'));
+           }
 
            $actionsUl.append(
                $('<li></li>').append(button)

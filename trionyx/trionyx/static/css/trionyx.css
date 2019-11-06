@@ -677,6 +677,34 @@ ul.pagination a {
     font-weight: bold;
 }
 
+/* Success */
+.dropdown-menu > li > a.text-success {
+    color: #3c763d;
+}
+.dropdown-menu > li > a.text-success:hover {
+    color: #2b542c;
+}
+/* info */
+.dropdown-menu > li > a.text-info {
+    color: #31708f;
+}
+.dropdown-menu > li > a.text-info:hover {
+    color: #245269;
+}
+/* Warning */
+.dropdown-menu > li > a.text-warning {
+    color: #8a6d3b;
+}
+.dropdown-menu > li > a.text-warning:hover {
+    color: #66512c;
+}
+/* Danger */
+.dropdown-menu > li > a.text-danger {
+    color: #a94442;
+}
+.dropdown-menu > li > a.text-danger:hover {
+    color: #843534;
+}
 
 /* DragTable */
 /*****************************************************************************/

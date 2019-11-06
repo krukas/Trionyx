@@ -74,10 +74,12 @@ class SidebarRegister:
         - **theme (optional)**: Theme of sidebar can be light or dark
         - **actions (optional)**: List[Dict] of actions  that are displayed in dropdown.
             - **label**: Action label
+            - **class**: class of action link
             - **url**: Url used for action link
             - **dialog** Action link url is an dialog
             - **dialog_options**: Dialog options
             - **reload**: On dialog success reload sidebar
+            - **divider**: Add divider before action
         """
         model_alias = models_config.get_model_name(model_alias) if model_alias else ''
 

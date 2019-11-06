@@ -138,7 +138,7 @@ def tasks_update(layout, obj):
 
 
 @sidebars.register(Post, 'item')
-def item_sidebar(obj):
+def item_sidebar(request, obj):
     layout = post_overview(obj)
 
 
@@ -149,11 +149,37 @@ def item_sidebar(obj):
         'theme': 'light',
         'actions': [
             {
-                'label': 'Edit',
+                'label': 'Save',
+                'class': 'text-success text-bold',
                 'url': model_url(obj, 'dialog-edit'),
                 'dialog': True,
                 'dialog_options': {},
                 'reload': True,
+            },
+            {
+                'label': 'Warning',
+                'class': 'text-warning',
+                'url': model_url(obj, 'dialog-edit'),
+                'dialog': True,
+                'dialog_options': {},
+                'reload': True,
+            },
+            {
+                'label': 'Info',
+                'class': 'text-info',
+                'url': model_url(obj, 'dialog-edit'),
+                'dialog': True,
+                'dialog_options': {},
+                'reload': True,
+            },
+            {
+                'label': 'Delete',
+                'class': 'text-danger',
+                'url': model_url(obj, 'dialog-edit'),
+                'dialog': True,
+                'dialog_options': {},
+                'reload': True,
+                'divider': True,
             }
         ]
     }

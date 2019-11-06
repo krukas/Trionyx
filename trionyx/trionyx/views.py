@@ -310,7 +310,7 @@ class SidebarJsend(JsendView):
         from trionyx.views import sidebars
         config = models_config.get_config(f'{app}.{model}')
         obj = config.model.objects.get(id=pk)
-        return sidebars.get_sidebar(config.model, code)(obj)
+        return sidebars.get_sidebar(config.model, code)(request, obj)
 
 
 # =============================================================================
