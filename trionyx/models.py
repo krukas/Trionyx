@@ -23,7 +23,7 @@ from trionyx import utils
 if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.postgresql':
     from django.contrib.postgres.fields import JSONField  # noqa F401
 else:
-    from jsonfield import JSONField  # noqa F401
+    from jsonfield import JSONField  # type: ignore # noqa F401
 
 TX_MODEL_OVERWRITES = {key.lower(): value.lower() for key, value in settings.TX_MODEL_OVERWRITES.items()}
 

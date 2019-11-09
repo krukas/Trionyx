@@ -137,7 +137,7 @@ EMAIL_HOST_PASSWORD = get_env_var('EMAIL_HOST_PASSWORD', '')
 EMAIL_USE_TLS = get_env_var('EMAIL_USE_TLS', False)
 EMAIL_USE_SSL = get_env_var('EMAIL_USE_SSL', False)
 
-DEFAULT_FROM_EMAIL = get_env_var('DEFAULT_FROM_EMAIL',  'webmaster@localhost')
+DEFAULT_FROM_EMAIL = get_env_var('DEFAULT_FROM_EMAIL', 'webmaster@localhost')
 
 # ==============================================================================
 # Auth / security
