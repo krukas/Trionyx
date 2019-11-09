@@ -117,6 +117,29 @@ MIDDLEWARE = [
 ]
 
 # ==============================================================================
+# Database
+# ==============================================================================
+DATABASES = get_env_var('DATABASES', {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'development.sqlite3',
+    }
+})
+
+# ==============================================================================
+# Database
+# ==============================================================================
+EMAIL_BACKEND = get_env_var('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = get_env_var('EMAIL_HOST', 'localhost')
+EMAIL_PORT = get_env_var('EMAIL_PORT', 25)
+EMAIL_HOST_USER = get_env_var('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = get_env_var('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = get_env_var('EMAIL_USE_TLS', False)
+EMAIL_USE_SSL = get_env_var('EMAIL_USE_SSL', False)
+
+DEFAULT_FROM_EMAIL = get_env_var('DEFAULT_FROM_EMAIL',  'webmaster@localhost')
+
+# ==============================================================================
 # Auth / security
 # ==============================================================================
 AUTH_USER_MODEL = 'trionyx.User'
