@@ -44,7 +44,7 @@ def media_nginx_accel(request, path):
     """
     Location /protected/ {
         internal;
-        root <complete path to project root dir>;
+        alias <complete path to project root dir>;
     }
 
     """
