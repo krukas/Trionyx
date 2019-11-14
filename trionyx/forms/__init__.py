@@ -74,6 +74,7 @@ class ModelForm(DjangoModelForm):  # type: ignore
             obj = super().save(commit)
 
             for key, form in self.get_inline_forms().items():
+                form.is_valid()  # Make sure cleaned_data is filled
                 fk_name = self.inline_forms[key].get('fk_name', 'instance')
                 if fk_name == 'instance':
                     logger.debug('Save inline form {} as FormSet, commit: {}'.format(key, commit))

@@ -536,7 +536,7 @@ class ComponentFieldsMixin:
         if 'renderer' in field:
             value = field['renderer'](value, data_object=data, **options)
         elif isinstance(value, Component):
-            value.set_object(self.object, True)
+            value.set_object(data, True)
             value = value.render(self.context.copy(), self.request)
         else:
             value = renderer.render_value(value, data_object=data, **options)
