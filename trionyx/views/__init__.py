@@ -5,7 +5,6 @@ trionyx.views
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
-import inspect
 import logging
 from collections import defaultdict
 
@@ -15,7 +14,7 @@ from trionyx.layout import Layout, Column12, Panel, DescriptionList, Component
 
 from .models import (  # noqa F401
     ListView, ListJsendView, ListExportView, ListChoicesJsendView, DetailTabView,
-    DetailTabJsendView, UpdateView, CreateView, DeleteView, LayoutView,
+    DetailTabJsendView, UpdateView, CreateView, DeleteView, LayoutView, LayoutUpdateView,
 )
 from .dialogs import (  # noqa F401
     DialogView, UpdateDialog, CreateDialog, LayoutDialog, DeleteDialog
@@ -33,27 +32,75 @@ class LayoutRegister:
         """Init"""
         self.layouts = {}
 
+    def add_layout(self, code, func):
+        """Add layout"""
+        if code in self.layouts and self.layouts[code]['layout']:
+            raise Exception("Layout {} already registered".format(code))
+
+        if code in self.layouts:
+            self.layouts[code]['layout'] = func
+        else:
+            self.layouts[code] = {
+                'layout': func,
+                'updates': [],
+            }
+
     def register(self, code):
         """Add layout to register"""
         def wrapper(create_layout):
-            self.layouts[code] = create_layout
+            self.add_layout(code, create_layout)
             return create_layout
         return wrapper
 
-    def get_layout(self, code, object, request=None):
+    def add_layout_update(self, code, func):
+        """Add update layout function"""
+        if code in self.layouts:
+            self.layouts[code]['updates'].append(func)
+        else:
+            self.layouts[code] = {
+                'layout': False,
+                'updates': [func],
+            }
+
+    def update(self, code):
+        """Register an update for layout"""
+        def wrapper(update_layout):
+            self.add_layout_update(code, update_layout)
+            return update_layout
+        return wrapper
+
+    def get_layout(self, code, object, layout_id=None):
         """Get complete layout for given object"""
         if code not in self.layouts:
             raise Exception('layout does not exist')
-        layout = self.layouts.get(code)
-        layout = layout(object)
+
+        layout_config = self.layouts.get(code)
+
+        layout = layout_config['layout'](object)
         if isinstance(layout, Component):
             layout = Layout(layout)
 
         if isinstance(layout, list):
             layout = Layout(*layout)
 
+        for update_layout in layout_config['updates']:
+            try:
+                update_layout(layout, object)
+            except Exception as e:
+                logger.error('Could not update layout for {}: {}'.format(
+                    code,
+                    str(e)
+                ))
+
+        from trionyx.urls import model_url
+
+        if layout_id:
+            layout.id = layout_id
+
+        layout.update_url = model_url(object, 'layout-update', code=code)
         layout.set_object(object)
-        return layout.render(request)
+
+        return layout
 
 
 class SidebarRegister:
@@ -158,7 +205,6 @@ class TabRegister:
         def wrapper(create_layout):
             item = TabItem(
                 code=code,
-                create_layout=create_layout,
                 name=name,
                 order=order,
                 display_filter=display_filter
@@ -169,6 +215,7 @@ class TabRegister:
 
             self.tabs[model_alias].append(item)
             self.tabs[model_alias] = sorted(self.tabs[model_alias], key=lambda item: item.order if item.order else 10)
+            layouts.add_layout(f'{model_alias}-{code}', create_layout)
 
             return create_layout
         return wrapper
@@ -184,9 +231,7 @@ class TabRegister:
         model_alias = self.get_model_alias(model_alias)
 
         def wrapper(update_layout):
-            for item in self.tabs[model_alias]:
-                if item.code == code:
-                    item.layout_updates.append(update_layout)
+            layouts.add_layout_update(f'{model_alias}-{code}', update_layout)
             return update_layout
         return wrapper
 
@@ -216,12 +261,7 @@ class TabRegister:
 
     def get_model_alias(self, model_alias):
         """Get model alias if class then convert to alias string"""
-        from trionyx.models import Model
-        if inspect.isclass(model_alias) and issubclass(model_alias, Model):
-            config = models_config.get_config(model_alias)
-            name = '{}.{}'.format(config.app_label, config.model_name).lower()
-        else:
-            name = model_alias.lower()
+        name = models_config.get_model_name(model_alias)
         return TX_MODEL_OVERWRITES.get(name, name)
 
     def auto_generate_missing_tabs(self):
@@ -244,15 +284,13 @@ class TabRegister:
 class TabItem:
     """Tab item that holds the tab data and renders the layout"""
 
-    def __init__(self, code, create_layout, name=None, order=None, display_filter=None):
+    def __init__(self, code, name=None, order=None, display_filter=None):
         """Init TabItem"""
         self._name = None
         self.code = code
-        self.create_layout = create_layout
         self.name = name
         self.order = order
         self.display_filter = display_filter if display_filter else lambda object: True
-        self.layout_updates = []
 
     @property
     def name(self):
@@ -268,23 +306,8 @@ class TabItem:
 
     def get_layout(self, object):
         """Get complete layout for given object"""
-        layout = self.create_layout(object)
-        if isinstance(layout, Component):
-            layout = Layout(layout)
-
-        if isinstance(layout, list):
-            layout = Layout(*layout)
-
-        for update_layout in self.layout_updates:
-            try:
-                update_layout(layout, object)
-            except Exception as e:
-                logger.error('Could not update layout for {}: {}'.format(
-                    self.code,
-                    str(e)
-                ))
-        layout.set_object(object)
-        return layout
+        model_alias = tabs.get_model_alias(object)
+        return layouts.get_layout(f'{model_alias}-{self.code}', object)
 
     def __str__(self):
         """Tab string representation"""

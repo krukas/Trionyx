@@ -518,14 +518,30 @@ class LayoutView(DetailTabView):
         context = super().get_context_data(**kwargs)
         from trionyx.views import layouts
         try:
-            context['layout'] = layouts.get_layout(
-                self.kwargs.get('code'),
-                self.object,
-                self.request
-            )
+            context['layout'] = layouts.get_layout(self.kwargs.get('code'), self.object).render(self.request)
         except Exception:
             raise Http404()
         return context
+
+
+class LayoutUpdateView(JsendView, ModelClassMixin):
+    """Update whole or section of an layout"""
+
+    def handle_request(self, request, pk, code, **kwargs):
+        """Render layout or given component for layout"""
+        from trionyx.views import layouts
+        layout = layouts.get_layout(
+            code,
+            self.get_model_class().objects.get(id=pk),
+            request.GET.get('layout_id')
+        )
+
+        component_id = request.GET.get('component')
+        if component_id:
+            comp, _ = layout.find_component_by_id(component_id)
+            return comp.render({}, request)
+        else:
+            return ''.join(comp.render({}, request) for comp in layout.components)
 
 
 # =============================================================================

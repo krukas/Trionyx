@@ -1,5 +1,5 @@
 {% load trionyx %}
-<div>
+<div {% if component.css_id %}id="{{ component.css_id }}"{% endif %}>
     <div class="panel panel-{% if component.contextual %}{{ component.contextual }}{% else %}default{% endif %}">
         <div class="panel-heading">{% if component.title %}{{ component.title }}{% else %}{{component.object}}{% endif %}</div>
         <div class="{% if component.collapse %}panel-collapse{% else %}panel-body{% endif %}">

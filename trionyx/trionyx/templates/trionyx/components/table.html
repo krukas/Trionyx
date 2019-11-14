@@ -1,4 +1,4 @@
-<table class="table table-condensed">
+<table class="table table-condensed" {% if component.css_id %}id="{{ component.css_id }}"{% endif %}>
     <thead>
         <tr>
             {% for field in component.get_fields %}

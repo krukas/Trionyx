@@ -571,3 +571,28 @@ function closeSidebar() {
 $(function(){
    reloadSidebar();
 });
+
+/* layout */
+function txUpdateLayout(id, component) {
+    if (id in window.trionyx_layouts) {
+        var url = window.trionyx_layouts[id] + '?layout_id=' + id;
+        if (typeof component !== 'undefined' && component) {
+            url += '&component=' + component;
+        }
+
+        $.get(url, function(response) {
+            if (response.status === 'success') {
+                var htmlId = '#' + id;
+                if (typeof component !== 'undefined' && component) {
+                    htmlId += ' #component-' + component;
+                    var tempDiv = $('<div></div>').html(response.data);
+                    $(htmlId).html($(tempDiv).find('#component-' + component).html());
+                } else {
+                    $(htmlId).html(response.data);
+                }
+
+                trionyxInitialize();
+            }
+        });
+    }
+}

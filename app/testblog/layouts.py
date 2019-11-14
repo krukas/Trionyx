@@ -24,9 +24,10 @@ def post_overview(obj):
                             'Update',
                             url=model_url(obj, 'dialog-edit'),
                             dialog=True,
-                            dialog_options={
-                                'callback': "function(){trionyx_reload_tab('general')}"
-                            },
+                            # dialog_options={
+                            #     'callback': "function(){trionyx_reload_tab('general')}"
+                            # },
+                            dialog_reload_layout='table-description',
                             color=Colors.TEAL,
                         )
                     },
@@ -94,7 +95,8 @@ def post_overview(obj):
                                 'callback': "function(){trionyx_reload_tab('general')}"
                             },
                         )
-                    }
+                    },
+                    id="table-description"
                 )
             )
         ),

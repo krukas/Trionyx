@@ -45,7 +45,6 @@ import time
 from typing import List, Dict, Union, Any
 
 from django import template
-from django.utils.functional import cached_property
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.conf import settings
@@ -79,6 +78,8 @@ class Layout:
 
     def __init__(self, *components, **options):
         """Initialize Layout"""
+        self.id = f'layout_{utils.random_string(8)}'.lower()
+        self.update_url = ''
         self.object = False
         self.components = list(components)
         self.options = options
@@ -194,7 +195,7 @@ class Layout:
 
         # Pass object along to child components for rendering
         for component in self.components:
-            component.set_object(self.object)
+            component.set_object(self.object, layout_id=self.id)
 
     def add_component(self, component, id=None, path=None, before=False, append=False):
         """
@@ -271,9 +272,10 @@ class Component:
 
     def __init__(self, *components, **options):
         """Initialize Component"""
-        self.id = options.get('id')
+        self.id = options.pop('id', None)
+        self.css_id = f"component-{self.id}" if self.id else None
+        self.layout_id = None
         self.components = list(filter(None, components))
-        self.parent = None
         self.object = options.get('object', False)
         self.context = {}
         self.request = None
@@ -282,18 +284,20 @@ class Component:
         for key, value in options.items():
             setattr(self, key, value)
 
-    @cached_property
-    def css_id(self):
-        """Generate random css id for component"""
-        return 'component-{}'.format(utils.random_string(6))
-
-    def set_object(self, object, force=False):
+    def set_object(self, object, force=False, layout_id=None):
         """
         Set object for rendering component and set object to all components
+
+        when object is set the layout should be complete with all components.
+        So we also use it to set the layout_id so it's available in the updated method
+        and also prevent whole other lookup of all components.
 
         :param object:
         :return:
         """
+        if layout_id:
+            self.layout_id = layout_id
+
         if self.object is False or force:
             self.object = object
         else:
@@ -303,7 +307,7 @@ class Component:
 
         # Pass object along to child components for rendering
         for component in self.components:
-            component.set_object(object, force)
+            component.set_object(object, force, layout_id)
 
     def updated(self):
         """Object updated hook method that is called when component is updated with object"""
@@ -536,7 +540,7 @@ class ComponentFieldsMixin:
         if 'renderer' in field:
             value = field['renderer'](value, data_object=data, **options)
         elif isinstance(value, Component):
-            value.set_object(data, True)
+            value.set_object(data, True, self.layout_id)
             value = value.render(self.context.copy(), self.request)
         else:
             value = renderer.render_value(value, data_object=data, **options)
@@ -621,6 +625,9 @@ class HtmlTagWrapper(Component):
             self.attr['class'] = self.color_class.format(color=Colors.THEME)
             kwargs.pop('class', None)
 
+        if self.css_id:
+            self.attr['id'] = self.css_id
+
         for key, value in kwargs.items():
             if key in self.valid_attr:
                 self.attr[key] = value
@@ -640,7 +647,8 @@ class OnclickTag(HtmlTagWrapper):
 
     def __init__(
         self, *components, url=None, model_url=None, model_params=None, model_code=None,
-        sidebar=False, dialog=False, dialog_options=None, dialog_reload_tab=None, dialog_reload_sidebar=False, **options
+        sidebar=False, dialog=False, dialog_options=None,
+        dialog_reload_tab=None, dialog_reload_sidebar=False, dialog_reload_layout=False, **options
     ):
         """Init tag"""
         super().__init__(*components, **options)
@@ -652,6 +660,7 @@ class OnclickTag(HtmlTagWrapper):
         self.dialog = dialog
         self.dialog_options = dialog_options if dialog_options else {}
         self.on_click = options.get('onClick', False)
+        self.dialog_reload_layout = dialog_reload_layout
 
         if dialog_reload_tab:
             self.dialog_options['callback'] = """function(data, dialog){{
@@ -670,6 +679,17 @@ class OnclickTag(HtmlTagWrapper):
 
     def updated(self):
         """Set onClick url based on object"""
+        if self.dialog_reload_layout:
+            self.dialog_options['callback'] = """function(data, dialog){{
+                        if (data.success) {{
+                            dialog.close();
+                            txUpdateLayout('{id}', '{component}');
+                        }}
+                    }}""".format(
+                id=self.layout_id,
+                component=self.dialog_reload_layout if isinstance(self.dialog_reload_layout, str) else ''
+            )
+
         if not self.on_click:
             from trionyx.urls import model_url
             url = model_url(
