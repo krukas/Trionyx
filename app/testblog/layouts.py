@@ -147,6 +147,7 @@ def item_sidebar(request, obj):
         'fixed_content': 'Some fixed content 2',
         'content': 'Real content <br>' * 100,
         'theme': 'light',
+        'hover': False,
         'actions': [
             {
                 'label': 'Save',

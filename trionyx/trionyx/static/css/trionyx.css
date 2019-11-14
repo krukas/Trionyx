@@ -304,7 +304,7 @@ body {
     border-bottom: 1px solid #ddd;
     right: 0;
     left: 230px;
-    transition: left .3s ease-in-out;
+    transition: all .3s ease-in-out;
 }
 
 .detail-tab-view-tabs ul.nav {
@@ -636,6 +636,13 @@ ul.pagination a {
 }
 
 /* Sidebar */
+
+.control-sidebar-open .content-wrapper {
+    margin-right: 350px;
+}
+.control-sidebar-open .content-header-affix {
+    right: 350px;
+}
 
 .control-sidebar,
 .control-sidebar-bg {

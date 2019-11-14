@@ -525,7 +525,11 @@ function openSidebar(url) {
         $('#trionyx-sidebar-content').css('margin-top', height + 'px');
         $sidebar.css('padding-bottom', height  + 'px');
 
-        $sidebar.addClass('control-sidebar-open');
+        if ('hover' in data && data.hover) {
+            $sidebar.addClass('control-sidebar-open');
+        } else {
+            $('body').addClass('control-sidebar-open');
+        }
 
         // Store active sidebar
         var activeSidebars = localStorage.getItem('trionyxActiveSidebar');
@@ -555,6 +559,7 @@ function reloadSidebar(){
 function closeSidebar() {
     $('#trionyx-sidebar-content').html('');
     $('#trionyx-control-sidebar').removeClass('control-sidebar-open');
+    $('body').removeClass('control-sidebar-open');
 
     // Remove sidebar from active sidebars
     var activeSidebars = localStorage.getItem('trionyxActiveSidebar');

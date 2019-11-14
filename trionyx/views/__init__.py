@@ -72,6 +72,7 @@ class SidebarRegister:
         - **content**: Html content to display in sidebar
         - **fixed_content (optional)**: Html content that is fixed displayed under the title
         - **theme (optional)**: Theme of sidebar can be light or dark
+        - **hover (optional)**: Sidebar hovers over content instead of pushing it away
         - **actions (optional)**: List[Dict] of actions  that are displayed in dropdown.
             - **label**: Action label
             - **class**: class of action link
