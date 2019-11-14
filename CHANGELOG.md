@@ -1,3 +1,9 @@
+### [1.0.6] - 14-11-2019
+#### Fixed
+- New inlineformset wasn't saved
+- ComponentFieldsMixin rendered component value with wrong object 
+
+
 ### [1.0.5] - 31-10-2019
 #### Fixed
 - Fixed model overwrite configs/forms/menu
