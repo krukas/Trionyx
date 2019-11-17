@@ -25,6 +25,17 @@ TX_MODEL_CONFIGS.update(settings.TX_MODEL_CONFIGS)
 TX_MODEL_OVERWRITES: Dict[str, str] = {key.lower(): value.lower() for key, value in settings.TX_MODEL_OVERWRITES.items()}
 
 
+class AppSettings():
+    """Simple helper for app settings"""
+
+    def __init__(self, prefix, app_settings):
+        """Init settings"""
+        for key, value in app_settings.items():
+            setattr(self, key.upper(), getattr(
+                settings, f'{prefix}_{key}'.upper(), value
+            ))
+
+
 class Variables:
     """Get and set system wide persistent variables like counters"""
 
@@ -296,6 +307,9 @@ class ModelConfig:
 
     def get_absolute_url(self, model: Model) -> str:
         """Get model url"""
+        if hasattr(model, 'get_absolute_url'):
+            return model.get_absolute_url()
+
         return reverse('trionyx:model-view', kwargs={
             'app': model._meta.app_label,
             'model': model._meta.model_name,
