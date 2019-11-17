@@ -52,7 +52,14 @@ class ModelForm(DjangoModelForm):  # type: ignore
                         fk_name: self.instance
                     }
 
-                self.__inline_forms[key] = options['form'](self.data if self.data else None, **kwargs)
+                if 'queryset' in options:
+                    self.__inline_forms[key] = options['form'](
+                        self.data if self.data else None,
+                        queryset = options['queryset'],
+                        **kwargs
+                    )
+                else:
+                    self.__inline_forms[key] = options['form'](self.data if self.data else None, **kwargs)
 
         return self.__inline_forms
 
