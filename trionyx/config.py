@@ -6,6 +6,7 @@ trionyx.config
 :license: GPLv3
 """
 import inspect
+import contextlib
 from functools import reduce
 from typing import Optional, Generator, Union, List, Type, Dict, Any, TYPE_CHECKING
 
@@ -13,6 +14,8 @@ from django.apps import apps, AppConfig
 from django.urls import reverse
 from django.conf import settings
 from django.db.models import Field, Model
+from django.core.cache import cache
+from trionyx.utils import CacheLock
 
 if TYPE_CHECKING:
     from trionyx.trionyx.models import User  # noqa F401
@@ -20,6 +23,55 @@ if TYPE_CHECKING:
 TX_MODEL_CONFIGS = settings.TX_CORE_MODEL_CONFIGS
 TX_MODEL_CONFIGS.update(settings.TX_MODEL_CONFIGS)
 TX_MODEL_OVERWRITES: Dict[str, str] = {key.lower(): value.lower() for key, value in settings.TX_MODEL_OVERWRITES.items()}
+
+
+class Variables:
+    """Get and set system wide persistent variables like counters"""
+
+    cache_key = 'trionyx-variables'
+
+    def get(self, code, default=None):
+        """Get value for given variable code"""
+        from trionyx.trionyx import LOCAL_DATA
+        from trionyx.trionyx.models import SystemVariable
+        variables = getattr(LOCAL_DATA, 'trionyx_variables', None)
+
+        if variables is None:
+            variables = cache.get(self.cache_key)
+
+        if variables is None:
+            variables = {
+                variable.code: variable.value for variable in SystemVariable.objects.all()
+            }
+            cache.set(self.cache_key, variables, timeout=60 * 60 * 24)
+
+        setattr(LOCAL_DATA, 'trionyx_variables', variables)
+
+        return variables.get(code, default)
+
+    def set(self, code, value):
+        """Set new value for given variable code"""
+        from trionyx.trionyx import LOCAL_DATA
+        from trionyx.trionyx.models import SystemVariable
+        with CacheLock('variables-set', code):
+            SystemVariable.objects.update_or_create(code=code, defaults={
+                'value': value,
+            })
+
+        setattr(LOCAL_DATA, 'trionyx_variables', None)
+        cache.delete(self.cache_key)
+
+    @contextlib.contextmanager
+    def get_increment(self, code, start=0, increment=1):
+        """
+        Context with next increment value, variable is locked till context is closed.
+
+        New increment value is only saved after successfully cosing context.
+        """
+        with CacheLock('variables-increment', code):
+            value = self.get(code, default=start) + increment
+            yield value
+            self.set(code, value)
 
 
 class ModelConfig:
@@ -410,3 +462,4 @@ class Models:
 
 
 models_config = Models()
+variables = Variables()
