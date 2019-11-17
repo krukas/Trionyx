@@ -286,6 +286,21 @@ TX_LOGO_NAME_SMALL_END: str = 'X'
 TX_THEME_COLOR: str = 'purple'
 """The theme skin color (header). Aviable colors: blue, yellow, green, purple, red, black. All colors have a light version blue-light"""
 
+TX_COMPANY_NAME = 'Trionyx'
+"""Company name"""
+
+TX_COMPANY_ADDRESS_LINES = []
+"""Company address lines"""
+
+TX_COMPANY_TELEPHONE = ''
+"""Company telephone number"""
+
+TX_COMPANY_WEBSITE = ''
+"""Company website address"""
+
+TX_COMPANY_EMAIL = ''
+"""Company email address"""
+
 
 def TX_DEFAULT_DASHBOARD():
     """Return default dashboard"""
