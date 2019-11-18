@@ -307,14 +307,11 @@ class ModelConfig:
 
     def get_absolute_url(self, model: Model) -> str:
         """Get model url"""
-        if hasattr(model, 'get_absolute_url'):
-            return model.get_absolute_url()
-
-        return reverse('trionyx:model-view', kwargs={
+        return getattr(model, 'get_absolute_url', lambda: reverse('trionyx:model-view', kwargs={
             'app': model._meta.app_label,
             'model': model._meta.model_name,
             'pk': model.pk
-        })
+        }))()
 
     def get_list_fields(self) -> List[dict]:
         """Get all list fields"""

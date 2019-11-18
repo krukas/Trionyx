@@ -597,6 +597,14 @@ class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
             form.helper.form_tag = False
         return form
 
+    def get_delete_url(self):
+        """Get model object delete url"""
+        return reverse('trionyx:model-delete', kwargs={
+            'app': self.object._meta.app_label,
+            'model': self.object._meta.model_name,
+            'pk': self.object.id
+        })
+
     def get_context_data(self, **kwargs):
         """Add context data to view"""
         context = super().get_context_data(**kwargs)
@@ -605,6 +613,11 @@ class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
             'title': self.title,
             'submit_value': self.submit_value,
             'cancel_url': self.cancel_url,
+            'delete_url': self.get_delete_url(),
+            'delete_permission': self.request.user.has_perm('{app_label}.delete_{model_name}'.format(
+                app_label=self.get_model_config().app_label,
+                model_name=self.get_model_config().model_name,
+            ).lower()) and not self.get_model_config().disable_delete,
             'object_url': self.get_model_config().get_absolute_url(self.object),
         })
 

@@ -12,7 +12,7 @@ import json
 import logging
 import os
 from pkg_resources import iter_entry_points
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 from django.core.exceptions import ImproperlyConfigured
 from kombu import Queue, Exchange
@@ -286,19 +286,19 @@ TX_LOGO_NAME_SMALL_END: str = 'X'
 TX_THEME_COLOR: str = 'purple'
 """The theme skin color (header). Aviable colors: blue, yellow, green, purple, red, black. All colors have a light version blue-light"""
 
-TX_COMPANY_NAME = 'Trionyx'
+TX_COMPANY_NAME: str = 'Trionyx'
 """Company name"""
 
-TX_COMPANY_ADDRESS_LINES = []
+TX_COMPANY_ADDRESS_LINES: List[str] = []
 """Company address lines"""
 
-TX_COMPANY_TELEPHONE = ''
+TX_COMPANY_TELEPHONE: str = ''
 """Company telephone number"""
 
-TX_COMPANY_WEBSITE = ''
+TX_COMPANY_WEBSITE: str = ''
 """Company website address"""
 
-TX_COMPANY_EMAIL = ''
+TX_COMPANY_EMAIL: str = ''
 """Company email address"""
 
 

@@ -36,6 +36,9 @@
     {% else %}
         <a href="{{ object_url }}" class="btn btn-flat bg-theme">{% trans "Cancel" %}</a>
     {% endif %}
+    {% if delete_url and delete_permission %}
+        <a href="{{ delete_url }}" class="btn btn-flat bg-theme">{% trans "Delete" %}</a>
+    {% endif %}
     <input type="submit" value="{% if submit_value %}{{ submit_value }}{% else %}{% trans "Save" %}{% endif %}" class="btn btn-flat btn-success"/>
 {% endblock %}
 

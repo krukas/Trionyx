@@ -55,7 +55,7 @@ class ModelForm(DjangoModelForm):  # type: ignore
                 if 'queryset' in options:
                     self.__inline_forms[key] = options['form'](
                         self.data if self.data else None,
-                        queryset = options['queryset'],
+                        queryset=options['queryset'],
                         **kwargs
                     )
                 else:
