@@ -1,19 +1,19 @@
-{% load crispy_forms_tags %}
+{% load crispy_forms_tags i18n %}
 
-{% if inline_form.forms %}
-    <table class="table inline-form-table">
+{% if inline_form.empty_form %}
+    <table class="table inline-form-table" id="formset-{{ inline_form_prefix }}">
         {{ inline_form.management_form|crispy }}
+        <thead>
+            <tr>
+                {% for field in inline_form.empty_form.visible_fields %}
+                    <th {% if field.name == 'DELETE' %}style="width: 40px"{% endif %}>{{ field.label }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
 
-        {% for form in inline_form.forms %}
-            {% if forloop.first %}
-                <tr>
-                    {% for field in form.visible_fields %}
-                        <th>{{ field.label }}</th>
-                    {% endfor %}
-                </tr>
-            {% endif %}
-
-                <tr class="{% cycle 'even' 'odd' %} formset_row-{{ inline_form.prefix }}">
+        <tbody class="formset-items">
+            {% for form in inline_form.forms %}
+                <tr class="formset-item">
                     {% for field in form.visible_fields %}
                     <td>
                         {% if forloop.first %}
@@ -21,12 +21,82 @@
                                 {{ hidden }}
                             {% endfor %}
                         {% endif %}
-                        {{ field|as_crispy_field }}
+                        {% if field.name == 'DELETE' %}
+                            <input type="checkbox" name="{{ field.html_name }}" class="delete-item-checkbox" style="display: none">
+                            <a href="#" class="btn btn-flat btn-danger delete-item">Delete</a>
+                        {% else %}
+                            {{ field|as_crispy_field }}
+                        {% endif %}
+
                     </td>
                     {% endfor %}
                 </tr>
-        {% endfor %}
+            {% endfor %}
+            <tr class="template" style="display: none">
+                {% for field in inline_form.empty_form.visible_fields %}
+                    <td>
+                        {% if forloop.first %}
+                            {% for hidden in form.hidden_fields %}
+                                {{ hidden }}
+                            {% endfor %}
+                        {% endif %}
+                        {% if field.name == 'DELETE' %}
+                            <input type="checkbox" name="{{ field.html_name }}" class="delete-item-checkbox" style="display: none">
+                            <a href="#" class="btn btn-flat btn-danger delete-item">Delete</a>
+                        {% else %}
+                            {{ field|as_crispy_field }}
+                        {% endif %}
+                    </td>
+                {% endfor %}
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="999">
+                    <a href="#" class="btn btn-flat btn-block btn-success add-item">{% trans 'Add ' %} {{ inline_form_verbose_name }}</a>
+                </td>
+            </tr>
+        </tfoot>
     </table>
+    <script>
+        function txInlineForm(prefix) {
+            var totalForms = $('#id_' + prefix + '-TOTAL_FORMS');
+            var itemParentSelector = '#formset-' + prefix + ' .formset-items';
+            var itemSelector = '#formset-' + prefix + ' .formset-item';
+            var templateSelector = '#formset-' + prefix + ' .template';
+
+            $('#formset-' + prefix + ' .add-item').click(function (ev) {
+                ev.preventDefault();
+                var count = $(itemSelector).length;
+                var tmplMarkup = $(templateSelector).html();
+                var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
+                var newItem = $('<tr class="formset-item"></tr>').append(compiledTmpl);
+
+                /* Remove generated select2 html */
+                newItem.find('.select2').remove();
+                newItem.find('select').removeClass('select2-hidden-accessible');
+
+                $(itemParentSelector).append(newItem);
+
+                totalForms.attr('value', count + 1);
+                addDeleteHandler();
+                trionyxInitialize();
+            });
+
+            function addDeleteHandler() {
+                $(itemSelector).on('click', '.delete-item', function (ev) {
+                    ev.preventDefault();
+                    var itemElement = $(this).closest('.formset-item');
+                    itemElement.css('display', 'none');
+                    itemElement.find('.delete-item-checkbox').prop( "checked", true );
+                });
+            }
+            addDeleteHandler();
+        }
+        window.addEventListener('load', function () {
+            txInlineForm('{{ inline_form_prefix }}');
+        });
+    </script>
 {% else %}
     {% crispy inline_form %}
 {% endif %}

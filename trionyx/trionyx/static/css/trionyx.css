@@ -764,8 +764,16 @@ th:hover .dragtable-drag-handle {
     border: none;
 }
 
+.inline-form-table th {
+    border-bottom: 1px solid #d2d6de !important;
+}
+
 .inline-form-table .form-group {
     margin: 0;
+}
+
+.inline-form-table .select2 {
+    min-width: 100% !important;
 }
 
 .inline-form-table .checkbox input[type="checkbox"] {
