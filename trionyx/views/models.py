@@ -381,7 +381,9 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
             'model_name': self.get_model_name(),
             'model_alias': self.get_model_alias(),
             'model_verbose_name': self.object._meta.verbose_name.title(),
-            'view_header_buttons': list(self.view_header_buttons()),
+            'view_header_buttons': list(
+                self.get_model_config().get_header_buttons('view', self.object, self.get_model_alias())
+            ),
             'back_url': self.get_back_url(),
             'edit_url': self.get_edit_url(),
             'delete_url': self.get_delete_url(),
@@ -419,44 +421,6 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
             'model': self.get_model_name(),
             'pk': self.object.id
         })
-
-    def view_header_buttons(self):
-        """Get the view header buttons"""
-        from django.urls.exceptions import NoReverseMatch
-
-        def url_reverse(url):
-            kwargs_list = [
-                {
-                    'app': self.get_app_label(),
-                    'model': self.get_model_name(),
-                    'pk': self.object.id
-                },
-                {
-                    'pk': self.object.id
-                },
-                {}
-            ]
-
-            for kwargs in kwargs_list:
-                try:
-                    return reverse(url, kwargs=kwargs)
-                except NoReverseMatch:
-                    pass
-
-            raise NoReverseMatch('Could not find match for {}'.format(url))
-
-        if self.get_model_config().view_header_buttons:
-            for config in self.get_model_config().view_header_buttons:
-                if 'show' in config and not config['show'](self.object, self.get_model_alias()):
-                    continue
-
-                button_type = config.get('type', 'bg-theme')
-                yield {
-                    'label': config['label'](self.object, self.get_model_alias()) if callable(config['label']) else config['label'],
-                    'type': button_type(self.object, self.get_model_alias()) if callable(button_type) else button_type,
-                    'url': config['url'](self.object, self.get_model_alias()) if callable(config['url']) else url_reverse(config['url']),
-                    'modal': config.get('modal', True)
-                }
 
     def get_model_alias(self):
         """Get model alias"""
@@ -597,14 +561,6 @@ class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
             form.helper.form_tag = False
         return form
 
-    def get_delete_url(self):
-        """Get model object delete url"""
-        return reverse('trionyx:model-delete', kwargs={
-            'app': self.object._meta.app_label,
-            'model': self.object._meta.model_name,
-            'pk': self.object.id
-        })
-
     def get_context_data(self, **kwargs):
         """Add context data to view"""
         context = super().get_context_data(**kwargs)
@@ -612,12 +568,10 @@ class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
         context.update({
             'title': self.title,
             'submit_value': self.submit_value,
+            'view_header_buttons': list(
+                self.get_model_config().get_header_buttons('edit', self.object)
+            ),
             'cancel_url': self.cancel_url,
-            'delete_url': self.get_delete_url(),
-            'delete_permission': self.request.user.has_perm('{app_label}.delete_{model_name}'.format(
-                app_label=self.get_model_config().app_label,
-                model_name=self.get_model_config().model_name,
-            ).lower()) and not self.get_model_config().disable_delete,
             'object_url': self.get_model_config().get_absolute_url(self.object),
         })
 

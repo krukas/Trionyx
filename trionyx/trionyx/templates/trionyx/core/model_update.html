@@ -36,9 +36,17 @@
     {% else %}
         <a href="{{ object_url }}" class="btn btn-flat bg-theme">{% trans "Cancel" %}</a>
     {% endif %}
-    {% if delete_url and delete_permission %}
-        <a href="{{ delete_url }}" class="btn btn-flat bg-theme">{% trans "Delete" %}</a>
-    {% endif %}
+
+    {% for button in view_header_buttons %}
+        <a
+           href="{% if button.dialog %}#{% else %}{{ button.url }}{% endif %}"
+           {% if button.dialog %}onClick="openDialog('{{ button.url }}', {{ button.dialog_options }})"{% endif %}
+           class="btn btn-flat {{ button.type }}"
+        >
+            {{ button.label }}
+        </a>
+    {% endfor %}
+
     <input type="submit" value="{% if submit_value %}{{ submit_value }}{% else %}{% trans "Save" %}{% endif %}" class="btn btn-flat btn-success"/>
 {% endblock %}
 

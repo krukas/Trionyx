@@ -190,7 +190,7 @@ class ModelConfig:
         - model_name: Class name of model
     """
 
-    view_header_buttons: Optional[List[str]] = None
+    view_header_buttons: Optional[List[dict]] = None
     """
     List with button configurations to be displayed in view header bar
 
@@ -202,10 +202,19 @@ class ModelConfig:
                 'url': lambda obj : reverse('blog.post', kwargs={'pk': obj.id}), # string or function
                 'type': 'default',
                 'show': lambda obj, alias : True, # Function that gives True or False if button must be displayed
-                'modal': True,
+                'dialog': True,
+                'dialog_options': \"\"\"function(data, dialog){
+                    // Example that will close dialog on success
+                    if (data.success) {
+                        dialog.close();
+                    }
+                }\"\"\"
             }
          ]
     """
+
+    edit_header_buttons: Optional[List[dict]] = None
+    """Same as the view_header_buttons but then for edit page"""
 
     disable_add: bool = False
     """Disable add for this model"""
@@ -389,6 +398,54 @@ class ModelConfig:
         elif isinstance(field, (models.ForeignKey, models.OneToOneField)):
             return 'related'
         return '__unknown__'
+
+    def get_header_buttons(self, page, obj, model_alias=None):
+        """Get header buttons for given page and object"""
+        from django.urls.exceptions import NoReverseMatch
+
+        if page not in ['view', 'edit']:
+            raise Exception('invalid page, valid pages are view, edit')
+
+        header_config = self.view_header_buttons if page == 'view' else self.edit_header_buttons
+        header_config = header_config if header_config else []
+
+        def url_reverse(url):
+            kwargs_list = [
+                {
+                    'app': self.app_label,
+                    'model': self.model_name,
+                    'pk': obj.id
+                },
+                {
+                    'pk': obj.id
+                },
+                {}
+            ]
+
+            for kwargs in kwargs_list:
+                try:
+                    return reverse(url, kwargs=kwargs)
+                except NoReverseMatch:
+                    pass
+
+            raise NoReverseMatch('Could not find match for {}'.format(url))
+
+        for config in header_config:
+            if 'show' in config and not config['show'](obj, model_alias):
+                continue
+
+            button_type = config.get('type', 'bg-theme')
+            dialog_options = config.get('dialog_options', {})
+            yield {
+                'label': config['label'](obj, model_alias) if callable(config['label']) else config['label'],
+                'type': button_type(obj, model_alias) if callable(button_type) else button_type,
+                'url': config['url'](obj, model_alias) if callable(config['url']) else url_reverse(config['url']),
+                'dialog': config.get('dialog', True),
+                'dialog_options': '{{ {} }}'.format(','.join(
+                    ("{}:{}" if key == 'callback' else "{}:'{}'").format(key, value)
+                    for key, value in dialog_options.items())
+                )
+            }
 
 
 class Models:

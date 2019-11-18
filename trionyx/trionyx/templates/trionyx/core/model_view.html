@@ -11,8 +11,8 @@
 
     {% for button in view_header_buttons %}
         <a
-           href="{% if button.modal %}#{% else %}{{ button.url }}{% endif %}"
-           {% if button.modal %}onClick="openDialog('{{ button.url }}')"{% endif %}
+           href="{% if button.dialog %}#{% else %}{{ button.url }}{% endif %}"
+           {% if button.dialog %}onClick="openDialog('{{ button.url }}', {{ button.dialog_options }})"{% endif %}
            class="btn btn-flat {{ button.type }}"
         >
             {{ button.label }}
