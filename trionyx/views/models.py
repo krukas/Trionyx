@@ -27,6 +27,7 @@ from django.urls import reverse
 from django.core.paginator import Paginator
 from django.contrib import messages
 from watson import search as watson
+from django.template.loader import render_to_string
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
 
@@ -384,12 +385,6 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
             'model_name': self.get_model_name(),
             'model_alias': self.get_model_alias(),
             'model_verbose_name': self.object._meta.verbose_name.title(),
-            'header_buttons': list(
-                self.get_model_config().get_header_buttons(self.object, {
-                    'page': 'view',
-                    'model_alias': self.get_model_alias()
-                })
-            ),
             'back_url': self.get_back_url(),
             'edit_url': self.get_edit_url(),
             'delete_url': self.get_delete_url(),
@@ -473,7 +468,16 @@ class DetailTabJsendView(ModelPermissionMixin, JsendView, ModelClassMixin):
 
         item = tabs.get_tab(model_alias, object, tab_code)
 
-        return item.get_layout(object).render(request)
+        return {
+            'header_buttons': render_to_string('trionyx/base/model_header_buttons.html', {
+                'header_buttons': self.get_model_config().get_header_buttons(object, {
+                    'page': 'view',
+                    'model_alias': model_alias,
+                    'tab': tab_code,
+                }),
+            }, request=request),
+            'content': item.get_layout(object).render(request),
+        }
 
 
 class LayoutView(DetailTabView):

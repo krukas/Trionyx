@@ -21,7 +21,7 @@ class BlogConfig(BaseConfig):
                 'label': 'Publish',  # string or function
                 'url': 'trionyx:model-dialog-edit',  # string or function
                 'type': 'bg-theme', # string or function
-                'show': lambda obj, context: context.get('page') == 'view',  # Function that gives True or False if button must be displayed
+                'show': lambda obj, context: context.get('page') == 'view' and context.get('tab') == 'general',  # Function that gives True or False if button must be displayed
                 'dialog': True,
             }
         ]

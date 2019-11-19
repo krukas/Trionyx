@@ -37,15 +37,7 @@
         <a href="{{ object_url }}" class="btn btn-flat bg-theme">{% trans "Cancel" %}</a>
     {% endif %}
 
-    {% for button in header_buttons %}
-        <a
-           href="{% if button.dialog %}#{% else %}{{ button.url }}{% endif %}"
-           {% if button.dialog %}onClick="openDialog('{{ button.url }}', {{ button.dialog_options }})"{% endif %}
-           class="btn btn-flat {{ button.type }}"
-        >
-            {{ button.label }}
-        </a>
-    {% endfor %}
+    {% include 'trionyx/base/model_header_buttons.html' %}
 
     <input type="submit" value="{% if submit_value %}{{ submit_value }}{% else %}{% trans "Save" %}{% endif %}" class="btn btn-flat btn-success"/>
 {% endblock %}
