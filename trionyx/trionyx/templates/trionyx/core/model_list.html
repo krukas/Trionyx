@@ -11,7 +11,7 @@
 {% block header_buttons %}
     {% include 'trionyx/base/model_header_buttons.html' %}
 
-    {% if create_permission %}
+    {% if create_permission and model_config.display_add_button %}
         <a href="{{ create_url }}" class="btn btn-flat bg-theme">{% trans "Create" %}</a>
     {% endif %}
 {% endblock %}

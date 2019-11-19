@@ -96,6 +96,7 @@ class ListView(ModelPermissionMixin, TemplateView, ModelClassMixin):
         context.update({
             'title': self.get_title(),
             'content_type_id': ContentType.objects.get_for_model(self.get_model_class()).id,
+            'model_config': self.get_model_config(),
             'ajax_url': self.get_ajax_url(),
             'download_url': self.get_download_url(),
             'create_url': self.get_create_url(),
@@ -379,6 +380,7 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
         context = super().get_context_data(**kwargs)
         tabs = self.get_active_tabs()
         context.update({
+            'model_config': self.get_model_config(),
             'page_detail_tabs': tabs,
             'active_tab': tabs[0].code if tabs else '',
             'app_label': self.get_app_label(),

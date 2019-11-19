@@ -11,10 +11,10 @@
 
     <span id="trionyx-model-header-buttons"></span>
 
-    {% if delete_url and delete_permission %}
+    {% if delete_url and delete_permission and model_config.display_delete_button %}
         <a href="{{ delete_url }}" class="btn btn-flat bg-theme">{% trans "Delete" %}</a>
     {% endif %}
-    {% if edit_url and change_permission %}
+    {% if edit_url and change_permission and model_config.display_change_button %}
         <a href="{{ edit_url }}" class="btn btn-flat bg-theme">{% trans "Edit" %}</a>
     {% endif %}
 

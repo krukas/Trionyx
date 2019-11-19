@@ -213,6 +213,15 @@ class ModelConfig:
          ]
     """
 
+    display_add_button: bool = True
+    """Display add button for this model"""
+
+    display_change_button: bool = True
+    """Display change button for this model"""
+
+    display_delete_button: bool = True
+    """Display delete button for this model"""
+
     disable_add: bool = False
     """Disable add for this model"""
 
