@@ -9,6 +9,16 @@
 {% endblock %}
 
 {% block header_buttons %}
+    {% for button in header_buttons %}
+        <a
+           href="{% if button.dialog %}#{% else %}{{ button.url }}{% endif %}"
+           {% if button.dialog %}onClick="openDialog('{{ button.url }}', {{ button.dialog_options }})"{% endif %}
+           class="btn btn-flat {{ button.type }}"
+        >
+            {{ button.label }}
+        </a>
+    {% endfor %}
+
     {% if create_permission %}
         <a href="{{ create_url }}" class="btn btn-flat bg-theme">{% trans "Create" %}</a>
     {% endif %}

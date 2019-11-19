@@ -9,7 +9,7 @@
         <a href="{{ back_url }}" class="btn btn-flat bg-theme">{% trans "Back" %}</a>
     {% endif %}
 
-    {% for button in view_header_buttons %}
+    {% for button in header_buttons %}
         <a
            href="{% if button.dialog %}#{% else %}{{ button.url }}{% endif %}"
            {% if button.dialog %}onClick="openDialog('{{ button.url }}', {{ button.dialog_options }})"{% endif %}

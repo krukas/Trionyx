@@ -98,6 +98,9 @@ class ListView(ModelPermissionMixin, TemplateView, ModelClassMixin):
             'ajax_url': self.get_ajax_url(),
             'download_url': self.get_download_url(),
             'create_url': self.get_create_url(),
+            'header_buttons': self.get_model_config().get_header_buttons(context={
+                'page': 'list',
+            }),
             'mass_delete_url': self.get_mass_delete_url(),
             'mass_update_url': self.get_mass_update_url(),
             'create_permission': self.request.user.has_perm('{app_label}.add_{model_name}'.format(
@@ -381,8 +384,11 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
             'model_name': self.get_model_name(),
             'model_alias': self.get_model_alias(),
             'model_verbose_name': self.object._meta.verbose_name.title(),
-            'view_header_buttons': list(
-                self.get_model_config().get_header_buttons('view', self.object, self.get_model_alias())
+            'header_buttons': list(
+                self.get_model_config().get_header_buttons(self.object, {
+                    'page': 'view',
+                    'model_alias': self.get_model_alias()
+                })
             ),
             'back_url': self.get_back_url(),
             'edit_url': self.get_edit_url(),
@@ -568,8 +574,8 @@ class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
         context.update({
             'title': self.title,
             'submit_value': self.submit_value,
-            'view_header_buttons': list(
-                self.get_model_config().get_header_buttons('edit', self.object)
+            'header_buttons': list(
+                self.get_model_config().get_header_buttons(self.object, {'page': 'edit'})
             ),
             'cancel_url': self.cancel_url,
             'object_url': self.get_model_config().get_absolute_url(self.object),

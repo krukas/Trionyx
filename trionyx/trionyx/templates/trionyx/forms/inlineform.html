@@ -23,7 +23,7 @@
                         {% endif %}
                         {% if field.name == 'DELETE' %}
                             <input type="checkbox" name="{{ field.html_name }}" class="delete-item-checkbox" style="display: none">
-                            <a href="#" class="btn btn-flat btn-danger delete-item">Delete</a>
+                            <a href="#" class="btn btn-flat btn-block btn-danger delete-item">Delete</a>
                         {% else %}
                             {{ field|as_crispy_field }}
                         {% endif %}
@@ -42,7 +42,7 @@
                         {% endif %}
                         {% if field.name == 'DELETE' %}
                             <input type="checkbox" name="{{ field.html_name }}" class="delete-item-checkbox" style="display: none">
-                            <a href="#" class="btn btn-flat btn-danger delete-item">Delete</a>
+                            <a href="#" class="btn btn-flat btn-block btn-danger delete-item">Delete</a>
                         {% else %}
                             {{ field|as_crispy_field }}
                         {% endif %}
