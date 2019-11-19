@@ -119,22 +119,11 @@ class DialogView(View, ModelClassMixin):
             return True
 
         if not self.permission:
-            config = self.get_model_config()
-
-            if self.permission_type == 'change' and config.disable_change:
-                return False
-
-            if self.permission_type == 'add' and config.disable_add:
-                return False
-
-            if self.permission_type == 'delete' and config.disable_delete:
-                return False
-
-            return request.user.has_perm('{app_label}.{type}_{model_name}'.format(
-                app_label=config.app_label,
-                type=self.permission_type,
-                model_name=config.model_name,
-            ).lower())
+            return self.get_model_config().has_permission(
+                self.permission_type,
+                self.object,
+                request.user
+            )
 
         return request.user.has_perm(self.permission)
 

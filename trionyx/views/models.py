@@ -105,18 +105,9 @@ class ListView(ModelPermissionMixin, TemplateView, ModelClassMixin):
             }),
             'mass_delete_url': self.get_mass_delete_url(),
             'mass_update_url': self.get_mass_update_url(),
-            'create_permission': self.request.user.has_perm('{app_label}.add_{model_name}'.format(
-                app_label=self.get_model_config().app_label,
-                model_name=self.get_model_config().model_name,
-            ).lower()) and not self.get_model_config().disable_add,
-            'change_permission': self.request.user.has_perm('{app_label}.change_{model_name}'.format(
-                app_label=self.get_model_config().app_label,
-                model_name=self.get_model_config().model_name,
-            ).lower()) and not self.get_model_config().disable_change,
-            'delete_permission': self.request.user.has_perm('{app_label}.delete_{model_name}'.format(
-                app_label=self.get_model_config().app_label,
-                model_name=self.get_model_config().model_name,
-            ).lower()) and not self.get_model_config().disable_delete
+            'create_permission': self.get_model_config().has_permission('add', user=self.request.user),
+            'change_permission': self.get_model_config().has_permission('change', user=self.request.user),
+            'delete_permission': self.get_model_config().has_permission('delete', user=self.request.user),
         })
         return context
 
@@ -391,14 +382,8 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
             'edit_url': self.get_edit_url(),
             'delete_url': self.get_delete_url(),
             'title': self.title,
-            'change_permission': self.request.user.has_perm('{app_label}.change_{model_name}'.format(
-                app_label=self.get_model_config().app_label,
-                model_name=self.get_model_config().model_name,
-            ).lower()) and not self.get_model_config().disable_change,
-            'delete_permission': self.request.user.has_perm('{app_label}.delete_{model_name}'.format(
-                app_label=self.get_model_config().app_label,
-                model_name=self.get_model_config().model_name,
-            ).lower()) and not self.get_model_config().disable_delete
+            'change_permission': self.get_model_config().has_permission('change', self.get_object(), user=self.request.user),
+            'delete_permission': self.get_model_config().has_permission('delete', self.get_object(), user=self.request.user),
         })
         return context
 
@@ -459,8 +444,7 @@ class DetailTabJsendView(ModelPermissionMixin, JsendView, ModelClassMixin):
     def handle_request(self, request, app, model, pk):
         """Render and return tab"""
         from trionyx.views import tabs
-        ModelClass = self.get_model_class()
-        object = ModelClass.objects.get(id=pk)
+        object = self.get_object()
 
         tab_code = request.GET.get('tab')
         model_alias = request.GET.get('model_alias')
@@ -480,6 +464,11 @@ class DetailTabJsendView(ModelPermissionMixin, JsendView, ModelClassMixin):
             }, request=request),
             'content': item.get_layout(object).render(request),
         }
+
+    def get_object(self):
+        """Get object"""
+        ModelClass = self.get_model_class()
+        return ModelClass.objects.get(id=self.kwargs.get('pk'))
 
 
 class LayoutView(DetailTabView):

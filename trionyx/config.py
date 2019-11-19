@@ -16,6 +16,7 @@ from django.conf import settings
 from django.db.models import Field, Model
 from django.core.cache import cache
 from trionyx.utils import CacheLock
+from trionyx.signals import can_view, can_add, can_change, can_delete
 
 if TYPE_CHECKING:
     from trionyx.trionyx.models import User  # noqa F401
@@ -295,6 +296,56 @@ class ModelConfig:
     def has_config(self, name: str) -> bool:
         """Check if config is set"""
         return name in self.__changed
+
+    def has_permission(self, action, obj=None, user=None):
+        """Check if action can be performed on object"""
+        assert action in ['view', 'add', 'change', 'delete']
+
+        mapping = {
+            'view': {
+                'disabled': False,
+                'signal': can_view,
+            },
+            'add': {
+                'disabled': self.disable_add,
+                'signal': can_add,
+            },
+            'change': {
+                'disabled': self.disable_change,
+                'signal': can_change,
+            },
+            'delete': {
+                'disabled': self.disable_delete,
+                'signal': can_delete,
+            }
+        }
+
+        # First check if its disabled in config
+        if mapping[action]['disabled']:
+            return False
+
+        has_permission = True
+
+        # If user is set check Django permissions
+        if user:
+            has_permission = has_permission and user.has_perm('{app_label}.{action}_{model_name}'.format(
+                app_label=self.app_label,
+                action=action,
+                model_name=self.model_name,
+            ).lower())
+
+        # If obj, check if any signal response has permission
+        if obj and not user.is_superuser:
+            assert isinstance(obj, self.model)
+
+            responses = mapping[action]['signal'].send(
+                self.model,
+                instance=obj
+            )
+
+            has_permission = has_permission and all([resp for recv, resp in responses])
+
+        return has_permission
 
     def get_field(self, field_name):
         """Get model field by name"""
