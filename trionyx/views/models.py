@@ -567,8 +567,8 @@ class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
         context = super().get_context_data(**kwargs)
 
         context.update({
-            'title': self.title,
-            'submit_value': self.submit_value,
+            'title': self.get_form().get_title() if hasattr(self.get_form(), 'get_title') else self.title,
+            'submit_value': self.get_form().get_submit_label() if hasattr(self.get_form(), 'get_submit_label') else  self.submit_value,
             'header_buttons': list(
                 self.get_model_config().get_header_buttons(self.object, {'page': 'edit'})
             ),
@@ -656,8 +656,8 @@ class CreateView(ModelPermissionMixin, DjangoCreateView, ModelClassMixin):
         context = super().get_context_data(**kwargs)
 
         context.update({
-            'title': self.title,
-            'submit_value': self.submit_value,
+            'title': self.get_form().get_title() if hasattr(self.get_form(), 'get_title') else self.title,
+            'submit_value': self.get_form().get_submit_label() if hasattr(self.get_form(), 'get_submit_label') else  self.submit_value,
             'cancel_url': self.get_cancel_url(),
             'model_verbose_name': self.get_model_class()._meta.verbose_name,
         })

@@ -56,7 +56,10 @@ class ModelPermissionMixin:
     def dispatch(self, request: HttpRequest, *args, **kwargs):
         """Validate if user can use view"""
         if self.permission_type in ['view', 'add', 'change', 'delete'] and hasattr(self, 'get_model_config'):
-            obj = self.get_object() if hasattr(self, 'get_object') else None  # type: ignore
+            try:
+                obj = self.get_object() if hasattr(self, 'get_object') else None  # type: ignore
+            except AttributeError:
+                obj = None
             if not self.get_model_config().has_permission(self.permission_type, obj, request.user):  # type: ignore
                 raise PermissionDenied()
         elif self.permission and not request.user.has_perm(self.permission):
