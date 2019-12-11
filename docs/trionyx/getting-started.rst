@@ -236,7 +236,7 @@ We are going to at a knowledgebase tab to the `admin -> users`:
 
                         {
                             'label': 'Content',
-                            'component': Component(
+                            'value': Component(
                                 Html(art.content),
                                 Button(
                                     'Edit',
