@@ -144,14 +144,14 @@ class ModelsTest(TestCase):
 
     def test_custom_header_button_detailview(self):
         config = models_config.get_config(User)
-        config.view_header_buttons = [
+        config.header_buttons = [
             {
                 'label': 'TestCustom header button',
-                'url': 'trionyx:model-edit',
+                'url': 'trionyx:model-list',
             }
         ]
 
-        response = self.client.get(self.get_user_url(self.test_user.id))
+        response = self.client.get(self.get_user_url())
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'TestCustom header button')

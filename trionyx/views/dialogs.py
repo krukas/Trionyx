@@ -222,7 +222,7 @@ class UpdateDialog(DialogView):
         setattr(form, 'helper', helper)
 
         return {
-            'title': form.get_title() if hasattr(form, 'get_title') else self.title.format(
+            'title': form.get_title() if hasattr(form, 'get_title') else self.title.format(  # type: ignore
                 model_name=self.get_model_config().model_name,
                 object=str(self.object) if self.object else '',
             ),
@@ -230,7 +230,7 @@ class UpdateDialog(DialogView):
                 'form': form,
                 'success_message': success_message,
             }),
-            'submit_label': form.get_submit_label() if hasattr(form, 'get_submit_label') else self.submit_label,
+            'submit_label': form.get_submit_label() if hasattr(form, 'get_submit_label') else self.submit_label,  # type: ignore
             'success': bool(success_message),
         }
 

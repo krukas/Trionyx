@@ -8,12 +8,25 @@
 - Add more tests and MyPy
 - Add getting started guide to docs and improve README
 - Add more bootstrap components
+- Add frontend layout update function
+- Add system variables
+- Add helper class for app settings
+- Add support for inline forms queryset
+- Add company information to settings
+- Add price template filter
+- Add ability for forms to set page title and submit label
+- Add options to display create/change/delete buttons
+- Add signals for permissions
 
 #### Changed
 - Drop support for python 3.5
 - Improve api serializer registration
 - Improve list view column sizes
 - Move from vitualenv to venv
+- Make inline formset dynamic
+- Make delete button available on edit page
+- Make header buttons generic and show them on list and edit page
+- Header buttons can be shown based on tab view 
 
 #### Fixed
 - Cant go to tab if code is same as code in jstree

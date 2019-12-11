@@ -471,6 +471,10 @@ class ModelConfig:
                     'pk': obj.id if obj else None
                 },
                 {
+                    'app': self.app_label,
+                    'model': self.model_name,
+                },
+                {
                     'pk': obj.id if obj else None
                 },
                 {}
