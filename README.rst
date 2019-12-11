@@ -87,13 +87,13 @@ This project is licensed under the GPLv3 License - see the LICENSE.txt file for 
 
 Change log
 ==========
-You can find the changelog in the `CHANGELOG.md`_
+You can find the changelog in the `docs`_
 
 .. _Django: https://www.djangoproject.com/
 .. _Celery: http://www.celeryproject.org/
 .. _AdminLTE: https://adminlte.io/
 
-.. _CHANGELOG.md: https://github.com/krukas/Trionyx/blob/master/CHANGELOG.md
+.. _docs: https://trionyx.readthedocs.io/en/latest/trionyx/changelog.html
 .. _Trionyx github repository: https://github.com/krukas/Trionyx/issues
 .. _Krukas: https://github.com/krukas
 .. _here: https://trionyx.readthedocs.io/en/latest/
