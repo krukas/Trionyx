@@ -1,4 +1,4 @@
-### [develop]
+### [2.0.0] - 11-12-2019
 
 **Compatibility breaking changes: drop support for python 3.5**
 
