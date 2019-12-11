@@ -20,6 +20,7 @@ Welcome to Trionyx's documentation!
    trionyx/celery
    trionyx/widgets
    trionyx/reusable-apps
+   trionyx/changelog
 
 
 

@@ -1,8 +1,10 @@
-### [2.0.0] - 11-12-2019
+[2.0.0] - 11-12-2019
+--------------------
 
 **Compatibility breaking changes: drop support for python 3.5**
 
-#### Added
+Added
+~~~~~
 - Add generic model sidebar
 - Add Summernote wysiwyg editor
 - Add more tests and MyPy
@@ -18,7 +20,8 @@
 - Add options to display create/change/delete buttons
 - Add signals for permissions
 
-#### Changed
+Changed
+~~~~~~~
 - Drop support for python 3.5
 - Improve api serializer registration
 - Improve list view column sizes
@@ -28,32 +31,43 @@
 - Make header buttons generic and show them on list and edit page
 - Header buttons can be shown based on tab view 
 
-#### Fixed
+Fixed
+~~~~~
 - Cant go to tab if code is same as code in jstree
 - Several small fixes and changes
 
 
-### [1.0.5] - 31-10-2019
-#### Fixed
+[1.0.5] - 31-10-2019
+--------------------
+Fixed
+~~~~~
 - Fixed model overwrite configs/forms/menu
 
 
-### [1.0.4] - 31-10-2019
-#### Changed
+[1.0.4] - 31-10-2019
+--------------------
+
+Changed
+~~~~~~~
 - Improved new project creation
 
-#### Fixed
+Fixed
+~~~~~
 - Filter related choices are not shown
 
 
-### [1.0.3] - 30-10-2019
-#### Fixed
+[1.0.3] - 30-10-2019
+--------------------
+Fixed
+~~~~~
 - Fixed to early reverse lookup
 - Fixed not all quickstart files where included
 
 
-### [1.0.2] - 30-10-2019
-#### Changed
+[1.0.2] - 30-10-2019
+--------------------
+Changed
+~~~~~~~
 - Dialog form initial also uses GET params
 - model_url accept GET params as dict
 - Improve Button component
@@ -62,21 +76,26 @@
 - Base Component can be used as an holder for Components to be rendered
 - Add debug comments to Component output
 
-#### Fixed
+Fixed
+~~~~~
 - Delete dialog does not return `success` boolean
 - Fixed html component not rendering html and tag not closed
 
 
-### [1.0.1] - 29-10-2019
-#### Fixed
+[1.0.1] - 29-10-2019
+--------------------
+Fixed
+~~~~~
 - Fixed verbose name has HTML
 
 
-### [1.0.0] - 29-10-2019
+[1.0.0] - 29-10-2019
+--------------------
 
 **Compatibility breaking changes: Migrations are cleared**
 
-#### Added
+Added
+~~~~~
 - Add get_current_request to utils
 - Add DB logger
 - Add options to disable create/update/delete for model
@@ -107,7 +126,8 @@
 - Add model overwrites support that are set with settings
 - Add renderers for email/url/bool/list
 
-#### Changed
+Changed
+~~~~~~~
 - Set fallback for user profile name and avatar
 - Improve header visibility
 - Make filters separate vuejs component + function to filter queryset
@@ -118,8 +138,9 @@
 - Changed pagination UX
 - Show filter label instead of field name
 
-#### Fixed
-- Project create settings BASE_DIR was incorrect 
+Fixed
+~~~~~
+- Project create settings BASE_DIR was incorrect
 - Menu item with empty filtered childs is shown
 - Make verbose_name field not required
 - Global search is activated on CTRL commands
@@ -130,18 +151,21 @@
 - Fix model list dragging + fix drag and sort align
 - Fixed None value is rendered as the string None
 
-### [0.2.0] - 04-06-2019 
+[0.2.0] - 04-06-2019
+--------------------
 
 **Compatibility breaking changes**
 
-#### Added
+Added
+~~~~~
 - Form register and refactor default forms to use this
 - Add custom form urls + shortcut model_url function
 - Add layout register + layout views
 - Add model verbose_name field + change choices to use verbose_name query
 - Add permission checks and hide menu/buttons with no permission
 
-#### Changed
+Changed
+~~~~~~~
 - Render fields for verbose_name and search title/description
 - Move all dependencies handling to setup.py
 - Upgrade to Django 2.2 and update other dependencies
@@ -150,29 +174,36 @@
 - Move navigtaion.tabs to views.tabs
 - Quickstart project settings layout + add environment.json
 
-#### Fixed
+Fixed
+~~~~~
 - Cant search in fitler select field
 - Datetimepicker not working for time
 - Travis build error
 - Button component
 
 
-### [0.1.1] - 30-05-2019
-#### Fixed
+[0.1.1] - 30-05-2019
+--------------------
+Fixed
+~~~~~
 - Search for not indexed models
 - Lint errors
 
 
-### [0.1.0] - 30-05-2019
-#### Added
+[0.1.0] - 30-05-2019
+--------------------
+Added
+~~~~~
 - Global search
 - Add filters to model list page
 - Set default form layouts for fields
 
-#### Changed
+Changed
+~~~~~~~
 - Search for not indexed models
 
-#### Fixed
+Fixed
+~~~~~
 - Make datepicker work with locale input format
 - On menu hover resize header 
 - Keep menu state after page refresh
