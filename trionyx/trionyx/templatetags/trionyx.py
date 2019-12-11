@@ -53,7 +53,7 @@ def is_date(value):
     return isinstance(value, date)
 
 
-@register.simple_tag
+@register.filter
 def price(value):
     """Render value in current locale with configured currency"""
-    return price_value_renderer(value)
+    return mark_safe(price_value_renderer(value))
