@@ -337,10 +337,9 @@ class ComponentFieldsMixin:
 
     - **field**: Name of object attribute or dict key to be rendered
     - **label**: Label of field
-    - **value**: Value to be rendered
+    - **value**: Value to be rendered (Can also be a component)
     - **format**: String format for rendering field, default is '{0}'
     - **renderer**: Render function for rendering value, result will be given to format. (lambda value, **options: value)
-    - **component**: Render field with given component, row object will be set as the component object
 
     Based on the order the fields are in the list a __index__ is set with the list index,
     this is used for rendering a object that is a list.
