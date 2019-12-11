@@ -27,6 +27,7 @@ from django.urls import reverse
 from django.core.paginator import Paginator
 from django.contrib import messages
 from watson import search as watson
+from django.template.loader import render_to_string
 from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
 
@@ -95,23 +96,18 @@ class ListView(ModelPermissionMixin, TemplateView, ModelClassMixin):
         context.update({
             'title': self.get_title(),
             'content_type_id': ContentType.objects.get_for_model(self.get_model_class()).id,
+            'model_config': self.get_model_config(),
             'ajax_url': self.get_ajax_url(),
             'download_url': self.get_download_url(),
             'create_url': self.get_create_url(),
+            'header_buttons': self.get_model_config().get_header_buttons(context={
+                'page': 'list',
+            }),
             'mass_delete_url': self.get_mass_delete_url(),
             'mass_update_url': self.get_mass_update_url(),
-            'create_permission': self.request.user.has_perm('{app_label}.add_{model_name}'.format(
-                app_label=self.get_model_config().app_label,
-                model_name=self.get_model_config().model_name,
-            ).lower()) and not self.get_model_config().disable_add,
-            'change_permission': self.request.user.has_perm('{app_label}.change_{model_name}'.format(
-                app_label=self.get_model_config().app_label,
-                model_name=self.get_model_config().model_name,
-            ).lower()) and not self.get_model_config().disable_change,
-            'delete_permission': self.request.user.has_perm('{app_label}.delete_{model_name}'.format(
-                app_label=self.get_model_config().app_label,
-                model_name=self.get_model_config().model_name,
-            ).lower()) and not self.get_model_config().disable_delete
+            'create_permission': self.get_model_config().has_permission('add', user=self.request.user),
+            'change_permission': self.get_model_config().has_permission('change', user=self.request.user),
+            'delete_permission': self.get_model_config().has_permission('delete', user=self.request.user),
         })
         return context
 
@@ -375,25 +371,19 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
         context = super().get_context_data(**kwargs)
         tabs = self.get_active_tabs()
         context.update({
+            'model_config': self.get_model_config(),
             'page_detail_tabs': tabs,
             'active_tab': tabs[0].code if tabs else '',
             'app_label': self.get_app_label(),
             'model_name': self.get_model_name(),
             'model_alias': self.get_model_alias(),
             'model_verbose_name': self.object._meta.verbose_name.title(),
-            'view_header_buttons': list(self.view_header_buttons()),
             'back_url': self.get_back_url(),
             'edit_url': self.get_edit_url(),
             'delete_url': self.get_delete_url(),
             'title': self.title,
-            'change_permission': self.request.user.has_perm('{app_label}.change_{model_name}'.format(
-                app_label=self.get_model_config().app_label,
-                model_name=self.get_model_config().model_name,
-            ).lower()) and not self.get_model_config().disable_change,
-            'delete_permission': self.request.user.has_perm('{app_label}.delete_{model_name}'.format(
-                app_label=self.get_model_config().app_label,
-                model_name=self.get_model_config().model_name,
-            ).lower()) and not self.get_model_config().disable_delete
+            'change_permission': self.get_model_config().has_permission('change', self.get_object(), user=self.request.user),
+            'delete_permission': self.get_model_config().has_permission('delete', self.get_object(), user=self.request.user),
         })
         return context
 
@@ -419,44 +409,6 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
             'model': self.get_model_name(),
             'pk': self.object.id
         })
-
-    def view_header_buttons(self):
-        """Get the view header buttons"""
-        from django.urls.exceptions import NoReverseMatch
-
-        def url_reverse(url):
-            kwargs_list = [
-                {
-                    'app': self.get_app_label(),
-                    'model': self.get_model_name(),
-                    'pk': self.object.id
-                },
-                {
-                    'pk': self.object.id
-                },
-                {}
-            ]
-
-            for kwargs in kwargs_list:
-                try:
-                    return reverse(url, kwargs=kwargs)
-                except NoReverseMatch:
-                    pass
-
-            raise NoReverseMatch('Could not find match for {}'.format(url))
-
-        if self.get_model_config().view_header_buttons:
-            for config in self.get_model_config().view_header_buttons:
-                if 'show' in config and not config['show'](self.object, self.get_model_alias()):
-                    continue
-
-                button_type = config.get('type', 'bg-theme')
-                yield {
-                    'label': config['label'](self.object, self.get_model_alias()) if callable(config['label']) else config['label'],
-                    'type': button_type(self.object, self.get_model_alias()) if callable(button_type) else button_type,
-                    'url': config['url'](self.object, self.get_model_alias()) if callable(config['url']) else url_reverse(config['url']),
-                    'modal': config.get('modal', True)
-                }
 
     def get_model_alias(self):
         """Get model alias"""
@@ -492,8 +444,7 @@ class DetailTabJsendView(ModelPermissionMixin, JsendView, ModelClassMixin):
     def handle_request(self, request, app, model, pk):
         """Render and return tab"""
         from trionyx.views import tabs
-        ModelClass = self.get_model_class()
-        object = ModelClass.objects.get(id=pk)
+        object = self.get_object()
 
         tab_code = request.GET.get('tab')
         model_alias = request.GET.get('model_alias')
@@ -503,7 +454,21 @@ class DetailTabJsendView(ModelPermissionMixin, JsendView, ModelClassMixin):
 
         item = tabs.get_tab(model_alias, object, tab_code)
 
-        return item.get_layout(object).render(request)
+        return {
+            'header_buttons': render_to_string('trionyx/base/model_header_buttons.html', {
+                'header_buttons': self.get_model_config().get_header_buttons(object, {
+                    'page': 'view',
+                    'model_alias': model_alias,
+                    'tab': tab_code,
+                }),
+            }, request=request),
+            'content': item.get_layout(object).render(request),
+        }
+
+    def get_object(self):
+        """Get object"""
+        ModelClass = self.get_model_class()
+        return ModelClass.objects.get(id=self.kwargs.get('pk'))
 
 
 class LayoutView(DetailTabView):
@@ -518,14 +483,30 @@ class LayoutView(DetailTabView):
         context = super().get_context_data(**kwargs)
         from trionyx.views import layouts
         try:
-            context['layout'] = layouts.get_layout(
-                self.kwargs.get('code'),
-                self.object,
-                self.request
-            )
+            context['layout'] = layouts.get_layout(self.kwargs.get('code'), self.object).render(self.request)
         except Exception:
             raise Http404()
         return context
+
+
+class LayoutUpdateView(JsendView, ModelClassMixin):
+    """Update whole or section of an layout"""
+
+    def handle_request(self, request, pk, code, **kwargs):
+        """Render layout or given component for layout"""
+        from trionyx.views import layouts
+        layout = layouts.get_layout(
+            code,
+            self.get_model_class().objects.get(id=pk),
+            request.GET.get('layout_id')
+        )
+
+        component_id = request.GET.get('component')
+        if component_id:
+            comp, _ = layout.find_component_by_id(component_id)
+            return comp.render({}, request)
+        else:
+            return ''.join(comp.render({}, request) for comp in layout.components)
 
 
 # =============================================================================
@@ -586,8 +567,13 @@ class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
         context = super().get_context_data(**kwargs)
 
         context.update({
-            'title': self.title,
-            'submit_value': self.submit_value,
+            'title': self.get_form().get_title() if hasattr(self.get_form(), 'get_title') else self.title,
+            'submit_value': (self.get_form().get_submit_label()
+                             if hasattr(self.get_form(), 'get_submit_label')
+                             else self.submit_value),
+            'header_buttons': list(
+                self.get_model_config().get_header_buttons(self.object, {'page': 'edit'})
+            ),
             'cancel_url': self.cancel_url,
             'object_url': self.get_model_config().get_absolute_url(self.object),
         })
@@ -672,8 +658,10 @@ class CreateView(ModelPermissionMixin, DjangoCreateView, ModelClassMixin):
         context = super().get_context_data(**kwargs)
 
         context.update({
-            'title': self.title,
-            'submit_value': self.submit_value,
+            'title': self.get_form().get_title() if hasattr(self.get_form(), 'get_title') else self.title,
+            'submit_value': (self.get_form().get_submit_label()
+                             if hasattr(self.get_form(), 'get_submit_label')
+                             else self.submit_value),
             'cancel_url': self.get_cancel_url(),
             'model_verbose_name': self.get_model_class()._meta.verbose_name,
         })

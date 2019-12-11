@@ -11,6 +11,7 @@ from crispy_forms.bootstrap import *  # noqa F403
 from django.template.loader import render_to_string
 from django.contrib.contenttypes.models import ContentType
 from trionyx import utils
+from trionyx.config import models_config
 
 from trionyx.utils import (
     get_current_locale,
@@ -153,8 +154,17 @@ class InlineForm(LayoutObject):
 
     def render(self, form, form_style, context, template_pack=TEMPLATE_PACK):
         """Render form"""
+        inline_form = form.get_inline_forms()[self.form_name]
+
+        if hasattr(inline_form, 'forms'):
+            config = models_config.get_config(inline_form.form._meta.model)
+        else:
+            config = models_config.get_config(inline_form._meta.model)
+
         return render_to_string(self.template, {
-            'inline_form': form.get_inline_forms()[self.form_name]
+            'inline_form_prefix': self.form_name,
+            'inline_form_verbose_name': config.get_verbose_name(),
+            'inline_form': inline_form,
         }, utils.get_current_request())
 
 

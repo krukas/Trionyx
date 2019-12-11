@@ -29,6 +29,9 @@
     <link rel="stylesheet" type="text/css" href="{% static tx_skin_css %}">
 
     {% block extra_head %}{% endblock %}
+    <script>
+        window.trionyx_layouts = {};
+    </script>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -102,6 +105,9 @@
 
             {% block content_bottom %}{% endblock %}
         </div>
+
+        {% include 'trionyx/base/right_sidebar.html' %}
+
     </div>
 {% endblock %}
 

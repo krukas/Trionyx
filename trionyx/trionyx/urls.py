@@ -49,6 +49,11 @@ urlpatterns = [
     path('model/<str:app>/<str:model>/<int:pk>/', core_views.DetailTabView.as_view(), name='model-view'),
     path('model/<str:app>/<str:model>/<int:pk>/tab/', core_views.DetailTabJsendView.as_view(), name='model-tab'),
     path('model/<str:app>/<str:model>/<int:pk>/layout/<str:code>/', core_views.LayoutView.as_view(), name='model-view-custom'),
+    path(
+        'model/<str:app>/<str:model>/<int:pk>/layout-update/<str:code>/',
+        core_views.LayoutUpdateView.as_view(),
+        name='model-layout-update'
+    ),
 
     path('model/<str:app>/<str:model>/<int:pk>/edit/', core_views.UpdateView.as_view(), name='model-edit'),
     path('model/<str:app>/<str:model>/<int:pk>/edit/<str:code>/', core_views.UpdateView.as_view(), name='model-edit-custom'),
@@ -64,6 +69,9 @@ urlpatterns = [
         name='model-dialog-edit-custom'
     ),
     path('dialog/model/<str:app>/<str:model>/<int:pk>/delete/', core_views.DeleteDialog.as_view(), name='model-dialog-delete'),
+
+    # Sidebar
+    path('sidebar/model/<str:app>/<str:model>/<int:pk>/<str:code>/', views.SidebarJsend.as_view(), name='model-sidebar'),
 
     # Mass actions
     path('mass/<str:app>/<str:model>/delete/', views.MassDeleteDialog.as_view(), name='model-mass-delete'),

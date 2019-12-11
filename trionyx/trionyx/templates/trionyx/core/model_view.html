@@ -9,20 +9,12 @@
         <a href="{{ back_url }}" class="btn btn-flat bg-theme">{% trans "Back" %}</a>
     {% endif %}
 
-    {% for button in view_header_buttons %}
-        <a
-           href="{% if button.modal %}#{% else %}{{ button.url }}{% endif %}"
-           {% if button.modal %}onClick="openDialog('{{ button.url }}')"{% endif %}
-           class="btn btn-flat {{ button.type }}"
-        >
-            {{ button.label }}
-        </a>
-    {% endfor %}
+    <span id="trionyx-model-header-buttons"></span>
 
-    {% if delete_url and delete_permission %}
+    {% if delete_url and delete_permission and model_config.display_delete_button %}
         <a href="{{ delete_url }}" class="btn btn-flat bg-theme">{% trans "Delete" %}</a>
     {% endif %}
-    {% if edit_url and change_permission %}
+    {% if edit_url and change_permission and model_config.display_change_button %}
         <a href="{{ edit_url }}" class="btn btn-flat bg-theme">{% trans "Edit" %}</a>
     {% endif %}
 
@@ -75,10 +67,11 @@
             show_tab = show_tab || true;
 
             if (tab_id in trionyx_loaded_tabs) {
+                $('#trionyx-model-header-buttons').html(trionyx_loaded_tabs[tab_id].header_buttons);
                 return;
             }
 
-            trionyx_loaded_tabs[tab_id] = true;
+            trionyx_loaded_tabs[tab_id] = {header_buttons: ''};
             var tab_content = $('#trionyx-tab-' + tab_id);
 
             $.ajax({
@@ -88,8 +81,10 @@
                     model_alias: trionyx_model_alias,
                 },
                 success: function(data) {
-                    if(data.status == 'success'){
-                        $(tab_content).html(data.data);
+                    if(data.status === 'success'){
+                        trionyx_loaded_tabs[tab_id].header_buttons = data.data.header_buttons;
+                        $('#trionyx-model-header-buttons').html(data.data.header_buttons);
+                        $(tab_content).html(data.data.content);
                     } else {
                         $(tab_content).html('<div class="alert alert-danger">Could not load tab</div>');
                         delete trionyx_loaded_tabs[tab_id];

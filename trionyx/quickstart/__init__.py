@@ -9,6 +9,7 @@ Quickstart Trionyx project and apps
 """
 import os
 import shutil
+import subprocess
 
 import trionyx
 from trionyx import utils
@@ -26,6 +27,9 @@ class Quickstart:
 
         self.app_path = os.path.join(os.path.dirname(quickstart_path), 'app')
         """Path to app template files"""
+
+        self.ansible_path = os.path.join(os.path.dirname(quickstart_path), 'ansible')
+        """Path to Ansible template files"""
 
     def create_project(self, project_path):
         """
@@ -70,6 +74,46 @@ class Quickstart:
         self.update_file(app_path, 'apps.py', {
             'name': name.lower(),
             'verbose_name': name.capitalize()
+        })
+
+    def create_ansible(self, project_path, domain, repo):
+        """Create Ansible live deploy script"""
+        try:
+            import yaml
+        except ImportError:
+            raise Exception('You need to have installed ansible')
+
+        shutil.copytree(self.ansible_path, project_path)
+
+        self.update_file(project_path, 'production', {
+            'domain': domain,
+        })
+
+        os.mkdir(os.path.join(project_path, 'ssh_keys'))
+        subprocess.check_output([
+            'ssh-keygen', '-t', 'rsa', '-b', '4096', '-N', '', '-f', os.path.join(project_path, 'ssh_keys', 'deploy_rsa')
+        ])
+        subprocess.check_output([
+            'ssh-keygen', '-t', 'rsa', '-b', '4096', '-N', '', '-f', os.path.join(project_path, 'ssh_keys', 'connect_rsa')
+        ])
+
+        with open(os.path.join(project_path, 'ssh_keys', 'deploy_rsa')) as _file:
+            deploy_key = _file.read()
+
+        config = {
+            'ansible_ssh_private_key_file': 'ssh_keys/connect_rsa',
+            'app_domain': domain,
+            'app_repo': repo,
+            'app_config_template': "{{ playbook_dir }}/templates/environment.json.j2",
+            'deploy_key': deploy_key,
+            'secret_key': utils.random_string(32),
+            'db_password': utils.random_string(16),
+            'broker_password': utils.random_string(16),
+            'smtp_password': '',
+        }
+
+        self.update_file(project_path, 'group_vars/all.yml', {
+            'config': yaml.dump(config, default_flow_style=False, allow_unicode=True),
         })
 
     def update_file(self, project_path, file_path, variables):

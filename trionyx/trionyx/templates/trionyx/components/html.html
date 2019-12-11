@@ -7,5 +7,13 @@
         <{{ component.tag }} {{ component.get_attr_text|safe }}/>
     {% endif %}
 {% else %}
+    {% if component.css_id %}
+        <div id="{{ component.css_id }}">
+    {% endif %}
+
     {{ component.html|safe }}
+
+    {% if component.css_id %}
+        </div>
+    {% endif %}
 {% endif %}

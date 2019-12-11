@@ -12,7 +12,7 @@ import json
 import logging
 import os
 from pkg_resources import iter_entry_points
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 from django.core.exceptions import ImproperlyConfigured
 from kombu import Queue, Exchange
@@ -115,6 +115,29 @@ MIDDLEWARE = [
     'trionyx.trionyx.middleware.GlobalRequestMiddleware',
     'trionyx.trionyx.middleware.LastLoginMiddleware',
 ]
+
+# ==============================================================================
+# Database
+# ==============================================================================
+DATABASES = get_env_var('DATABASES', {
+    'default': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'development.sqlite3',
+    }
+})
+
+# ==============================================================================
+# Database
+# ==============================================================================
+EMAIL_BACKEND = get_env_var('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
+EMAIL_HOST = get_env_var('EMAIL_HOST', 'localhost')
+EMAIL_PORT = get_env_var('EMAIL_PORT', 25)
+EMAIL_HOST_USER = get_env_var('EMAIL_HOST_USER', '')
+EMAIL_HOST_PASSWORD = get_env_var('EMAIL_HOST_PASSWORD', '')
+EMAIL_USE_TLS = get_env_var('EMAIL_USE_TLS', False)
+EMAIL_USE_SSL = get_env_var('EMAIL_USE_SSL', False)
+
+DEFAULT_FROM_EMAIL = get_env_var('DEFAULT_FROM_EMAIL', 'webmaster@localhost')
 
 # ==============================================================================
 # Auth / security
@@ -262,6 +285,21 @@ TX_LOGO_NAME_SMALL_END: str = 'X'
 
 TX_THEME_COLOR: str = 'purple'
 """The theme skin color (header). Aviable colors: blue, yellow, green, purple, red, black. All colors have a light version blue-light"""
+
+TX_COMPANY_NAME: str = 'Trionyx'
+"""Company name"""
+
+TX_COMPANY_ADDRESS_LINES: List[str] = []
+"""Company address lines"""
+
+TX_COMPANY_TELEPHONE: str = ''
+"""Company telephone number"""
+
+TX_COMPANY_WEBSITE: str = ''
+"""Company website address"""
+
+TX_COMPANY_EMAIL: str = ''
+"""Company email address"""
 
 
 def TX_DEFAULT_DASHBOARD():

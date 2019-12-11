@@ -27,7 +27,7 @@ clean:
 
 
 virtualenv: clean
-	virtualenv -p python3 env
+	python3 -m venv env
 
 
 

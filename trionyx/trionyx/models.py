@@ -181,6 +181,23 @@ class UserAttribute(models.Model):
 
 
 # =============================================================================
+# System variable
+# =============================================================================
+class SystemVariable(models.Model):
+    """Model to store system wide variable like account/invoice counter
+
+    Never use this model directly and use the trionyx.config.variables
+    """
+
+    code = models.CharField(max_length=128, unique=True)
+    value = models.JSONField()
+
+    def __str__(self):
+        """System variable representation"""
+        return self.code
+
+
+# =============================================================================
 # Logging
 # =============================================================================
 class LogManager(models.BaseManager):
@@ -306,6 +323,9 @@ class AuditLogEntry(models.BaseModel):
         ]
 
 
+# =============================================================================
+# Task
+# =============================================================================
 class Task(models.BaseModel):
     """Task model"""
 

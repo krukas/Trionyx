@@ -119,22 +119,11 @@ class DialogView(View, ModelClassMixin):
             return True
 
         if not self.permission:
-            config = self.get_model_config()
-
-            if self.permission_type == 'change' and config.disable_change:
-                return False
-
-            if self.permission_type == 'add' and config.disable_add:
-                return False
-
-            if self.permission_type == 'delete' and config.disable_delete:
-                return False
-
-            return request.user.has_perm('{app_label}.{type}_{model_name}'.format(
-                app_label=config.app_label,
-                type=self.permission_type,
-                model_name=config.model_name,
-            ).lower())
+            return self.get_model_config().has_permission(
+                self.permission_type,
+                self.object,
+                request.user
+            )
 
         return request.user.has_perm(self.permission)
 
@@ -185,7 +174,7 @@ class LayoutDialog(DialogView):
         """Render layout for object"""
         from trionyx.views import layouts
         try:
-            content = layouts.get_layout(self.kwargs.get('code'), self.object, self.request)
+            content = layouts.get_layout(self.kwargs.get('code'), self.object).render(self.request)
         except Exception:
             content = _('Layout does not exists')
 
@@ -233,7 +222,7 @@ class UpdateDialog(DialogView):
         setattr(form, 'helper', helper)
 
         return {
-            'title': self.title.format(
+            'title': form.get_title() if hasattr(form, 'get_title') else self.title.format(  # type: ignore
                 model_name=self.get_model_config().model_name,
                 object=str(self.object) if self.object else '',
             ),
@@ -241,7 +230,7 @@ class UpdateDialog(DialogView):
                 'form': form,
                 'success_message': success_message,
             }),
-            'submit_label': self.submit_label,
+            'submit_label': form.get_submit_label() if hasattr(form, 'get_submit_label') else self.submit_label,  # type: ignore
             'success': bool(success_message),
         }
 

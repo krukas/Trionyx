@@ -12,13 +12,18 @@ from functools import reduce
 from django.conf import settings
 from django.db.models import *  # noqa F403
 from django.urls import reverse
-from jsonfield import JSONField  # noqa F401
+
 from django.contrib import messages
 from django.utils import timezone
 from django.utils.translation import ugettext_lazy as _
 
 from trionyx.config import models_config
 from trionyx import utils
+
+if settings.DATABASES['default']['ENGINE'] == 'django.db.backends.postgresql':
+    from django.contrib.postgres.fields import JSONField  # noqa F401
+else:
+    from jsonfield import JSONField  # type: ignore # noqa F401
 
 TX_MODEL_OVERWRITES = {key.lower(): value.lower() for key, value in settings.TX_MODEL_OVERWRITES.items()}
 

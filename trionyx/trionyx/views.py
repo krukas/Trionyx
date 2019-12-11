@@ -44,7 +44,7 @@ def media_nginx_accel(request, path):
     """
     Location /protected/ {
         internal;
-        root <complete path to project root dir>;
+        alias <complete path to project root dir>;
     }
 
     """
@@ -297,6 +297,20 @@ class UserTasksJsend(JsendView):
                 'url': task.get_absolute_url(),
             } for task in tasks
         ]
+
+
+# =============================================================================
+# Sidebar
+# =============================================================================
+class SidebarJsend(JsendView):
+    """Model sidebar view"""
+
+    def handle_request(self, request, app, model, pk, code):
+        """Return given sidebar"""
+        from trionyx.views import sidebars
+        config = models_config.get_config(f'{app}.{model}')
+        obj = config.model.objects.get(id=pk)
+        return sidebars.get_sidebar(config.model, code)(request, obj)
 
 
 # =============================================================================

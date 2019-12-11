@@ -36,6 +36,9 @@
     {% else %}
         <a href="{{ object_url }}" class="btn btn-flat bg-theme">{% trans "Cancel" %}</a>
     {% endif %}
+
+    {% include 'trionyx/base/model_header_buttons.html' %}
+
     <input type="submit" value="{% if submit_value %}{{ submit_value }}{% else %}{% trans "Save" %}{% endif %}" class="btn btn-flat btn-success"/>
 {% endblock %}
 

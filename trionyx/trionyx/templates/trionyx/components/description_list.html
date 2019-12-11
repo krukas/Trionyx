@@ -1,3 +1,7 @@
+{% if component.css_id %}
+    <div id="{{ component.css_id }}">
+{% endif %}
+
 {% if component.get_rendered_object %}
     <dl {% if component.horizontal %}class="dl-horizontal"{% endif %}>
         {% for field in component.get_rendered_object %}
@@ -8,5 +12,9 @@
 {% elif component.no_data_message %}
     <div class="alert alert-default no-margin flat">
         {{ component.no_data_message }}
+    </div>
+{% endif %}
+
+{% if component.css_id %}
     </div>
 {% endif %}

@@ -8,6 +8,14 @@
     <script src="{% static js %}"></script>
 {% endfor %}
 
-{% for component in layout.components %}
-    {% render_component component %}
-{% endfor %}
+<script>
+    if ('trionyx_layouts' in window) {
+        window.trionyx_layouts['{{ layout.id }}'] = '{{ layout.update_url }}';
+    }
+</script>
+
+<div id="{{ layout.id }}">
+    {% for component in layout.components %}
+        {% render_component component %}
+    {% endfor %}
+</div>

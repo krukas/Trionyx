@@ -45,7 +45,6 @@ import time
 from typing import List, Dict, Union, Any
 
 from django import template
-from django.utils.functional import cached_property
 from django.template.loader import render_to_string
 from django.utils.safestring import mark_safe
 from django.conf import settings
@@ -56,11 +55,31 @@ from trionyx import utils
 register = template.Library()
 
 
+class Colors:
+    """Colors"""
+
+    THEME = 'theme'
+    LIGHT_BLUE = 'light-blue'
+    AQUA = 'aqua'
+    GREEN = 'green'
+    YELLOW = 'yellow'
+    RED = 'red'
+    GRAY = 'gray'
+    NAVY = 'navy'
+    TEAL = 'teal'
+    PURPLE = 'purple'
+    ORANGE = 'orange'
+    MAROON = 'maroon'
+    BLACK = 'black'
+
+
 class Layout:
     """Layout object that holds components"""
 
     def __init__(self, *components, **options):
         """Initialize Layout"""
+        self.id = f'layout_{utils.random_string(8)}'.lower()
+        self.update_url = ''
         self.object = False
         self.components = list(components)
         self.options = options
@@ -176,7 +195,7 @@ class Layout:
 
         # Pass object along to child components for rendering
         for component in self.components:
-            component.set_object(self.object)
+            component.set_object(self.object, layout_id=self.id)
 
     def add_component(self, component, id=None, path=None, before=False, append=False):
         """
@@ -253,9 +272,10 @@ class Component:
 
     def __init__(self, *components, **options):
         """Initialize Component"""
-        self.id = options.get('id')
+        self.id = options.pop('id', None)
+        self.css_id = f"component-{self.id}" if self.id else None
+        self.layout_id = None
         self.components = list(filter(None, components))
-        self.parent = None
         self.object = options.get('object', False)
         self.context = {}
         self.request = None
@@ -264,26 +284,34 @@ class Component:
         for key, value in options.items():
             setattr(self, key, value)
 
-    @cached_property
-    def css_id(self):
-        """Generate random css id for component"""
-        return 'component-{}'.format(utils.random_string(6))
-
-    def set_object(self, object, force=False):
+    def set_object(self, object, force=False, layout_id=None):
         """
         Set object for rendering component and set object to all components
+
+        when object is set the layout should be complete with all components.
+        So we also use it to set the layout_id so it's available in the updated method
+        and also prevent whole other lookup of all components.
 
         :param object:
         :return:
         """
+        if layout_id:
+            self.layout_id = layout_id
+
         if self.object is False or force:
             self.object = object
         else:
             object = self.object
 
+        self.updated()
+
         # Pass object along to child components for rendering
         for component in self.components:
-            component.set_object(object)
+            component.set_object(object, force, layout_id)
+
+    def updated(self):
+        """Object updated hook method that is called when component is updated with object"""
+        pass
 
     def render(self, context, request=None):
         """Render component"""
@@ -495,11 +523,6 @@ class ComponentFieldsMixin:
         """Render field for given data"""
         from trionyx.renderer import renderer
 
-        if 'component' in field:
-            component = field.get('component')
-            component.set_object(data, True)
-            return component.render(self.context)
-
         if 'value' in field:
             value = field['value']
         elif isinstance(data, object) and field['field'] and hasattr(data, field['field']):
@@ -517,7 +540,7 @@ class ComponentFieldsMixin:
         if 'renderer' in field:
             value = field['renderer'](value, data_object=data, **options)
         elif isinstance(value, Component):
-            value.set_object(self.object)
+            value.set_object(data, True, self.layout_id)
             value = value.render(self.context.copy(), self.request)
         else:
             value = renderer.render_value(value, data_object=data, **options)
@@ -582,10 +605,32 @@ class HtmlTagWrapper(Component):
     attr: Dict[str, str] = {}
     """Dict with html attributes"""
 
+    valid_attr: List[str] = []
+    """Valid attributes that can be used"""
+
+    color_class: str = ''
+    """When color is set the will be used as class example: btn btn-{color}"""
+
     def __init__(self, *args, **kwargs):
         """Initialize HtmlTagWrapper"""
         super().__init__(*args, **kwargs)
         self.attr = self.attr.copy() if self.attr else {}
+
+        if 'css_class' in kwargs:
+            kwargs['class'] = kwargs.pop('css_class')
+        elif 'color' in kwargs:
+            self.attr['class'] = self.color_class.format(color=kwargs['color'])
+            kwargs.pop('class', None)
+        elif self.color_class:
+            self.attr['class'] = self.color_class.format(color=Colors.THEME)
+            kwargs.pop('class', None)
+
+        if self.css_id:
+            self.attr['id'] = self.css_id
+
+        for key, value in kwargs.items():
+            if key in self.valid_attr:
+                self.attr[key] = value
 
     def get_attr_text(self):
         """Get html attr text to render in template"""
@@ -595,96 +640,27 @@ class HtmlTagWrapper(Component):
         ])
 
 
-class Html(HtmlTagWrapper):
-    """Html single html tag"""
+class OnclickTag(HtmlTagWrapper):
+    """HTML tag with onlick for url or dialog"""
 
-    template_name = 'trionyx/components/html.html'
-    tag = ''
-
-    valid_attr: List[str] = []
-    """Valid attributes that can be used"""
-
-    def __init__(self, html=None, **kwargs):
-        """Init Html"""
-        super().__init__(**kwargs)
-        kwargs['class'] = kwargs.pop('css_class', self.attr.get('class', ''))
-        self.html = html
-        for key, value in kwargs.items():
-            if key in self.valid_attr:
-                self.attr[key] = value
-
-
-class Img(Html):
-    """Img tag"""
-
-    tag = 'img'
-    valid_attr = ['src', 'width']
-    attr = {
-        'width': '100%',
-    }
-
-
-class Input(Html):
-    """Input tag"""
-
-    template_name = 'trionyx/components/input.html'
-
-    valid_attr = ['name', 'value', 'type', 'placeholder', 'class']
-    attr = {
-        'type': 'text',
-        'class': 'form-control',
-    }
-
-    def __init__(self, form_field=None, has_error=False, **kwargs):
-        """Init input"""
-        super().__init__(None, **kwargs)
-        self.has_error = has_error
-
-        if form_field:
-            self.attr['name'] = form_field.name
-            self.attr['value'] = form_field.value()
-            self.has_error = form_field.errors
-
-        if 'value' in self.attr and self.attr['value'] is None:
-            self.attr['value'] = ''
-
-
-class ButtonGroup(HtmlTagWrapper):
-    """Bootstrap button group"""
-
-    attr = {
-        'class': 'btn-group'
-    }
-
-
-class Button(Html):
-    """
-    Bootstrap button
-
-    - link_url
-    - dialog_url
-    - onClick
-    """
-
-    tag = 'button'
-    valid_attr = ['onClick', 'class']
-    attr = {
-        'class': 'btn btn-flat bg-theme'
-    }
+    valid_attr = ['onClick']
 
     def __init__(
-        self, label, url=None, model_url=None, model_params=None, model_code=None,
-        dialog=False, dialog_options=None, dialog_reload_tab=None, **options
+        self, *components, url=None, model_url=None, model_params=None, model_code=None,
+        sidebar=False, dialog=False, dialog_options=None,
+        dialog_reload_tab=None, dialog_reload_sidebar=False, dialog_reload_layout=False, **options
     ):
-        """Init button"""
-        super().__init__(html=label, **options)
+        """Init tag"""
+        super().__init__(*components, **options)
         self.url = url
         self.model_url = model_url
         self.model_code = model_code
         self.model_params = model_params
+        self.sidebar = sidebar
         self.dialog = dialog
         self.dialog_options = dialog_options if dialog_options else {}
         self.on_click = options.get('onClick', False)
+        self.dialog_reload_layout = dialog_reload_layout
 
         if dialog_reload_tab:
             self.dialog_options['callback'] = """function(data, dialog){{
@@ -693,25 +669,43 @@ class Button(Html):
                     trionyx_reload_tab('{tab}');
                 }}
             }}""".format(tab=dialog_reload_tab)
+        elif dialog_reload_sidebar:
+            self.dialog_options['callback'] = """function(data, dialog){
+                if (data.success) {
+                    dialog.close();
+                    reloadSidebar();
+                }
+            }"""
 
-    def set_object(self, obj):
-        """Set object and onClick"""
-        super().set_object(obj)
+    def updated(self):
+        """Set onClick url based on object"""
+        if self.dialog_reload_layout:
+            self.dialog_options['callback'] = """function(data, dialog){{
+                        if (data.success) {{
+                            dialog.close();
+                            txUpdateLayout('{id}', '{component}');
+                        }}
+                    }}""".format(
+                id=self.layout_id,
+                component=self.dialog_reload_layout if isinstance(self.dialog_reload_layout, str) else ''
+            )
 
         if not self.on_click:
             from trionyx.urls import model_url
             url = model_url(
-                model=obj,
+                model=self.object,
                 view_name=self.model_url,
                 code=self.model_code,
                 params=self.model_params
             ) if self.model_url else self.url
 
-            if not url and hasattr(obj, 'get_absolute_url'):
-                url = obj.get_absolute_url()
+            if not url and hasattr(self.object, 'get_absolute_url'):
+                url = self.object.get_absolute_url()
 
             if self.dialog:
                 self.attr['onClick'] = "openDialog('{}', {}); return false;".format(url, self.format_dialog_options())
+            elif self.sidebar:
+                self.attr['onClick'] = "openSidebar('{}'); return false;".format(url)
             else:
                 self.attr['onClick'] = "window.location.href='{}'; return false;".format(url)
 
@@ -720,6 +714,28 @@ class Button(Html):
         return '{{ {} }}'.format(','.join(
             ("{}:{}" if key == 'callback' else "{}:'{}'").format(key, value)
             for key, value in self.dialog_options.items()))
+
+
+class Html(HtmlTagWrapper):
+    """Renders html in a tag when set"""
+
+    template_name = 'trionyx/components/html.html'
+    tag = ''
+
+    def __init__(self, html=None, **kwargs):
+        """Init Html"""
+        super().__init__(**kwargs)
+        self.html = html
+
+
+class Img(Html):
+    """Img tag"""
+
+    tag = 'img'
+    valid_attr = ['src', 'width', 'class']
+    attr = {
+        'width': '100%',
+    }
 
 
 # =============================================================================
@@ -822,6 +838,105 @@ class Column12(Column):
 # =============================================================================
 # Bootstrap elements
 # =============================================================================
+class Badge(Html):
+    """Bootstrap badge"""
+
+    tag = 'span'
+    valid_attr = ['class']
+    color_class = 'badge bg-{color}'
+
+    def __init__(self, field=None, html=None, **kwargs):
+        """Init badge"""
+        self.field = field
+        super().__init__(html, **kwargs)
+
+    def updated(self):
+        """Set HTML with rendered field"""
+        from trionyx.renderer import renderer
+        self.html = renderer.render_field(self.object, self.field) if self.field else self.html
+
+
+class Alert(Html):
+    """Bootstrap alert"""
+
+    INFO = 'info'
+    SUCCESS = 'success'
+    WARNING = 'warning'
+    DANGER = 'danger'
+
+    tag = 'div'
+    color_class = 'alert alert-{color}'
+
+    def __init__(self, html, alert='success', no_margin=False, **options):
+        """Init alert"""
+        options.pop('color', None)
+        super().__init__(html, color=alert, **options)
+        if no_margin:
+            self.attr['class'] += ' no-margin'
+
+
+class ButtonGroup(HtmlTagWrapper):
+    """Bootstrap button group"""
+
+    valid_attr = ['class']
+
+    attr = {
+        'class': 'btn-group'
+    }
+
+
+class Button(OnclickTag):
+    """Bootstrap button"""
+
+    tag = 'button'
+    valid_attr = ['onClick', 'class']
+    color_class = 'btn btn-flat bg-{color}'
+
+    def __init__(self, label, **options):
+        """Init button"""
+        super().__init__(Html(label), **options)
+
+
+class Thumbnail(OnclickTag):
+    """Bootstrap Thumbnail"""
+
+    tag = 'a'
+
+    attr = {
+        'href': '#',
+        'class': 'thumbnail'
+    }
+
+    def __init__(self, src, **options):
+        """Init thumbnail"""
+        super().__init__(Img(src=src), **options)
+
+
+class Input(Html):
+    """Input tag"""
+
+    template_name = 'trionyx/components/input.html'
+
+    valid_attr = ['name', 'value', 'type', 'placeholder', 'class']
+    attr = {
+        'type': 'text',
+        'class': 'form-control',
+    }
+
+    def __init__(self, form_field=None, has_error=False, **kwargs):
+        """Init input"""
+        super().__init__(None, **kwargs)
+        self.has_error = has_error
+
+        if form_field:
+            self.attr['name'] = form_field.name
+            self.attr['value'] = form_field.value()
+            self.has_error = form_field.errors
+
+        if 'value' in self.attr and self.attr['value'] is None:
+            self.attr['value'] = ''
+
+
 class Panel(Component):
     """
     Bootstrap panel available options

@@ -6,6 +6,7 @@ trionyx.config
 :license: GPLv3
 """
 import inspect
+import contextlib
 from functools import reduce
 from typing import Optional, Generator, Union, List, Type, Dict, Any, TYPE_CHECKING
 
@@ -13,6 +14,9 @@ from django.apps import apps, AppConfig
 from django.urls import reverse
 from django.conf import settings
 from django.db.models import Field, Model
+from django.core.cache import cache
+from trionyx.utils import CacheLock
+from trionyx.signals import can_view, can_add, can_change, can_delete
 
 if TYPE_CHECKING:
     from trionyx.trionyx.models import User  # noqa F401
@@ -20,6 +24,66 @@ if TYPE_CHECKING:
 TX_MODEL_CONFIGS = settings.TX_CORE_MODEL_CONFIGS
 TX_MODEL_CONFIGS.update(settings.TX_MODEL_CONFIGS)
 TX_MODEL_OVERWRITES: Dict[str, str] = {key.lower(): value.lower() for key, value in settings.TX_MODEL_OVERWRITES.items()}
+
+
+class AppSettings():
+    """Simple helper for app settings"""
+
+    def __init__(self, prefix, app_settings):
+        """Init settings"""
+        for key, value in app_settings.items():
+            setattr(self, key.upper(), getattr(
+                settings, f'{prefix}_{key}'.upper(), value
+            ))
+
+
+class Variables:
+    """Get and set system wide persistent variables like counters"""
+
+    cache_key = 'trionyx-variables'
+
+    def get(self, code, default=None):
+        """Get value for given variable code"""
+        from trionyx.trionyx import LOCAL_DATA
+        from trionyx.trionyx.models import SystemVariable
+        variables = getattr(LOCAL_DATA, 'trionyx_variables', None)
+
+        if variables is None:
+            variables = cache.get(self.cache_key)
+
+        if variables is None:
+            variables = {
+                variable.code: variable.value for variable in SystemVariable.objects.all()
+            }
+            cache.set(self.cache_key, variables, timeout=60 * 60 * 24)
+
+        setattr(LOCAL_DATA, 'trionyx_variables', variables)
+
+        return variables.get(code, default)
+
+    def set(self, code, value):
+        """Set new value for given variable code"""
+        from trionyx.trionyx import LOCAL_DATA
+        from trionyx.trionyx.models import SystemVariable
+        with CacheLock('variables-set', code):
+            SystemVariable.objects.update_or_create(code=code, defaults={
+                'value': value,
+            })
+
+        setattr(LOCAL_DATA, 'trionyx_variables', None)
+        cache.delete(self.cache_key)
+
+    @contextlib.contextmanager
+    def get_increment(self, code, start=0, increment=1):
+        """
+        Context with next increment value, variable is locked till context is closed.
+
+        New increment value is only saved after successfully cosing context.
+        """
+        with CacheLock('variables-increment', code):
+            value = self.get(code, default=start) + increment
+            yield value
+            self.set(code, value)
 
 
 class ModelConfig:
@@ -127,7 +191,7 @@ class ModelConfig:
         - model_name: Class name of model
     """
 
-    view_header_buttons: Optional[List[str]] = None
+    header_buttons: Optional[List[dict]] = None
     """
     List with button configurations to be displayed in view header bar
 
@@ -138,11 +202,26 @@ class ModelConfig:
                 'label': 'Send email', # string or function
                 'url': lambda obj : reverse('blog.post', kwargs={'pk': obj.id}), # string or function
                 'type': 'default',
-                'show': lambda obj, alias : True, # Function that gives True or False if button must be displayed
-                'modal': True,
+                'show': lambda obj, context: context.get('page') == 'view', # Function that gives True or False if button must be displayed
+                'dialog': True,
+                'dialog_options': \"\"\"function(data, dialog){
+                    // Example that will close dialog on success
+                    if (data.success) {
+                        dialog.close();
+                    }
+                }\"\"\"
             }
          ]
     """
+
+    display_add_button: bool = True
+    """Display add button for this model"""
+
+    display_change_button: bool = True
+    """Display change button for this model"""
+
+    display_delete_button: bool = True
+    """Display delete button for this model"""
 
     disable_add: bool = False
     """Disable add for this model"""
@@ -218,6 +297,56 @@ class ModelConfig:
         """Check if config is set"""
         return name in self.__changed
 
+    def has_permission(self, action, obj=None, user=None):
+        """Check if action can be performed on object"""
+        assert action in ['view', 'add', 'change', 'delete']
+
+        mapping = {
+            'view': {
+                'disabled': False,
+                'signal': can_view,
+            },
+            'add': {
+                'disabled': self.disable_add,
+                'signal': can_add,
+            },
+            'change': {
+                'disabled': self.disable_change,
+                'signal': can_change,
+            },
+            'delete': {
+                'disabled': self.disable_delete,
+                'signal': can_delete,
+            }
+        }
+
+        # First check if its disabled in config
+        if mapping[action]['disabled']:
+            return False
+
+        has_permission = True
+
+        # If user is set check Django permissions
+        if user:
+            has_permission = has_permission and user.has_perm('{app_label}.{action}_{model_name}'.format(
+                app_label=self.app_label,
+                action=action,
+                model_name=self.model_name,
+            ).lower())
+
+        # If obj, check if any signal response has permission
+        if obj and not user.is_superuser:
+            assert isinstance(obj, self.model)
+
+            responses = mapping[action]['signal'].send(
+                self.model,
+                instance=obj
+            )
+
+            has_permission = has_permission and all([resp for recv, resp in responses])
+
+        return has_permission
+
     def get_field(self, field_name):
         """Get model field by name"""
         return self.model._meta.get_field(field_name)
@@ -244,11 +373,11 @@ class ModelConfig:
 
     def get_absolute_url(self, model: Model) -> str:
         """Get model url"""
-        return reverse('trionyx:model-view', kwargs={
+        return getattr(model, 'get_absolute_url', lambda: reverse('trionyx:model-view', kwargs={
             'app': model._meta.app_label,
             'model': model._meta.model_name,
             'pk': model.pk
-        })
+        }))()
 
     def get_list_fields(self) -> List[dict]:
         """Get all list fields"""
@@ -326,6 +455,55 @@ class ModelConfig:
         elif isinstance(field, (models.ForeignKey, models.OneToOneField)):
             return 'related'
         return '__unknown__'
+
+    def get_header_buttons(self, obj=None, context=None):
+        """Get header buttons for given page and object"""
+        from django.urls.exceptions import NoReverseMatch
+
+        context = context if context else {}
+        header_buttons = self.header_buttons if self.header_buttons else []
+
+        def url_reverse(url):
+            kwargs_list = [
+                {
+                    'app': self.app_label,
+                    'model': self.model_name,
+                    'pk': obj.id if obj else None
+                },
+                {
+                    'app': self.app_label,
+                    'model': self.model_name,
+                },
+                {
+                    'pk': obj.id if obj else None
+                },
+                {}
+            ]
+
+            for kwargs in kwargs_list:
+                try:
+                    return reverse(url, kwargs=kwargs)
+                except NoReverseMatch:
+                    pass
+
+            raise NoReverseMatch('Could not find match for {}'.format(url))
+
+        for button in header_buttons:
+            if 'show' in button and not button['show'](obj, context):
+                continue
+
+            button_type = button.get('type', 'bg-theme')
+            dialog_options = button.get('dialog_options', {})
+            yield {
+                'label': button['label'](obj, context) if callable(button['label']) else button['label'],
+                'type': button_type(obj, context) if callable(button_type) else button_type,
+                'url': button['url'](obj, context) if callable(button['url']) else url_reverse(button['url']),
+                'dialog': button.get('dialog', True),
+                'dialog_options': '{{ {} }}'.format(','.join(
+                    ("{}:{}" if key == 'callback' else "{}:'{}'").format(key, value)
+                    for key, value in dialog_options.items())
+                )
+            }
 
 
 class Models:
@@ -410,3 +588,4 @@ class Models:
 
 
 models_config = Models()
+variables = Variables()

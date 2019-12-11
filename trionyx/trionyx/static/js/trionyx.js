@@ -453,3 +453,146 @@ function TrionyxDialog(url, options) {
         });
     }
 };
+
+/* Sidebar */
+function openSidebar(url) {
+    var $sidebar = $('#trionyx-control-sidebar');
+
+    $.get(url, function(response){
+        if (response.status !== 'success') {
+            alert('Sidebar error');
+            return;
+        }
+
+        var data = response.data;
+
+        var theme = 'theme' in data ? data.theme : 'light';
+        if (theme === 'light') {
+            $sidebar.removeClass('control-sidebar-dark').addClass('control-sidebar-light');
+        } else {
+            $sidebar.removeClass('control-sidebar-light').addClass('control-sidebar-dark');
+        }
+
+        // Set actions
+        var actions = 'actions' in data ? data.actions : [];
+        var $actionsUl = $('#trionyx-sidebar-controls .dropdown-menu');
+        $actionsUl.html('');
+        $.each(actions, function (index, action) {
+           var button = $("<a href='#'>" + action.label + "</a>");
+           if ('class' in action) {
+               button.addClass(action.class);
+           }
+           button.on('click', function () {
+               if (action.dialog) {
+                   var options = action.dialog_options;
+                   if (action.reload) {
+                       options.callback = function (data, dialog) {
+                           if (data.success) {
+                               openSidebar(url);
+                               dialog.close();
+                           }
+                       }
+                   }
+                   openDialog(action.url, options);
+               } else {
+                   window.location.href = action.url;
+               }
+           });
+
+           if ('divider' in action && action.divider) {
+               $actionsUl.append($('<li class="divider"></li>'));
+           }
+
+           $actionsUl.append(
+               $('<li></li>').append(button)
+           );
+        });
+
+        if (actions.length > 0) {
+            $('#trionyx-sidebar-controls .btn-group').removeClass('hide');
+        } else {
+            $('#trionyx-sidebar-controls .btn-group').addClass('hide');
+        }
+
+
+        // Set content
+        $('#trionyx-sidebar-title').html('title' in data ? data.title : '');
+        $('#trionyx-sidebar-top-content').html('fixed_content' in data ? data.fixed_content : '');
+        $('#trionyx-sidebar-content').html('content' in data ? data.content : '');
+
+        // fix content top margin
+        var height = $('#trionyx-sidebar-top').height();
+        $('#trionyx-sidebar-content').css('margin-top', height + 'px');
+        $sidebar.css('padding-bottom', height  + 'px');
+
+        if ('hover' in data && data.hover) {
+            $sidebar.addClass('control-sidebar-open');
+        } else {
+            $('body').addClass('control-sidebar-open');
+        }
+
+        // Store active sidebar
+        var activeSidebars = localStorage.getItem('trionyxActiveSidebar');
+        activeSidebars = activeSidebars ? JSON.parse(activeSidebars) : {};
+        activeSidebars[window.location.pathname] = url;
+        localStorage.setItem("trionyxActiveSidebar", JSON.stringify(activeSidebars));
+    });
+}
+
+function addActiveSidebar(path, url) {
+    // Activate sidebar on other page before you go to that page
+    var activeSidebars = localStorage.getItem('trionyxActiveSidebar');
+    activeSidebars = activeSidebars ? JSON.parse(activeSidebars) : {};
+    activeSidebars[path] = url;
+    localStorage.setItem("trionyxActiveSidebar", JSON.stringify(activeSidebars));
+}
+
+function reloadSidebar(){
+    var activeSidebars = localStorage.getItem('trionyxActiveSidebar');
+    activeSidebars = activeSidebars ? JSON.parse(activeSidebars) : {};
+
+    if (window.location.pathname in activeSidebars) {
+       openSidebar(activeSidebars[window.location.pathname]);
+   }
+}
+
+function closeSidebar() {
+    $('#trionyx-sidebar-content').html('');
+    $('#trionyx-control-sidebar').removeClass('control-sidebar-open');
+    $('body').removeClass('control-sidebar-open');
+
+    // Remove sidebar from active sidebars
+    var activeSidebars = localStorage.getItem('trionyxActiveSidebar');
+    activeSidebars = activeSidebars ? JSON.parse(activeSidebars) : {};
+    delete activeSidebars[window.location.pathname];
+    localStorage.setItem("trionyxActiveSidebar", JSON.stringify(activeSidebars));
+}
+
+$(function(){
+   reloadSidebar();
+});
+
+/* layout */
+function txUpdateLayout(id, component) {
+    if (id in window.trionyx_layouts) {
+        var url = window.trionyx_layouts[id] + '?layout_id=' + id;
+        if (typeof component !== 'undefined' && component) {
+            url += '&component=' + component;
+        }
+
+        $.get(url, function(response) {
+            if (response.status === 'success') {
+                var htmlId = '#' + id;
+                if (typeof component !== 'undefined' && component) {
+                    htmlId += ' #component-' + component;
+                    var tempDiv = $('<div></div>').html(response.data);
+                    $(htmlId).html($(tempDiv).find('#component-' + component).html());
+                } else {
+                    $(htmlId).html(response.data);
+                }
+
+                trionyxInitialize();
+            }
+        });
+    }
+}

@@ -52,7 +52,14 @@ class ModelForm(DjangoModelForm):  # type: ignore
                         fk_name: self.instance
                     }
 
-                self.__inline_forms[key] = options['form'](self.data if self.data else None, **kwargs)
+                if 'queryset' in options:
+                    self.__inline_forms[key] = options['form'](
+                        self.data if self.data else None,
+                        queryset=options['queryset'],
+                        **kwargs
+                    )
+                else:
+                    self.__inline_forms[key] = options['form'](self.data if self.data else None, **kwargs)
 
         return self.__inline_forms
 
@@ -74,6 +81,7 @@ class ModelForm(DjangoModelForm):  # type: ignore
             obj = super().save(commit)
 
             for key, form in self.get_inline_forms().items():
+                form.is_valid()  # Make sure cleaned_data is filled
                 fk_name = self.inline_forms[key].get('fk_name', 'instance')
                 if fk_name == 'instance':
                     logger.debug('Save inline form {} as FormSet, commit: {}'.format(key, commit))

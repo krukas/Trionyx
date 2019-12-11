@@ -304,7 +304,7 @@ body {
     border-bottom: 1px solid #ddd;
     right: 0;
     left: 230px;
-    transition: left .3s ease-in-out;
+    transition: all .3s ease-in-out;
 }
 
 .detail-tab-view-tabs ul.nav {
@@ -635,6 +635,84 @@ ul.pagination a {
     margin: 0;
 }
 
+/* Sidebar */
+
+.control-sidebar-open .content-wrapper {
+    margin-right: 350px;
+}
+.control-sidebar-open .content-header-affix {
+    right: 350px;
+}
+
+.control-sidebar,
+.control-sidebar-bg {
+    width: 350px;
+    right: -350px;
+}
+
+.fixed .control-sidebar {
+    overflow-y: hidden;
+}
+
+#trionyx-sidebar-content {
+    height: 100%;
+    overflow-y: auto;
+    padding: 10px;
+    padding-bottom: 20px;
+}
+
+#trionyx-sidebar-top {
+    position: absolute;
+    background: #f9fafc;
+    z-index: 1020;
+    right: 0;
+    left: 0;
+    box-shadow: 0 4px 6px -6px rgba(24,28,33,.4);
+}
+
+.control-sidebar-dark #trionyx-sidebar-top {
+    background: #222d32;
+    box-shadow: 0 4px 6px -6px rgba(24,28,33, 1);
+}
+
+#trionyx-sidebar-controls {
+    padding: 10px;
+}
+
+#trionyx-sidebar-title {
+    font-size: 16px;
+    font-weight: bold;
+}
+
+/* Success */
+.dropdown-menu > li > a.text-success {
+    color: #3c763d;
+}
+.dropdown-menu > li > a.text-success:hover {
+    color: #2b542c;
+}
+/* info */
+.dropdown-menu > li > a.text-info {
+    color: #31708f;
+}
+.dropdown-menu > li > a.text-info:hover {
+    color: #245269;
+}
+/* Warning */
+.dropdown-menu > li > a.text-warning {
+    color: #8a6d3b;
+}
+.dropdown-menu > li > a.text-warning:hover {
+    color: #66512c;
+}
+/* Danger */
+.dropdown-menu > li > a.text-danger {
+    color: #a94442;
+}
+.dropdown-menu > li > a.text-danger:hover {
+    color: #843534;
+}
+
 /* DragTable */
 /*****************************************************************************/
 /* https://github.com/jebaird/dragtable/blob/master/src/css/dragtable-default.css */
@@ -686,8 +764,16 @@ th:hover .dragtable-drag-handle {
     border: none;
 }
 
+.inline-form-table th {
+    border-bottom: 1px solid #d2d6de !important;
+}
+
 .inline-form-table .form-group {
     margin: 0;
+}
+
+.inline-form-table .select2 {
+    min-width: 100% !important;
 }
 
 .inline-form-table .checkbox input[type="checkbox"] {

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 from setuptools import setup
 from setuptools import find_packages
 from trionyx import __version__
@@ -51,11 +52,11 @@ setup(
             'coverage',
             'flake8',
             'pydocstyle',
-            'mypy',
-            'django-stubs >= 1.2.0, < 1.3.0',
+            'mypy==0.750',
+            'django-stubs >= 1.3.0, < 1.4.0',
             'ipython',
             'Sphinx',
             'sphinx_rtd_theme',
         ]
-    }
+    },
 )

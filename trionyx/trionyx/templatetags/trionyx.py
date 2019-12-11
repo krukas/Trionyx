@@ -13,6 +13,8 @@ from django.core.serializers import serialize
 from django.db.models.query import QuerySet
 from django.utils.safestring import mark_safe
 
+from trionyx.renderer import price_value_renderer
+
 register = template.Library()
 
 
@@ -49,3 +51,9 @@ def model_url(model, view_name, code=None):
 def is_date(value):
     """Check if value is date object"""
     return isinstance(value, date)
+
+
+@register.filter
+def price(value):
+    """Render value in current locale with configured currency"""
+    return mark_safe(price_value_renderer(value))

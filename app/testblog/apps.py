@@ -16,13 +16,13 @@ class BlogConfig(BaseConfig):
         search_description = '{publish_date} {title} {price}'
         list_default_fields = ['id', 'publish_date', 'title']
 
-        view_header_buttons = [
+        header_buttons = [
             {
                 'label': 'Publish',  # string or function
                 'url': 'trionyx:model-dialog-edit',  # string or function
                 'type': 'bg-theme', # string or function
-                'show': lambda obj, alias: True,  # Function that gives True or False if button must be displayed
-                'modal': True,
+                'show': lambda obj, context: context.get('page') == 'view' and context.get('tab') == 'general',  # Function that gives True or False if button must be displayed
+                'dialog': True,
             }
         ]
 

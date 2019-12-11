@@ -25,7 +25,7 @@ logger = logging.getLogger(__name__)
 class CacheLock:
     """CacheLock uses the django cache to give a lock for given keys"""
 
-    def __init__(self, *keys: List[Any], timeout: Optional[int] = None):
+    def __init__(self, *keys: Any, timeout: Optional[int] = None):
         """Init CacheLock"""
         self.keys = keys
         self.timeout = timeout

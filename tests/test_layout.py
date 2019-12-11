@@ -35,16 +35,16 @@ class ModelsTest(TestCase):
     def test_remove_component(self):
         self.layout.delete_component(path='row.column6.panel')
         self.layout.delete_component(id='right-panel')
-        self.assertHTMLEqual(self.layout.render(), """
+        self.assertInHTML("""
         <div class="row">
             <div class="col-md-6"></div>
             <div class="col-md-6"></div>
         </div>
-        """)
+        """, self.layout.render())
 
     def test_remove_top_component(self):
         self.layout.delete_component(path='row')
-        self.assertHTMLEqual(self.layout.render(), "")
+        self.assertInHTML("""<div id="{}"></div>""".format(self.layout.id), self.layout.render())
 
     def test_remove_invalid_component(self):
         with self.assertRaises(Exception):
@@ -58,10 +58,10 @@ class ModelsTest(TestCase):
         self.layout.add_component(l.Img(), path='row.column6[1].panel', append=True)
         self.layout.add_component(l.Img(), id='left-panel', append=True)
 
-        self.assertHTMLEqual(self.layout.render(), """
+        self.assertInHTML("""
         <div class="row">
             <div class="col-md-6">
-                <div>
+                <div id="component-left-panel">
                     <div class="panel panel-default">
                         <div class="panel-heading">Left panel</div>
                         <div class="panel-collapse">
@@ -71,7 +71,7 @@ class ModelsTest(TestCase):
                 </div>
             </div>
             <div class="col-md-6">
-                <div>
+                <div id="component-right-panel">
                     <div class="panel panel-default">
                         <div class="panel-heading">Right panel</div>
                         <div class="panel-collapse">
@@ -81,7 +81,7 @@ class ModelsTest(TestCase):
                 </div>
             </div>
         </div>
-        """)
+        """, self.layout.render())
 
     def test_input(self):
         self.assertHTMLEqual(l.Input(name='test').render({}), """
