@@ -382,8 +382,8 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
             'edit_url': self.get_edit_url(),
             'delete_url': self.get_delete_url(),
             'title': self.title,
-            'change_permission': self.get_model_config().has_permission('change', self.get_object(), user=self.request.user),
-            'delete_permission': self.get_model_config().has_permission('delete', self.get_object(), user=self.request.user),
+            'change_permission': self.get_model_config().has_permission('change', self.object, user=self.request.user),
+            'delete_permission': self.get_model_config().has_permission('delete', self.object, user=self.request.user),
         })
         return context
 
@@ -444,7 +444,6 @@ class DetailTabJsendView(ModelPermissionMixin, JsendView, ModelClassMixin):
     def handle_request(self, request, app, model, pk):
         """Render and return tab"""
         from trionyx.views import tabs
-        object = self.get_object()
 
         tab_code = request.GET.get('tab')
         model_alias = request.GET.get('model_alias')
@@ -452,23 +451,25 @@ class DetailTabJsendView(ModelPermissionMixin, JsendView, ModelClassMixin):
 
         # TODO permission check
 
-        item = tabs.get_tab(model_alias, object, tab_code)
+        item = tabs.get_tab(model_alias, self.get_object(), tab_code)
 
         return {
             'header_buttons': render_to_string('trionyx/base/model_header_buttons.html', {
-                'header_buttons': self.get_model_config().get_header_buttons(object, {
+                'header_buttons': self.get_model_config().get_header_buttons(self.get_object(), {
                     'page': 'view',
                     'model_alias': model_alias,
                     'tab': tab_code,
                 }),
             }, request=request),
-            'content': item.get_layout(object).render(request),
+            'content': item.get_layout(self.get_object()).render(request),
         }
 
     def get_object(self):
         """Get object"""
-        ModelClass = self.get_model_class()
-        return ModelClass.objects.get(id=self.kwargs.get('pk'))
+        if not hasattr(self, 'object'):
+            ModelClass = self.get_model_class()
+            self.object = ModelClass.objects.get(id=self.kwargs.get('pk'))
+        return self.object
 
 
 class LayoutView(DetailTabView):
@@ -553,14 +554,15 @@ class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
 
     def get_form(self, form_class=None):
         """Get form for model"""
-        form = super().get_form(form_class)
+        if not hasattr(self, 'form'):
+            self.form = super().get_form(form_class)
 
-        if not getattr(form, 'helper', None):
-            form.helper = FormHelper(form)
-            form.helper.form_tag = False
+        if not getattr(self.form, 'helper', None):
+            self.form.helper = FormHelper(self.form)
+            self.form.helper.form_tag = False
         else:
-            form.helper.form_tag = False
-        return form
+            self.form.helper.form_tag = False
+        return self.form
 
     def get_context_data(self, **kwargs):
         """Add context data to view"""
@@ -633,14 +635,15 @@ class CreateView(ModelPermissionMixin, DjangoCreateView, ModelClassMixin):
 
     def get_form(self, form_class=None):
         """Get form for model"""
-        form = super().get_form(form_class)
+        if not hasattr(self, 'form'):
+            self.form = super().get_form(form_class)
 
-        if not getattr(form, 'helper', None):
-            form.helper = FormHelper(form)
-            form.helper.form_tag = False
+        if not getattr(self.form, 'helper', None):
+            self.form.helper = FormHelper(self.form)
+            self.form.helper.form_tag = False
         else:
-            form.helper.form_tag = False
-        return form
+            self.form.helper.form_tag = False
+        return self.form
 
     def get_cancel_url(self):
         """Get cancel url"""

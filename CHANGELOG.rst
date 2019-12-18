@@ -1,3 +1,14 @@
+[DEVELOP]
+---------
+Changed
+~~~~~~~
+- Small improvements to prevent double SQL calls
+
+Fixed
+~~~~~
+- Ansible role name is not found
+
+
 [2.0.0] - 11-12-2019
 --------------------
 

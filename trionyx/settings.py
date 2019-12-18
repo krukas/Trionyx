@@ -127,7 +127,7 @@ DATABASES = get_env_var('DATABASES', {
 })
 
 # ==============================================================================
-# Database
+# Email
 # ==============================================================================
 EMAIL_BACKEND = get_env_var('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = get_env_var('EMAIL_HOST', 'localhost')
