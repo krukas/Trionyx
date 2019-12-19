@@ -1,5 +1,9 @@
 [DEVELOP]
 ---------
+Added
+~~~~~
+- Add helper function for setting the Watson search language
+
 Changed
 ~~~~~~~
 - Small improvements to prevent double SQL calls

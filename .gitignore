@@ -18,3 +18,4 @@ htmlcov/
 development.sqlite3
 .idea
 celerybeat-schedule
+environment.json

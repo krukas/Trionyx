@@ -1,5 +1,0 @@
-{
-  "DEBUG": true,
-  "SECRET_KEY": "Not secure key",
-  "ALLOWED_HOSTS": ["localhost", "127.0.0.1"]
-}

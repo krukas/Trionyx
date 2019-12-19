@@ -38,14 +38,16 @@ DEBUG = True
 COMPRESS_ENABLED = False
 
 # Database
-DATABASES = {
+DATABASES = get_env_var('DATABASES', {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': os.path.join(BASE_DIR, 'development.sqlite3'),
     }
-}
+})
 
 ALLOWED_HOSTS = []
+
+WATSON_POSTGRES_SEARCH_CONFIG = get_watson_search_config(LANGUAGE_CODE)
 
 # Celery beat schedule
 from trionyx.utils import create_celerybeat_schedule
