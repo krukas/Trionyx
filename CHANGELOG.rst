@@ -12,6 +12,7 @@ Changed
 Fixed
 ~~~~~
 - Ansible role name is not found
+- JsonField does not work in combination with jsonfield module
 
 
 [2.0.0] - 11-12-2019
