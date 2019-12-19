@@ -105,8 +105,8 @@ class ModelsTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(lines[0].strip(), 'id,email')
-        self.assertEqual(lines[1].strip(), '2,test@test.com')
-        self.assertEqual(lines[2].strip(), '1,info@trionyx.com')
+        self.assertEqual(lines[1].strip(), '{},test@test.com'.format(self.test_user.id))
+        self.assertEqual(lines[2].strip(), '{},info@trionyx.com'.format(self.user.id))
 
     def test_listchoices(self):
         response = self.client.get('/model/trionyx/user/choices/', {
