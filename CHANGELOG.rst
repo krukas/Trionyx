@@ -7,6 +7,7 @@ Added
 Changed
 ~~~~~~~
 - Small improvements to prevent double SQL calls
+- #39 Make python version configurable for Makefile
 
 Fixed
 ~~~~~
