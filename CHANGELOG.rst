@@ -1,5 +1,5 @@
-[DEVELOP]
----------
+[2.0.1] - 19-12-2019
+--------------------
 Added
 ~~~~~
 - Add helper function for setting the Watson search language
