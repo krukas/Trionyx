@@ -1,3 +1,20 @@
+[2.0.1] - 19-12-2019
+--------------------
+Added
+~~~~~
+- Add helper function for setting the Watson search language
+
+Changed
+~~~~~~~
+- Small improvements to prevent double SQL calls
+- #39 Make python version configurable for Makefile
+
+Fixed
+~~~~~
+- Ansible role name is not found
+- JsonField does not work in combination with jsonfield module
+
+
 [2.0.0] - 11-12-2019
 --------------------
 

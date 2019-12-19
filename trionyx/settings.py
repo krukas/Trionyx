@@ -46,6 +46,31 @@ def get_env_var(setting: str, default: Optional[Any] = None, configs: Dict[str, 
         raise ImproperlyConfigured("ImproperlyConfigured: Set {} environment variable".format(setting))
 
 
+def get_watson_search_config(language):
+    """
+    Get watson language config, default to pg_catalog.english for not supported language
+
+    List of supported languages can be found on https://github.com/etianen/django-watson/wiki/Language-support#language-support
+    """
+    return {
+        'da': 'pg_catalog.danish',
+        'nl': 'pg_catalog.dutch',
+        'en': 'pg_catalog.english',
+        'fi': 'pg_catalog.finnish',
+        'fr': 'pg_catalog.french',
+        'de': 'pg_catalog.german',
+        'hu': 'pg_catalog.hungarian',
+        'it': 'pg_catalog.italian',
+        'no': 'pg_catalog.norwegian',
+        'pt': 'pg_catalog.portuguese',
+        'ro': 'pg_catalog.romanian',
+        'ru': 'pg_catalog.russian',
+        'es': 'pg_catalog.spanish',
+        'sv': 'pg_catalog.swedish',
+        'tr': 'pg_catalog.turkish',
+    }.get(language.lower()[:2], 'pg_catalog.english')
+
+
 DEBUG = get_env_var('DEBUG', False)
 ALLOWED_HOSTS = get_env_var('ALLOWED_HOSTS', [])
 SECRET_KEY = get_env_var('SECRET_KEY')
@@ -127,7 +152,7 @@ DATABASES = get_env_var('DATABASES', {
 })
 
 # ==============================================================================
-# Database
+# Email
 # ==============================================================================
 EMAIL_BACKEND = get_env_var('EMAIL_BACKEND', 'django.core.mail.backends.smtp.EmailBackend')
 EMAIL_HOST = get_env_var('EMAIL_HOST', 'localhost')

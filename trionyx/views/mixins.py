@@ -53,11 +53,17 @@ class ModelPermissionMixin:
 
     permission_type: Optional[str] = None
 
+    def get_object(self, *args, **kwargs):
+        """Override to prevent multiple lookups"""
+        if not getattr(self, 'object', False) and hasattr(super(), 'get_object'):
+            self.object = getattr(super(), 'get_object', lambda *args, **kwargs: None)(*args, **kwargs)
+        return getattr(self, 'object', None)
+
     def dispatch(self, request: HttpRequest, *args, **kwargs):
         """Validate if user can use view"""
         if self.permission_type in ['view', 'add', 'change', 'delete'] and hasattr(self, 'get_model_config'):
             try:
-                obj = self.get_object() if hasattr(self, 'get_object') else None  # type: ignore
+                obj = self.get_object()
             except AttributeError:
                 obj = None
             if not self.get_model_config().has_permission(self.permission_type, obj, request.user):  # type: ignore

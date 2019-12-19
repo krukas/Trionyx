@@ -13,6 +13,7 @@ jobs:
         environment:
           CI_ENV: true
           PYTHON_VERSION: python3.6
+          TRIONYX_CONFIG: ci-environment.json
       - image: circleci/redis:5.0.3
     steps:
       - checkout
@@ -47,6 +48,7 @@ jobs:
         environment:
           CI_ENV: true
           PYTHON_VERSION: python3.7
+          TRIONYX_CONFIG: ci-environment.json
   python3.8:
     <<: *test-template
     docker:
@@ -54,3 +56,4 @@ jobs:
         environment:
           CI_ENV: true
           PYTHON_VERSION: python3.8
+          TRIONYX_CONFIG: ci-environment.json
