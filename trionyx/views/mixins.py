@@ -53,10 +53,10 @@ class ModelPermissionMixin:
 
     permission_type: Optional[str] = None
 
-    def get_object(self):
+    def get_object(self, *args, **kwargs):
         """Override to prevent multiple lookups"""
         if not getattr(self, 'object', False) and hasattr(super(), 'get_object'):
-            self.object = getattr(super(), 'get_object', lambda: None)()
+            self.object = getattr(super(), 'get_object', lambda *args, **kwargs: None)(*args, **kwargs)
         return getattr(self, 'object', None)
 
     def dispatch(self, request: HttpRequest, *args, **kwargs):
