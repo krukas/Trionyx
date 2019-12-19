@@ -22,8 +22,6 @@ from trionyx.config import models_config
 from trionyx import utils
 
 
-
-
 TX_MODEL_OVERWRITES = {key.lower(): value.lower() for key, value in settings.TX_MODEL_OVERWRITES.items()}
 
 
