@@ -96,8 +96,16 @@ def post_overview(obj):
                             },
                         )
                     },
+                    {
+                        'label': 'ProgressBar',
+                        'value': Component(
+                            ProgressBar(value=543, max_value=2400),
+                            ProgressBar(value=20, size='xs'),
+                            ProgressBar(value=78, active=True, color=Colors.GREEN),
+                        ),
+                    },
                     id="table-description"
-                )
+                ),
             )
         ),
         Column12(

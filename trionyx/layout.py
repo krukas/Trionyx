@@ -974,6 +974,28 @@ class DescriptionList(Component, ComponentFieldsMixin):
         self.fields = fields
 
 
+class ProgressBar(Component):
+    """Bootstrap progressbar, fields are the params"""
+
+    template_name = 'trionyx/components/progressbar.html'
+
+    def __init__(self, field='', value=0, max_value=100, size='md', striped=False, active=False, **options):
+        """Init progressbar"""
+        super().__init__(**options)
+        self.field = field
+        self.max_value = max_value
+        self.value = value
+        self.color = options.get('color', 'theme')
+        self.striped = striped or active
+        self.size = size
+        self.active = active
+        self.show_text = size not in ['sm', 'xs', 'xxs']
+
+    def updated(self):
+        """Set HTML with rendered field"""
+        self.value = round((getattr(self.object, self.field, self.value) / self.max_value) * 100)
+
+
 class TableDescription(Component, ComponentFieldsMixin):
     """Bootstrap table description, fields are the params"""
 

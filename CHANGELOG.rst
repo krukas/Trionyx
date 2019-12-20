@@ -3,6 +3,7 @@
 Added
 ~~~~~
 - Add create_reusable_app command
+- Add ProgressBar component
 
 
 [2.0.1] - 19-12-2019
