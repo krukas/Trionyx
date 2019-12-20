@@ -19,6 +19,7 @@ Welcome to Trionyx's documentation!
    trionyx/forms
    trionyx/celery
    trionyx/widgets
+   trionyx/deploying
    trionyx/reusable-apps
    trionyx/changelog
 
