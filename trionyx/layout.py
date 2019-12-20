@@ -974,6 +974,40 @@ class DescriptionList(Component, ComponentFieldsMixin):
         self.fields = fields
 
 
+class UnorderedList(Html, ComponentFieldsMixin):
+    """Unordered list"""
+
+    tag = 'ul'
+
+    def __init__(self, *fields, objects=None, **options):
+        """Init list"""
+        super().__init__('', **options)
+        self.objects = objects
+        self.fields = fields
+
+    def updated(self):
+        """Set html with rendered fields"""
+        if self.objects:
+            values = [item[0]['value'] for item in self.get_rendered_objects()]
+        else:
+            values = [item['value'] for item in self.get_rendered_object()]
+
+        sublist_indexes = {
+            field['__index__']: field['label']
+            for field in self.get_fields() if isinstance(field.get('value'), UnorderedList)
+        }
+        self.html = ''.join('<li>{label}{value}</li>'.format(
+            label=sublist_indexes.get(index, ''),
+            value=value
+        ) for index, value in enumerate(values))
+
+
+class OrderedList(UnorderedList):
+    """Ordered list"""
+
+    tag = 'ol'
+
+
 class ProgressBar(Component):
     """Bootstrap progressbar, fields are the params"""
 
@@ -992,7 +1026,7 @@ class ProgressBar(Component):
         self.show_text = size not in ['sm', 'xs', 'xxs']
 
     def updated(self):
-        """Set HTML with rendered field"""
+        """Set value with rendered field"""
         self.value = round((getattr(self.object, self.field, self.value) / self.max_value) * 100)
 
 

@@ -104,6 +104,47 @@ def post_overview(obj):
                             ProgressBar(value=78, active=True, color=Colors.GREEN),
                         ),
                     },
+                    {
+                        'label': 'Lists',
+                        'value': UnorderedList(
+                            'title',
+                            'content',
+                            {
+                                'value': 'Fixed value'
+                            },
+                            {
+                                'label': 'Unordered sublist',
+                                'value': UnorderedList(
+                                    'status',
+                                    {
+                                        'label': 'Another unordered sublist',
+                                        'value': UnorderedList(
+                                            'price'
+                                        ),
+                                    }
+                                )
+                            },
+                            {
+                                'label': 'Ordered sublist',
+                                'value': OrderedList(
+                                    'status',
+                                    {
+                                        'label': 'Another ordered sublist',
+                                        'value': OrderedList(
+                                            'price'
+                                        ),
+                                    }
+                                )
+                            },
+                            {
+                                'label': 'tags',
+                                'value': UnorderedList(
+                                    'name',
+                                    objects='tags'
+                                ),
+                            }
+                        )
+                    },
                     id="table-description"
                 ),
             )
