@@ -1,6 +1,9 @@
 from trionyx.views import tabs, layouts, sidebars
 from trionyx.layout import *
 from trionyx.urls import model_url
+from trionyx import models
+from django.db.models.functions import TruncDay
+from trionyx.renderer import price_value_renderer
 
 from .models import Post, Tag
 
@@ -41,6 +44,45 @@ def post_overview(obj):
                         )
                     },
                 )
+            ),
+            Panel(
+                'Charts',
+                LineChart(
+                    Post.objects.order_by('-sale_date'),
+                    'sale_date',
+                    'price',
+                ),
+                LineChart(
+                    Post.objects.annotate(day=TruncDay('publish_date')).values(
+                        'day').annotate(sum_price=models.Sum('price')).values('day', 'sum_price').order_by('-day'),
+                    'day',
+                    {
+                        'label': 'Total price per day',
+                        'field': 'sum_price',
+                        'renderer': price_value_renderer,
+                    },
+                    time_unit='day',
+                ),
+                LineChart(
+                    'tags',
+                    'name',
+                    'id',
+                ),
+                BarChart(
+                    'tags',
+                    'name',
+                    'id',
+                ),
+                DoughnutChart(
+                    'tags',
+                    'name',
+                    'id',
+                ),
+                PieChart(
+                    'tags',
+                    'name',
+                    'id',
+                ),
             )
         ),
         Column6(
@@ -165,7 +207,7 @@ def post_overview(obj):
                     {
                         'label': 'Value',
                         'value': 'fixed value',
-                        'renderer': lambda value, data_object, **options: '{}'.format(data_object)
+                        'renderer': lambda value, data_object, **options: '{}'.format(data_object),
                     },
                     footer=[
                         [

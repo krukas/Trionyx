@@ -5,6 +5,7 @@ Added
 - Add create_reusable_app command
 - Add ProgressBar component
 - Add Unordered and Ordered list components
+- Add LineChart, BarChart, PieChart and DoughnutChart component
 
 
 [2.0.1] - 19-12-2019
