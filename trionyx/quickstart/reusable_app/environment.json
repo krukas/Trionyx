@@ -1,0 +1,4 @@
+{
+  "DEBUG": true,
+  "SECRET_KEY": "Not a secret"
+}

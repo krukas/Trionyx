@@ -28,6 +28,9 @@ class Quickstart:
         self.app_path = os.path.join(os.path.dirname(quickstart_path), 'app')
         """Path to app template files"""
 
+        self.reusable_app_path = os.path.join(os.path.dirname(quickstart_path), 'reusable_app')
+        """Path to reusable app template files"""
+
         self.ansible_path = os.path.join(os.path.dirname(quickstart_path), 'ansible')
         """Path to Ansible template files"""
 
@@ -75,6 +78,30 @@ class Quickstart:
             'name': name.lower(),
             'verbose_name': name.capitalize()
         })
+
+    def create_reusable_app(self, path, name):
+        """
+        Create Trionyx reusable app
+
+        :param path:
+        :param name:
+        :return:
+        """
+        shutil.copytree(self.reusable_app_path, path)
+
+        variables = {
+            'name': name.lower(),
+            'verbose_name': name.capitalize(),
+        }
+
+        self.update_file(path, '[app_name]/apps.py', variables)
+        self.update_file(path, 'app/settings.py', variables)
+        self.update_file(path, 'MANIFEST.in', variables)
+        self.update_file(path, 'README.rst', variables)
+        self.update_file(path, 'setup.py', variables)
+
+        # Rename package
+        shutil.move(os.path.join(path, '[app_name]'), os.path.join(path, name.lower()))
 
     def create_ansible(self, project_path, domain, repo):
         """Create Ansible live deploy script"""

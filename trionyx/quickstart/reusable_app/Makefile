@@ -2,7 +2,6 @@ PY_VERSION := python3
 PIP := env/bin/pip
 PY := env/bin/python
 FLAKE8 := env/bin/flake8
-MYPY := env/bin/mypy
 PYDOCSTYLE := env/bin/pydocstyle
 COVERAGE := env/bin/coverage
 
@@ -49,6 +48,18 @@ shell:
 	)
 
 
+
+lint:
+	-$(FLAKE8) trionyx_accounts
+	-$(PYDOCSTYLE) trionyx_accounts
+
+
+
+test: lint
+	$(COVERAGE) run manage.py test tests
+
+
+
 run:
 	@( \
 		. env/bin/activate; \
@@ -62,19 +73,6 @@ celery:
 		. env/bin/activate; \
 		celery worker -A app.celery -B -l info; \
 	)
-
-
-
-lint:
-	-$(FLAKE8) trionyx
-	-$(PYDOCSTYLE) trionyx
-	-$(FLAKE8) tests
-	-$(MYPY)
-
-
-
-test: lint
-	$(COVERAGE) run manage.py test tests
 
 
 
