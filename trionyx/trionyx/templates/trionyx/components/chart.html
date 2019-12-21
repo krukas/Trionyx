@@ -9,7 +9,7 @@
             scales: {{ component.chart_scales|jsonify }},
             tooltips: {
                 callbacks: {
-                    {% if component.chart_type == 'line' %}
+                    {% if component.chart_type == 'line' or component.chart_type == 'bar' %}
                         label: function (item, data) {
                             var itemData = data.datasets[item.datasetIndex].data[item.index];
 

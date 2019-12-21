@@ -69,19 +69,28 @@ def post_overview(obj):
                     'id',
                 ),
                 BarChart(
-                    'tags',
-                    'name',
-                    'id',
+                    Post.objects.annotate(day=TruncDay('publish_date')).values('day'
+                    ).annotate(
+                        sum_price=models.Sum('price'),
+                        sum_id=models.Sum('id')).values('day', 'sum_price', 'sum_id').order_by('-day'),
+                    'day',
+                    {
+                        'label': 'Total price per day',
+                        'field': 'sum_price',
+                        'renderer': price_value_renderer,
+                    },
+                    'sum_id',
+                    time_unit='day',
                 ),
                 DoughnutChart(
-                    'tags',
+                    [['Python3', 60], ['Javascript', 30], ['Sql', 10]],
                     'name',
-                    'id',
+                    'value',
                 ),
                 PieChart(
-                    'tags',
+                    [['Python3', 60], ['Javascript', 30], ['Sql', 10]],
                     'name',
-                    'id',
+                    'value',
                 ),
             )
         ),

@@ -1239,7 +1239,7 @@ class LineChart(Chart):
             ],
         }
 
-        if isinstance(self.get_value(fields[0], items[0]), datetime.date):
+        if items and isinstance(self.get_value(fields[0], items[0]), datetime.date):
             unit = 'hour' if isinstance(self.get_value(fields[0], items[0]), datetime.datetime) else 'day'
             self.chart_scales = {
                 'xAxes': [{
@@ -1253,30 +1253,10 @@ class LineChart(Chart):
             }
 
 
-class BarChart(Chart):
+class BarChart(LineChart):
     """BarChart"""
 
     chart_type = 'bar'
-
-    def updated(self):
-        """Set chart data and scales"""
-        fields = self.get_fields()
-        items = self.get_objects()
-
-        self.chart_data = {
-            'labels': [self.render_field(fields[0], item) for item in items],
-            'datasets': [{
-                'label': fields[1]['label'],
-                'data': [{
-                    'x': self.get_json_value(self.get_value(fields[0], item)),
-                    'y': self.get_json_value(self.get_value(fields[1], item)),
-                    'label': self.render_field(fields[1], item)
-                } for item in items],
-                'backgroundColor': self.get_colors(len(items), 'fill'),
-                'borderColor': self.get_colors(len(items), 'stroke'),
-                'borderWidth': 1,
-            }]
-        }
 
 
 class PieChart(Chart):
