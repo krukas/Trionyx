@@ -13,6 +13,20 @@ class ModelsTest(TestCase):
         self.test_user = User.objects.create_user(email='test@test.com', password='top_secret')
         self.client.login(email='info@trionyx.com', password='top_secret')
 
+    def test_protected_media(self):
+        response = self.client.get('/media/somefile/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get('X-Accel-Redirect'), '/protected/media/somefile/')
+
+    def test_protected_media_not_loggedin(self):
+        self.client.logout()
+        response = self.client.get('/media/somefile/')
+        self.assertEqual(response.status_code, 302)
+
+    def test_logout(self):
+        response = self.client.get('/logout/')
+        self.assertEqual(response.status_code, 302)
+
     def test_profile(self):
         response = self.client.get('/account/view/')
         self.assertContains(response, 'info@trionyx.com')
@@ -155,3 +169,20 @@ class ModelsTest(TestCase):
         })
 
         self.assertTrue(mock_call.called)
+
+    # Sidebar
+    def test_sidebar_not_exists(self):
+        response = self.client.get('/sidebar/model/trionyx/user/1/doesnotexists/')
+        self.assertContains(response, 'User matching query does not exist')
+
+    def test_sidebar(self):
+        from trionyx.views import sidebars
+
+        @sidebars.register(User, 'item')
+        def item_sidebar(request, obj):
+            return {
+                'title': 'User title',
+            }
+
+        response = self.client.get(f'/sidebar/model/trionyx/user/{self.user.id}/item/')
+        self.assertContains(response, 'User title')

@@ -68,11 +68,11 @@ class Command(BaseCommand):
 
         for skin, color in skins.items():
             for _, config in css_color_selectors.items():
-                print(',\n'.join([
+                self.stdout.write(',\n'.join([
                     *['.skin-{} {}'.format(skin, s) for s in config['selectors']],
                     *['.skin-{}-light {}'.format(skin, s) for s in config['selectors']],
                 ]))
-                print('{')
+                self.stdout.write('{')
                 for css in config['css']:
-                    print('    ' + css.format(color=color))
-                print('}\n')
+                    self.stdout.write('    ' + css.format(color=color))
+                self.stdout.write('}\n\n')

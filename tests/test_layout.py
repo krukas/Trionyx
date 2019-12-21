@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.test import TestCase
 from trionyx import layout as l  # noqa E741
 
@@ -161,3 +163,33 @@ class ModelsTest(TestCase):
             </tfooter>
         </table>
         """)
+
+    def test_line_chart(self):
+        chart = l.LineChart(
+            [
+                [datetime.fromtimestamp(1576951711), 1],
+                [datetime.fromtimestamp(1576941711), 2],
+                [datetime.fromtimestamp(1576931711), 3]
+            ],
+            'x',
+            'y'
+        )
+        chart.set_object({})
+
+        self.assertEqual(chart.chart_data['labels'], [1576951711000, 1576941711000, 1576931711000])
+        self.assertEqual(chart.chart_data['datasets'][0]['data'], [
+            {'x': 1576951711000, 'y': 1, 'label': '1'},
+            {'x': 1576941711000, 'y': 2, 'label': '2'},
+            {'x': 1576931711000, 'y': 3, 'label': '3'}
+        ])
+
+    def test_pie_chart(self):
+        chart = l.PieChart(
+            [['Python3', 60], ['Javascript', 30], ['Sql', 10]],
+            'name',
+            'value',
+        )
+        chart.set_object({})
+
+        self.assertEqual(chart.chart_data['labels'], ['Python3', 'Javascript', 'Sql'])
+        self.assertEqual(chart.chart_data['datasets'][0]['data'], [60, 30, 10])

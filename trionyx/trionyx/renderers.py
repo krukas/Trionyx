@@ -25,8 +25,8 @@ def render_level(model, *args, **kwargs):
 
 def render_progress(model, *args, **kwargs):
     """Render progress"""
-    from trionyx.trionyx.layouts import progress_renderer
-    return progress_renderer(model.progress)
+    from trionyx.trionyx.layouts import ProgressBar
+    return ProgressBar(value=model.progress).render({})
 
 
 def render_status(model, *args, **kwargs):

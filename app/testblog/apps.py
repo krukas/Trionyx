@@ -41,3 +41,6 @@ class BlogConfig(BaseConfig):
     class Tag:
         verbose_name = '{name}'
         menu_exclude = True
+
+        search_title = None
+        search_description = None

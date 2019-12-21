@@ -11,6 +11,7 @@ import os
 import shutil
 import subprocess
 
+import yaml
 import trionyx
 from trionyx import utils
 
@@ -105,11 +106,6 @@ class Quickstart:
 
     def create_ansible(self, project_path, domain, repo):
         """Create Ansible live deploy script"""
-        try:
-            import yaml
-        except ImportError:
-            raise Exception('You need to have installed ansible')
-
         shutil.copytree(self.ansible_path, project_path)
 
         self.update_file(project_path, 'production', {

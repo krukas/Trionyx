@@ -105,7 +105,9 @@ class DialogView(View, ModelClassMixin):
         self.config = None
         try:
             self.model = self.get_model_class()
-        except Http404:
+        except Http404 as e:
+            if self.model or ('app' in self.kwargs and 'model' in self.kwargs):
+                raise e
             return kwargs
 
         if self.model and kwargs.get('pk', False):

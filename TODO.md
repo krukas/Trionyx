@@ -18,7 +18,6 @@
     - ~~Delete~~
     - ~~Update~~
     - Custom (eq update status or publish)
-  - Custom attributes?
 - ~~Save verbose_name as field~~
   - ~~Change choices field to values_list('id', 'verbose_name')~~
 - Replace crispy form with trionyx own layout/components
@@ -41,7 +40,7 @@
   - ~~log level is set as setting~~
 - Layout/Value renderers
   - Progressbar with realtime option
-  - Unordered/Ordered List
+  - ~~Unordered/Ordered List~~
   - icon renderer/shortcut
   - ~~button (Link to/open dialog)~~
   - ChartJs with realtime option
@@ -57,14 +56,8 @@
 - DB config
   - App have config description (value type, options, yes/no, etc)
   - Based on app config descriptions generate admin settings page
-- Standard models that are connected with a component:
-  - Media files
-    - Generic media file model (name, size, extension/file type)
-    - maybe file manager interface?
-  - comments
 - contrib apps:
   - Knowledge base with easy linking to multiple models
     - Connect knowledge base with layout component
   - Companies: Manage company relations/contact information
-  - Social login
     

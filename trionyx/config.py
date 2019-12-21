@@ -78,7 +78,7 @@ class Variables:
         """
         Context with next increment value, variable is locked till context is closed.
 
-        New increment value is only saved after successfully cosing context.
+        New increment value is only saved after successfully closing context.
         """
         with CacheLock('variables-increment', code):
             value = self.get(code, default=start) + increment

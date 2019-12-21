@@ -49,6 +49,21 @@ class ModelsTest(TestCase):
         self.assertEqual(data['status'], 'success')
         self.assertEqual(len(data['data']['items']), 1)
 
+    def test_ajax_listview_invalid_json_filters(self):
+        response = self.client.post('/model/trionyx/user/ajax/', {
+            'filters': '{]'
+        })
+        data = response.json()
+        self.assertEqual(data['status'], 'success')
+        self.assertEqual(len(data['data']['items']), 2)
+
+    def test_ajax_listview_select_related(self):
+        response = self.client.post('/model/testblog/post/ajax/', {
+            'selected_fields': 'id,category,category__name'
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()['data']['items']), 0)
+
     def test_ajax_listview_search(self):
         response = self.client.post('/model/trionyx/user/ajax/', {
             'search': 'info@trionyx.com'
@@ -91,6 +106,18 @@ class ModelsTest(TestCase):
         self.assertEqual(len(data['data']['items']), 2)
         self.assertEqual(len(data['data']['items'][0]['row_data']), 2)
 
+    def test_ajax_listview_custom_fields_twice(self):
+        self.client.post('/model/trionyx/user/ajax/', {
+            'selected_fields': 'id,email',
+        })
+        response = self.client.post('/model/trionyx/user/ajax/', {
+            'selected_fields': 'id,email',
+        })
+        data = response.json()
+        self.assertEqual(data['status'], 'success')
+        self.assertEqual(len(data['data']['items']), 2)
+        self.assertEqual(len(data['data']['items'][0]['row_data']), 2)
+
     def test_403_ajax_listview(self):
         self.client.login(email='test@test.com', password='top_secret')
         response = self.client.get('/model/trionyx/user/ajax/')
@@ -116,6 +143,24 @@ class ModelsTest(TestCase):
         data = response.json()
         self.assertEqual(data['status'], 'success')
         self.assertEqual(len(data['data']), 2)
+
+    def test_listchoices_nested(self):
+        response = self.client.get('/model/testblog/post/choices/', {
+            'field': 'category__created_by',
+        })
+
+        data = response.json()
+        self.assertEqual(data['status'], 'success')
+        self.assertEqual(len(data['data']), 2)
+
+    def test_listchoices_invalid(self):
+        response = self.client.get('/model/testblog/post/choices/', {
+            'field': 'category__invalid',
+        })
+
+        data = response.json()
+        self.assertEqual(data['status'], 'success')
+        self.assertEqual(len(data['data']), 0)
 
     # Test detail view
     def test_detailview(self):
@@ -155,6 +200,26 @@ class ModelsTest(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, 'TestCustom header button')
+
+    def test_layout_view(self):
+        response = self.client.get(f'/model/trionyx/user/{self.user.id}/layout/trionyx.user-general/')
+        self.assertEqual(response.status_code, 200)
+
+    def test_layout_view_404(self):
+        response = self.client.get(f'/model/trionyx/user/{self.user.id}/layout/notexists/')
+        self.assertEqual(response.status_code, 404)
+
+    def test_layout_update_complete(self):
+        response = self.client.get(f'/model/trionyx/user/{self.user.id}/layout-update/trionyx.user-general/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['status'], 'success')
+
+    def test_layout_update_selection(self):
+        response = self.client.get(f'/model/trionyx/user/{self.user.id}/layout-update/trionyx.user-general/', data={
+            'component': 'all-active-permissions-panel',
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()['status'], 'success')
 
     # create/update/delete
     def test_create_view(self):

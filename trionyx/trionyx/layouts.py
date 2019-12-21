@@ -124,6 +124,7 @@ def trionyx_user(obj):
                         css_files=['plugins/jstree/themes/default/style.css'],
                         js_files=['plugins/jstree/jstree.min.js'],
                     ),
+                    id='all-active-permissions-panel',
                 ),
             ),
         ),
