@@ -6,6 +6,11 @@ Added
 - Add ProgressBar component
 - Add Unordered and Ordered list components
 - Add LineChart, BarChart, PieChart and DoughnutChart component
+- Add options to register data function for a widget
+
+Fixed
+~~~~~
+- Widget config popup is blank
 
 
 [2.0.1] - 19-12-2019
