@@ -244,7 +244,10 @@ class FilterFieldsJsendView(JsendView):
 
     def handle_request(self, request, *args, **kwargs):
         """Get filter fields"""
-        modelClass = ContentType.objects.get_for_id(request.GET.get('id')).model_class()
+        try:
+            modelClass = ContentType.objects.get_for_id(request.GET.get('id')).model_class()
+        except ContentType.DoesNotExist:
+            return {}
         config = models_config.get_config(modelClass)
 
         return {
@@ -386,8 +389,9 @@ class SaveDashboardJsendView(JsendView):
 class WidgetConfigDialog(DialogView):
     """Widget config dialog view"""
 
-    def display_dialog(self, code, *args, **kwargs):
+    def display_dialog(self):
         """Handle widget config"""
+        code = self.kwargs.get('code')
         if code not in widgets:
             raise Exception('Widget does not exists')
 
@@ -430,9 +434,9 @@ class WidgetConfigDialog(DialogView):
             'config': config
         }
 
-    def handle_dialog(self, code, *args, **kwargs):
+    def handle_dialog(self):
         """Handle widget config"""
-        return self.display_dialog(code)
+        return self.display_dialog()
 
 
 # Mass actions
