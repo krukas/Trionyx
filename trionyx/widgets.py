@@ -6,6 +6,7 @@ trionyx.widgets
 :license: GPLv3
 """
 import json
+from collections import defaultdict
 from typing import Dict, List, ClassVar, Type
 
 from django.utils import timezone
@@ -22,6 +23,37 @@ from django.utils.translation import ugettext_lazy as _
 
 
 widgets: Dict[str, 'BaseWidget'] = {}
+
+
+class WidgetDataRegister:
+    """Class where widget data can be registered"""
+
+    def __init__(self):
+        """Init"""
+        self.widget_data = defaultdict(dict)
+
+    def register(self, widget, data_code, data_name, **options):
+        """Add data to register"""
+        def wrapper(data_function):
+            self.widget_data[widget.code][data_code] = {
+                'name': data_name,
+                'function': data_function,
+                'options': options,
+            }
+            return data_function
+        return wrapper
+
+    def get_all_data(self, widget):
+        """Get all data"""
+        return self.widget_data.get(widget.code, None)
+
+    def get_data(self, widget, code):
+        """Get data"""
+        return self.widget_data[widget.code].get(code)
+
+
+widget_data = WidgetDataRegister()
+register_data = widget_data.register
 
 
 class MetaClass(type):
@@ -180,7 +212,14 @@ class TotalSummaryWidget(BaseWidget):
 
     def get_data(self, request: HttpRequest, config: dict) -> str:
         """Get data"""
-        ModelClass = ContentType.objects.get_for_id(config['model']).model_class()
+        if config.get('source', '__custom__') != '__custom__':
+            func = widget_data.get_data(self, config.get('source')).get('function', lambda config: '-')
+            return func(config)
+
+        try:
+            ModelClass = ContentType.objects.get_for_id(config.get('model', -1)).model_class()
+        except ContentType.DoesNotExist:
+            return '-'
 
         if not ModelClass:
             return ''
@@ -221,3 +260,12 @@ class TotalSummaryWidget(BaseWidget):
         else:
             result = query.aggregate(sum=Sum(config['field']))
             return renderer.render_field(ModelClass(**{config['field']: result['sum']}), config['field'])
+
+
+@register_data(TotalSummaryWidget, 'online_users', _('Unique users today'), icon='fa fa-user', color='purple')
+def total_online_users(config):
+    """Get total online users"""
+    from trionyx.trionyx.models import User
+    return User.objects.filter(
+        last_online__gte=timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
+    ).count()

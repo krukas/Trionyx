@@ -1,0 +1,30 @@
+{% load trionyx %}
+<div {% if div.css_id %}id="{{ div.css_id }}"{% endif %}
+    class="{{ div.css_class }}" {{ div.flat_attrs|safe }}>
+        {{ fields|safe }}
+</div>
+<script>
+    function trionyxFormDependenciesChange(dependencies) {
+        var show = true;
+        for (index in dependencies) {
+            let dep = dependencies[index];
+            show = show && $('#id_' + dep[0]).val().match(dep[1]);
+        }
+        if (show) {
+            $('#{{ div.css_id }}').slideDown();
+        } else {
+            $('#{{ div.css_id }}').slideUp();
+        }
+    }
+
+    function trionyxFormDepend(dependencies) {
+        for (index in dependencies) {
+            $('#id_' + dependencies[index][0]).change(function () {
+                trionyxFormDependenciesChange(dependencies);
+            });
+        }
+        trionyxFormDependenciesChange(dependencies);
+    }
+
+    trionyxFormDepend({{ div.dependencies|jsonify }});
+</script>

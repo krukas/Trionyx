@@ -5,7 +5,7 @@ trionyx.forms.layout
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
-from crispy_forms.layout import TEMPLATE_PACK, Field, LayoutObject  # Imports to satisfy MyPy
+from crispy_forms.layout import TEMPLATE_PACK, Field, LayoutObject, Div  # Imports to satisfy MyPy
 from crispy_forms.layout import *  # noqa F403
 from crispy_forms.bootstrap import *  # noqa F403
 from django.template.loader import render_to_string
@@ -35,6 +35,26 @@ class HtmlTemplate:
             **context.flatten(),
             **self.context,
         })
+
+
+class Depend(Div):
+    """
+    Depend layout only shows when all given form field dependencies match.
+
+    Dependencies are given as list of tuples where first value is field name and second a regex value it should match.
+
+    [
+        ('language', r'(nl|be)')
+    ]
+    """
+
+    template = 'trionyx/forms/depend.html'
+
+    def __init__(self, dependencies, *args, **kwargs):
+        """Init"""
+        super().__init__(*args, **kwargs)
+        self.dependencies = dependencies
+        self.css_id = 'depend-' + utils.random_string(8)
 
 
 class DateTimePicker(Field):
