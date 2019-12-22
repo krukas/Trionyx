@@ -224,7 +224,7 @@ class ModelsTest(TestCase):
 
     # Sidebar
     def test_sidebar_not_exists(self):
-        response = self.client.get('/sidebar/model/trionyx/user/1/doesnotexists/')
+        response = self.client.get(f'/sidebar/model/trionyx/user/{self.user.id}/doesnotexists/')
         self.assertContains(response, 'User matching query does not exist')
 
     def test_sidebar(self):
