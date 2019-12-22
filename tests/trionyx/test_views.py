@@ -85,6 +85,58 @@ class ModelsTest(TestCase):
         response = self.client.get('/')
         self.assertContains(response, 'tx-dashboard')
 
+    def test_dashboard_widget_data(self):
+        response = self.client.post('/dashboard/widget-data/', {
+            'code': 'auditlog'
+        }, content_type='application/json')
+
+        data = response.json()
+        self.assertEqual(data['status'], 'success')
+
+    def test_dashboard_widget_data_error(self):
+        response = self.client.post('/dashboard/widget-data/', {
+            'code': 'not-exists-code'
+        }, content_type='application/json')
+
+        data = response.json()
+        self.assertEqual(data['status'], 'error')
+
+    def test_dashboard_save(self):
+        response = self.client.post('/dashboard/save/', [], content_type='application/json')
+
+        data = response.json()
+        self.assertEqual(data['status'], 'success')
+
+    def test_dashboard_save_error(self):
+        response = self.client.post('/dashboard/save/', {}, content_type='application/json')
+
+        data = response.json()
+        self.assertEqual(data['status'], 'error')
+
+    def test_dashboard_widget_dialog(self):
+        response = self.client.post('/dashboard/widget-config/auditlog/', {})
+
+        data = response.json()
+        self.assertEqual(data['title'], 'Widget config')
+
+    def test_dashboard_widget_dialog_wrong_code(self):
+        response = self.client.post('/dashboard/widget-config/notexists/', {})
+
+        data = response.json()
+        self.assertEqual(data['title'], 'Widget does not exists')
+
+    def test_dashboard_widget_dialog_save(self):
+        response = self.client.post('/dashboard/widget-config/auditlog/', {
+            'title': 'Trionyx',
+            'refresh': 15,
+            'show': 'all',
+            '__post__': True,
+        })
+
+        data = response.json()
+        self.assertEqual(data['title'], 'Widget config')
+        self.assertEqual(data['config'], {'show': 'all', 'title': 'Trionyx', 'refresh': '15'})
+
     # Mass delete
     def test_no_mass_delete(self):
         response = self.client.post('/mass/trionyx/user/delete/')

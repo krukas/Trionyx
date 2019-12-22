@@ -393,7 +393,9 @@ class WidgetConfigDialog(DialogView):
         """Handle widget config"""
         code = self.kwargs.get('code')
         if code not in widgets:
-            raise Exception('Widget does not exists')
+            return {
+                'title': _('Widget does not exists')
+            }
 
         if '__post__' in self.request.POST:
             post = self.request.POST
