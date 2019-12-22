@@ -225,7 +225,7 @@ class ModelsTest(TestCase):
     # Sidebar
     def test_sidebar_not_exists(self):
         response = self.client.get(f'/sidebar/model/trionyx/user/{self.user.id}/doesnotexists/')
-        self.assertContains(response, 'User matching query does not exist')
+        self.assertContains(response, 'Sidebar does not exists for model')
 
     def test_sidebar(self):
         from trionyx.views import sidebars
