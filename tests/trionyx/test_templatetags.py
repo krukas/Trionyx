@@ -96,3 +96,11 @@ class TemplateTagTest(TestCase):
             "{{ date|is_date }}"
         )
         self.assertInHTML('False', template.render(context))
+
+    def test_price(self):
+        context = Context({'total': 110.25})
+        template = Template(
+            '{% load trionyx %}'
+            "{{ total|price }}"
+        )
+        self.assertInHTML('US$ 110,25', template.render(context))

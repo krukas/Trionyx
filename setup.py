@@ -9,7 +9,7 @@ def readme():
 
 setup(
     name = 'Trionyx',
-    packages = find_packages(exclude=['app']),
+    packages = find_packages(include=['trionyx', 'trionyx.*']),
     include_package_data=True,
     scripts=['trionyx/bin/trionyx'],
     version = __version__,
@@ -42,6 +42,7 @@ setup(
         'celery >= 4.3.0, < 4.4',
 
         'Pillow>=5.0.0',
+        'PyYAML==5.2',
     ],
     extras_require={
         'dev': [

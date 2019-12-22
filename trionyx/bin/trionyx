@@ -34,8 +34,9 @@ class TrionyxCommand:
             usage='''trionyx <command> [<args>]
 
 Available commands are:
-   create_project   Creates a new Trionyx project
-   create_ansible   Creates a new ansible project to build and deploy Trionyx server
+   create_project       Creates a new Trionyx project
+   create_reusable_app  Create a new reusable app
+   create_ansible       Creates a new ansible project to build and deploy Trionyx server
         ''')
         parser.add_argument('command', help='Subcommand to run')
 
@@ -67,6 +68,27 @@ Available commands are:
             sys.exit(1)
         except Exception:
             print("Could not create project")
+            sys.exit(1)
+
+    def create_reusable_app(self, argv):
+        """Create reusable app"""
+        parser = argparse.ArgumentParser(description='Create a Trionyx reusable app')
+        parser.add_argument('name', help='Name of app')
+
+        args = parser.parse_args(argv)
+
+        try:
+            quickstart = Quickstart()
+            quickstart.create_reusable_app(os.path.join(os.getcwd(), args.name), args.name)
+            print(
+                '\n\033[32mReusable app created in \033[33m{name}\033[32m,'.format(name=args.name),
+                'cd into app folder and run\033[33m make setup\n'
+            )
+        except FileExistsError:
+            print("Could not create reusable app because a folder ({}) already exists".format(args.name))
+            sys.exit(1)
+        except Exception:
+            print("Could not create reusable app")
             sys.exit(1)
 
     def create_ansible(self, argv):

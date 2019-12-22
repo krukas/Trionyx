@@ -1,0 +1,27 @@
+{% load trionyx %}
+<canvas id="{{ component.css_id }}" style="width: 100% !important;height: auto !important; min-height: {{ component.height }}">
+</canvas>
+<script>
+    new Chart(document.getElementById('{{ component.css_id }}'), {
+        type: '{{ component.chart_type }}',
+        data: {{ component.chart_data|jsonify }},
+        options: {
+            scales: {{ component.chart_scales|jsonify }},
+            tooltips: {
+                callbacks: {
+                    {% if component.chart_type == 'line' or component.chart_type == 'bar' %}
+                        label: function (item, data) {
+                            var itemData = data.datasets[item.datasetIndex].data[item.index];
+
+                            if (typeof itemData === 'object' && 'label' in itemData) {
+                                return itemData.label;
+                            }
+
+                            return itemData;
+                        }
+                    {% endif %}
+                }
+            }
+        }
+    });
+</script>

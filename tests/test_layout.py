@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.test import TestCase
 from trionyx import layout as l  # noqa E741
 
@@ -90,6 +92,20 @@ class ModelsTest(TestCase):
         </div>
         """)
 
+    def test_badge(self):
+        badge = l.Badge(html='test')
+        badge.set_object(self.user)
+        self.assertHTMLEqual(
+            badge.render({}),
+            f"""<span class="badge bg-theme">test</span>""")
+
+    def test_alert(self):
+        self.assertHTMLEqual(l.Alert('trionyx', no_margin=True).render({}), """
+        <div class="alert alert-success no-margin">
+            trionyx
+        </div>
+        """)
+
     def test_button(self):
         button = l.Button('Trionyx')
         button.set_object(self.user)
@@ -112,6 +128,75 @@ class ModelsTest(TestCase):
             Trionyx
         </button>
         """.format(id=self.user.id))
+
+    def test_ordered_list(self):
+        unordered = l.OrderedList(
+            {
+                'value': 'Item 1',
+            },
+            {
+                'value': 'Item 2',
+            }
+        )
+        unordered.set_object({})
+        self.assertHTMLEqual(unordered.render({}), """
+        <ol>
+            <li>
+                Item 1
+            </li><li>
+                Item 2
+            </li>
+        </ol>
+        """)
+
+    def test_ordered_list_objects(self):
+        unordered = l.OrderedList(
+            '_index_',
+            objects=[['Item 1'], ['Item 2']]
+        )
+        unordered.set_object({})
+        self.assertHTMLEqual(unordered.render({}), """
+        <ol>
+            <li>
+                Item 1
+            </li><li>
+                Item 2
+            </li>
+        </ol>
+        """)
+
+    def test_progressBar(self):
+        progressbar = l.ProgressBar(value=10)
+        progressbar.set_object({})
+        self.assertHTMLEqual(progressbar.render({}), """
+        <div class=" progress progress-md">
+            <div aria-valuemax="100" aria-valuemin="0" aria-valuenow="10"
+            class=" progress-bar progress-bar-theme" role="progressbar" style="width: 10%">
+                <span>
+                    10%
+                </span>
+            </div>
+        </div>
+        """)
+
+    def test_table_description(self):
+        self.assertHTMLEqual(l.TableDescription({
+            'label': 'Trionyx',
+            'value': 'Test',
+        }).render({}), """
+        <table class="table table-condensed">
+            <tbody>
+                <tr>
+                    <th style="width: 150px;">
+                        Trionyx:
+                    </th>
+                    <td class="description-value">
+                        Test
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        """)
 
     def test_table(self):
         html = l.Table(
@@ -161,3 +246,33 @@ class ModelsTest(TestCase):
             </tfooter>
         </table>
         """)
+
+    def test_line_chart(self):
+        chart = l.LineChart(
+            [
+                [datetime.fromtimestamp(1576951711), 1],
+                [datetime.fromtimestamp(1576941711), 2],
+                [datetime.fromtimestamp(1576931711), 3]
+            ],
+            'x',
+            'y'
+        )
+        chart.set_object({})
+
+        self.assertEqual(chart.chart_data['labels'], [1576951711000, 1576941711000, 1576931711000])
+        self.assertEqual(chart.chart_data['datasets'][0]['data'], [
+            {'x': 1576951711000, 'y': 1, 'label': '1'},
+            {'x': 1576941711000, 'y': 2, 'label': '2'},
+            {'x': 1576931711000, 'y': 3, 'label': '3'}
+        ])
+
+    def test_pie_chart(self):
+        chart = l.PieChart(
+            [['Python3', 60], ['Javascript', 30], ['Sql', 10]],
+            'name',
+            'value',
+        )
+        chart.set_object({})
+
+        self.assertEqual(chart.chart_data['labels'], ['Python3', 'Javascript', 'Sql'])
+        self.assertEqual(chart.chart_data['datasets'][0]['data'], [60, 30, 10])

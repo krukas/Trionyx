@@ -12,6 +12,7 @@ from typing import Optional, Dict, Any, Type
 from django.views.generic import View
 from django.http import JsonResponse
 from django.http.request import HttpRequest
+from django.http import Http404
 from django.template.loader import render_to_string
 from django.db.models import Model
 from django.forms import ModelForm
@@ -102,7 +103,12 @@ class DialogView(View, ModelClassMixin):
         """Load object and model config and remove pk from kwargs"""
         self.object = None
         self.config = None
-        self.model = self.get_model_class()
+        try:
+            self.model = self.get_model_class()
+        except Http404 as e:
+            if self.model or ('app' in self.kwargs and 'model' in self.kwargs):
+                raise e
+            return kwargs
 
         if self.model and kwargs.get('pk', False):
             try:

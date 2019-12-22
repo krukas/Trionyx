@@ -1,6 +1,9 @@
 from trionyx.views import tabs, layouts, sidebars
 from trionyx.layout import *
 from trionyx.urls import model_url
+from trionyx import models
+from django.db.models.functions import TruncDay
+from trionyx.renderer import price_value_renderer
 
 from .models import Post, Tag
 
@@ -41,6 +44,54 @@ def post_overview(obj):
                         )
                     },
                 )
+            ),
+            Panel(
+                'Charts',
+                LineChart(
+                    Post.objects.order_by('-sale_date'),
+                    'sale_date',
+                    'price',
+                ),
+                LineChart(
+                    Post.objects.annotate(day=TruncDay('publish_date')).values(
+                        'day').annotate(sum_price=models.Sum('price')).values('day', 'sum_price').order_by('-day'),
+                    'day',
+                    {
+                        'label': 'Total price per day',
+                        'field': 'sum_price',
+                        'renderer': price_value_renderer,
+                    },
+                    time_unit='day',
+                ),
+                LineChart(
+                    'tags',
+                    'name',
+                    'id',
+                ),
+                BarChart(
+                    Post.objects.annotate(day=TruncDay('publish_date')).values('day'
+                    ).annotate(
+                        sum_price=models.Sum('price'),
+                        sum_id=models.Sum('id')).values('day', 'sum_price', 'sum_id').order_by('-day'),
+                    'day',
+                    {
+                        'label': 'Total price per day',
+                        'field': 'sum_price',
+                        'renderer': price_value_renderer,
+                    },
+                    'sum_id',
+                    time_unit='day',
+                ),
+                DoughnutChart(
+                    [['Python3', 60], ['Javascript', 30], ['Sql', 10]],
+                    'name',
+                    'value',
+                ),
+                PieChart(
+                    [['Python3', 60], ['Javascript', 30], ['Sql', 10]],
+                    'name',
+                    'value',
+                ),
             )
         ),
         Column6(
@@ -96,8 +147,57 @@ def post_overview(obj):
                             },
                         )
                     },
+                    {
+                        'label': 'ProgressBar',
+                        'value': Component(
+                            ProgressBar(value=543, max_value=2400),
+                            ProgressBar(value=20, size='xs'),
+                            ProgressBar(value=78, active=True, color=Colors.GREEN),
+                        ),
+                    },
+                    {
+                        'label': 'Lists',
+                        'value': UnorderedList(
+                            'title',
+                            'content',
+                            {
+                                'value': 'Fixed value'
+                            },
+                            {
+                                'label': 'Unordered sublist',
+                                'value': UnorderedList(
+                                    'status',
+                                    {
+                                        'label': 'Another unordered sublist',
+                                        'value': UnorderedList(
+                                            'price'
+                                        ),
+                                    }
+                                )
+                            },
+                            {
+                                'label': 'Ordered sublist',
+                                'value': OrderedList(
+                                    'status',
+                                    {
+                                        'label': 'Another ordered sublist',
+                                        'value': OrderedList(
+                                            'price'
+                                        ),
+                                    }
+                                )
+                            },
+                            {
+                                'label': 'tags',
+                                'value': UnorderedList(
+                                    'name',
+                                    objects='tags'
+                                ),
+                            }
+                        )
+                    },
                     id="table-description"
-                )
+                ),
             )
         ),
         Column12(
@@ -116,7 +216,7 @@ def post_overview(obj):
                     {
                         'label': 'Value',
                         'value': 'fixed value',
-                        'renderer': lambda value, data_object, **options: '{}'.format(data_object)
+                        'renderer': lambda value, data_object, **options: '{}'.format(data_object),
                     },
                     footer=[
                         [

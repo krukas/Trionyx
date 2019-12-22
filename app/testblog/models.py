@@ -1,4 +1,5 @@
 from trionyx import models
+from django.utils import timezone
 
 class Category(models.BaseModel):
     name = models.CharField(max_length=255)
@@ -17,6 +18,7 @@ class Post(models.BaseModel):
     content = models.TextField()
 
     publish_date = models.DateTimeField()
+    sale_date = models.DateField(default=timezone.now)
 
     category = models.ForeignKey(Category, models.CASCADE, related_name='posts')
     tags = models.ManyToManyField(Tag, related_name='posts')

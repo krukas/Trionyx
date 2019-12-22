@@ -12,7 +12,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from trionyx.models import get_class
 from trionyx import forms
-from trionyx.forms.layout import Layout, Fieldset, Div, HtmlTemplate, Filters  # type: ignore
+from trionyx.forms.layout import Layout, Fieldset, Div, HtmlTemplate, Filters, Depend  # type: ignore
 from trionyx.forms.helper import FormHelper
 from trionyx.trionyx.icons import ICON_CHOICES
 from trionyx.config import models_config
@@ -372,9 +372,10 @@ class TotalSummaryWidgetForm(forms.Form):
     ]
 
     icon = forms.ChoiceField(label=_('Icon'), choices=ICON_CHOICES)
+    source = forms.ChoiceField(label=_('Source'), choices=[], required=True)
 
     model = forms.ChoiceField(label=_('Model'), choices=[], required=False)
-    field = forms.CharField(label=_('Field'))
+    field = forms.CharField(label=_('Field'), required=False)
 
     period = forms.ChoiceField(label=_('Period'), choices=PERIOD_CHOICES)
     period_field = forms.CharField(label=_('Period field'), required=False)
@@ -383,6 +384,13 @@ class TotalSummaryWidgetForm(forms.Form):
     def __init__(self, *args, **kwargs):
         """Init form"""
         super().__init__(*args, **kwargs)
+
+        from trionyx.widgets import widget_data, TotalSummaryWidget
+        self.fields['source'].choices = [
+            ('', '------'),
+            *[(code, data['name']) for code, data in widget_data.get_all_data(TotalSummaryWidget).items()],
+            ('__custom__', _('Custom'))
+        ]
 
         # TODO Change this to use ajax
         content_type_map = ContentType.objects.get_for_models(*list(models_config.get_all_models(utils.get_current_request().user)))
@@ -413,37 +421,56 @@ class TotalSummaryWidgetForm(forms.Form):
 
         self.helper = FormHelper()
         self.helper.layout = Layout(
-            'icon',
-            Div(
+            'source',
+            Depend(
+                [('source', r'__custom__')],
+                'icon',
                 Div(
-                    'model',
-                    css_class="col-md-6",
+                    Div(
+                        'model',
+                        css_class="col-md-6",
+                    ),
+                    Div(
+                        HtmlTemplate('widgets/total_summary/form_field.html', {
+                            'summary_fields': summary_fields,
+                            'value': self.initial.get('field'),
+                        }),
+                        css_class="col-md-6",
+                    ),
+                    css_class="row"
                 ),
                 Div(
-                    HtmlTemplate('widgets/total_summary/form_field.html', {
-                        'summary_fields': summary_fields,
-                        'value': self.initial.get('field'),
-                    }),
-                    css_class="col-md-6",
+                    Div(
+                        'period',
+                        css_class="col-md-6",
+                    ),
+                    Div(
+                        HtmlTemplate('widgets/total_summary/period_field.html', {
+                            'period_fields': period_fields,
+                            'value': self.initial.get('period_field'),
+                        }),
+                        css_class="col-md-6",
+                    ),
+                    css_class="row"
                 ),
-                css_class="row"
-            ),
-            Div(
-                Div(
-                    'period',
-                    css_class="col-md-6",
+                Fieldset(
+                    _('Filters'),
+                    Filters('filters', content_type_input_id='id_model'),
                 ),
-                Div(
-                    HtmlTemplate('widgets/total_summary/period_field.html', {
-                        'period_fields': period_fields,
-                        'value': self.initial.get('period_field'),
-                    }),
-                    css_class="col-md-6",
-                ),
-                css_class="row"
-            ),
-            Fieldset(
-                _('Filters'),
-                Filters('filters', content_type_input_id='id_model'),
+                css_id='widget-custom-source'
             )
         )
+
+    def clean(self):
+        """Clean"""
+        super().clean()
+
+        if self.cleaned_data.get('source') != '__custom__':
+            from trionyx.widgets import widget_data, TotalSummaryWidget
+            data = widget_data.get_data(TotalSummaryWidget, self.cleaned_data.get('source'))
+            if data:
+                self.cleaned_data.update(data.get('options', {}))
+        elif not self.cleaned_data.get('field'):
+            self.add_error(None, _('Field field is required'))
+
+        return self.cleaned_data

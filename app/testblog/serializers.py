@@ -6,4 +6,4 @@ from trionyx.api import serializers
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'verbose_name']
+        fields = ['id', 'email', 'verbose_name']

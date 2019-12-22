@@ -1,0 +1,14 @@
+<div class="progress progress-{{ component.size }} {% if component.active %}active{% endif %}">
+	<div
+            class="progress-bar progress-bar-{{ component.color }} {% if component.striped %}progress-bar-striped{% endif %}"
+            role="progressbar"
+            aria-valuenow="{{ component.value }}"
+            aria-valuemin="0"
+            aria-valuemax="100"
+            style="width: {{ component.value }}%"
+    >
+        {% if component.show_text %}
+            <span>{{ component.value }}%</span>
+        {% endif %}
+	</div>
+</div>

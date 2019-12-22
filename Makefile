@@ -9,10 +9,14 @@ COVERAGE := env/bin/coverage
 
 help:
 	@echo "COMMANDS:"
-	@echo "  clean          Remove all generated files."
-	@echo "  setup          Setup development environment."
-	@echo "  shell          Open ipython from the development environment."
-	@echo "  test           Run tests."
+	@echo "  clean              Remove all generated files."
+	@echo "  setup              Setup development environment."
+	@echo "  shell              Open ipython from the development environment."
+	@echo "  test               Run tests."
+	@echo "  run                Start development server"
+	@echo "  celery             Start celery"
+	@echo "  locales_collect    Collect all translation"
+	@echo "  locales_compile    Compile all translation"
 	@echo ""
 
 

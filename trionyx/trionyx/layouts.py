@@ -12,7 +12,7 @@ from django.utils import timezone
 from rest_framework.authtoken.models import Token
 from trionyx.layout import (
     Container, Row, Column10, Column2, Column12, Column6,
-    Panel, DescriptionList, TableDescription, Img, Table, Html, HtmlTemplate
+    Panel, DescriptionList, TableDescription, Img, Table, Html, HtmlTemplate, ProgressBar
 )
 from trionyx.renderer import datetime_value_renderer
 from trionyx.trionyx.models import AuditLogEntry, LogEntry
@@ -124,6 +124,7 @@ def trionyx_user(obj):
                         css_files=['plugins/jstree/themes/default/style.css'],
                         js_files=['plugins/jstree/jstree.min.js'],
                     ),
+                    id='all-active-permissions-panel',
                 ),
             ),
         ),
@@ -206,24 +207,6 @@ def trionyx_log(obj):
     )
 
 
-def progress_renderer(value, *args, **kwargs):
-    """Render progressbar"""
-    return """<div class="progress">
-        <div
-            class="progress-bar progress-bar-theme"
-            role="progressbar"
-            aria-valuemin="0"
-            aria-valuemax="100"
-            aria-valuenow="{progress}"
-            style="width: {progress}%"
-        >
-            {progress}%
-        </div>
-    </div>""".format(
-        progress=value,
-    )
-
-
 @tabs.register('trionyx.task')
 def task(obj):
     """Render task layout"""
@@ -251,7 +234,7 @@ def task(obj):
                     TableDescription(
                         {
                             'field': 'progress',
-                            'renderer': progress_renderer,
+                            'value': ProgressBar('progress'),
                         },
                         {
                             'field': 'progress_output',

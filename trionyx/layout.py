@@ -42,6 +42,8 @@ Layouts are defined and registered in layouts.py in an app.
 """
 import re
 import time
+import datetime
+import decimal
 from typing import List, Dict, Union, Any
 
 from django import template
@@ -170,6 +172,12 @@ class Layout:
         for comp in component.components:
             files.extend(self.collect_css_files(comp))
 
+        # When ComponentFieldsMixin is used the value can be a component
+        if isinstance(component, ComponentFieldsMixin):
+            for field in component.get_fields():
+                if isinstance(field.get('value'), Component):
+                    files.extend(self.collect_css_files(field.get('value')))
+
         return list(set(files))
 
     def collect_js_files(self, component=None):
@@ -180,6 +188,12 @@ class Layout:
 
         for comp in component.components:
             files.extend(self.collect_js_files(comp))
+
+        # When ComponentFieldsMixin is used the value can be a component
+        if isinstance(component, ComponentFieldsMixin):
+            for field in component.get_fields():
+                if isinstance(field.get('value'), Component):
+                    files.extend(self.collect_js_files(field.get('value')))
 
         return list(set(files))
 
@@ -518,22 +532,22 @@ class ComponentFieldsMixin:
 
         return field
 
+    def get_value(self, field, data):
+        """Get value"""
+        if 'value' in field:
+            return field['value']
+        elif isinstance(data, object) and field['field'] and hasattr(data, field['field']):
+            return getattr(data, field['field'])
+        elif isinstance(data, dict) and field['field'] in data:
+            return data.get(field['field'])
+        elif isinstance(data, list) and field['__index__'] < len(data):
+            return data[field['__index__']]
+        return ''
+
     def render_field(self, field, data):
         """Render field for given data"""
         from trionyx.renderer import renderer
-
-        if 'value' in field:
-            value = field['value']
-        elif isinstance(data, object) and field['field'] and hasattr(data, field['field']):
-            value = getattr(data, field['field'])
-            if 'renderer' not in field:
-                value = renderer.render_field(data, field['field'], **field)
-        elif isinstance(data, dict) and field['field'] in data:
-            value = data.get(field['field'])
-        elif isinstance(data, list) and field['__index__'] < len(data):
-            value = data[field['__index__']]
-        else:
-            return ''
+        value = self.get_value(field, data)
 
         options = {key: value for key, value in field.items() if key not in ['value', 'data_object']}
         if 'renderer' in field:
@@ -541,6 +555,8 @@ class ComponentFieldsMixin:
         elif isinstance(value, Component):
             value.set_object(data, True, self.layout_id)
             value = value.render(self.context.copy(), self.request)
+        elif isinstance(data, object) and field['field'] and hasattr(data, field['field']):
+            value = renderer.render_field(data, field['field'], **field)
         else:
             value = renderer.render_value(value, data_object=data, **options)
 
@@ -559,15 +575,19 @@ class ComponentFieldsMixin:
 
     def get_rendered_objects(self):
         """Render objects"""
+        return [
+            self.get_rendered_object(obj)
+            for obj in self.get_objects()
+        ]
+
+    def get_objects(self):
+        """Get objects"""
         objects = self.objects
 
         if isinstance(objects, str):
             objects = getattr(self.object, objects).all()
 
-        return [
-            self.get_rendered_object(obj)
-            for obj in objects
-        ]
+        return objects
 
 
 # =============================================================================
@@ -974,6 +994,62 @@ class DescriptionList(Component, ComponentFieldsMixin):
         self.fields = fields
 
 
+class UnorderedList(Html, ComponentFieldsMixin):
+    """Unordered list"""
+
+    tag = 'ul'
+
+    def __init__(self, *fields, objects=None, **options):
+        """Init list"""
+        super().__init__('', **options)
+        self.objects = objects
+        self.fields = fields
+
+    def updated(self):
+        """Set html with rendered fields"""
+        if self.objects:
+            values = [item[0]['value'] for item in self.get_rendered_objects()]
+        else:
+            values = [item['value'] for item in self.get_rendered_object()]
+
+        sublist_indexes = {
+            field['__index__']: field['label']
+            for field in self.get_fields() if isinstance(field.get('value'), UnorderedList)
+        }
+        self.html = ''.join('<li>{label}{value}</li>'.format(
+            label=sublist_indexes.get(index, ''),
+            value=value
+        ) for index, value in enumerate(values))
+
+
+class OrderedList(UnorderedList):
+    """Ordered list"""
+
+    tag = 'ol'
+
+
+class ProgressBar(Component):
+    """Bootstrap progressbar, fields are the params"""
+
+    template_name = 'trionyx/components/progressbar.html'
+
+    def __init__(self, field='', value=0, max_value=100, size='md', striped=False, active=False, **options):
+        """Init progressbar"""
+        super().__init__(**options)
+        self.field = field
+        self.max_value = max_value
+        self.value = value
+        self.color = options.get('color', 'theme')
+        self.striped = striped or active
+        self.size = size
+        self.active = active
+        self.show_text = size not in ['sm', 'xs', 'xxs']
+
+    def updated(self):
+        """Set value with rendered field"""
+        self.value = round((getattr(self.object, self.field, self.value) / self.max_value) * 100)
+
+
 class TableDescription(Component, ComponentFieldsMixin):
     """Bootstrap table description, fields are the params"""
 
@@ -1047,3 +1123,165 @@ class Table(Component, ComponentFieldsMixin):
             self.get_rendered_footer_object(obj)
             for obj in objects
         ]
+
+
+class Chart(Component, ComponentFieldsMixin):
+    """Chart component"""
+
+    chart_type = ''
+
+    template_name = "trionyx/components/chart.html"
+
+    css_files = ['plugins/chartjs/Chart.min.css']
+    js_files = ['plugins/chartjs/Chart.min.js']
+
+    def __init__(self, objects, *fields, **options):
+        """Init Chart"""
+        options['id'] = options.pop('id', utils.random_string(8))
+        super().__init__(**options)
+        self.chart_data = {}
+        self.chart_scales = {}
+        self.height = options.get('height', '300px')
+        self.options = options
+
+        self.objects = objects
+        """Can be string with field name relation, Queryset or list"""
+
+        self.fields = fields
+
+        # Set all colors from, default first color is theme
+        self.colors = {
+            'blue': {
+                'fill': 'rgba(60, 141, 188, 0.2)',
+                'stroke': 'rgba(60, 141, 188, 1)',
+            },
+            'yellow': {
+                'fill': 'rgba(243, 156, 18, 0.2)',
+                'stroke': 'rgba(243, 156, 18, 1)',
+            },
+            'green': {
+                'fill': 'rgba(0, 166, 90, 0.2)',
+                'stroke': 'rgba(0, 166, 90, 1)',
+            },
+            'purple': {
+                'fill': 'rgba(96, 92, 168, 0.2)',
+                'stroke': 'rgba(96, 92, 168, 1)',
+            },
+            'red': {
+                'fill': 'rgba(221, 75, 57, 0.2)',
+                'stroke': 'rgba(221, 75, 57, 1)',
+            },
+            'black': {
+                'fill': 'rgba(17, 17, 17, 0.2)',
+                'stroke': 'rgba(17, 17, 17, 1)',
+            },
+        }
+        self.color_order = ['blue', 'yellow', 'green', 'purple', 'red', 'black']
+        self.theme_color = settings.TX_THEME_COLOR.replace('-light', '')
+
+    def get_json_value(self, value):
+        """Get json value"""
+        if issubclass(value.__class__, (int, float, str, bool)):
+            return value
+        if isinstance(value, decimal.Decimal):
+            return float(value)
+        if isinstance(value, datetime.date):
+            return time.mktime(value.timetuple()) * 1000
+        return str(value)
+
+    def get_colors(self, size, color_type):
+        """Get colors"""
+        colors = []
+
+        if self.theme_color in self.colors:
+            colors.append(self.colors[self.theme_color][color_type])
+
+        for name, color_types in self.colors.items():
+            if len(colors) >= size:
+                break
+
+            if name == self.theme_color:
+                continue
+
+            colors.append(color_types[color_type])
+
+        return colors
+
+    def get_color(self, index, color_type):
+        """Get color"""
+        return self.get_colors(10, color_type)[index]
+
+
+class LineChart(Chart):
+    """LineChart"""
+
+    chart_type = 'line'
+
+    def updated(self):
+        """Set chart data and scales"""
+        fields = self.get_fields()
+        items = self.get_objects()
+
+        self.chart_data = {
+            'labels': [self.get_json_value(self.get_value(fields[0], item)) for item in items],
+            'datasets': [
+                {
+                    'label': fields[index]['label'],
+                    'backgroundColor': self.get_color(index - 1, 'fill'),
+                    'borderColor': self.get_color(index - 1, 'stroke'),
+                    'fill': self.options.get('fill', True),
+                    'data': [{
+                        'x': self.get_json_value(self.get_value(fields[0], item)),
+                        'y': self.get_json_value(self.get_value(fields[index], item)),
+                        'label': self.render_field(fields[index], item),
+                    } for item in items],
+                } for index in range(1, len(fields))
+            ],
+        }
+
+        if items and isinstance(self.get_value(fields[0], items[0]), datetime.date):
+            unit = 'hour' if isinstance(self.get_value(fields[0], items[0]), datetime.datetime) else 'day'
+            self.chart_scales = {
+                'xAxes': [{
+                    'type': 'time',
+                    'autoSkip': False,
+                    'time': {
+                        'unit': self.options.get('time_unit', unit),
+                        'unitStepSize': self.options.get('time_unit_step_size', 1),
+                    },
+                }]
+            }
+
+
+class BarChart(LineChart):
+    """BarChart"""
+
+    chart_type = 'bar'
+
+
+class PieChart(Chart):
+    """BarChart"""
+
+    chart_type = 'pie'
+
+    def updated(self):
+        """Set chart data and scales"""
+        fields = self.get_fields()
+        items = self.get_objects()
+
+        self.chart_data = {
+            'labels': [self.render_field(fields[0], item) for item in items],
+            'datasets': [{
+                'label': fields[1]['label'],
+                'data': [self.get_json_value(self.get_value(fields[1], item)) for item in items],
+                'backgroundColor': self.get_colors(len(items), 'fill'),
+                'borderColor': self.get_colors(len(items), 'stroke'),
+                'borderWidth': 1,
+            }]
+        }
+
+
+class DoughnutChart(PieChart):
+    """BarChart"""
+
+    chart_type = 'doughnut'

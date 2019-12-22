@@ -13,6 +13,20 @@ class ModelsTest(TestCase):
         self.test_user = User.objects.create_user(email='test@test.com', password='top_secret')
         self.client.login(email='info@trionyx.com', password='top_secret')
 
+    def test_protected_media(self):
+        response = self.client.get('/media/somefile/')
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.get('X-Accel-Redirect'), '/protected/media/somefile/')
+
+    def test_protected_media_not_loggedin(self):
+        self.client.logout()
+        response = self.client.get('/media/somefile/')
+        self.assertEqual(response.status_code, 302)
+
+    def test_logout(self):
+        response = self.client.get('/logout/')
+        self.assertEqual(response.status_code, 302)
+
     def test_profile(self):
         response = self.client.get('/account/view/')
         self.assertContains(response, 'info@trionyx.com')
@@ -70,6 +84,58 @@ class ModelsTest(TestCase):
     def test_dashboard(self):
         response = self.client.get('/')
         self.assertContains(response, 'tx-dashboard')
+
+    def test_dashboard_widget_data(self):
+        response = self.client.post('/dashboard/widget-data/', {
+            'code': 'auditlog'
+        }, content_type='application/json')
+
+        data = response.json()
+        self.assertEqual(data['status'], 'success')
+
+    def test_dashboard_widget_data_error(self):
+        response = self.client.post('/dashboard/widget-data/', {
+            'code': 'not-exists-code'
+        }, content_type='application/json')
+
+        data = response.json()
+        self.assertEqual(data['status'], 'error')
+
+    def test_dashboard_save(self):
+        response = self.client.post('/dashboard/save/', [], content_type='application/json')
+
+        data = response.json()
+        self.assertEqual(data['status'], 'success')
+
+    def test_dashboard_save_error(self):
+        response = self.client.post('/dashboard/save/', {}, content_type='application/json')
+
+        data = response.json()
+        self.assertEqual(data['status'], 'error')
+
+    def test_dashboard_widget_dialog(self):
+        response = self.client.post('/dashboard/widget-config/auditlog/', {})
+
+        data = response.json()
+        self.assertEqual(data['title'], 'Widget config')
+
+    def test_dashboard_widget_dialog_wrong_code(self):
+        response = self.client.post('/dashboard/widget-config/notexists/', {})
+
+        data = response.json()
+        self.assertEqual(data['title'], 'Widget does not exists')
+
+    def test_dashboard_widget_dialog_save(self):
+        response = self.client.post('/dashboard/widget-config/auditlog/', {
+            'title': 'Trionyx',
+            'refresh': 15,
+            'show': 'all',
+            '__post__': True,
+        })
+
+        data = response.json()
+        self.assertEqual(data['title'], 'Widget config')
+        self.assertEqual(data['config'], {'show': 'all', 'title': 'Trionyx', 'refresh': '15'})
 
     # Mass delete
     def test_no_mass_delete(self):
@@ -155,3 +221,20 @@ class ModelsTest(TestCase):
         })
 
         self.assertTrue(mock_call.called)
+
+    # Sidebar
+    def test_sidebar_not_exists(self):
+        response = self.client.get(f'/sidebar/model/trionyx/user/{self.user.id}/doesnotexists/')
+        self.assertContains(response, 'Sidebar does not exists for model')
+
+    def test_sidebar(self):
+        from trionyx.views import sidebars
+
+        @sidebars.register(User, 'item')
+        def item_sidebar(request, obj):
+            return {
+                'title': 'User title',
+            }
+
+        response = self.client.get(f'/sidebar/model/trionyx/user/{self.user.id}/item/')
+        self.assertContains(response, 'User title')
