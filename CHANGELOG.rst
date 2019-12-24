@@ -13,6 +13,14 @@ Fixed
 - Widget config popup is blank
 
 
+[2.0.2] - 24-12-2019
+--------------------
+Fixed
+~~~~~
+- Fix inlineforms not working in popup
+- Widget config dialog wasn't shown
+
+
 [2.0.1] - 19-12-2019
 --------------------
 Added
