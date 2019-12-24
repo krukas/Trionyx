@@ -93,9 +93,14 @@
             }
             addDeleteHandler();
         }
-        window.addEventListener('load', function () {
+
+        if (document.readyState === "complete") {
             txInlineForm('{{ inline_form_prefix }}');
-        });
+        } else {
+            window.addEventListener('load', function () {
+                txInlineForm('{{ inline_form_prefix }}');
+            });
+        }
     </script>
 {% else %}
     {% crispy inline_form %}
