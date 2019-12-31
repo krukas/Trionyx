@@ -406,7 +406,11 @@ function TrionyxDialog(url, options) {
 
     // Build dialog
     var dialogSizeClass = '';
-    if ('size' in options && options.size === 'large') {
+    if ('size' in options && options.size === 'full') {
+        dialogSizeClass = 'modal-full';
+    } else if ('size' in options && options.size === 'extra-large') {
+        dialogSizeClass = 'modal-xl';
+    } else if ('size' in options && options.size === 'large') {
         dialogSizeClass = 'modal-lg';
     } else if ('size' in options && options.size === 'small') {
         dialogSizeClass = 'modal-sm';

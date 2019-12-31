@@ -485,6 +485,18 @@ dl {
 }
 /*****************************************************************************/
 
+@media (min-width: 768px) {
+    .modal-xl {
+        width: 90%;
+        max-width:1200px;
+    }
+
+    .modal-full {
+        width: auto;
+        margin: 10px;
+    }
+}
+
 #app-model-list thead tr {
     border-top: 2px solid #f4f4f4;
 }
