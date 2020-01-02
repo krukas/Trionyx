@@ -7,7 +7,7 @@ trionyx.widgets
 """
 import json
 from collections import defaultdict
-from typing import Dict, List, ClassVar, Type
+from typing import Dict, List, ClassVar, Type, Optional
 
 from django.utils import timezone
 from django.http.request import HttpRequest
@@ -123,7 +123,7 @@ class BaseWidget(metaclass=MetaClass):
     description: ClassVar[str] = ''
     """Short description on what the widget does"""
 
-    config_form_class: ClassVar[Type[Form]]
+    config_form_class: ClassVar[Optional[Type[Form]]] = None
     """Form class used to change the widget. The form cleaned_data is used as the config"""
 
     default_width: ClassVar[int] = 4
