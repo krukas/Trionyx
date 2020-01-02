@@ -7,10 +7,19 @@ Added
 - Add Unordered and Ordered list components
 - Add LineChart, BarChart, PieChart and DoughnutChart component
 - Add options to register data function for a widget
+- Add support for file upload in dialog
+- Add full/extra-large size options to dialog
+- Add link target option to header buttons
+- Add Date value renderer
+- Add current url to dialog object
+- Add Link component
+- Add component option to lock object
 
 Fixed
 ~~~~~
 - Widget config popup is blank
+- Fix form layout Depend not working on create/update view
+- Fix widget config_form_class is not set
 
 
 [2.0.2] - 24-12-2019
