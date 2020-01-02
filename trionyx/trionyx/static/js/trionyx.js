@@ -317,6 +317,7 @@ function openDialog(url, options) {
 
 function TrionyxDialog(url, options) {
     var self = this;
+    self.url = url;
     options = typeof options !== 'undefined' ? options : {};
     var dialog = $('<div class="modal fade" data-backdrop="static" data-keyboard="false">');
     var form = $('<form method="POST" enctype="multipart/form-data" novalidate>');
@@ -368,6 +369,7 @@ function TrionyxDialog(url, options) {
         } else {
             if (data.url) {
                 form.attr('action', data.url);
+                self.url = data.url;
             }
 
             self.setTitle(data);
