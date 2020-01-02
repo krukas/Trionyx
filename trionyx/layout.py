@@ -291,6 +291,7 @@ class Component:
         self.layout_id = None
         self.components = list(filter(None, components))
         self.object = options.get('object', False)
+        self.lock_object = options.get('lock_object', False)
         self.context = {}
         self.request = None
 
@@ -312,7 +313,7 @@ class Component:
         if layout_id:
             self.layout_id = layout_id
 
-        if self.object is False or force:
+        if not self.lock_object and (self.object is False or force):
             self.object = object
         else:
             object = self.object
@@ -755,6 +756,24 @@ class Img(Html):
     attr = {
         'width': '100%',
     }
+
+
+class Link(Html):
+    """Link tag"""
+
+    tag = 'a'
+    valid_attr = ['href', 'class']
+
+    def __init__(self, label=None, href=None, **kwargs):
+        """Init"""
+        self.label = label
+        self.href = href
+        super().__init__(label, href=href, **kwargs)
+
+    def updated(self):
+        """Update link"""
+        self.html = self.html if self.label else str(self.object)
+        self.attr['href'] = self.attr['href'] if self.href else self.object.get_absolute_url()
 
 
 # =============================================================================
