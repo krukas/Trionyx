@@ -3,6 +3,7 @@
        href="{% if button.dialog %}#{% else %}{{ button.url }}{% endif %}"
        {% if button.dialog %}onClick="openDialog('{{ button.url }}', {{ button.dialog_options }})"{% endif %}
        class="btn btn-flat {{ button.type }}"
+       target="{{ button.target }}"
     >
         {{ button.label }}
     </a>

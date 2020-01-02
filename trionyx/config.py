@@ -498,6 +498,7 @@ class ModelConfig:
                 'label': button['label'](obj, context) if callable(button['label']) else button['label'],
                 'type': button_type(obj, context) if callable(button_type) else button_type,
                 'url': button['url'](obj, context) if callable(button['url']) else url_reverse(button['url']),
+                'target': button.get('target', '_self'),
                 'dialog': button.get('dialog', True),
                 'dialog_options': '{{ {} }}'.format(','.join(
                     ("{}:{}" if key == 'callback' else "{}:'{}'").format(key, value)
