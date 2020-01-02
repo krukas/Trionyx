@@ -1,6 +1,6 @@
 {% load trionyx %}
 <div {% if div.css_id %}id="{{ div.css_id }}"{% endif %}
-    class="{{ div.css_class }}" {{ div.flat_attrs|safe }}>
+    class="{{ div.css_class }}" {{ div.flat_attrs|safe }} style="display: none">
         {{ fields|safe }}
 </div>
 <script>
@@ -26,5 +26,11 @@
         trionyxFormDependenciesChange(dependencies);
     }
 
-    trionyxFormDepend({{ div.dependencies|jsonify }});
+    if (document.readyState === "complete") {
+        trionyxFormDepend({{ div.dependencies|jsonify }});
+    } else {
+        window.addEventListener('load', function () {
+            trionyxFormDepend({{ div.dependencies|jsonify }});
+        });
+    }
 </script>
