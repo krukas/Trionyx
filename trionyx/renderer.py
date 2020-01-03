@@ -58,7 +58,7 @@ def bool_value_renderer(value, **options):
 
 def list_value_renderer(value, **options):
     """Render list value"""
-    return ', '.join(value)
+    return ', '.join(map(str, value))
 
 
 def related_field_renderer(value, **options):
