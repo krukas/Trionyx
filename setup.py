@@ -43,6 +43,7 @@ setup(
 
         'Pillow>=5.0.0',
         'PyYAML==5.2',
+        'docutils==0.15.2',
     ],
     extras_require={
         'dev': [

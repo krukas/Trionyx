@@ -10,6 +10,7 @@ from trionyx.menu import app_menu
 from trionyx import utils
 from trionyx.urls import model_url
 from trionyx.models import get_class
+from trionyx import __version__
 
 
 def trionyx(request):
@@ -25,9 +26,16 @@ def trionyx(request):
         'TX_THEME_COLOR': settings.TX_THEME_COLOR,
         'tx_skin_css': 'css/skins/skin-{}.min.css'.format(settings.TX_THEME_COLOR),
         'tx_tasks_url': model_url(get_class('trionyx.Task'), 'list'),
+        'tx_version': __version__,
+        'tx_show_changelog': (
+            settings.TX_SHOW_CHANGELOG_NEW_VERSION
+            and request.user.is_authenticated
+            and request.user.get_attribute('trionyx_last_shown_version') != utils.get_app_version()),
 
         'trionyx_menu_items': app_menu.get_menu_items(request.user),
         'trionyx_menu_collapse': request.COOKIES.get('menu.state') == 'collapsed',
+
+        'app_version': utils.get_app_version(),
 
         'datetime_input_format': utils.datetime_format_to_momentjs(utils.get_datetime_input_format()),
         'date_input_format': utils.datetime_format_to_momentjs(utils.get_datetime_input_format(date_only=True)),

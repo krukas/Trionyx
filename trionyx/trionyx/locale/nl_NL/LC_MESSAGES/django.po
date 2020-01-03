@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-02 19:32+0000\n"
-"PO-Revision-Date: 2020-01-02 20:28+0100\n"
+"POT-Creation-Date: 2020-01-03 21:11+0000\n"
+"PO-Revision-Date: 2020-01-03 22:12+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
@@ -527,7 +527,17 @@ msgstr "We zullen eraan werken om dat meteen op te lossen. Ondertussen kunt u "
 msgid "return to dashboard"
 msgstr "terugkeren naar het dashboard"
 
-#: trionyx/trionyx/templates/trionyx/base.html:153
+#: trionyx/trionyx/templates/trionyx/base.html:113
+#| msgid "Permissions"
+msgid "Version"
+msgstr "Versie"
+
+#: trionyx/trionyx/templates/trionyx/base.html:117
+#| msgid "Created by"
+msgid "Powered by"
+msgstr "Aangedreven door"
+
+#: trionyx/trionyx/templates/trionyx/base.html:166
 #: trionyx/trionyx/templates/trionyx/core/dashboard.html:193
 msgid "Close"
 msgstr "Sluiten"
@@ -622,7 +632,7 @@ msgstr "Bewerken"
 #: trionyx/trionyx/templates/trionyx/core/dashboard.html:114
 #: trionyx/trionyx/templates/trionyx/core/model_mass_update.html:18
 #: trionyx/trionyx/templates/trionyx/core/model_update.html:42
-#: trionyx/trionyx/views.py:435
+#: trionyx/trionyx/views.py:472
 msgid "Save"
 msgstr "Opslaan"
 
@@ -640,7 +650,7 @@ msgstr "Terug"
 #: trionyx/trionyx/templates/trionyx/core/model_delete.html:31
 #: trionyx/trionyx/templates/trionyx/core/model_list.html:121
 #: trionyx/trionyx/templates/trionyx/core/model_view.html:15
-#: trionyx/trionyx/views.py:182 trionyx/trionyx/views.py:496
+#: trionyx/trionyx/views.py:185 trionyx/trionyx/views.py:533
 msgid "Delete"
 msgstr "Verwijderen"
 
@@ -735,7 +745,7 @@ msgid "Updating %(count)s %(model_name_plural)s"
 msgstr "Bijwerken van %(count)s %(model_name_plural)s"
 
 #: trionyx/trionyx/templates/trionyx/core/model_mass_update.html:35
-#: trionyx/trionyx/views.py:181
+#: trionyx/trionyx/views.py:184
 msgid "Change"
 msgstr "Wijzigen"
 
@@ -814,41 +824,50 @@ msgstr "Tel records"
 msgid "Period Field"
 msgstr "Periodeveld"
 
-#: trionyx/trionyx/views.py:179
+#: trionyx/trionyx/views.py:182
 msgid "View"
 msgstr "Bekijken"
 
-#: trionyx/trionyx/views.py:180
+#: trionyx/trionyx/views.py:183
 msgid "Add"
 msgstr "Toevoegen"
 
-#: trionyx/trionyx/views.py:397
+#: trionyx/trionyx/views.py:329
+#, python-brace-format
+msgid "Changelog for {name}"
+msgstr "Changelog voor {name}"
+
+#: trionyx/trionyx/views.py:331
+msgid "Don't show again"
+msgstr "Niet meer tonen"
+
+#: trionyx/trionyx/views.py:434
 msgid "Widget does not exists"
 msgstr "Widget bestaat niet"
 
-#: trionyx/trionyx/views.py:429
+#: trionyx/trionyx/views.py:466
 msgid "Widget config"
 msgstr "Widget configuratie"
 
-#: trionyx/trionyx/views.py:478
+#: trionyx/trionyx/views.py:515
 msgid "Something went wrong on deleting the items"
 msgstr "Er is iets misgegaan bij het verwijderen van de items"
 
-#: trionyx/trionyx/views.py:485
+#: trionyx/trionyx/views.py:522
 #, python-brace-format
 msgid "Deleting {count} {model_name} items"
 msgstr "Het verwijderen van {count} {model_name} items"
 
-#: trionyx/trionyx/views.py:519 trionyx/trionyx/views.py:543
+#: trionyx/trionyx/views.py:556 trionyx/trionyx/views.py:580
 msgid "You must make a selection"
 msgstr "U moet een selectie maken"
 
-#: trionyx/trionyx/views.py:576
+#: trionyx/trionyx/views.py:613
 #, python-brace-format
 msgid "Mass update {count} {model_name}"
 msgstr "Massa update {count} {model_name}"
 
-#: trionyx/trionyx/views.py:584
+#: trionyx/trionyx/views.py:621
 #, python-brace-format
 msgid "Successfully started task for updating {count} {model_name}"
 msgstr ""

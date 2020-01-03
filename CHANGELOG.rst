@@ -14,6 +14,8 @@ Added
 - Add current url to dialog object
 - Add Link component
 - Add component option to lock object
+- Add footer with Trionyx and app version
+- Add changelog dialog with auto show on version change
 
 Changed
 ~~~~~~~

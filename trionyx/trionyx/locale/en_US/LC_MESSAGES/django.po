@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-01-02 19:32+0000\n"
+"POT-Creation-Date: 2020-01-03 21:11+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -524,7 +524,15 @@ msgstr ""
 msgid "return to dashboard"
 msgstr ""
 
-#: trionyx/trionyx/templates/trionyx/base.html:153
+#: trionyx/trionyx/templates/trionyx/base.html:113
+msgid "Version"
+msgstr ""
+
+#: trionyx/trionyx/templates/trionyx/base.html:117
+msgid "Powered by"
+msgstr ""
+
+#: trionyx/trionyx/templates/trionyx/base.html:166
 #: trionyx/trionyx/templates/trionyx/core/dashboard.html:193
 msgid "Close"
 msgstr ""
@@ -619,7 +627,7 @@ msgstr ""
 #: trionyx/trionyx/templates/trionyx/core/dashboard.html:114
 #: trionyx/trionyx/templates/trionyx/core/model_mass_update.html:18
 #: trionyx/trionyx/templates/trionyx/core/model_update.html:42
-#: trionyx/trionyx/views.py:435
+#: trionyx/trionyx/views.py:472
 msgid "Save"
 msgstr ""
 
@@ -637,7 +645,7 @@ msgstr ""
 #: trionyx/trionyx/templates/trionyx/core/model_delete.html:31
 #: trionyx/trionyx/templates/trionyx/core/model_list.html:121
 #: trionyx/trionyx/templates/trionyx/core/model_view.html:15
-#: trionyx/trionyx/views.py:182 trionyx/trionyx/views.py:496
+#: trionyx/trionyx/views.py:185 trionyx/trionyx/views.py:533
 msgid "Delete"
 msgstr ""
 
@@ -732,7 +740,7 @@ msgid "Updating %(count)s %(model_name_plural)s"
 msgstr ""
 
 #: trionyx/trionyx/templates/trionyx/core/model_mass_update.html:35
-#: trionyx/trionyx/views.py:181
+#: trionyx/trionyx/views.py:184
 msgid "Change"
 msgstr ""
 
@@ -809,41 +817,50 @@ msgstr ""
 msgid "Period Field"
 msgstr ""
 
-#: trionyx/trionyx/views.py:179
+#: trionyx/trionyx/views.py:182
 msgid "View"
 msgstr ""
 
-#: trionyx/trionyx/views.py:180
+#: trionyx/trionyx/views.py:183
 msgid "Add"
 msgstr ""
 
-#: trionyx/trionyx/views.py:397
+#: trionyx/trionyx/views.py:329
+#, python-brace-format
+msgid "Changelog for {name}"
+msgstr ""
+
+#: trionyx/trionyx/views.py:331
+msgid "Don't show again"
+msgstr ""
+
+#: trionyx/trionyx/views.py:434
 msgid "Widget does not exists"
 msgstr ""
 
-#: trionyx/trionyx/views.py:429
+#: trionyx/trionyx/views.py:466
 msgid "Widget config"
 msgstr ""
 
-#: trionyx/trionyx/views.py:478
+#: trionyx/trionyx/views.py:515
 msgid "Something went wrong on deleting the items"
 msgstr ""
 
-#: trionyx/trionyx/views.py:485
+#: trionyx/trionyx/views.py:522
 #, python-brace-format
 msgid "Deleting {count} {model_name} items"
 msgstr ""
 
-#: trionyx/trionyx/views.py:519 trionyx/trionyx/views.py:543
+#: trionyx/trionyx/views.py:556 trionyx/trionyx/views.py:580
 msgid "You must make a selection"
 msgstr ""
 
-#: trionyx/trionyx/views.py:576
+#: trionyx/trionyx/views.py:613
 #, python-brace-format
 msgid "Mass update {count} {model_name}"
 msgstr ""
 
-#: trionyx/trionyx/views.py:584
+#: trionyx/trionyx/views.py:621
 #, python-brace-format
 msgid "Successfully started task for updating {count} {model_name}"
 msgstr ""

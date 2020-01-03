@@ -106,6 +106,19 @@
             {% block content_bottom %}{% endblock %}
         </div>
 
+        <footer class="main-footer">
+            {% block footer %}
+                {% if app_version %}
+                    <div class="pull-right hidden-xs">
+                        <b>{{ TX_APP_NAME }} {% trans 'Version' %}</b>
+                        <a href="#" onclick="openDialog('{% url 'trionyx:changelog' %}', {size: 'large'})">{{ app_version }}</a>
+                    </div>
+                {%  endif %}
+                <strong>{% trans 'Powered by' %} <a href="https://github.com/krukas/Trionyx" target="_blank">Trionyx</a></strong>
+                ({{ tx_version }})
+            {% endblock %}
+        </footer>
+
         {% include 'trionyx/base/right_sidebar.html' %}
 
     </div>
@@ -152,6 +165,11 @@
     window.trionyx_translations = {
         close: '{% trans 'Close' %}',
     }
+
+    {% if tx_show_changelog %}
+        openDialog('{% url 'trionyx:changelog' %}?show=1', {size: 'large'});
+    {% endif %}
+
 </script>
 
 {% include 'trionyx/base/filters.html' %}

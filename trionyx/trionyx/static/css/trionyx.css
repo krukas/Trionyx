@@ -792,3 +792,30 @@ th:hover .dragtable-drag-handle {
     margin-left: -16px;
     left: 50%;
 }
+
+/* Changelog */
+.changelog-wrapper {
+    height: calc(100vh - 200px);
+    overflow-y: scroll;
+}
+
+.changelog-wrapper h1:first-of-type {
+    margin-top: 0px;
+}
+
+.changelog-wrapper h1 {
+    font-size: 26px;
+    margin-bottom: 5px;
+}
+
+.changelog-wrapper h2 {
+    font-size: 20px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.changelog-wrapper h3 {
+    font-size: 18px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}

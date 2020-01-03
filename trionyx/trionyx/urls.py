@@ -30,6 +30,9 @@ urlpatterns = [
     # Tasks
     path('user-tasks/', views.UserTasksJsend.as_view(), name='user-tasks'),
 
+    # Changelog
+    path('changelog/', views.ChangelogDialog.as_view(), name='changelog'),
+
     # Dashboard
     path('', views.DashboardView.as_view(), name='dashboard'),
     path('dashboard/save/', views.SaveDashboardJsendView.as_view(), name='dashboard-save'),

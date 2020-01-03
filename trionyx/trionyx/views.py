@@ -5,10 +5,13 @@ trionyx.trionyx.view.accounts
 :copyright: 2018 by Maikel Martens
 :license: GPLv3
 """
+import os
+import re
 import json
 import logging
 from collections import OrderedDict
 
+from docutils.core import publish_parts
 from django.http import HttpResponse, HttpResponseRedirect
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.auth import logout as django_logout
@@ -300,6 +303,40 @@ class UserTasksJsend(JsendView):
                 'url': task.get_absolute_url(),
             } for task in tasks
         ]
+
+
+# =============================================================================
+# Changelog
+# =============================================================================
+class ChangelogDialog(DialogView):
+    """Dialog to show app changelog based on CHANGELOG.rst"""
+
+    def display_dialog(self):
+        """Display changelog"""
+        changelog_path = os.path.join(settings.BASE_DIR, 'CHANGELOG.rst')
+
+        if os.path.isfile(changelog_path):
+            with open(changelog_path, 'r', encoding='utf-8') as _file:
+                content = publish_parts(_file.read(), writer_name='html')['html_body']
+        else:
+            content = ''
+
+        if settings.TX_CHANGELOG_HASHTAG_URL:
+            link_re = r'<a href="{link}" target="_blank">#\1</a>'.format(link=settings.TX_CHANGELOG_HASHTAG_URL.format(tag='\\1'))
+            content = re.sub(r"#([\d\w\-]+)", link_re, content)
+
+        return {
+            'title': str(_('Changelog for {name}')).format(name=settings.TX_APP_NAME),
+            'content': f'<div class="changelog-wrapper">{content}</div>',
+            'submit_label': _("Don't show again") if self.request.GET.get('show') else False,
+        }
+
+    def handle_dialog(self):
+        """Save shown changelog version"""
+        self.request.user.set_attribute('trionyx_last_shown_version', utils.get_app_version())
+        return {
+            'close': True,
+        }
 
 
 # =============================================================================

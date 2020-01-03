@@ -457,3 +457,9 @@ TX_CORE_MODEL_CONFIGS: Dict[str, Dict[str, Any]] = {
 
 TX_DB_LOG_LEVEL: int = logging.WARNING
 """The DB log level for logging"""
+
+TX_CHANGELOG_HASHTAG_URL: Optional[str] = None
+"""Url to convert all hastags to example: https://github.com/krukas/Trionyx/issues/{tag}"""
+
+TX_SHOW_CHANGELOG_NEW_VERSION = True
+"""Show changelog dialog with new version"""

@@ -37,6 +37,8 @@ SECRET_KEY = 'dev-key-very-secure'
 DEBUG = True
 COMPRESS_ENABLED = False
 
+TX_CHANGELOG_HASHTAG_URL = 'https://github.com/krukas/Trionyx/issues/{tag}'
+
 # Database
 DATABASES = get_env_var('DATABASES', {
     'default': {
