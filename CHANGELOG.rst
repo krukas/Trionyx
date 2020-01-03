@@ -15,11 +15,18 @@ Added
 - Add Link component
 - Add component option to lock object
 
+Changed
+~~~~~~~
+- Update translations
+
 Fixed
 ~~~~~
 - Widget config popup is blank
 - Fix form layout Depend not working on create/update view
 - Fix widget config_form_class is not set
+- Fix list_value_renderer crashes on non string list items
+- Fix list load loop on fast reloads (eq spam next button)
+- Fix Makefile translate commands
 
 
 [2.0.2] - 24-12-2019
