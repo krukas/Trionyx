@@ -52,11 +52,21 @@ class Quickstart:
             'secret_key': utils.random_string(32)
         })
 
+        app_name = os.path.basename(project_path).capitalize()
+
         self.update_file(project_path, 'README.rst', {
             'title': "{name}\n{heading}".format(
-                name=os.path.basename(project_path).capitalize(),
-                heading='=' * len(os.path.basename(project_path)),
+                name=app_name,
+                heading='=' * len(app_name),
             )
+        })
+
+        self.update_file(project_path, 'config/settings/base.py', {
+            'app_name': app_name,
+            'logo_name_start': app_name[0],
+            'logo_name_end': app_name[1:],
+            'logo_name_small_start': app_name[0].upper(),
+            'logo_name_small_end': app_name[1].upper(),
         })
 
     def create_app(self, apps_path, name):
