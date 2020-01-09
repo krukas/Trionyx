@@ -29,6 +29,7 @@ Fixed
 - Fix list_value_renderer crashes on non string list items
 - Fix list load loop on fast reloads (eq spam next button)
 - Fix Makefile translate commands
+- Fix CreateDialog permission check wasn't working
 
 
 [2.0.2] - 24-12-2019

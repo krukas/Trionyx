@@ -121,7 +121,7 @@ class DialogView(View, ModelClassMixin):
 
     def has_permission(self, request: HttpRequest) -> bool:
         """Check if user has permission"""
-        if not self.object and not self.permission:
+        if not self.object and not self.permission and self.permission_type != 'add':
             return True
 
         if not self.permission:
