@@ -17,6 +17,7 @@ Added
 - Add footer with Trionyx and app version
 - Add changelog dialog with auto show on version change
 - Add command to generate favicon
+- Add Ansible upgrade playbook for quickstart
 
 Changed
 ~~~~~~~

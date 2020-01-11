@@ -134,6 +134,8 @@ class Quickstart:
             deploy_key = _file.read()
 
         config = {
+            'ansible_ssh_user': 'ansible',
+            'ansible_ssh_port': 6969,
             'ansible_ssh_private_key_file': 'ssh_keys/connect_rsa',
             'app_domain': domain,
             'app_repo': repo,
