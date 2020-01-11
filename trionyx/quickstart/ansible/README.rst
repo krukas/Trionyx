@@ -75,3 +75,18 @@ If you only want to deploy and not check all steps for building the server, you 
     
 
 For more information on Ansible playbooks go to https://docs.ansible.com/
+
+Server maintenance
+------------------
+
+Security updates are automatically installed with unattended-upgrades.
+For the normal system update there is an upgrade.yml playbook.
+
+.. warning::
+    The upgrade.yml playbook will restart the server if an updated package required a system reboot.
+
+You can run the system upgrade playbook with following command:
+
+.. code-block:: bash
+
+    ansible-playbook upgrade.yml -i production
