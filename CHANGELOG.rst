@@ -22,6 +22,7 @@ Added
 Changed
 ~~~~~~~
 - Update translations
+- Add traceback stack to DB logs with no Exception
 
 Fixed
 ~~~~~

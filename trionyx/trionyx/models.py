@@ -223,6 +223,14 @@ class LogManager(models.BaseManager):
             log.traceback = ''.join(traceback.TracebackException(
                 *record.exc_info
             ).format())
+        if not record.exc_info and not log.traceback:
+            # Create traceback and remove last items from log library
+            new_trace = 'Traceback stack (with the logging removed):\n'
+            for line in traceback.format_stack():
+                if '/logging/__init__.py' in line:
+                    break
+                new_trace += line
+            log.traceback = new_trace
 
         request = get_current_request()
         entry = LogEntry.objects.create(
