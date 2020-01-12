@@ -23,6 +23,7 @@ Changed
 ~~~~~~~
 - Update translations
 - Add traceback stack to DB logs with no Exception
+- Set max_page of 1000 for API and default page size to 25
 
 Fixed
 ~~~~~

@@ -14,6 +14,8 @@ from rest_framework.pagination import PageNumberPagination as RestPageNumberPagi
 class PageNumberPagination(RestPageNumberPagination):
     """Api Pagination class"""
 
+    max_page_size = 1000
+
     def get_paginated_response(self, data):
         """Get paginated response, added extra fields"""
         return Response(OrderedDict([
