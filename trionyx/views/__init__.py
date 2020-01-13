@@ -207,7 +207,8 @@ class TabRegister:
                 code=code,
                 name=name,
                 order=order,
-                display_filter=display_filter
+                display_filter=display_filter,
+                model_alias=model_alias
             )
 
             if item in self.tabs[model_alias]:
@@ -284,13 +285,14 @@ class TabRegister:
 class TabItem:
     """Tab item that holds the tab data and renders the layout"""
 
-    def __init__(self, code, name=None, order=None, display_filter=None):
+    def __init__(self, code, name=None, order=None, display_filter=None, model_alias=None):
         """Init TabItem"""
         self._name = None
         self.code = code
         self.name = name
         self.order = order
         self.display_filter = display_filter if display_filter else lambda object: True
+        self.model_alias = model_alias
 
     @property
     def name(self):
@@ -306,7 +308,7 @@ class TabItem:
 
     def get_layout(self, object):
         """Get complete layout for given object"""
-        model_alias = tabs.get_model_alias(object)
+        model_alias = self.model_alias if self.model_alias else tabs.get_model_alias(object)
         return layouts.get_layout(f'{model_alias}-{self.code}', object)
 
     def __str__(self):

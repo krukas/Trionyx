@@ -34,6 +34,7 @@ Fixed
 - Fix list load loop on fast reloads (eq spam next button)
 - Fix Makefile translate commands
 - Fix CreateDialog permission check wasn't working
+- Fix model alias tabs not working
 
 
 [2.0.2] - 24-12-2019
