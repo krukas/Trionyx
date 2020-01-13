@@ -18,6 +18,7 @@ Added
 - Add changelog dialog with auto show on version change
 - Add command to generate favicon
 - Add Ansible upgrade playbook for quickstart
+- Add user API token reset link
 
 Changed
 ~~~~~~~

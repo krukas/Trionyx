@@ -11,7 +11,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.utils import timezone
 from rest_framework.authtoken.models import Token
 from trionyx.layout import (
-    Container, Row, Column10, Column2, Column12, Column6,
+    Container, Row, Column10, Column2, Column12, Column6, Component, OnclickLink,
     Panel, DescriptionList, TableDescription, Img, Table, Html, HtmlTemplate, ProgressBar
 )
 from trionyx.renderer import datetime_value_renderer
@@ -59,7 +59,16 @@ def account_overview(obj):
                             'timezone',
                             {
                                 'label': _('API Token'),
-                                'value': token.key,
+                                'value': Component(
+                                    Html(token.key),
+                                    OnclickLink(
+                                        _('Reset'),
+                                        model_url='dialog-edit-custom',
+                                        model_code='reset-api-token',
+                                        dialog=True,
+                                        dialog_reload_layout=True,
+                                    ),
+                                ),
                             },
                         ),
                     )
@@ -110,7 +119,16 @@ def trionyx_user(obj):
                         'groups',
                         {
                             'label': _('API Token'),
-                            'value': token.key,
+                            'value': Component(
+                                Html(token.key),
+                                OnclickLink(
+                                    _('Reset'),
+                                    model_url='dialog-edit-custom',
+                                    model_code='reset-api-token',
+                                    dialog=True,
+                                    dialog_reload_layout=True,
+                                ),
+                            ),
                         },
                     ),
                 ),

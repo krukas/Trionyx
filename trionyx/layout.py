@@ -776,6 +776,20 @@ class Link(Html):
         self.attr['href'] = self.attr['href'] if self.href else self.object.get_absolute_url()
 
 
+class OnclickLink(OnclickTag):
+    """Link"""
+
+    tag = 'a'
+    valid_attr = ['onClick', 'class']
+    attr = {
+        'href': '#',
+    }
+
+    def __init__(self, label, **options):
+        """Init OnclickLink"""
+        super().__init__(Html(label), **options)
+
+
 # =============================================================================
 # Bootstrap grid system
 # =============================================================================
