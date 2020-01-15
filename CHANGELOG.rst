@@ -36,6 +36,7 @@ Fixed
 - Fix Makefile translate commands
 - Fix CreateDialog permission check wasn't working
 - Fix model alias tabs not working
+- Fix Quickstart reusable app
 
 
 [2.0.2] - 24-12-2019

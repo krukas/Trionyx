@@ -106,6 +106,7 @@ class Quickstart:
         }
 
         self.update_file(path, '[app_name]/apps.py', variables)
+        self.update_file(path, '[app_name]/__init__.py', variables)
         self.update_file(path, 'app/settings.py', variables)
         self.update_file(path, 'MANIFEST.in', variables)
         self.update_file(path, 'README.rst', variables)
