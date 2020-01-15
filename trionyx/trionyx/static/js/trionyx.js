@@ -602,3 +602,26 @@ function txUpdateLayout(id, component) {
         });
     }
 }
+
+/* Form depend */
+function trionyxFormDepend(selector, dependencies) {
+    function trionyxFormDependenciesChange() {
+        var show = true;
+        for (index in dependencies) {
+            let dep = dependencies[index];
+            show = show && $('#id_' + dep[0]).val().match(dep[1]);
+        }
+        if (show) {
+            $(selector).slideDown();
+        } else {
+            $(selector).slideUp();
+        }
+    }
+
+    for (index in dependencies) {
+        $('#id_' + dependencies[index][0]).change(function () {
+            trionyxFormDependenciesChange();
+        });
+    }
+    trionyxFormDependenciesChange();
+}

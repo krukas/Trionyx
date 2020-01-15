@@ -4,33 +4,7 @@
         {{ fields|safe }}
 </div>
 <script>
-    function trionyxFormDependenciesChange(dependencies) {
-        var show = true;
-        for (index in dependencies) {
-            let dep = dependencies[index];
-            show = show && $('#id_' + dep[0]).val().match(dep[1]);
-        }
-        if (show) {
-            $('#{{ div.css_id }}').slideDown();
-        } else {
-            $('#{{ div.css_id }}').slideUp();
-        }
-    }
-
-    function trionyxFormDepend(dependencies) {
-        for (index in dependencies) {
-            $('#id_' + dependencies[index][0]).change(function () {
-                trionyxFormDependenciesChange(dependencies);
-            });
-        }
-        trionyxFormDependenciesChange(dependencies);
-    }
-
-    if (document.readyState === "complete") {
-        trionyxFormDepend({{ div.dependencies|jsonify }});
-    } else {
-        window.addEventListener('load', function () {
-            trionyxFormDepend({{ div.dependencies|jsonify }});
-        });
-    }
+    runOnReady(function () {
+        trionyxFormDepend('#{{ div.css_id }}', {{ div.dependencies|jsonify }});
+    });
 </script>

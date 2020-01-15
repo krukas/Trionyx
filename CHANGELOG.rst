@@ -19,12 +19,14 @@ Added
 - Add command to generate favicon
 - Add Ansible upgrade playbook for quickstart
 - Add user API token reset link
+- Add JS helper runOnReady function
 
 Changed
 ~~~~~~~
 - Update translations
 - Add traceback stack to DB logs with no Exception
 - Set max_page of 1000 for API and default page size to 25
+- Moved depend JS to static files
 
 Fixed
 ~~~~~
