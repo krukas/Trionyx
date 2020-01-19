@@ -20,6 +20,7 @@ urlpatterns = [
 
     path('login/', views.LoginView.as_view(), name='login'),
     path('logout/', views.logout, name='logout'),
+    path('basic-auth/<str:user_type>/', views.basic_auth, name='basic-auth'),
 
     path('account/edit/', views.UpdateUserAccountView.as_view(), name='edit-account'),
     path('account/view/', views.ViewUserAccountView.as_view(), name='view-account'),

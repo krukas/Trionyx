@@ -20,6 +20,7 @@ Added
 - Add Ansible upgrade playbook for quickstart
 - Add user API token reset link
 - Add JS helper runOnReady function
+- Add basic-auth authentication view
 
 Changed
 ~~~~~~~

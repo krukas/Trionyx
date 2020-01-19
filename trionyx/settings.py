@@ -174,6 +174,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 LOGIN_EXEMPT_URLS = [
     'static',
     'api',
+    'basic-auth',
 ]
 """A list of urls that dont require a login"""
 

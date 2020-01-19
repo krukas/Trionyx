@@ -43,6 +43,15 @@ Task = get_class('trionyx.Task')
 logger = logging.getLogger(__name__)
 
 
+def basic_auth(request, user_type):
+    """View that can be used for basic-auth like Nginx ngx_http_auth_request_module"""
+    if user_type == 'superuser' and request.user.is_authenticated and request.user.is_superuser:
+        return HttpResponse('OK')
+    if user_type == 'user' and request.user.is_authenticated:
+        return HttpResponse('OK')
+    return HttpResponse('NOK', status=403)
+
+
 def media_nginx_accel(request, path):
     """
     Location /protected/ {
