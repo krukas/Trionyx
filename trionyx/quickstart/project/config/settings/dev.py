@@ -73,10 +73,6 @@ LOGGING = {
             'level': 'DEBUG',
             'handlers': ['console'],
         },
-        'django_jsend': {
-            'level': 'DEBUG',
-            'handlers': ['console'],
-        },
         # 'django.db.backends': {
         #     'level': 'DEBUG',
         #     'handlers': ['console'],

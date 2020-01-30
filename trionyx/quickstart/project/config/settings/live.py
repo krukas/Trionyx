@@ -38,10 +38,6 @@ LOGGING = {
             'level': 'WARNING',
             'handlers': ['error-file'],
         },
-        'django_jsend': {
-            'level': 'ERROR',
-            'handlers': ['error-file'],
-        },
         'django': {
             'level': 'ERROR',
             'handlers': ['error-file'],
