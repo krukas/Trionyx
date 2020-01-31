@@ -74,6 +74,9 @@ urlpatterns = [
     ),
     path('dialog/model/<str:app>/<str:model>/<int:pk>/delete/', core_views.DeleteDialog.as_view(), name='model-dialog-delete'),
 
+    # Ajax choices
+    path('form/choices/<str:id>/', views.ajaxFormModelChoices, name='form-choices'),
+
     # Sidebar
     path('sidebar/model/<str:app>/<str:model>/<int:pk>/<str:code>/', views.SidebarJsend.as_view(), name='model-sidebar'),
 

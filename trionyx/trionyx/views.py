@@ -12,7 +12,8 @@ import logging
 from collections import OrderedDict
 
 from docutils.core import publish_parts
-from django.http import HttpResponse, HttpResponseRedirect
+from django.core.paginator import Paginator
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.contrib.auth.views import LoginView as DjangoLoginView
 from django.contrib.auth import logout as django_logout
 from django.contrib.auth.models import Permission
@@ -25,6 +26,7 @@ from django.conf import settings
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
+from django.forms.widgets import SelectMultiple
 
 from trionyx.models import get_class
 from trionyx.views import UpdateView, DetailTabView, DialogView, JsendView
@@ -33,7 +35,7 @@ from trionyx.config import models_config
 from trionyx.widgets import widgets
 from trionyx import utils
 from trionyx.forms.helper import FormHelper
-from trionyx.forms import form_register, modelform_factory
+from trionyx.forms import form_register, modelform_factory, ModelAjaxChoiceField
 from trionyx.models import filter_queryset_with_user_filters
 from trionyx.trionyx.tasks import MassUpdateTask
 
@@ -206,6 +208,43 @@ def create_permission_jstree(selected=None, disabled=False):
         })
 
     return jstree
+
+
+# =============================================================================
+# Ajax form views
+# =============================================================================
+def ajaxFormModelChoices(request, id):
+    """View for select2 ajax data request"""
+    if id not in ModelAjaxChoiceField.registered_fields:
+        return JsonResponse({})
+
+    field = ModelAjaxChoiceField.registered_fields[id]
+    query = field.queryset.order_by('verbose_name')
+
+    search = request.GET.get('q', None)
+    if search:
+        config = models_config.get_config(query.model)
+        if not config.disable_search_index:
+            query = watson.filter(query, search, ranking=False)
+        else:
+            query = query.filter(verbose_name__contains=search)
+
+    pages = Paginator(query, 20)
+    page = pages.page(int(request.GET.get('page', 1)))
+
+    result = [
+        {'id': '', 'text': '------'}
+    ] if not isinstance(field.widget, SelectMultiple) and not field.required and page.number == 1 else []
+
+    return JsonResponse({
+        'results': result + [{
+            'id': row[0],
+            'text': row[1],
+        } for row in page.object_list.values_list('id', 'verbose_name')],
+        'pagination': {
+            'more': page.has_next(),
+        }
+    })
 
 
 # =============================================================================

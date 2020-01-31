@@ -21,6 +21,7 @@ Added
 - Add user API token reset link
 - Add JS helper runOnReady function
 - Add basic-auth authentication view
+- Add ajax form choices and multiple choices field
 
 Changed
 ~~~~~~~
