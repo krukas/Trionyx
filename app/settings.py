@@ -57,6 +57,7 @@ CELERY_BEAT_SCHEDULE = create_celerybeat_schedule(INSTALLED_APPS)
 
 LOGGING = {
 	'version': 1,
+    'disable_existing_loggers': False,
 	'formatters': {
 		'color_console': {
 			'()': 'colorlog.ColoredFormatter',
@@ -85,7 +86,7 @@ LOGGING = {
 		}
 	},
 	'loggers': {
-		'apps': {
+		'app': {
 			'level': 'DEBUG',
 			'handlers': ['console'],
 		},

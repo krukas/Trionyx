@@ -41,6 +41,7 @@ Fixed
 - Fix CreateDialog permission check wasn't working
 - Fix model alias tabs not working
 - Fix Quickstart reusable app
+- Fix log messages is not formatted in db logger
 
 
 [2.0.2] - 24-12-2019
