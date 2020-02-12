@@ -1111,10 +1111,17 @@ class Table(Component, ComponentFieldsMixin):
 
     template_name = 'trionyx/components/table.html'
 
-    def __init__(self, objects, *fields, **options):
+    def __init__(self, objects, *fields, css_class='table',
+                 condensed=True, hover=False, striped=False, bordered=True, **options):
         """Init Table"""
         footer = options.pop('footer', None)
         super().__init__(**options)
+
+        css_class = f'{css_class} table-condensed' if condensed else css_class
+        css_class = f'{css_class} table-hover' if hover else css_class
+        css_class = f'{css_class} table-striped' if striped else css_class
+        css_class = f'{css_class} table-bordered' if bordered else css_class
+        self.css_class = css_class
 
         self.objects = objects
         """Can be string with field name relation, Queryset or list"""

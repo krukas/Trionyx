@@ -228,8 +228,10 @@ def post_overview(obj):
                             'class': 'text-right'
                         },
                         'Price'
-                    ]
-                )
+                    ],
+                    hover=True,
+                ),
+                collapse=True,
             )
         )
     ]
