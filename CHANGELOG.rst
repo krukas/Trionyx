@@ -29,6 +29,7 @@ Changed
 - Add traceback stack to DB logs with no Exception
 - Set max_page of 1000 for API and default page size to 25
 - Moved depend JS to static files
+- Change logging to file rotation for quickstart project
 
 Fixed
 ~~~~~
