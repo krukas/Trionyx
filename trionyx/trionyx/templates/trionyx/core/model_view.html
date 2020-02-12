@@ -1,8 +1,8 @@
 {% extends "trionyx/base.html" %}
 {% load i18n static %}
 
-{% block title %}{% if title %}{{ title }}{% else %}{{ object }} | {{ model_verbose_name }}{% endif %}{% endblock %}
-{% block page_title %}{% if title %}{{ title }}{% else %}{{ object }}{% endif %}{% endblock %}
+{% block title %}{% if title %}{{ title|truncatechars:80 }}{% else %}{{ object|truncatechars:80 }} | {{ model_verbose_name }}{% endif %}{% endblock %}
+{% block page_title %}{% if title %}{{ title|truncatechars:80 }}{% else %}{{ object|truncatechars:80 }}{% endif %}{% endblock %}
 
 {% block header_buttons %}
     {% if back_url %}

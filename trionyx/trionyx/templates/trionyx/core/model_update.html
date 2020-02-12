@@ -3,17 +3,17 @@
 
 {% block title %}
     {% if title %}
-        {{ title }}
+        {{ title|truncatechars:80 }}
     {% else %}
-        {% trans "Update" %} {{ object }}
+        {% trans "Update" %} {{ object|truncatechars:80 }}
     {% endif %}
 {% endblock %}
 
 {% block page_title %}
     {% if title %}
-        {{ title }}
+        {{ title|truncatechars:80 }}
     {% else %}
-        {{ object }}
+        {{ object|truncatechars:80 }}
     {% endif %}
 {% endblock %}
 

@@ -45,6 +45,7 @@ Fixed
 - Fix Quickstart reusable app
 - Fix log messages is not formatted in db logger
 - Fix BaseTask can be executed to fast
+- Fix prevent large header titles pushing buttons and content away
 
 
 [2.0.2] - 24-12-2019
