@@ -42,6 +42,7 @@ Fixed
 - Fix model alias tabs not working
 - Fix Quickstart reusable app
 - Fix log messages is not formatted in db logger
+- Fix BaseTask can be executed to fast
 
 
 [2.0.2] - 24-12-2019
