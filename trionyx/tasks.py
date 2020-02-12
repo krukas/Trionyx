@@ -119,10 +119,9 @@ class BaseTask(celery.Task, metaclass=TaskMetaClass):
             user=user,
             status=Task.SCHEDULED if eta else Task.QUEUE,
             scheduled_at=eta,
-            countdown=countdown,
         )
 
-        return self.apply_async(args=args, kwargs=kwargs, task_id=task_id, eta=eta, queue=queue)
+        return self.apply_async(args=args, kwargs=kwargs, task_id=task_id, eta=eta, queue=queue, countdown=countdown)
 
     def set_progress(self, progress):
         """Set progress"""
