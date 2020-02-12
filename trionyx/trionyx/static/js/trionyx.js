@@ -317,6 +317,7 @@ function openDialog(url, options) {
 
 function TrionyxDialog(url, options) {
     var self = this;
+    self.url = url;
     options = typeof options !== 'undefined' ? options : {};
     var dialog = $('<div class="modal fade" data-backdrop="static" data-keyboard="false">');
     var form = $('<form method="POST" enctype="multipart/form-data" novalidate>');
@@ -368,6 +369,7 @@ function TrionyxDialog(url, options) {
         } else {
             if (data.url) {
                 form.attr('action', data.url);
+                self.url = data.url;
             }
 
             self.setTitle(data);
@@ -406,7 +408,11 @@ function TrionyxDialog(url, options) {
 
     // Build dialog
     var dialogSizeClass = '';
-    if ('size' in options && options.size === 'large') {
+    if ('size' in options && options.size === 'full') {
+        dialogSizeClass = 'modal-full';
+    } else if ('size' in options && options.size === 'extra-large') {
+        dialogSizeClass = 'modal-xl';
+    } else if ('size' in options && options.size === 'large') {
         dialogSizeClass = 'modal-lg';
     } else if ('size' in options && options.size === 'small') {
         dialogSizeClass = 'modal-sm';
@@ -595,4 +601,27 @@ function txUpdateLayout(id, component) {
             }
         });
     }
+}
+
+/* Form depend */
+function trionyxFormDepend(selector, dependencies) {
+    function trionyxFormDependenciesChange() {
+        var show = true;
+        for (index in dependencies) {
+            let dep = dependencies[index];
+            show = show && $('#id_' + dep[0]).val().match(dep[1]);
+        }
+        if (show) {
+            $(selector).slideDown();
+        } else {
+            $(selector).slideUp();
+        }
+    }
+
+    for (index in dependencies) {
+        $('#id_' + dependencies[index][0]).change(function () {
+            trionyxFormDependenciesChange();
+        });
+    }
+    trionyxFormDependenciesChange();
 }

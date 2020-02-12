@@ -37,6 +37,8 @@ SECRET_KEY = 'dev-key-very-secure'
 DEBUG = True
 COMPRESS_ENABLED = False
 
+TX_CHANGELOG_HASHTAG_URL = 'https://github.com/krukas/Trionyx/issues/{tag}'
+
 # Database
 DATABASES = get_env_var('DATABASES', {
     'default': {
@@ -55,6 +57,7 @@ CELERY_BEAT_SCHEDULE = create_celerybeat_schedule(INSTALLED_APPS)
 
 LOGGING = {
 	'version': 1,
+    'disable_existing_loggers': False,
 	'formatters': {
 		'color_console': {
 			'()': 'colorlog.ColoredFormatter',
@@ -83,15 +86,11 @@ LOGGING = {
 		}
 	},
 	'loggers': {
-		'apps': {
+		'app': {
 			'level': 'DEBUG',
 			'handlers': ['console'],
 		},
         'trionyx': {
-			'level': 'DEBUG',
-			'handlers': ['console'],
-		},
-        'django_jsend': {
 			'level': 'DEBUG',
 			'handlers': ['console'],
 		},

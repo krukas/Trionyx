@@ -176,3 +176,12 @@ def get_current_request():
     """Get current request object"""
     from trionyx.trionyx import LOCAL_DATA
     return getattr(LOCAL_DATA, 'request', None)
+
+
+def get_app_version():
+    """Get app version"""
+    try:
+        from config import __version__  # type: ignore
+        return __version__
+    except ImportError:
+        return None

@@ -5,5 +5,5 @@ from trionyx.trionyx.apps import BaseConfig
 class Config(BaseConfig):
     """[[verbose_name]] configuration"""
 
-    name = 'apps.[[name]]'
+    name = '[[name]]'
     verbose_name = '[[verbose_name]]'

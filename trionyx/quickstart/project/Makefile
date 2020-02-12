@@ -93,11 +93,11 @@ test: lint
 locales_collect:
 	@( \
 	    . env/bin/activate; \
-	    python manage.py makemessages -l 'en_US' -i 'env/*' --no-obsolete; \
-	    python manage.py makemessages -l 'nl_NL' -i 'env/*' --no-obsolete; \
+	    $(PY) manage.py makemessages -l 'en_US' -i 'env/*' --no-obsolete; \
+	    $(PY) manage.py makemessages -l 'nl_NL' -i 'env/*' --no-obsolete; \
     )
 
 
 
 locales_compile:
-	@(. env/bin/activate; python manage.py compilemessages -l en_US -l nl_NL)
+	@(. env/bin/activate; $(PY) manage.py compilemessages -l en_US -l nl_NL)

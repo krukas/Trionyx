@@ -4,6 +4,7 @@ env/
 .coverage
 media/
 /static/
+trionyx/trionyx/static/img/favicon.png
 
 docs/_build/
 build/

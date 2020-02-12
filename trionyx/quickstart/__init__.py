@@ -52,11 +52,21 @@ class Quickstart:
             'secret_key': utils.random_string(32)
         })
 
+        app_name = os.path.basename(project_path).capitalize()
+
         self.update_file(project_path, 'README.rst', {
             'title': "{name}\n{heading}".format(
-                name=os.path.basename(project_path).capitalize(),
-                heading='=' * len(os.path.basename(project_path)),
+                name=app_name,
+                heading='=' * len(app_name),
             )
+        })
+
+        self.update_file(project_path, 'config/settings/base.py', {
+            'app_name': app_name,
+            'logo_name_start': app_name[0],
+            'logo_name_end': app_name[1:],
+            'logo_name_small_start': app_name[0].upper(),
+            'logo_name_small_end': app_name[1].upper(),
         })
 
     def create_app(self, apps_path, name):
@@ -96,6 +106,7 @@ class Quickstart:
         }
 
         self.update_file(path, '[app_name]/apps.py', variables)
+        self.update_file(path, '[app_name]/__init__.py', variables)
         self.update_file(path, 'app/settings.py', variables)
         self.update_file(path, 'MANIFEST.in', variables)
         self.update_file(path, 'README.rst', variables)
@@ -124,6 +135,8 @@ class Quickstart:
             deploy_key = _file.read()
 
         config = {
+            'ansible_ssh_user': 'ansible',
+            'ansible_ssh_port': 6969,
             'ansible_ssh_private_key_file': 'ssh_keys/connect_rsa',
             'app_domain': domain,
             'app_repo': repo,

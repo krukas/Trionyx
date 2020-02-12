@@ -12,7 +12,7 @@ from django.contrib.contenttypes.models import ContentType
 
 from trionyx.models import get_class
 from trionyx import forms
-from trionyx.forms.layout import Layout, Fieldset, Div, HtmlTemplate, Filters, Depend  # type: ignore
+from trionyx.forms.layout import Layout, Fieldset, Div, HtmlTemplate, Filters, Depend, HTML  # type: ignore
 from trionyx.forms.helper import FormHelper
 from trionyx.trionyx.icons import ICON_CHOICES
 from trionyx.config import models_config
@@ -297,6 +297,49 @@ class UserUpdateForm(forms.ModelForm):
             user.save()
             self.save_m2m()
         return user
+
+
+@forms.register(code='reset-api-token')
+class UserResetApiToken(forms.ModelForm):
+    """Reset API token form"""
+
+    class Meta:
+        """Meta"""
+
+        model = User
+        fields = []  # type: ignore
+
+    def __init__(self, *args, **kwargs):
+        """Init"""
+        super().__init__(*args, **kwargs)
+        if utils.get_current_request().user.id == self.instance.id:
+            text = _('Are you sure you want to invalidate your current API key and generate a new one?')
+        else:
+            text = _('Are you sure you want to invalidate the API key and generate a new one for {user}?'.format(
+                user=self.instance
+            ))
+
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            Div(
+                HTML(text),
+                css_class='alert alert-warning'
+            )
+        )
+
+    def save(self, commit=True):
+        """Create new token"""
+        from rest_framework.authtoken.models import Token
+        Token.objects.filter(user=self.instance).delete()
+        Token.objects.create(user=self.instance)
+
+    def get_title(self):
+        """Form title"""
+        return _('Invalidate and regenerate API token')
+
+    def get_submit_label(self):
+        """Form submit label"""
+        return _('Regenerate API token')
 
 
 @forms.register(default_create=True, default_edit=True)

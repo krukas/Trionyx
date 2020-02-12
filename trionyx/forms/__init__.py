@@ -10,19 +10,100 @@ Core forms for Trionyx
 import logging
 import inspect
 from collections import defaultdict
-from typing import List, Optional
+from typing import List, Optional, Dict
 
 from django.forms import *  # noqa F403
 from django.forms import ModelForm as DjangoModelForm
 from django.db.models.fields import NOT_PROVIDED
 from django.db import transaction
 from django.conf import settings
+from django.urls import reverse
 
 from trionyx.config import models_config
+from trionyx import utils
 
 logger = logging.getLogger(__name__)
 
 TX_MODEL_OVERWRITES_REVERSE = {value.lower(): key.lower() for key, value in settings.TX_MODEL_OVERWRITES.items()}
+
+
+class ModelAjaxChoiceField(ModelChoiceField):
+    """
+    Ajax model choice field, for Trionyx models.
+
+    Note: This will not work if this is used with a form that is displayed multiple times on a page.
+    """
+
+    registered_fields: Dict[str, ModelChoiceField] = {}
+
+    def __init__(self, queryset, *args, **kwargs):
+        """Init"""
+        self.field_id = utils.random_string(16)
+        self.registered_fields[self.field_id] = self
+        super().__init__(queryset, *args, **kwargs)
+
+    @property
+    def choices(self):
+        """Get active choices"""
+        from django.utils.functional import lazy
+        # Lazy function is used, because first call to choices if before `prepare_value`
+        return lazy(self.lazy_choices, list)()
+
+    def lazy_choices(self):
+        """Lazy choices, is used to get active choices"""
+        from trionyx.trionyx import LOCAL_DATA
+        value = getattr(LOCAL_DATA, f'choices-{self.field_id}', None)
+        return self.queryset.filter(id=value).values_list('id', 'verbose_name') if value else []
+
+    def prepare_value(self, value):
+        """Prepare value and store value in local data"""
+        from trionyx.trionyx import LOCAL_DATA
+        setattr(LOCAL_DATA, f'choices-{self.field_id}', value)
+        return super().prepare_value(value)
+
+    def widget_attrs(self, widget):
+        """Set select2 widget data"""
+        return {
+            'data-ajax-url': reverse('trionyx:form-choices', kwargs={'id': self.field_id}),
+        }
+
+
+class ModelAjaxMultipleChoiceField(ModelMultipleChoiceField):
+    """
+    Ajax model multiple choice field, for Trionyx models.
+
+    Note: This will not work if this is used with a form that is displayed multiple times on a page.
+    """
+
+    def __init__(self, queryset, *args, **kwargs):
+        """Init"""
+        self.field_id = utils.random_string(16)
+        ModelAjaxChoiceField.registered_fields[self.field_id] = self
+        super().__init__(queryset, *args, **kwargs)
+
+    @property
+    def choices(self):
+        """Get active choices"""
+        from django.utils.functional import lazy
+        return lazy(self.lazy_choices, list)()
+
+    def lazy_choices(self):
+        """Get active choices"""
+        from trionyx.trionyx import LOCAL_DATA
+        values = getattr(LOCAL_DATA, f'choices-{self.field_id}', None)
+        return [(v.id, v.verbose_name) for v in values] if values else []
+
+    def prepare_value(self, value):
+        """Prepare value"""
+        from trionyx.trionyx import LOCAL_DATA
+        setattr(LOCAL_DATA, f'choices-{self.field_id}', value)
+        return super().prepare_value(value)
+
+    def widget_attrs(self, widget):
+        """Set select2 widget data"""
+        return {
+            'data-ajax-url': reverse('trionyx:form-choices', kwargs={'id': self.field_id}),
+        }
 
 
 class ModelForm(DjangoModelForm):  # type: ignore

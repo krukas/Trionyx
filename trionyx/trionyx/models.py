@@ -205,15 +205,19 @@ class LogManager(models.BaseManager):
 
     def create_log_entry_by_record(self, record):
         """Create log entry by `logging.LogRecord`"""
+        if record.name == 'celery.app.trace':
+            # Remove celery task id, to make same errors match
+            record.args['id'] = ''
+
         log_hash = hashlib.md5(str(' '.join(str(x) for x in [
             record.pathname,
             record.lineno,
-            record.msg,
+            record.getMessage(),
         ])).encode()).hexdigest()
 
         log, _ = self.get_or_create(log_hash=log_hash, defaults={
             'level': record.levelno,
-            'message': record.msg,
+            'message': record.getMessage(),
             'file_path': record.pathname,
             'file_line': record.lineno,
             'last_event': timezone.now(),
@@ -223,6 +227,14 @@ class LogManager(models.BaseManager):
             log.traceback = ''.join(traceback.TracebackException(
                 *record.exc_info
             ).format())
+        if not record.exc_info and not log.traceback:
+            # Create traceback and remove last items from log library
+            new_trace = 'Traceback stack (with the logging removed):\n'
+            for line in traceback.format_stack():
+                if '/logging/__init__.py' in line:
+                    break
+                new_trace += line
+            log.traceback = new_trace
 
         request = get_current_request()
         entry = LogEntry.objects.create(

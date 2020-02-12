@@ -121,7 +121,7 @@ class DialogView(View, ModelClassMixin):
 
     def has_permission(self, request: HttpRequest) -> bool:
         """Check if user has permission"""
-        if not self.object and not self.permission:
+        if not self.object and not self.permission and self.permission_type != 'add':
             return True
 
         if not self.permission:
@@ -242,7 +242,7 @@ class UpdateDialog(DialogView):
 
     def handle_dialog(self) -> Dict[str, Any]:
         """Handle form and save and set success message on valid form"""
-        form = self.get_form_class()(data=self.request.POST, instance=self.object)
+        form = self.get_form_class()(data=self.request.POST, files=self.request.FILES, instance=self.object)
 
         success_message = None
         if form.is_valid():

@@ -291,6 +291,7 @@ class Component:
         self.layout_id = None
         self.components = list(filter(None, components))
         self.object = options.get('object', False)
+        self.lock_object = options.get('lock_object', False)
         self.context = {}
         self.request = None
 
@@ -312,7 +313,7 @@ class Component:
         if layout_id:
             self.layout_id = layout_id
 
-        if self.object is False or force:
+        if not self.lock_object and (self.object is False or force):
             self.object = object
         else:
             object = self.object
@@ -757,6 +758,38 @@ class Img(Html):
     }
 
 
+class Link(Html):
+    """Link tag"""
+
+    tag = 'a'
+    valid_attr = ['href', 'class']
+
+    def __init__(self, label=None, href=None, **kwargs):
+        """Init"""
+        self.label = label
+        self.href = href
+        super().__init__(label, href=href, **kwargs)
+
+    def updated(self):
+        """Update link"""
+        self.html = self.html if self.label else str(self.object)
+        self.attr['href'] = self.attr['href'] if self.href else self.object.get_absolute_url()
+
+
+class OnclickLink(OnclickTag):
+    """Link"""
+
+    tag = 'a'
+    valid_attr = ['onClick', 'class']
+    attr = {
+        'href': '#',
+    }
+
+    def __init__(self, label, **options):
+        """Init OnclickLink"""
+        super().__init__(Html(label), **options)
+
+
 # =============================================================================
 # Bootstrap grid system
 # =============================================================================
@@ -1078,10 +1111,17 @@ class Table(Component, ComponentFieldsMixin):
 
     template_name = 'trionyx/components/table.html'
 
-    def __init__(self, objects, *fields, **options):
+    def __init__(self, objects, *fields, css_class='table',
+                 condensed=True, hover=False, striped=False, bordered=False, **options):
         """Init Table"""
         footer = options.pop('footer', None)
         super().__init__(**options)
+
+        css_class = f'{css_class} table-condensed' if condensed else css_class
+        css_class = f'{css_class} table-hover' if hover else css_class
+        css_class = f'{css_class} table-striped' if striped else css_class
+        css_class = f'{css_class} table-bordered' if bordered else css_class
+        self.css_class = css_class
 
         self.objects = objects
         """Can be string with field name relation, Queryset or list"""

@@ -38,19 +38,19 @@
   - ~~Logs all from trionyx and apps~~
   - ~~Admin can see logs in interface~~
   - ~~log level is set as setting~~
-- Layout/Value renderers
-  - Progressbar with realtime option
+- Layout components
+  - ~~Progressbar~~
   - ~~Unordered/Ordered List~~
   - icon renderer/shortcut
   - ~~button (Link to/open dialog)~~
-  - ChartJs with realtime option
+  - ~~ChartJs~~
 - Forms
   - computed field
   - render layout components
   - Slider field
-  - File uploader (Maybe generic file model)
+  - ~~File uploader~~
   - email/money field with icon
-  - wysiwyg (support for files with generic file model)
+  - ~~wysiwyg~~
   - color picker
 - Changelog/version view based project CHANGELOG.md
 - DB config

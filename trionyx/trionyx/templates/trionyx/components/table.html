@@ -1,38 +1,40 @@
-<table class="table table-condensed" {% if component.css_id %}id="{{ component.css_id }}"{% endif %}>
-    <thead>
-        <tr>
-            {% for field in component.get_fields %}
-                <th {% if field.width %}style="width: {{ field.width }};"{% endif %}>
-                    {{ field.label }}
-                </th>
-            {% endfor %}
-        </tr>
-    </thead>
-    <tbody>
-        {% for row in component.get_rendered_objects %}
+<div class="table-responsive">
+    <table class="{{ component.css_class }}" {% if component.css_id %}id="{{ component.css_id }}"{% endif %}>
+        <thead>
             <tr>
-                {% for column in row %}
-                   <td {% if column.class %}class="{{ column.class }}"{% endif %}>
-                       {{ column.value|safe }}
-                   </td>
+                {% for field in component.get_fields %}
+                    <th {% if field.width %}style="width: {{ field.width }};"{% endif %}>
+                        {{ field.label }}
+                    </th>
                 {% endfor %}
             </tr>
-        {% endfor %}
-    </tbody>
-    {% if component.footer_objects %}
-        <tfooter class="">
-            {% for row in component.get_rendered_footer_objects %}
+        </thead>
+        <tbody>
+            {% for row in component.get_rendered_objects %}
                 <tr>
                     {% for column in row %}
-                       <td
-                               {% if column.class %}class="{{ column.class }}"{% endif %}
-                               {% if column.colspan %}colspan="{{ column.colspan }}"{% endif %}
-                       >
+                       <td {% if column.class %}class="{{ column.class }}"{% endif %}>
                            {{ column.value|safe }}
                        </td>
                     {% endfor %}
                 </tr>
             {% endfor %}
-        </tfooter>
-    {% endif %}
-</table>
+        </tbody>
+        {% if component.footer_objects %}
+            <tfoot>
+                {% for row in component.get_rendered_footer_objects %}
+                    <tr>
+                        {% for column in row %}
+                           <td
+                                   {% if column.class %}class="{{ column.class }}"{% endif %}
+                                   {% if column.colspan %}colspan="{{ column.colspan }}"{% endif %}
+                           >
+                               {{ column.value|safe }}
+                           </td>
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tfoot>
+        {% endif %}
+    </table>
+</div>

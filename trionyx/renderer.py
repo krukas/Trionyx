@@ -6,7 +6,7 @@ trionyx.renderer
 :license: GPLv3
 """
 import os
-from datetime import datetime
+from datetime import datetime, date
 from decimal import Decimal
 from functools import reduce
 
@@ -17,6 +17,12 @@ from babel.numbers import format_decimal, format_currency
 
 from trionyx import utils
 from trionyx import models
+
+
+def date_value_renderer(value, **options):
+    """Render date value with django formats, default is SHORT_DATE_FORMAT"""
+    date_format = options.get('date_format', 'SHORT_DATE_FORMAT')
+    return formats.date_format(value, date_format)
 
 
 def datetime_value_renderer(value, **options):
@@ -52,7 +58,7 @@ def bool_value_renderer(value, **options):
 
 def list_value_renderer(value, **options):
     """Render list value"""
-    return ', '.join(value)
+    return ', '.join(map(str, value))
 
 
 def related_field_renderer(value, **options):
@@ -141,6 +147,7 @@ class Renderer:
 
 
 renderer = Renderer({
+    date: date_value_renderer,
     datetime: datetime_value_renderer,
     Decimal: number_value_renderer,
     float: number_value_renderer,

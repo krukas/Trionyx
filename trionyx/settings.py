@@ -174,6 +174,7 @@ SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 LOGIN_EXEMPT_URLS = [
     'static',
     'api',
+    'basic-auth',
 ]
 """A list of urls that dont require a login"""
 
@@ -287,7 +288,7 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'trionyx.api.pagination.PageNumberPagination',
-    'PAGE_SIZE': 20,
+    'PAGE_SIZE': 25,
 }
 
 # ==============================================================================
@@ -457,3 +458,9 @@ TX_CORE_MODEL_CONFIGS: Dict[str, Dict[str, Any]] = {
 
 TX_DB_LOG_LEVEL: int = logging.WARNING
 """The DB log level for logging"""
+
+TX_CHANGELOG_HASHTAG_URL: Optional[str] = None
+"""Url to convert all hastags to example: https://github.com/krukas/Trionyx/issues/{tag}"""
+
+TX_SHOW_CHANGELOG_NEW_VERSION = True
+"""Show changelog dialog with new version"""

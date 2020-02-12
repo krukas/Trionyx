@@ -18,7 +18,7 @@ First we need to do a little manual setup on the server, you can do this by runn
     touch /home/ansible/.ssh/authorized_keys
     
     read -p 'Ansible public ssh key: ' ansible_public_key
-    echo $ansible_public_key > /home/ansible/.ssh/authorized_keys
+    echo \$ansible_public_key > /home/ansible/.ssh/authorized_keys
     
     chmod 600 /home/ansible/.ssh/authorized_keys
     chown ansible -Rf /home/ansible/.ssh
@@ -75,3 +75,18 @@ If you only want to deploy and not check all steps for building the server, you 
     
 
 For more information on Ansible playbooks go to https://docs.ansible.com/
+
+Server maintenance
+------------------
+
+Security updates are automatically installed with unattended-upgrades.
+For the normal system update there is an upgrade.yml playbook.
+
+.. warning::
+    The upgrade.yml playbook will restart the server if an updated package required a system reboot.
+
+You can run the system upgrade playbook with following command:
+
+.. code-block:: bash
+
+    ansible-playbook upgrade.yml -i production

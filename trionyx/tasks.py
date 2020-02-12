@@ -46,6 +46,9 @@ class BaseTask(celery.Task, metaclass=TaskMetaClass):
     task_lock = True
     task_model = None
 
+    default_countdown = 2
+    """Prevent task run to soon and transaction is not committed, this will happen if you use post_save signal"""
+
     def __call__(self, *args, **kwargs):
         """Run task"""
         self.__task, _ = Task.objects.get_or_create(celery_task_id=self.request.id)
@@ -100,6 +103,7 @@ class BaseTask(celery.Task, metaclass=TaskMetaClass):
         queue = kwargs.pop('task_queue', self.task_queue)
 
         eta = eta if isinstance(eta, datetime) else None
+        countdown = self.default_countdown if eta is None else None
         model = object if object else model
 
         if not user and get_current_request() and get_current_request().user.is_authenticated:
@@ -114,10 +118,10 @@ class BaseTask(celery.Task, metaclass=TaskMetaClass):
             object_verbose_name=str(object) if object else '',
             user=user,
             status=Task.SCHEDULED if eta else Task.QUEUE,
-            scheduled_at=eta
+            scheduled_at=eta,
         )
 
-        return self.apply_async(args=args, kwargs=kwargs, task_id=task_id, eta=eta, queue=queue)
+        return self.apply_async(args=args, kwargs=kwargs, task_id=task_id, eta=eta, queue=queue, countdown=countdown)
 
     def set_progress(self, progress):
         """Set progress"""

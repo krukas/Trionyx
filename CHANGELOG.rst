@@ -1,5 +1,5 @@
-[DEVELOP]
----------
+[2.1.0] - 12-02-2020
+--------------------
 Added
 ~~~~~
 - Add create_reusable_app command
@@ -7,10 +7,53 @@ Added
 - Add Unordered and Ordered list components
 - Add LineChart, BarChart, PieChart and DoughnutChart component
 - Add options to register data function for a widget
+- Add support for file upload in dialog
+- Add full/extra-large size options to dialog
+- Add link target option to header buttons
+- Add Date value renderer
+- Add current url to dialog object
+- Add Link component
+- Add component option to lock object
+- Add footer with Trionyx and app version
+- Add changelog dialog with auto show on version change
+- Add command to generate favicon
+- Add Ansible upgrade playbook for quickstart
+- Add user API token reset link
+- Add JS helper runOnReady function
+- Add basic-auth authentication view
+- Add ajax form choices and multiple choices field
+
+Changed
+~~~~~~~
+- Update translations
+- Add traceback stack to DB logs with no Exception
+- Set max_page of 1000 for API and default page size to 25
+- Moved depend JS to static files
+- Change logging to file rotation for quickstart project
+- Improve Table component styling options
 
 Fixed
 ~~~~~
 - Widget config popup is blank
+- Fix form layout Depend not working on create/update view
+- Fix widget config_form_class is not set
+- Fix list_value_renderer crashes on non string list items
+- Fix list load loop on fast reloads (eq spam next button)
+- Fix Makefile translate commands
+- Fix CreateDialog permission check wasn't working
+- Fix model alias tabs not working
+- Fix Quickstart reusable app
+- Fix log messages is not formatted in db logger
+- Fix BaseTask can be executed to fast
+- Fix prevent large header titles pushing buttons and content away
+
+
+[2.0.2] - 24-12-2019
+--------------------
+Fixed
+~~~~~
+- Fix inlineforms not working in popup
+- Widget config dialog wasn't shown
 
 
 [2.0.1] - 19-12-2019

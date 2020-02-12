@@ -223,28 +223,30 @@ class ModelsTest(TestCase):
             ]
         ).render({})
         self.assertHTMLEqual(html, """
-        <table class="table table-condensed">
-            <thead>
-                <tr>
-                    <th>Column 1</th>
-                    <th>Column 2</th>
-                    <th>Column 3</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr>
-                    <td>column1</td>
-                    <td>column2</td>
-                    <td>column3</td>
-                </tr>
-            </tbody>
-            <tfooter class="">
-                <tr>
-                    <td colspan="2">Footer</td>
-                    <td class="text-right">123</td>
-                </tr>
-            </tfooter>
-        </table>
+        <div class="table-responsive">
+            <table class="table table-condensed">
+                <thead>
+                    <tr>
+                        <th>Column 1</th>
+                        <th>Column 2</th>
+                        <th>Column 3</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>column1</td>
+                        <td>column2</td>
+                        <td>column3</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="2">Footer</td>
+                        <td class="text-right">123</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
         """)
 
     def test_line_chart(self):

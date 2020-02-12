@@ -289,6 +289,7 @@
                 massActionAllSelected: false,
 
                 activeFilters: [],
+                setActiveFilters: false,
                 renderedActiveFilters: [],
             },
 
@@ -353,7 +354,7 @@
                 activeFilters: function() {
                     this.renderedActiveFilters = this.$refs.trionyxFilters.renderedFilters;
 
-                    if (!this.loading) {
+                    if (!this.setActiveFilters) {
                         this.load();
                     }
                 },
@@ -374,7 +375,6 @@
                     } else {
                         this.sort = field;
                     };
-
                     this.load();
                 },
                 toPage: function (page) {
@@ -427,7 +427,7 @@
                         url: this.ajaxUrl,
                         data: initial ? {} : data,
                     }).done(function(response){
-                        if(response.status != 'success') {
+                        if(response.status !== 'success') {
                             return;
                         }
                         var data = response.data;
@@ -450,17 +450,20 @@
                         self.selected_fields = data.current_fields.join(',');
                         self.allFields = data.fields;
                         self.currentFields = data.current_fields;
-                        self.disableLoad = false;
+                        self.setActiveFilters = true;
                         self.activeFilters = data.filters;
-                    }).fail(function () {
-                        console.log('error');
+                    }).fail(function (response) {
+                        if (response.status !== 0) {
+                            console.log('error', data);
+                        }
                     }).always(function () {
                         self.ajaxCall = null;
+                        self.loading = false;
 
                         // To prevent watch is little later and get in load loop
                         setTimeout(function () {
-                            self.loading = false;
-                        }, 100);
+                            self.setActiveFilters = false;
+                        }, 100)
                     });
                 },
 

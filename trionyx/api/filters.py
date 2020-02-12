@@ -32,7 +32,7 @@ class SearchFilter(BaseFilterBackend):
         """Filter queryset"""
         if not self.get_search_term(request):
             return queryset
-        return watson.filter(queryset, self.get_search_term(request))
+        return watson.filter(queryset, self.get_search_term(request), ranking=False)
 
     def get_schema_fields(self, view):
         """Get filter schema fields"""

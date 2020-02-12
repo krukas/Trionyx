@@ -20,6 +20,7 @@ urlpatterns = [
 
     path('login/', views.LoginView.as_view(), name='login'),
     path('logout/', views.logout, name='logout'),
+    path('basic-auth/<str:user_type>/', views.basic_auth, name='basic-auth'),
 
     path('account/edit/', views.UpdateUserAccountView.as_view(), name='edit-account'),
     path('account/view/', views.ViewUserAccountView.as_view(), name='view-account'),
@@ -29,6 +30,9 @@ urlpatterns = [
 
     # Tasks
     path('user-tasks/', views.UserTasksJsend.as_view(), name='user-tasks'),
+
+    # Changelog
+    path('changelog/', views.ChangelogDialog.as_view(), name='changelog'),
 
     # Dashboard
     path('', views.DashboardView.as_view(), name='dashboard'),
@@ -69,6 +73,9 @@ urlpatterns = [
         name='model-dialog-edit-custom'
     ),
     path('dialog/model/<str:app>/<str:model>/<int:pk>/delete/', core_views.DeleteDialog.as_view(), name='model-dialog-delete'),
+
+    # Ajax choices
+    path('form/choices/<str:id>/', views.ajaxFormModelChoices, name='form-choices'),
 
     # Sidebar
     path('sidebar/model/<str:app>/<str:model>/<int:pk>/<str:code>/', views.SidebarJsend.as_view(), name='model-sidebar'),

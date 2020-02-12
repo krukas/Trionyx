@@ -7,6 +7,10 @@ body {
     border-radius: 0 !important;
 }
 
+.panel > .panel-collapse > .table-responsive > .table {
+    margin-bottom: 0;
+}
+
 /*****************************************************************************/
 /* Theme colors*/
 /*****************************************************************************/
@@ -485,6 +489,18 @@ dl {
 }
 /*****************************************************************************/
 
+@media (min-width: 768px) {
+    .modal-xl {
+        width: 90%;
+        max-width:1200px;
+    }
+
+    .modal-full {
+        width: auto;
+        margin: 10px;
+    }
+}
+
 #app-model-list thead tr {
     border-top: 2px solid #f4f4f4;
 }
@@ -779,4 +795,31 @@ th:hover .dragtable-drag-handle {
 .inline-form-table .checkbox input[type="checkbox"] {
     margin-left: -16px;
     left: 50%;
+}
+
+/* Changelog */
+.changelog-wrapper {
+    height: calc(100vh - 200px);
+    overflow-y: scroll;
+}
+
+.changelog-wrapper h1:first-of-type {
+    margin-top: 0px;
+}
+
+.changelog-wrapper h1 {
+    font-size: 26px;
+    margin-bottom: 5px;
+}
+
+.changelog-wrapper h2 {
+    font-size: 20px;
+    margin-top: 10px;
+    margin-bottom: 5px;
+}
+
+.changelog-wrapper h3 {
+    font-size: 18px;
+    margin-top: 10px;
+    margin-bottom: 5px;
 }
