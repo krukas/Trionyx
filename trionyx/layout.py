@@ -1112,7 +1112,7 @@ class Table(Component, ComponentFieldsMixin):
     template_name = 'trionyx/components/table.html'
 
     def __init__(self, objects, *fields, css_class='table',
-                 condensed=True, hover=False, striped=False, bordered=True, **options):
+                 condensed=True, hover=False, striped=False, bordered=False, **options):
         """Init Table"""
         footer = options.pop('footer', None)
         super().__init__(**options)
