@@ -502,7 +502,7 @@ class WidgetConfigDialog(DialogView):
                 config = form.cleaned_data
                 config['title'] = self.request.POST.get('title')
                 config['refresh'] = self.request.POST.get('refresh')
-            else:
+            elif '__post__' in self.request.POST:
                 logger.error(json.dumps(form.errors))
         elif '__post__' in self.request.POST:
             config = {
