@@ -1,5 +1,5 @@
-[DEVELOP]
----------
+[2.1.0] - 12-02-2020
+--------------------
 Added
 ~~~~~
 - Add create_reusable_app command
