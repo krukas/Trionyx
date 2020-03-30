@@ -7,6 +7,7 @@ Added
 Fixed
 ~~~~~
 - Fix multiple enumerations are added to list view on slow load
+- Fix drag column order on list view out order after drag event
 
 [2.1.0] - 12-02-2020
 --------------------

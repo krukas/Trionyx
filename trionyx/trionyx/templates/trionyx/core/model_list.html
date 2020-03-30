@@ -411,16 +411,17 @@
                 searchLoad: function() {
                     this.load();
                 },
-                load: function(initial){
+                load: function(initial, selected_fields){
                     var self = this;
                     this.loading = true;
                     initial = typeof initial !== 'undefined' ? initial : false;
+                    selected_fields = typeof selected_fields !== 'undefined' ? selected_fields : this.currentFields.join(',');
                     var filters = typeof this.$refs.trionyxFilters !== 'undefined' ? this.$refs.trionyxFilters.json : '[]';
                     var data = {
                         page: this.page,
                         page_size: this.pageSize,
                         sort: this.sort,
-                        selected_fields: this.currentFields.join(','),
+                        selected_fields: selected_fields,
                         filters: filters,
                         search: this.search,
                     };
@@ -611,8 +612,7 @@
 
                         if (!$.arrayCompare(currentFields, changed_fields)) {
                             changed_fields.shift();
-                            self.currentFields = changed_fields;
-                            self.load();
+                            self.load(changed_fields);
                         }
                     }
                 });
@@ -620,7 +620,9 @@
                 // Update DragTable
                 var currentFields = ['NR'];
                 $.each(self.currentFields, function(index, value){
-                   currentFields.push(value);
+                    if (value !== 'NR') {
+                        currentFields.push(value);
+                    }
                 });
                 $('#app-model-list table').dragtable('order', currentFields);
             }
