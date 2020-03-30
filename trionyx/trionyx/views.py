@@ -71,6 +71,8 @@ def media_nginx_accel(request, path):
 class LoginView(DjangoLoginView):
     """Trionyx login view"""
 
+    redirect_authenticated_user = True
+
     template_name = 'trionyx/core/login.html'
 
 

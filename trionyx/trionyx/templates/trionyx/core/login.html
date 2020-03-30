@@ -25,6 +25,9 @@
             {% block login_form %}
                 <form action="" method="post">
                     {% csrf_token %}
+
+                    <input type="hidden" name="next" value="{{ next }}">
+
                     {% if message %}
                         <p class="login-box-msg" style="color: red;">{{ message }}</p>
                     {% endif %}

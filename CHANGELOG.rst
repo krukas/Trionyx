@@ -1,3 +1,10 @@
+[DEVELOP] -
+-----------
+Added
+~~~~~
+- Add login redirect to previous visited page
+
+
 [2.1.0] - 12-02-2020
 --------------------
 Added
