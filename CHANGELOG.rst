@@ -4,6 +4,9 @@ Added
 ~~~~~
 - Add login redirect to previous visited page
 
+Fixed
+~~~~~
+- Fix multiple enumerations are added to list view on slow load
 
 [2.1.0] - 12-02-2020
 --------------------
