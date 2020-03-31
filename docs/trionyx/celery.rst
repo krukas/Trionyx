@@ -53,6 +53,10 @@ Example of a task with arguments:
     send_email.delay('test@example.com')
 
 
+.. note::
+
+    If you are using Django signals like post_save to start tasks, make sure you use `transaction.on_commit <https://docs.djangoproject.com/en/2.2/topics/db/transactions/#performing-actions-after-commit>`_
+
 .. _celery-cron:
 
 Running task periodically (cron)
