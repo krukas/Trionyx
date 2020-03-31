@@ -174,7 +174,7 @@
                 <thead>
                     <tr>
                         {% if delete_permission or change_permission %}
-                            <th class="dragtable-no-drag" style="width: 45px; padding-right: 0;">
+                            <th class="dragtable-no-drag" style="width: 45px; padding-right: 0;" data-header="--checkbox--">
                                 <div class="btn-group btn-group-xs mass-action-group">
                                   <button type="button" class="btn btn-flat btn-default" data-toggle="dropdown" aria-expanded="false">
                                       <i class="fa no-margin" v-bind:class="massActionIconClass"></i>
@@ -415,13 +415,13 @@
                     var self = this;
                     this.loading = true;
                     initial = typeof initial !== 'undefined' ? initial : false;
-                    selected_fields = typeof selected_fields !== 'undefined' ? selected_fields : this.currentFields.join(',');
+                    selected_fields = typeof selected_fields !== 'undefined' ? selected_fields : this.currentFields;
                     var filters = typeof this.$refs.trionyxFilters !== 'undefined' ? this.$refs.trionyxFilters.json : '[]';
                     var data = {
                         page: this.page,
                         page_size: this.pageSize,
                         sort: this.sort,
-                        selected_fields: selected_fields,
+                        selected_fields: selected_fields.join(','),
                         filters: filters,
                         search: this.search,
                     };
@@ -612,15 +612,18 @@
 
                         if (!$.arrayCompare(currentFields, changed_fields)) {
                             changed_fields.shift();
-                            self.load(changed_fields);
+                            if (changed_fields.includes('NR')) {
+                                changed_fields.shift();
+                            }
+                            self.load(false, changed_fields);
                         }
                     }
                 });
 
                 // Update DragTable
-                var currentFields = ['NR'];
+                var currentFields = config.massPermission ? ['--checkbox--', 'NR'] : ['NR'];
                 $.each(self.currentFields, function(index, value){
-                    if (value !== 'NR') {
+                    if (value !== 'NR' || value !== '--checkbox--') {
                         currentFields.push(value);
                     }
                 });
@@ -641,6 +644,7 @@
                     contentTypeId: {{ content_type_id }},
                     massDeleteUrl: "{{ mass_delete_url }}",
                     massUpdateUrl: "{{ mass_update_url }}",
+                    massPermission: {% if delete_permission or change_permission %}true{% else %}false{% endif %}
                 });
             });
         });
