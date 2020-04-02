@@ -57,10 +57,26 @@ class GlobalRequestMiddleware:
     def __call__(self, request):
         """Store request in local data"""
         LOCAL_DATA.request = request
+
+        def streaming_content_wrapper(content):
+            try:
+                for chunk in content:
+                    yield chunk
+            finally:
+                del LOCAL_DATA.request
+
         try:
-            return self.get_response(request)
-        finally:
+            response = self.get_response(request)
+        except Exception as e:
             del LOCAL_DATA.request
+            raise e
+
+        if response.streaming:
+            response.streaming_content = streaming_content_wrapper(response.streaming_content)
+        else:
+            del LOCAL_DATA.request
+
+        return response
 
 
 class LastLoginMiddleware:
