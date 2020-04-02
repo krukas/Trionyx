@@ -174,7 +174,7 @@
                 <thead>
                     <tr>
                         {% if delete_permission or change_permission %}
-                            <th class="dragtable-no-drag" style="width: 45px; padding-right: 0;">
+                            <th class="dragtable-no-drag" style="width: 45px; padding-right: 0;" data-header="--checkbox--">
                                 <div class="btn-group btn-group-xs mass-action-group">
                                   <button type="button" class="btn btn-flat btn-default" data-toggle="dropdown" aria-expanded="false">
                                       <i class="fa no-margin" v-bind:class="massActionIconClass"></i>
@@ -275,6 +275,7 @@
                 items: [],
 
                 csrfmiddlewaretoken: getCookie('csrftoken'),
+                enumeratedAdded: false,
                 page: 1,
                 editPage: 1,
                 pageSize: 10,
@@ -306,8 +307,13 @@
                 },
                 enumeratedItems: function(){
                     var counter = (this.page - 1) * this.pageSize + 1;
+                    var enumeratedAdded = this.enumeratedAdded;
+                    this.enumeratedAdded = true;
+
                     return this.items.map(function(item){
-                        item.row_data.splice(0, 0, counter++);
+                        if (!enumeratedAdded) {
+                            item.row_data.splice(0, 0, counter++);
+                        }
                         return item;
                     });
                 },
@@ -379,6 +385,7 @@
                 },
                 toPage: function (page) {
                     this.page = page;
+                    this.editPage = page;
                     this.load();
                 },
                 pageChange: function() {
@@ -404,16 +411,17 @@
                 searchLoad: function() {
                     this.load();
                 },
-                load: function(initial){
+                load: function(initial, selected_fields){
                     var self = this;
                     this.loading = true;
                     initial = typeof initial !== 'undefined' ? initial : false;
+                    selected_fields = typeof selected_fields !== 'undefined' ? selected_fields : this.currentFields;
                     var filters = typeof this.$refs.trionyxFilters !== 'undefined' ? this.$refs.trionyxFilters.json : '[]';
                     var data = {
                         page: this.page,
                         page_size: this.pageSize,
                         sort: this.sort,
-                        selected_fields: this.currentFields.join(','),
+                        selected_fields: selected_fields.join(','),
                         filters: filters,
                         search: this.search,
                     };
@@ -441,6 +449,7 @@
                             item.selected = false;
                             return item
                         });
+                        self.enumeratedAdded = false;
                         self.page = data.page;
                         self.editPage = data.page;
                         self.pageSize = data.page_size;
@@ -603,16 +612,20 @@
 
                         if (!$.arrayCompare(currentFields, changed_fields)) {
                             changed_fields.shift();
-                            self.currentFields = changed_fields;
-                            self.load();
+                            if (changed_fields.includes('NR')) {
+                                changed_fields.shift();
+                            }
+                            self.load(false, changed_fields);
                         }
                     }
                 });
 
                 // Update DragTable
-                var currentFields = ['NR'];
+                var currentFields = config.massPermission ? ['--checkbox--', 'NR'] : ['NR'];
                 $.each(self.currentFields, function(index, value){
-                   currentFields.push(value);
+                    if (value !== 'NR' || value !== '--checkbox--') {
+                        currentFields.push(value);
+                    }
                 });
                 $('#app-model-list table').dragtable('order', currentFields);
             }
@@ -631,6 +644,7 @@
                     contentTypeId: {{ content_type_id }},
                     massDeleteUrl: "{{ mass_delete_url }}",
                     massUpdateUrl: "{{ mass_update_url }}",
+                    massPermission: {% if delete_permission or change_permission %}true{% else %}false{% endif %}
                 });
             });
         });
