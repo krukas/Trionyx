@@ -170,7 +170,7 @@ def filter_queryset_with_user_filters(queryset, filters, request=None):
                 queryset = queryset.filter(**{'{}__lte'.format(filter['field']): filter['value']})
             elif filter['operator'] == '>':
                 queryset = queryset.filter(**{'{}__gt'.format(filter['field']): filter['value']})
-            elif filter['operator'] == '>':
+            elif filter['operator'] == '>=':
                 queryset = queryset.filter(**{'{}__gte'.format(filter['field']): filter['value']})
         except Exception:
             if request:
