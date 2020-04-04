@@ -1,5 +1,12 @@
-[DEVELOP] -
------------
+[2.1.2] - 04-04-2020
+--------------------
+Fixed
+~~~~~
+- Greater then filter not working
+
+
+[2.1.1] - 02-04-2020
+--------------------
 Added
 ~~~~~
 - Add login redirect to previous visited page
@@ -8,6 +15,8 @@ Fixed
 ~~~~~
 - Fix multiple enumerations are added to list view on slow load
 - Fix drag column order on list view out order after drag event
+- get_current_request not working in streaming response
+
 
 [2.1.0] - 12-02-2020
 --------------------
