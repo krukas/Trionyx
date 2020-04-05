@@ -168,20 +168,6 @@
                         }
                     })
                 } else {
-                    var filterValueText = $(this.$refs.filterValueText);
-                    if (['datetime', 'date'].indexOf(field.type) !== -1) {
-                        var self = this;
-                        filterValueText.datetimepicker({
-                            format: field.type === 'date' ? this.dateInputFormat : this.datetimeInputFormat,
-                            locale: this.currentLocale,
-                            dayViewHeaderFormat: 'MMMM YYYY'
-                        }).on('dp.change',function(event){
-                            var dp = filterValueText.data("DateTimePicker");
-                            self.filterValue = event.date ? event.date.format(dp.format()) : null;
-                        });
-                    } else if (filterValueText.data("DateTimePicker")) {
-                        filterValueText.data("DateTimePicker").destroy()
-                    }
                     this.filterValueInputType = 'text';
                 }
             },
@@ -258,6 +244,26 @@
         },
         updated: function () {
             var self = this;
+
+            var filterValueText = $(this.$refs.filterValueText);
+            if (this.filterField in this.fields){
+                var field = this.fields[this.filterField];
+                if (this.filterValueInputType === 'text' && ['datetime', 'date'].indexOf(field.type) !== -1) {
+                    var self = this;
+                    filterValueText.datetimepicker({
+                        format: field.type === 'date' ? self.dateInputFormat : self.datetimeInputFormat,
+                        locale: self.currentLocale,
+                        dayViewHeaderFormat: 'MMMM YYYY'
+                    }).on('dp.change',function(event){
+                        var dp = filterValueText.data("DateTimePicker");
+                        if (dp) {
+                            self.filterValue = event.date ? event.date.format(dp.format()) : null;
+                        }
+                    });
+                } else if (filterValueText.data("DateTimePicker")) {
+                    filterValueText.data("DateTimePicker").destroy();
+                }
+            }
 
             $(this.$refs.selectFilterField).select2({
                 width: "100%"

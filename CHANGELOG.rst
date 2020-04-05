@@ -1,3 +1,10 @@
+[DEVELOP] -
+-----------
+Fixed
+~~~~~
+- Filters datepicker won't work if previous selected field was a select
+
+
 [2.1.2] - 04-04-2020
 --------------------
 Fixed
