@@ -3,6 +3,7 @@
 Fixed
 ~~~~~
 - Filters datepicker won't work if previous selected field was a select
+- Mass update crashes on collecting fields from forms when custom __init__ is used
 
 
 [2.1.2] - 04-04-2020

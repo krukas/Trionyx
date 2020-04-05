@@ -694,8 +694,8 @@ class MassUpdateView(ModelPermissionMixin, TemplateView, ModelClassMixin):
         forms = form_register.get_all_forms(self.get_model_class())
         if forms:  # Only use fields that ara also in forms
             for Form in forms:
-                fields.extend([name for name in Form().base_fields if name in model_fields])
-                fields.extend([name for name in Form().declared_fields if name in model_fields])
+                fields.extend([name for name in Form.base_fields if name in model_fields])
+                fields.extend([name for name in Form.declared_fields if name in model_fields])
         else:
             fields = [f.name for f in model_config.get_fields()]
 
