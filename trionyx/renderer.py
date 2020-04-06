@@ -105,6 +105,9 @@ class LazyFieldRenderer:
         result = renderer.render_field(self.obj, self.field_name, **self.options)
         return str(result) if result is not None else ''
 
+    def __format__(self, format_spec):
+        return getattr(self.obj, self.field_name).__format__(format_spec) if format_spec else self.__str__()
+
 
 class Renderer:
     """Registry to hold all renderer's"""

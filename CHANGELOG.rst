@@ -1,5 +1,13 @@
 [DEVELOP] -
 -----------
+Added
+~~~~~
+- Add support for __format__ for LazyFieldRenderer (used by model verbose_name)
+
+Changed
+~~~~~~~
+- Remove Google fonts
+
 Fixed
 ~~~~~
 - Filters datepicker won't work if previous selected field was a select
