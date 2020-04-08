@@ -3,6 +3,7 @@
 Added
 ~~~~~
 - Add support for __format__ for LazyFieldRenderer (used by model verbose_name)
+- Add support for CTRL+Click and scroll wheel click on list view item to open new tab
 
 Changed
 ~~~~~~~
