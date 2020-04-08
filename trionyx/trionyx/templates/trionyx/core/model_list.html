@@ -69,6 +69,10 @@
         .model-list > thead > tr > th,
         .model-list > tbody > tr > td {
             white-space: nowrap;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            -webkit-user-select: none;
+            user-select: none;
         }
         .model-list > thead > tr > th:last-child {
             width: 100%;
@@ -216,7 +220,7 @@
                                 />
                             </td>
                         {% endif %}
-                        <td v-for="column in item.row_data" v-html="column" v-on:click="clickItem(item)" />
+                        <td v-for="column in item.row_data" v-html="column" v-on:click="clickItem(item, $event)" v-on:click.middle="clickItem(item, $event)"/>
                     </tr>
                 </tbody>
             </table>
@@ -400,8 +404,12 @@
                     }
                     this.load();
                 },
-                clickItem: function(item) {
-                    window.location.href = item.url;
+                clickItem: function(item, event) {
+                    if (event.button === 1 || (event.ctrlKey && event.button === 0)) {
+                        window.open(item.url, '_blank');
+                    } else {
+                        window.location.href = item.url;
+                    }
                 },
                 clickRemoveFilter: function(filter){
                     if (this.activeFilters.indexOf(filter) !== -1) {

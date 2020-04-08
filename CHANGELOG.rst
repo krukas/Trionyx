@@ -1,3 +1,20 @@
+[2.1.3] - 08-04-2020
+--------------------
+Added
+~~~~~
+- Add support for __format__ for LazyFieldRenderer (used by model verbose_name)
+- Add support for CTRL+Click and scroll wheel click on list view item to open new tab
+
+Changed
+~~~~~~~
+- Remove Google fonts
+
+Fixed
+~~~~~
+- #51 Filters datepicker won't work if previous selected field was a select
+- Mass update crashes on collecting fields from forms when custom __init__ is used
+
+
 [2.1.2] - 04-04-2020
 --------------------
 Fixed
