@@ -35,7 +35,7 @@ class LayoutRegister:
     def add_layout(self, code, func):
         """Add layout"""
         if code in self.layouts and self.layouts[code]['layout']:
-            raise Exception("Layout {} already registered".format(code))
+            raise ValueError("Layout {} already registered".format(code))
 
         if code in self.layouts:
             self.layouts[code]['layout'] = func
@@ -72,7 +72,7 @@ class LayoutRegister:
     def get_layout(self, code, object, layout_id=None):
         """Get complete layout for given object"""
         if code not in self.layouts:
-            raise Exception('layout does not exist')
+            raise LookupError('layout does not exist')
 
         layout_config = self.layouts.get(code)
 
@@ -132,7 +132,7 @@ class SidebarRegister:
         model_alias = models_config.get_model_name(model_alias) if model_alias else ''
 
         if (model_alias, code) in self.sidebars:
-            raise Exception(f'There is already a sidebar for model: {model_alias} and code: {code}')
+            raise ValueError(f'There is already a sidebar for model: {model_alias} and code: {code}')
 
         def wrapper(create_sidebar):
             self.sidebars[(model_alias, code)] = create_sidebar
@@ -145,7 +145,7 @@ class SidebarRegister:
         model_alias = models_config.get_model_name(model_alias) if model_alias else ''
 
         if (model_alias, code) not in self.sidebars:
-            raise Exception(f'Sidebar does not exists for model: {model_alias} and code: {code}')
+            raise LookupError(f'Sidebar does not exists for model: {model_alias} and code: {code}')
 
         return self.sidebars[(model_alias, code)]
 
@@ -185,7 +185,7 @@ class TabRegister:
         for item in self.tabs[model_alias]:
             if item.code == tab_code and item.display_filter(object):
                 return item
-        raise Exception('Given tab does not exits or is filtered')
+        raise LookupError('Given tab does not exits or is filtered')
 
     def register(self, model_alias, code='general', name=None, order=10, display_filter=None):
         """
@@ -212,7 +212,7 @@ class TabRegister:
             )
 
             if item in self.tabs[model_alias]:
-                raise Exception("Tab {} already registered for model {}".format(code, model_alias))
+                raise ValueError("Tab {} already registered for model {}".format(code, model_alias))
 
             self.tabs[model_alias].append(item)
             self.tabs[model_alias] = sorted(self.tabs[model_alias], key=lambda item: item.order if item.order else 10)

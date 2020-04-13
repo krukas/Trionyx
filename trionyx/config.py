@@ -393,7 +393,7 @@ class ModelConfig:
                     config = {'field': field_config}
 
                 if 'field' not in config:
-                    raise Exception("Field config is missing field: {}".format(config))
+                    raise ValueError("Field config is missing field: {}".format(config))
 
                 field_model_config = self
                 field_parts = config['field'].split('__')

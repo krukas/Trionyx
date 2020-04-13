@@ -124,7 +124,7 @@ class User(models.BaseModel, AbstractBaseUser, PermissionsMixin):
     def send_email(self, subject, body='', html_template=None, template_context=None, files=None):
         """Send email to user"""
         if not body and not html_template:
-            raise Exception('You must supply a body or/and html_template')
+            raise ValueError('You must supply a body or/and html_template')
 
         with self.locale_override():
             message = EmailMultiAlternatives(

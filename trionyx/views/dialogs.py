@@ -114,7 +114,7 @@ class DialogView(View, ModelClassMixin):
             try:
                 self.object = self.model.objects.get(pk=kwargs.get('pk'))
             except Exception:
-                raise Exception(_("Could not load {model}").format(model=self.model.__name__.lower()))
+                raise LookupError(_("Could not load {model}").format(model=self.model.__name__.lower()))
             setattr(self, self.model.__name__.lower(), self.object)
 
         return kwargs

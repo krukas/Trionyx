@@ -233,7 +233,7 @@ class FormRegister:
             model_name = self.get_model_alias(model_alias if model_alias else form.Meta.model, False)
 
             if form_code in self.forms[model_name]:
-                raise Exception("Form {} already registered for model {}".format(code, model_name))
+                raise ValueError("Form {} already registered for model {}".format(code, model_name))
 
             self.forms[model_name][form_code] = {
                 'form': form,

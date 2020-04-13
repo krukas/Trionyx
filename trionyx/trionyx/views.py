@@ -451,7 +451,7 @@ class WidgetDataJsendView(JsendView):
         data = json.loads(request.body.decode('utf-8'))
 
         if data['code'] not in widgets:
-            raise Exception('Widget does not exists')
+            raise LookupError('Widget does not exists')
 
         widget = widgets.get(data['code'])()
 
@@ -466,7 +466,7 @@ class SaveDashboardJsendView(JsendView):
         dashboard = json.loads(request.body.decode('utf-8'))
 
         if not isinstance(dashboard, list):
-            raise Exception('Expect dashboard to be a list')
+            raise TypeError('Expect dashboard to be a list')
 
         request.user.set_attribute('tx_dashboard', dashboard)
 

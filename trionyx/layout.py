@@ -233,7 +233,7 @@ class Layout:
             comp, parent = self.find_component_by_path(path)
 
         if not comp:
-            raise Exception('Could not add component: Unknown path {} or id {}'.format(path, id))
+            raise LookupError('Could not add component: Unknown path {} or id {}'.format(path, id))
 
         if append:
             if before:
@@ -256,7 +256,7 @@ class Layout:
         :return:
         """
         if not id and not path:
-            raise Exception('You must supply an id or path')
+            raise ValueError('You must supply an id or path')
 
         if id:
             comp, parent = self.find_component_by_id(id)
@@ -264,7 +264,7 @@ class Layout:
             comp, parent = self.find_component_by_path(path)
 
         if not comp:
-            raise Exception('Could not delete component: Unknown path {} or id {}'.format(path, id))
+            raise ValueError('Could not delete component: Unknown path {} or id {}'.format(path, id))
 
         if parent:
             parent.components.remove(comp)

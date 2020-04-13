@@ -41,7 +41,7 @@ class ModelClassMixin:
         """Get Trionyx model config"""
         ModelClass = self.get_model_class()
         if not ModelClass:
-            raise Exception('Could not get model class')
+            raise LookupError('Could not get model class')
 
         if not hasattr(self, '__config'):
             setattr(self, '__config', models_config.get_config(ModelClass))

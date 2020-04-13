@@ -57,4 +57,4 @@ class MassUpdateTask(BaseTask):
             self.set_progress(math.ceil((index / count) * 100))
 
         if errors:
-            raise Exception(_('Could not update the following items {}').format(', '.join(errors)))
+            raise Warning(_('Could not update the following items {}').format(', '.join(errors)))
