@@ -127,6 +127,8 @@ class DateTimePicker(Field):
         """Init DateTimePicker"""
         if not self.format:
             self.format = get_datetime_input_format()
+        if 'format' in kwargs:
+            self.format = kwargs.get('format')
 
         if not self.locale:
             self.locale = get_current_locale()
