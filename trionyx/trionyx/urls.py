@@ -78,7 +78,8 @@ urlpatterns = [
     path('form/choices/<str:id>/', views.ajaxFormModelChoices, name='form-choices'),
 
     # Sidebar
-    path('sidebar/model/<str:app>/<str:model>/<int:pk>/<str:code>/', views.SidebarJsend.as_view(), name='model-sidebar'),
+    path('sidebar/model/<str:app>/<str:model>/<int:pk>/', views.SidebarJsend.as_view(), name='model-sidebar'),
+    path('sidebar/model/<str:app>/<str:model>/<int:pk>/<str:code>/', views.SidebarJsend.as_view(), name='model-sidebar-custom'),
 
     # Mass actions
     path('mass/<str:app>/<str:model>/delete/', views.MassDeleteDialog.as_view(), name='model-mass-delete'),

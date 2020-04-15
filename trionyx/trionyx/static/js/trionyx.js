@@ -466,7 +466,6 @@ function openSidebar(url) {
 
     $.get(url, function(response){
         if (response.status !== 'success') {
-            alert('Sidebar error');
             return;
         }
 
@@ -490,7 +489,12 @@ function openSidebar(url) {
            }
            button.on('click', function () {
                if (action.dialog) {
-                   var options = action.dialog_options;
+                   var options = typeof action.dialog_options !== 'undefined' ? action.dialog_options : {};
+
+                   if ('callback' in options) {
+                       options.callback = new Function('data', 'dialog', options.callback);
+                   }
+
                    if (action.reload) {
                        options.callback = function (data, dialog) {
                            if (data.success) {

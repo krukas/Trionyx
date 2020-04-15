@@ -395,7 +395,7 @@ class ChangelogDialog(DialogView):
 class SidebarJsend(JsendView):
     """Model sidebar view"""
 
-    def handle_request(self, request, app, model, pk, code):
+    def handle_request(self, request, app, model, pk, code=None):
         """Return given sidebar"""
         from trionyx.views import sidebars
         config = models_config.get_config(f'{app}.{model}')
