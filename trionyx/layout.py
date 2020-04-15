@@ -748,6 +748,20 @@ class Html(HtmlTagWrapper):
         self.html = html
 
 
+class Field(Html):
+    """Render single field from object"""
+
+    def __init__(self, field, **options):
+        """Init Field"""
+        super().__init__(**options)
+        self.field = field
+
+    def updated(self):
+        """Update html"""
+        from trionyx.renderer import renderer
+        self.html = renderer.render_field(self.object, self.field)
+
+
 class Img(Html):
     """Img tag"""
 
@@ -787,7 +801,8 @@ class OnclickLink(OnclickTag):
 
     def __init__(self, label, **options):
         """Init OnclickLink"""
-        super().__init__(Html(label), **options)
+        label = label if isinstance(label, Component) else Html(label)
+        super().__init__(label, **options)
 
 
 # =============================================================================
@@ -1111,7 +1126,7 @@ class Table(Component, ComponentFieldsMixin):
 
     template_name = 'trionyx/components/table.html'
 
-    def __init__(self, objects, *fields, css_class='table',
+    def __init__(self, objects, *fields, css_class='table', header=True,
                  condensed=True, hover=False, striped=False, bordered=False, **options):
         """Init Table"""
         footer = options.pop('footer', None)
@@ -1127,6 +1142,7 @@ class Table(Component, ComponentFieldsMixin):
         """Can be string with field name relation, Queryset or list"""
 
         self.fields = fields
+        self.header = header
 
         self.footer_objects = footer[0] if footer else None
         """Can be string with field name relation, Queryset or list"""
