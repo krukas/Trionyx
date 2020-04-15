@@ -232,6 +232,7 @@ STATICFILES_FINDERS = [
 
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = True
+COMPRESS_OFFLINE_CONTEXT = 'trionyx.trionyx.context_processors.offline_context'
 
 # ==============================================================================
 # Cache backend

@@ -6,11 +6,26 @@ trionyx.trionyx.context_processors
 :license: GPLv3
 """
 from django.conf import settings
+from django.apps import apps
 from trionyx.menu import app_menu
 from trionyx import utils
 from trionyx.urls import model_url
 from trionyx.models import get_class
 from trionyx import __version__
+
+
+def offline_context():
+    """Offline context used by compress"""
+    context = {
+        'STATIC_URL': settings.STATIC_URL,
+        'apps_css_files': [],
+        'apps_js_files': [],
+    }
+    for app in apps.get_app_configs():
+        context['apps_css_files'].extend(getattr(app, 'css_files', []))
+        context['apps_js_files'].extend(getattr(app, 'js_files', []))
+
+    return [context]
 
 
 def trionyx(request):
@@ -42,4 +57,6 @@ def trionyx(request):
         'current_locale': utils.get_current_locale(),
         'summernote_language': '{}-{}'.format(locale, locale.upper()),
         'summernote_language_js': 'plugins/summernote/lang/summernote-{}-{}.min.js'.format(locale, locale.upper()),
+
+        **offline_context()[0]
     }

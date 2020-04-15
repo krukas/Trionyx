@@ -23,6 +23,10 @@
         <link rel="stylesheet" type="text/css" href="{% static "css/AdminLTE.min.css" %}">
         <link rel="stylesheet" type="text/css" href="{% static "css/trionyx.css" %}">
 
+        {% for css_file in apps_css_files %}
+            <link rel="stylesheet" type="text/css" href="{% static css_file %}">
+        {% endfor %}
+
         {% block extra_css %}{% endblock %}
 
     {% endcompress %}
@@ -149,6 +153,10 @@
         <script src="{% static "js/vue.min.js" %}"></script>
     {% endif %}
     <script src="{% static "js/trionyx.js" %}"></script>
+
+    {% for js_file in apps_js_files %}
+            <script src="{% static js_file %}"></script>
+    {% endfor %}
 
     <script>
         $(document).ready(function () {
