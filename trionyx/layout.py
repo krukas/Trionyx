@@ -682,6 +682,9 @@ class OnclickTag(HtmlTagWrapper):
         self.on_click = options.get('onClick', False)
         self.dialog_reload_layout = dialog_reload_layout
 
+        self.model_url = 'sidebar' if sidebar and not self.model_url else self.model_url
+        self.model_url = 'dialog-edit' if dialog and not self.model_url else self.model_url
+
         if dialog_reload_tab:
             self.dialog_options['callback'] = """function(data, dialog){{
                 if (data.success) {{
@@ -751,15 +754,23 @@ class Html(HtmlTagWrapper):
 class Field(Html):
     """Render single field from object"""
 
-    def __init__(self, field, **options):
+    def __init__(self, field, renderer=None, format=None, **options):
         """Init Field"""
         super().__init__(**options)
         self.field = field
+        self.renderer = renderer
+        self.format = format if format else '{0}'
 
     def updated(self):
         """Update html"""
         from trionyx.renderer import renderer
-        self.html = renderer.render_field(self.object, self.field)
+
+        if self.renderer:
+            value = self.renderer(getattr(self.object, self.field), data_object=self.object)
+        else:
+            value = renderer.render_field(self.object, self.field)
+
+        self.html = self.format.format(value)
 
 
 class Img(Html):
@@ -905,22 +916,17 @@ class Column12(Column):
 # =============================================================================
 # Bootstrap elements
 # =============================================================================
-class Badge(Html):
+class Badge(HtmlTagWrapper):
     """Bootstrap badge"""
 
     tag = 'span'
     valid_attr = ['class']
     color_class = 'badge bg-{color}'
 
-    def __init__(self, field=None, html=None, **kwargs):
+    def __init__(self, value, **kwargs):
         """Init badge"""
-        self.field = field
-        super().__init__(html, **kwargs)
-
-    def updated(self):
-        """Set HTML with rendered field"""
-        from trionyx.renderer import renderer
-        self.html = renderer.render_field(self.object, self.field) if self.field else self.html
+        value = value if isinstance(value, Component) else Html(value)
+        super().__init__(value, **kwargs)
 
 
 class Alert(Html):
