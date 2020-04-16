@@ -229,6 +229,9 @@ class ModelConfig:
     display_delete_button: bool = True
     """Display delete button for this model"""
 
+    disable_view: bool = False
+    """Disable view for this model"""
+
     disable_add: bool = False
     """Disable add for this model"""
 
@@ -309,7 +312,7 @@ class ModelConfig:
 
         mapping = {
             'view': {
-                'disabled': False,
+                'disabled': self.disable_view,
                 'signal': can_view,
             },
             'add': {
