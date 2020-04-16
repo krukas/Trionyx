@@ -428,7 +428,7 @@ class DashboardView(TemplateView):
             self.request.user.set_attribute('tx_dashboard', dashboard)
 
         context.update({
-            'widget_templates': [widget().template for index, widget in widgets.items()],
+            'widget_templates': [widget().template for index, widget in widgets.items() if widget.is_enabled()],
             'widgets': [{
                 'code': widget.code,
                 'name': str(widget.name),
@@ -437,7 +437,7 @@ class DashboardView(TemplateView):
                 'config_fields': widget().config_fields,
                 'default_w': widget.default_width,
                 'default_h': widget.default_height,
-            } for index, widget in widgets.items()],
+            } for index, widget in widgets.items() if widget.is_enabled()],
             'dashboard': dashboard,
         })
         return context

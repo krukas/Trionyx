@@ -328,6 +328,9 @@ TX_COMPANY_WEBSITE: str = ''
 TX_COMPANY_EMAIL: str = ''
 """Company email address"""
 
+TX_DISABLE_AUDITLOG = False
+"""Disable auditlog"""
+
 
 def TX_DEFAULT_DASHBOARD():
     """Return default dashboard"""
@@ -441,6 +444,9 @@ TX_CORE_MODEL_CONFIGS: Dict[str, Dict[str, Any]] = {
         'hide_permissions': True,
     },
     'trionyx.auditlogentry': {
+        'hide_permissions': True,
+    },
+    'trionyx.systemvariable': {
         'hide_permissions': True,
     },
     'sessions.session': {

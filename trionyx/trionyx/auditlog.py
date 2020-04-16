@@ -125,6 +125,9 @@ def log_delete(sender, instance, **kwargs):
 
 def init_auditlog():
     """Init auditlog"""
+    if settings.TX_DISABLE_AUDITLOG:
+        return
+
     for config in models_config.get_all_configs(False):
         if config.auditlog_disable or (not config.is_trionyx_model and not config.has_config('auditlog_disable')):
             continue

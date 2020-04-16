@@ -9,6 +9,7 @@ import json
 from collections import defaultdict
 from typing import Dict, List, ClassVar, Type, Optional
 
+from django.conf import settings
 from django.utils import timezone
 from django.http.request import HttpRequest
 from django.contrib.staticfiles.templatetags.staticfiles import static
@@ -159,6 +160,11 @@ class BaseWidget(metaclass=MetaClass):
                 fields.append(field)
         return fields
 
+    @staticmethod
+    def is_enabled() -> bool:
+        """Determine if widget is enabled"""
+        return True
+
 
 class AuditlogWidget(BaseWidget):
     """Auditlog widget"""
@@ -168,6 +174,11 @@ class AuditlogWidget(BaseWidget):
     description = _('Show the latest tracked actions done by users and the system')
     config_form_class = AuditlogWidgetForm
     default_height = 22
+
+    @staticmethod
+    def is_enabled():
+        """Determine if AuditlogWidget is enabled"""
+        return not settings.TX_DISABLE_AUDITLOG
 
     def get_data(self, request: HttpRequest, config: dict) -> List[dict]:
         """Get data for widget"""
