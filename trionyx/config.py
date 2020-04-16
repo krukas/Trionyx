@@ -31,10 +31,16 @@ class AppSettings():
 
     def __init__(self, prefix, app_settings):
         """Init settings"""
-        for key, value in app_settings.items():
-            setattr(self, key.upper(), getattr(
-                settings, f'{prefix}_{key}'.upper(), value
-            ))
+        self.__prefix = prefix
+        self.__settings = {
+            key.upper(): getattr(settings, f'{prefix}_{key}'.upper(), value)
+            for key, value in app_settings.items()
+        }
+
+    def __getattr__(self, name):
+        """Get setting"""
+        key = name.upper()
+        return variables.get(f'{self.__prefix}_{key}', self.__settings.get(key))
 
 
 class Variables:
