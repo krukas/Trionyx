@@ -345,6 +345,14 @@ dl {
     margin: 3px;
 }
 
+.avatar-xs {
+    height: 16px;
+    width: 16px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin: 3px;
+}
+
 /*****************************************************************************/
 /* Box colors */
 
