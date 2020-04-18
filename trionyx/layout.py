@@ -292,6 +292,7 @@ class Component:
         self.components = list(filter(None, components))
         self.object = options.get('object', False)
         self.lock_object = options.get('lock_object', False)
+        self.should_render = options.get('should_render', lambda self: True)
         self.context = {}
         self.request = None
 
@@ -330,6 +331,9 @@ class Component:
 
     def render(self, context, request=None):
         """Render component"""
+        if not self.should_render(self):
+            return ''
+
         context['component'] = self
         self.context = context
         self.request = request
@@ -597,11 +601,11 @@ class ComponentFieldsMixin:
 class HtmlTemplate(Component):
     """HtmlTemplate render django html template"""
 
-    def __init__(self, template_name, context=None, css_files=None, js_files=None):
+    def __init__(self, template_name, context=None, css_files=None, js_files=None, **options):
         """Initialize HtmlTemplate"""
-        super().__init__()
+        super().__init__(**options)
         self.template_name = template_name
-        self.context = context
+        self.context = context if context else {}
         self.css_files = css_files if css_files else []
         self.js_files = js_files if js_files else []
 
