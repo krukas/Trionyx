@@ -361,6 +361,8 @@ function TrionyxDialog(url, options) {
         data.url = 'url' in data ? data.url : '';
         data.close = 'close' in data ? data.close : false;
 
+        // Make sure that any popovers made by summernote are removed
+        dialog.find('.summernote').summernote('destroy');
 
         if(data.close){
             dialog.modal('hide');
