@@ -685,37 +685,33 @@ class OnclickTag(HtmlTagWrapper):
         self.dialog_options = dialog_options if dialog_options else {}
         self.on_click = options.get('onClick', False)
         self.dialog_reload_layout = dialog_reload_layout
+        self.dialog_reload_tab = dialog_reload_tab
+        self.dialog_reload_sidebar = dialog_reload_sidebar
 
         self.model_url = 'sidebar' if sidebar and not self.model_url else self.model_url
         self.model_url = 'dialog-edit' if dialog and not self.model_url else self.model_url
 
-        if dialog_reload_tab:
-            self.dialog_options['callback'] = """function(data, dialog){{
-                if (data.success) {{
-                    dialog.close();
-                    trionyx_reload_tab('{tab}');
-                }}
-            }}""".format(tab=dialog_reload_tab)
-        elif dialog_reload_sidebar:
-            self.dialog_options['callback'] = """function(data, dialog){
-                if (data.success) {
-                    dialog.close();
-                    reloadSidebar();
-                }
-            }"""
-
     def updated(self):
         """Set onClick url based on object"""
+        reload_functions = ''
         if self.dialog_reload_layout:
-            self.dialog_options['callback'] = """function(data, dialog){{
-                        if (data.success) {{
-                            dialog.close();
-                            txUpdateLayout('{id}', '{component}');
-                        }}
-                    }}""".format(
+            reload_functions += "txUpdateLayout('{id}', '{component}');".format(
                 id=self.layout_id,
                 component=self.dialog_reload_layout if isinstance(self.dialog_reload_layout, str) else ''
             )
+        if self.dialog_reload_tab:
+            dialog_reload_tab = self.dialog_reload_tab if isinstance(self.dialog_reload_tab, list) else [self.dialog_reload_tab]
+            reload_functions += ''.join([f"trionyx_reload_tab('{tab}');" for tab in dialog_reload_tab])
+        if self.dialog_reload_sidebar:
+            reload_functions += "reloadSidebar();"
+
+        if reload_functions:
+            self.dialog_options['callback'] = f"""function(data, dialog){{
+                        if (data.success) {{
+                            dialog.close();
+                            {reload_functions}
+                        }}
+                    }}"""
 
         if not self.on_click:
             from trionyx.urls import model_url
