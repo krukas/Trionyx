@@ -9,6 +9,7 @@ import json
 from collections import defaultdict
 from typing import Dict, List, ClassVar, Type, Optional
 
+from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.utils import timezone
 from django.http.request import HttpRequest
@@ -276,7 +277,6 @@ class TotalSummaryWidget(BaseWidget):
 @register_data(TotalSummaryWidget, 'online_users', _('Unique users today'), icon='fa fa-user', color='purple')
 def total_online_users(config):
     """Get total online users"""
-    from trionyx.trionyx.models import User
-    return User.objects.filter(
+    return get_user_model().objects.filter(
         last_online__gte=timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
     ).count()

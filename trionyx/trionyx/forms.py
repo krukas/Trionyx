@@ -9,8 +9,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.contrib.auth import password_validation
 from django.contrib.auth.models import Group
 from django.contrib.contenttypes.models import ContentType
+from django.contrib.auth import get_user_model
 
-from trionyx.models import get_class
 from trionyx import forms
 from trionyx.forms.layout import Layout, Fieldset, Div, HtmlTemplate, Filters, Depend, HTML  # type: ignore
 from trionyx.forms.helper import FormHelper
@@ -18,7 +18,7 @@ from trionyx.trionyx.icons import ICON_CHOICES
 from trionyx.config import models_config
 from trionyx import utils
 
-User = get_class('trionyx.User')
+User = get_user_model()
 
 
 class ProfileUpdateForm(forms.ModelForm):

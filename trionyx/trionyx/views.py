@@ -27,6 +27,7 @@ from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
 from django.forms.widgets import SelectMultiple
+from django.contrib.auth import get_user_model
 
 from trionyx.models import get_class
 from trionyx.views import UpdateView, DetailTabView, DialogView, JsendView
@@ -39,7 +40,7 @@ from trionyx.forms import form_register, modelform_factory, ModelAjaxChoiceField
 from trionyx.models import filter_queryset_with_user_filters
 from trionyx.trionyx.tasks import MassUpdateTask
 
-User = get_class('trionyx.User')
+User = get_user_model()
 Task = get_class('trionyx.Task')
 
 logger = logging.getLogger(__name__)

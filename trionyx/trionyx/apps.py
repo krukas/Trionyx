@@ -14,6 +14,7 @@ from django.apps import AppConfig
 from django.apps import apps
 from django.utils import timezone
 from django.db.models import Model
+from django.contrib.auth import get_user_model
 
 from trionyx.config import models_config, ModelConfig
 from trionyx.menu import app_menu
@@ -70,10 +71,9 @@ class Config(BaseConfig):
         app_menu.add_item('admin/logs', _('Logs'), url=model_url('trionyx.log', 'list'), order=9090, permission='is_superuser')
 
         # Add User renderer
-        from trionyx.models import get_class
         from trionyx.renderer import renderer
         renderer.register(
-            get_class('trionyx.User'),
+            get_user_model(),
             lambda value, **options: """<img src="{url}" class="avatar-sm" title="{user}">""".format(
                 url=value.avatar.url if value.avatar else static('img/avatar.png'),
                 user=str(value)
