@@ -530,6 +530,12 @@ class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
     """Url code for cancel button, when not set object.get_absolute_url is used"""
 
     @property
+    def permission(self):
+        """Permission for view"""
+        from trionyx.forms import form_register
+        return form_register.get_edit_permission(self.get_model_class(), self.kwargs.get('code')) or super().permission
+
+    @property
     def success_url(self):
         """Return success url"""
         return self.get_model_config().get_absolute_url(self.object)
@@ -609,6 +615,12 @@ class CreateView(ModelPermissionMixin, DjangoCreateView, ModelClassMixin):
 
     cancel_url = None
     """Url code for cancel button, when not set model list view is used"""
+
+    @property
+    def permission(self):
+        """Permission for view"""
+        from trionyx.forms import form_register
+        return form_register.get_create_permission(self.get_model_class(), self.kwargs.get('code')) or super().permission
 
     @property
     def success_url(self):

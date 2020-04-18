@@ -207,6 +207,12 @@ class UpdateDialog(DialogView):
     success_message = _('{model_name} ({object}) is successfully updated')
     """Success message on successfully form saved"""
 
+    @property
+    def permission(self):
+        """Permission for dialog"""
+        from trionyx.forms import form_register
+        return form_register.get_edit_permission(self.get_model_class(), self.kwargs.get('code'))
+
     def get_form_class(self) -> Type[ModelForm]:
         """Get form class for dialog, default will get form from model config"""
         from trionyx.forms import form_register
@@ -265,6 +271,12 @@ class CreateDialog(UpdateDialog):
     title = _("Create {model_name}")
     submit_label = _('create')
     success_message = _('{model_name} ({object}) is successfully created')
+
+    @property
+    def permission(self):
+        """Permission for dialog"""
+        from trionyx.forms import form_register
+        return form_register.get_create_permission(self.get_model_class(), self.kwargs.get('code'))
 
     def get_form_class(self) -> Type[ModelForm]:
         """Get create form class"""
