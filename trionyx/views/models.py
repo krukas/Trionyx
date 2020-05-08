@@ -195,16 +195,16 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
         query = filter_queryset_with_user_filters(query, self.get_filters(), self.request)
 
         fields = self.get_all_fields()
-        select_related = self.get_model_config().list_select_related if self.get_model_config().list_select_related else []
+        prefetch_related = self.get_model_config().list_prefetch_related if self.get_model_config().list_prefetch_related else []
         for field in self.get_current_fields():
             field_parts = field.split('__')
             if len(field_parts) > 1:
-                select_related.append('__'.join(field_parts[:-1]))
+                prefetch_related.append('__'.join(field_parts[:-1]))
             elif fields[field]['type'] == 'related':
-                select_related.append(field)
+                prefetch_related.append(field)
 
-        if select_related:
-            query = query.select_related(*set(select_related))
+        if prefetch_related:
+            query = query.prefetch_related(*set(prefetch_related))
 
         return query.order_by(self.get_sort())
 

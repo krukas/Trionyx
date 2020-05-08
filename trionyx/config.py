@@ -176,8 +176,8 @@ class ModelConfig:
     list_default_fields: Optional[List[str]] = None
     """Array of fields that default is used in form list"""
 
-    list_select_related: Optional[List[str]] = None
-    """Array of fields to add foreign-key relationships to query, use this for relations that are used in search or renderer"""
+    list_prefetch_related: Optional[List[str]] = None
+    """Array of fields to prefetch for query, use this for relations that are used in search or renderer"""
 
     list_default_sort: str = '-pk'
     """Default sort field for list view"""
