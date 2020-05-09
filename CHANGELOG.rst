@@ -1,3 +1,34 @@
+[DEVELOP] -
+-----------
+Added
+~~~~~
+- Allow apps to add global css/js files
+- Add Field component
+- Add option to hide table header
+- Add options to disable auditlog
+- App settings can be overridden with system variables
+- Add config to disable viewing of model
+- Add option should_render to components
+- New projects will print emails to console in development
+- Add options to set custom create/edit permission on form
+- Add permission to dashboard widgets and widget data
+
+Changed
+~~~~~~~
+- Make raised Exceptions more explicit
+- Update models to use settings.AUTH_USER_MODEL and in code to get_user_model()
+- Remove -custom for code url path
+- Allow for muliple dialog reload options
+- Change select_related to prefetch_related to prevent join errors on not null fields
+- Do model clean on objects for MassUpdate
+- Several small Improvement
+
+Fixed
+~~~~~~~
+- Form Datetimepicker format is not set in __init__
+- Summernote popovers remain on page if dialog was closed
+
+
 [2.1.3] - 08-04-2020
 --------------------
 Added

@@ -21,6 +21,7 @@ from trionyx.renderer import renderer
 from trionyx.config import models_config
 from trionyx.trionyx.forms import AuditlogWidgetForm, TotalSummaryWidgetForm
 from trionyx.models import Sum, filter_queryset_with_user_filters
+from trionyx.utils import get_current_request
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -34,11 +35,12 @@ class WidgetDataRegister:
         """Init"""
         self.widget_data = defaultdict(dict)
 
-    def register(self, widget, data_code, data_name, **options):
+    def register(self, widget, data_code, data_name, permission=None, **options):
         """Add data to register"""
         def wrapper(data_function):
             self.widget_data[widget.code][data_code] = {
                 'name': data_name,
+                'permission': permission,
                 'function': data_function,
                 'options': options,
             }
@@ -47,11 +49,24 @@ class WidgetDataRegister:
 
     def get_all_data(self, widget):
         """Get all data"""
-        return self.widget_data.get(widget.code, None)
+        user = getattr(get_current_request(), 'user', False) if get_current_request() else None
+        return {
+            name: data
+            for name, data in self.widget_data.get(widget.code, {}).items()
+            if (
+                user and data['permission'] and user.has_perm(data['permission'])
+            ) or (not user or not data['permission'])
+        }
 
     def get_data(self, widget, code):
         """Get data"""
-        return self.widget_data[widget.code].get(code)
+        user = getattr(get_current_request(), 'user', False) if get_current_request() else None
+        data = self.widget_data[widget.code].get(code)
+
+        if user and data and data['permission']:
+            return data if user.has_perm(data['permission']) else {}
+
+        return data
 
 
 widget_data = WidgetDataRegister()
@@ -119,6 +134,9 @@ class BaseWidget(metaclass=MetaClass):
     code: ClassVar[str]
     """Code for widget"""
 
+    permission: ClassVar[Optional[str]] = None
+    """Permission to use this widget"""
+
     name: ClassVar[str] = ''
     """Name for widget is also used as default title"""
 
@@ -165,6 +183,17 @@ class BaseWidget(metaclass=MetaClass):
     def is_enabled() -> bool:
         """Determine if widget is enabled"""
         return True
+
+    @classmethod
+    def is_visible(cls, request) -> bool:
+        """Check if widget is visible for given request"""
+        user = getattr(request, 'user', False)
+        visible = cls.is_enabled()
+
+        if user and cls.permission:
+            visible = visible and user.has_perm(cls.permission)
+
+        return visible
 
 
 class AuditlogWidget(BaseWidget):
@@ -274,7 +303,7 @@ class TotalSummaryWidget(BaseWidget):
             return renderer.render_field(ModelClass(**{config['field']: result['sum']}), config['field'])
 
 
-@register_data(TotalSummaryWidget, 'online_users', _('Unique users today'), icon='fa fa-user', color='purple')
+@register_data(TotalSummaryWidget, 'online_users_today', _('Unique users today'), icon='fa fa-user', color='purple')
 def total_online_users(config):
     """Get total online users"""
     return get_user_model().objects.filter(
