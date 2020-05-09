@@ -10,6 +10,7 @@ import math
 
 from django.conf import settings
 from django.utils import timezone
+from django.forms import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from trionyx.trionyx.models import Task
@@ -50,11 +51,14 @@ class MassUpdateTask(BaseTask):
                 setattr(obj, key, value)
 
             try:
+                obj.clean()
                 obj.save()
+            except ValidationError as e:
+                errors.append("{}: {}".format(obj, ','.join(e.messages)))
             except Exception:
                 errors.append(str(obj))
-
-            self.set_progress(math.ceil((index / count) * 100))
+            finally:
+                self.set_progress(math.ceil((index / count) * 100))
 
         if errors:
             raise Exception(_('Could not update the following items {}').format(', '.join(errors)))
