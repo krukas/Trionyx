@@ -242,7 +242,7 @@ def task(obj):
                             'field': 'execution_time',
                             'renderer': lambda value, **options: str(timezone.timedelta(seconds=value)),
                         },
-                        'result',
+                        'result=class:pre',
                     )
                 )
             ),

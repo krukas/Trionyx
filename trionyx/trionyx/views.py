@@ -634,6 +634,7 @@ class MassUpdateView(ModelPermissionMixin, TemplateView, ModelClassMixin):
         form = self.get_form(self.request.POST)
 
         if not form.is_valid():
+            print(form.errors)
             context = self.get_context_data(**kwargs)
             context.update({
                 'model_name': self.get_model_config().get_verbose_name(),
@@ -701,6 +702,7 @@ class MassUpdateView(ModelPermissionMixin, TemplateView, ModelClassMixin):
             fields = [f.name for f in model_config.get_fields()]
 
         FormClass = modelform_factory(self.get_model_class(), fields=sorted(list(set(fields))))
+        FormClass._post_clean = lambda self: None
         form = FormClass(data)
 
         # Disable fields that are not checked for change

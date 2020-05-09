@@ -88,6 +88,7 @@ class BaseTask(celery.Task, metaclass=TaskMetaClass):
 
             self.__task.result = result
             self.__task.status = Task.FAILED
+            self.__task.progress = 100
             self.__task.save()
 
         return result
