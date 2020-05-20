@@ -250,6 +250,7 @@ class ListJsendView(ModelPermissionMixin, JsendView, ModelListMixin):
 
     def get_items(self, paginator, current_page):
         """Get list items for current page"""
+        from trionyx.urls import model_url
         fields = self.get_model_config().get_list_fields()
 
         page = paginator.page(current_page)
@@ -259,6 +260,8 @@ class ListJsendView(ModelPermissionMixin, JsendView, ModelListMixin):
             items.append({
                 'id': item.id,
                 'url': self.get_model_config().get_absolute_url(item),
+                'edit_url': model_url(item, 'edit'),
+                'delete_url': model_url(item, 'delete'),
                 'row_data': [
                     fields[field]['renderer'](item, field, no_link=True)
                     for field in self.get_current_fields()

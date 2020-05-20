@@ -16,6 +16,7 @@ Added
 - Add ImageField renderer
 - Add foreign field renderer that renders object with `a` tag
 - Add Json field renderer
+- Add action column to list view with actions view,edit and delete (remove row click)
 
 Changed
 ~~~~~~~
