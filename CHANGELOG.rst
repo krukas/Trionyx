@@ -1,3 +1,12 @@
+[2.1.4] - 20-05-2020
+--------------------
+Fixed
+~~~~~
+- Do model clean on objects for MassUpdate
+- Summernote popovers remain on page if dialog was closed
+- Form Datetimepicker format is not set in __init__
+
+
 [2.1.3] - 08-04-2020
 --------------------
 Added
