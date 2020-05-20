@@ -357,8 +357,12 @@ dl {
     margin: 3px;
 }
 
-.select2-container {
-    width: 100% !important;
+.image-field {
+    height: 18px;
+    width: 18px;
+    object-fit: cover;
+    border-radius: 3px;
+    margin: 0;
 }
 
 /*****************************************************************************/

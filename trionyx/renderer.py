@@ -71,7 +71,7 @@ def file_field_renderer(file, **options):
     if not file:
         return ''
 
-    if options.get('no_html', False):
+    if options.get('no_html', False) or options.get('no_link', False):
         return file.url
 
     return '<a href="{file.url}" target="_blank">{name}</a>'.format(file=file, name=os.path.basename(file.path))
@@ -79,16 +79,29 @@ def file_field_renderer(file, **options):
 
 def url_field_renderer(value, **options):
     """Render url field"""
-    if options.get('no_html', False):
+    if options.get('no_html', False) or options.get('no_link', False):
         return value
     return '<a href="{url}" target="_blank">{url}</a>'.format(url=value) if value else ''
 
 
 def email_field_renderer(value, **options):
     """Render email field"""
-    if options.get('no_html', False):
+    if options.get('no_html', False) or options.get('no_link', False):
         return value
     return '<a href="mailto:{email}" target="_blank">{email}</a>'.format(email=value) if value else ''
+
+
+def image_field_renderer(value, **options):
+    """Render image field"""
+    if not value:
+        return ''
+
+    image = f'<img src="{settings.MEDIA_URL}{value}" class="image-field">'
+
+    if options.get('no_link', False):
+        return image
+
+    return f'<a href="{settings.MEDIA_URL}{value}" target="_blank">{image}</a>'
 
 
 class LazyFieldRenderer:
@@ -163,4 +176,5 @@ renderer = Renderer({
     models.FileField: file_field_renderer,
     models.URLField: url_field_renderer,
     models.EmailField: email_field_renderer,
+    models.ImageField: image_field_renderer,
 })

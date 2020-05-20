@@ -260,7 +260,7 @@ class ListJsendView(ModelPermissionMixin, JsendView, ModelListMixin):
                 'id': item.id,
                 'url': self.get_model_config().get_absolute_url(item),
                 'row_data': [
-                    fields[field]['renderer'](item, field)
+                    fields[field]['renderer'](item, field, no_link=True)
                     for field in self.get_current_fields()
                 ]
             })
