@@ -13,11 +13,13 @@
     function txPeriodFieldsUpdate() {
         $('#widget-period-field').select2().empty();
         $('#widget-period-field').select2({
+            width: '100%',
             data: periodFields[$('#id_model').val()],
         });
     };
 
     $('#widget-period-field').select2({
+        width: '100%',
         data: [],
     });
 

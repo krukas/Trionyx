@@ -1,10 +1,12 @@
 function trionyxInitialize() {
     $('.select').select2({
+        width: '100%',
         escapeMarkup: function(markup) {
             return markup;
         }
     });
     $('.selectmultiple').select2({
+        width: '100%',
         escapeMarkup: function(markup) {
             return markup;
         }

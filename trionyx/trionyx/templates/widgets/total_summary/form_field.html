@@ -13,11 +13,13 @@
     function txSummaryFieldsUpdate() {
         $('#widget-field').select2().empty();
         $('#widget-field').select2({
+            width: '100%',
             data: [{id: '__count__', text: ' -- {% trans 'Count records' %} ---'}].concat(summaryFields[$('#id_model').val()]),
         });
     };
 
     $('#widget-field').select2({
+        width: '100%',
         data: [{id: '__count__', text: '--- {% trans 'Count records' %} ---'}],
     });
 
