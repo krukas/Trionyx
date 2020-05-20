@@ -13,6 +13,7 @@ Added
 - Add options to set custom create/edit permission on form
 - Add permission to dashboard widgets and widget data
 - Add celery command for development with auto reload on file change
+- Add ImageField renderer
 
 Changed
 ~~~~~~~
@@ -23,6 +24,7 @@ Changed
 - Change select_related to prefetch_related to prevent join errors on not null fields
 - Do model clean on objects for MassUpdate
 - Several small Improvement
+- Add no_link options to renderers with an `a` tag, for list view its won't render value in `a` tag
 
 Fixed
 ~~~~~~~
