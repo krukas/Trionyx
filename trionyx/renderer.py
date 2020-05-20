@@ -61,11 +61,6 @@ def list_value_renderer(value, **options):
     return ', '.join(map(str, value))
 
 
-def related_field_renderer(value, **options):
-    """Render list of related items"""
-    return ', '.join(str(obj) for obj in value.all())
-
-
 def file_field_renderer(file, **options):
     """Render file field as link"""
     if not file:
@@ -102,6 +97,22 @@ def image_field_renderer(value, **options):
         return image
 
     return f'<a href="{settings.MEDIA_URL}{value}" target="_blank">{image}</a>'
+
+
+def foreign_field_renderer(value, **options):
+    """Render foreign field"""
+    if options.get('no_html', False) or options.get('no_link', False):
+        return str(value) if value else ''
+
+    return '<a href="{url}">{value}</a>'.format(url=value.get_absolute_url(), value=value) if value else ''
+
+
+def many_to_many_field_renderer(value, **options):
+    """Render many to many field"""
+    if options.get('no_html', False) or options.get('no_link', False):
+        return ', '.join([str(obj) for obj in value.all()])
+
+    return ', '.join(['<a href="{url}">{value}</a>'.format(url=obj.get_absolute_url(), value=obj) for obj in value.all()])
 
 
 class LazyFieldRenderer:
@@ -172,9 +183,10 @@ renderer = Renderer({
     bool: bool_value_renderer,
     list: list_value_renderer,
     models.PriceField: price_value_renderer,
-    models.ManyToManyField: related_field_renderer,
     models.FileField: file_field_renderer,
     models.URLField: url_field_renderer,
     models.EmailField: email_field_renderer,
     models.ImageField: image_field_renderer,
+    models.ForeignKey: foreign_field_renderer,
+    models.ManyToManyField: many_to_many_field_renderer,
 })

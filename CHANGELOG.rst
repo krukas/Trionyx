@@ -14,6 +14,7 @@ Added
 - Add permission to dashboard widgets and widget data
 - Add celery command for development with auto reload on file change
 - Add ImageField renderer
+- Add foreign field renderer that renders object with `a` tag
 
 Changed
 ~~~~~~~
@@ -26,6 +27,7 @@ Changed
 - Several small Improvement
 - Add no_link options to renderers with an `a` tag, for list view its won't render value in `a` tag
 - Close list fields popover on outside click
+- Change many to many field renderer to use `a` tags
 
 Fixed
 ~~~~~~~
