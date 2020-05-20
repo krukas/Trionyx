@@ -227,7 +227,7 @@
         </div>
 
         <div id="fields-popover-content" class="hidden">
-            <div style="max-height: 250px; overflow-y: scroll">
+            <div style="max-height: 250px; overflow-y: scroll" class="popover-fields-content">
                 <div class="col-md-12">
                     <input id="fields-popover-search" placeholder="{% trans "search" %}" class="form-control">
                 </div>
@@ -542,6 +542,12 @@
 
             mounted(){
                 var self = this;
+                $(document).on('click', function (e) {
+                    if ($(e.target).closest('.popover').has('.popover-fields-content').length === 0 && $(e.target).closest('#fields-popover').length === 0) {
+                        // Fixes issue where after closing, takes 2 clicks to re-open
+                        (($('#fields-popover').popover('hide').data('bs.popover')||{}).inState||{}).click = false
+                    }
+                });
                 $('#fields-popover').popover({
                     html: true,
                     content: function(){

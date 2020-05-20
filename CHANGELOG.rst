@@ -25,6 +25,7 @@ Changed
 - Do model clean on objects for MassUpdate
 - Several small Improvement
 - Add no_link options to renderers with an `a` tag, for list view its won't render value in `a` tag
+- Close list fields popover on outside click
 
 Fixed
 ~~~~~~~
