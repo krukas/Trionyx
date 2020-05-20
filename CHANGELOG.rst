@@ -15,6 +15,7 @@ Added
 - Add celery command for development with auto reload on file change
 - Add ImageField renderer
 - Add foreign field renderer that renders object with `a` tag
+- Add Json field renderer
 
 Changed
 ~~~~~~~

@@ -6,6 +6,7 @@ trionyx.renderer
 :license: GPLv3
 """
 import os
+import json
 from datetime import datetime, date
 from decimal import Decimal
 from functools import reduce
@@ -115,6 +116,16 @@ def many_to_many_field_renderer(value, **options):
     return ', '.join(['<a href="{url}">{value}</a>'.format(url=obj.get_absolute_url(), value=obj) for obj in value.all()])
 
 
+def json_field_renderer(value, **options):
+    """Render json field"""
+    value = json.dumps(value, indent=4)
+
+    if options.get('no_html', False):
+        return value
+
+    return f'<span class="pre">{value}</span>'
+
+
 class LazyFieldRenderer:
     """Performs render action when __str__ is called"""
 
@@ -189,4 +200,5 @@ renderer = Renderer({
     models.ImageField: image_field_renderer,
     models.ForeignKey: foreign_field_renderer,
     models.ManyToManyField: many_to_many_field_renderer,
+    models.JSONField: json_field_renderer,
 })
