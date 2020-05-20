@@ -12,6 +12,7 @@ Added
 - New projects will print emails to console in development
 - Add options to set custom create/edit permission on form
 - Add permission to dashboard widgets and widget data
+- Add celery command for development with auto reload on file change
 
 Changed
 ~~~~~~~
