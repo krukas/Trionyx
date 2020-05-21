@@ -788,6 +788,7 @@ table .dragtable-col-placeholder:first {
 
 th:hover .dragtable-drag-handle {
     display: inline;
+    cursor: pointer;
 }
 
 .description-value .form-control {

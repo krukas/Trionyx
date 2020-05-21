@@ -280,6 +280,7 @@
     <script src="{% static "js/jquery.dragtable.js" %}"></script>
 
     <script type="text/javascript">
+
     function TrionyxList(config){
         return new Vue({
             el: '#app-model-list',
@@ -550,12 +551,23 @@
 
             mounted(){
                 var self = this;
+
+                // Fix dropdown not visible for bottom items
+                $('.table-responsive').on('show.bs.dropdown', function () {
+                    $('.table-responsive').css( "overflow", "inherit" );
+                }).on('hide.bs.dropdown', function () {
+                    $('.table-responsive').css( "overflow", "auto" );
+                });
+
+                // Fix popover not closing on outside click
                 $(document).on('click', function (e) {
                     if ($(e.target).closest('.popover').has('.popover-fields-content').length === 0 && $(e.target).closest('#fields-popover').length === 0) {
                         // Fixes issue where after closing, takes 2 clicks to re-open
                         (($('#fields-popover').popover('hide').data('bs.popover')||{}).inState||{}).click = false
                     }
                 });
+
+                // Init popover
                 $('#fields-popover').popover({
                     html: true,
                     content: function(){
