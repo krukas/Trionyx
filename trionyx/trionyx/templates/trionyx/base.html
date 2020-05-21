@@ -181,6 +181,8 @@
         close: '{% trans 'Close' %}',
     }
 
+    moment.locale('{{ current_locale }}');
+
     {% if tx_show_changelog %}
         openDialog('{% url 'trionyx:changelog' %}?show=1', {size: 'large'});
     {% endif %}

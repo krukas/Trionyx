@@ -133,8 +133,14 @@
                        :w="widget.w"
                        :h="widget.h"
                        :i="widget.i"
+                       :min-w="widget.minW"
+                       :max-w="widget.maxW"
+                       :min-h="widget.minH"
+                       :max-h="widget.maxH"
+                       :is-resizable="widget.isResizable"
                        :key="widget.i"
                        :drag-allow-from="'.drag-handle'"
+                       @resized="resizedEvent"
             >
                 <component v-bind:is="'widget-' + widget.code" v-bind="{widget:widget}" :ref="widget.i"></component>
                 <div v-if="edit" class="drag-handle">
@@ -239,6 +245,10 @@
                 },
             },
             methods: {
+                resized: function() {
+                },
+                configChange: function(code, value) {
+                },
                 load: function () {
                     var self = this;
                     $.ajax({
@@ -252,7 +262,7 @@
                         dataType: "json",
                         success: function(response) {
                             if(response.status === 'success'){
-                                self.data = response.data;
+                                self.data = response.data
                             } else {
                                 self.error = true;
                             }
@@ -264,16 +274,55 @@
         };
 
         function tx_initDashboard(config) {
+            widgets = {}
+            widgets = config.widgets.reduce(function (obj, item) {
+                return {
+                    ...obj,
+                    [item.code]: item,
+                }
+            }, widgets);
+
            return new Vue({
                 el: '#tx-dashboard',
                 delimiters: ['[[', ']]'],
                 data: {
                     widgets: config.widgets,
-                    dashboard: config.dashboard,
+                    dashboard: config.dashboard.map(function(widgetData){
+                        if (widgetData.code in widgets) {
+                            var widget = widgets[widgetData.code];
+                            if (widget.fixed_w) {
+                                widgetData.w = widget.fixed_w;
+                                widgetData.minW = widget.fixed_w;
+                                widgetData.maxW = widget.fixed_w;
+                            } else {
+                                widgetData.minW = undefined;
+                                widgetData.maxW = undefined;
+                            }
+
+                            if (widget.fixed_h) {
+                                widgetData.h = widget.fixed_h;
+                                widgetData.minH = widget.fixed_h;
+                                widgetData.maxH = widget.fixed_h;
+                            } else {
+                                widgetData.minH = undefined;
+                                widgetData.maxH = undefined;
+                            }
+
+                            widgetData.isResizable = widget.is_resizable;
+                            if (widget.is_resizable !== null && !widget.is_resizable) {
+                                widgetData.w = widget.fixed_w ? widget.fixed_w : widget.default_w;
+                                widgetData.h = widget.fixed_h ? widget.fixed_h : widget.default_h;
+                            }
+                        }
+                        return widgetData;
+                    }),
                     edit: false,
                     showNewModal: false,
                 },
                 methods: {
+                    resizedEvent: function(i) {
+                        this.$refs[i][0].resized();
+                    },
                     saveDashboard: function(){
                         var self = this;
                         this.edit = false;
@@ -287,6 +336,7 @@
                     },
                     updateWidgetConfig: function(widget, code, value){
                         widget.config[code] = value;
+                        this.$refs[widget.i][0].configChange(code, value);
                     },
                     openWidgetConfigDialog: function(widget){
                         var self = this;
@@ -318,9 +368,14 @@
                             config: config,
                             x: 0,
                             y: Math.max(...this.dashboard.map(item => item.y + item.h)),
-                            w: widget.default_w,
-                            h: widget.default_h,
+                            w: widget.fixed_w ? widget.fixed_w : widget.default_w,
+                            h: widget.fixed_h ? widget.fixed_h : widget.default_h,
                             i: randomString(16),
+                            maxW: widget.fixed_w ? widget.fixed_w : undefined,
+                            minW: widget.fixed_w ? widget.fixed_w : undefined,
+                            maxH: widget.fixed_h ? widget.fixed_h : undefined,
+                            minH: widget.fixed_h ? widget.fixed_h : undefined,
+                            isResizable: widget.is_resizable,
                         };
 
                         this.dashboard.push(newWidget);

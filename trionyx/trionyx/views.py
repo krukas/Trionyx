@@ -438,6 +438,9 @@ class DashboardView(TemplateView):
                 'config_fields': widget().config_fields,
                 'default_w': widget.default_width,
                 'default_h': widget.default_height,
+                'fixed_w': widget.fixed_width,
+                'fixed_h': widget.fixed_height,
+                'is_resizable': widget.is_resizable,
             } for index, widget in widgets.items() if widget.is_visible(self.request)],
             'dashboard': dashboard,
         })

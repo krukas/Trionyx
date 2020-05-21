@@ -19,9 +19,10 @@ from django.forms import Form
 from trionyx.trionyx.models import AuditLogEntry
 from trionyx.renderer import renderer
 from trionyx.config import models_config
-from trionyx.trionyx.forms import AuditlogWidgetForm, TotalSummaryWidgetForm
-from trionyx.models import Sum, filter_queryset_with_user_filters
+from trionyx.trionyx.forms import AuditlogWidgetForm, TotalSummaryWidgetForm, GraphWidgetForm
+from trionyx.models import Sum, filter_queryset_with_user_filters, Count
 from trionyx.utils import get_current_request
+from trionyx import utils
 from django.utils.translation import ugettext_lazy as _
 
 
@@ -152,6 +153,15 @@ class BaseWidget(metaclass=MetaClass):
     default_height: ClassVar[int] = 20
     """Default height of widget, each step is 10px"""
 
+    fixed_width: Optional[int] = None
+    """Set a fixed width for widget"""
+
+    fixed_height: Optional[int] = None
+    """Set a fixed height for widget"""
+
+    is_resizable: Optional[bool] = None
+    """Is widget resizable"""
+
     @property
     def template(self) -> str:
         """Template path `widgets/{code}.html` overwrite to set custom path"""
@@ -242,6 +252,8 @@ class AuditlogWidget(BaseWidget):
         ]
 
 
+# Total summary widget
+# ---------------------------------------------------------------------------------------------------------------------
 class TotalSummaryWidget(BaseWidget):
     """Total summary widget"""
 
@@ -249,7 +261,7 @@ class TotalSummaryWidget(BaseWidget):
     name = _('Total summary')
     description = _('Show total for given field on given period')
     config_form_class = TotalSummaryWidgetForm
-    default_height = 5
+    fixed_height = 5
 
     def get_data(self, request: HttpRequest, config: dict) -> str:
         """Get data"""
@@ -309,3 +321,230 @@ def total_online_users(config):
     return get_user_model().objects.filter(
         last_online__gte=timezone.now().replace(hour=0, minute=0, second=0, microsecond=0)
     ).count()
+
+
+# Total summary widget
+# ---------------------------------------------------------------------------------------------------------------------
+class GraphWidget(BaseWidget):
+    """Graph widget"""
+
+    code = 'graph'
+    name = _('Graph')
+    description = _('Graph a sum of field or item count over given timeline')
+    config_form_class = GraphWidgetForm
+    default_height = 20
+
+    colors = {
+        'light-blue': {
+            'fill': 'rgba(60, 141, 188, 0.2)',
+            'stroke': 'rgba(60, 141, 188, 1)',
+        },
+        'aqua': {
+            'fill': 'rgba(0, 192, 239, 0.2)',
+            'stroke': 'rgba(0, 192, 239, 1)',
+        },
+        'green': {
+            'fill': 'rgba(0, 166, 90, 0.2)',
+            'stroke': 'rgba(0, 166, 90, 1)',
+        },
+        'yellow': {
+            'fill': 'rgba(243, 156, 18, 0.2)',
+            'stroke': 'rgba(243, 156, 18, 1)',
+        },
+        'red': {
+            'fill': 'rgba(221, 75, 57, 0.2)',
+            'stroke': 'rgba(221, 75, 57, 1)',
+        },
+        'gray': {
+            'fill': 'rgba(210, 214, 222, 0.2)',
+            'stroke': 'rgba(210, 214, 222, 1)',
+        },
+        'navy': {
+            'fill': 'rgba(0, 31, 63, 0.2)',
+            'stroke': 'rgba(0, 31, 63, 1)',
+        },
+        'teal': {
+            'fill': 'rgba(57, 204, 204, 0.2)',
+            'stroke': 'rgba(57, 204, 204, 1)',
+        },
+        'purple': {
+            'fill': 'rgba(96, 92, 168, 0.2)',
+            'stroke': 'rgba(96, 92, 168, 1)',
+        },
+        'orange': {
+            'fill': 'rgba(255, 133, 27, 0.2)',
+            'stroke': 'rgba(255, 133, 27, 1)',
+        },
+        'maroon': {
+            'fill': 'rgba(216, 27, 96, 0.2)',
+            'stroke': 'rgba(216, 27, 96, 1)',
+        },
+        'black': {
+            'fill': 'rgba(17, 17, 17, 0.2)',
+            'stroke': 'rgba(17, 17, 17, 1)',
+        },
+    }
+
+    @classmethod
+    def get_color(cls, color, color_type):
+        """Get color"""
+        color = color if color in cls.colors else 'light-blue'
+        color_type = color_type if color_type in ['fill', 'stroke'] else 'stroke'
+
+        return cls.colors[color][color_type]
+
+    def get_data(self, request: HttpRequest, config: dict):
+        """Get graph data"""
+        if config.get('source', '__custom__') != '__custom__':
+            func = widget_data.get_data(self, config.get('source')).get('function', lambda config: None)
+            return func(config)
+
+        try:
+            ModelClass = ContentType.objects.get_for_id(config.get('model', -1)).model_class()
+        except ContentType.DoesNotExist:
+            return None
+
+        if not ModelClass:
+            return None
+
+        from django.db.models.functions import ExtractMinute, ExtractHour, ExtractDay, ExtractWeek, ExtractMonth, ExtractYear
+        interval_field = config.get('interval_field', 'created_at')
+        query = ModelClass.objects.get_queryset().annotate(
+            widget_minute=ExtractMinute(interval_field),
+            widget_hour=ExtractHour(interval_field),
+            widget_day=ExtractDay(interval_field),
+            widget_week=ExtractWeek(interval_field),
+            widget_month=ExtractMonth(interval_field),
+            widget_year=ExtractYear(interval_field)
+        )
+
+        if config.get('filters'):
+            query = filter_queryset_with_user_filters(query, json.loads(config['filters']))
+
+        if config.get('interval_period') == 'minute':
+            query = query.values('widget_minute', 'widget_hour', 'widget_day', 'widget_month', 'widget_year').order_by(
+                'widget_year', 'widget_month', 'widget_day', 'widget_hour', 'widget_minute')
+        elif config.get('interval_period') == 'hour':
+            query = query.values('widget_hour', 'widget_day', 'widget_month', 'widget_year').order_by(
+                'widget_year', 'widget_month', 'widget_day', 'widget_hour')
+        elif config.get('interval_period') == 'day':
+            query = query.values('widget_day', 'widget_month', 'widget_year').order_by(
+                'widget_year', 'widget_month', 'widget_day')
+        elif config.get('interval_period') == 'week':
+            query = query.values('widget_week', 'widget_year').order_by(
+                'widget_year', 'widget_week')
+        elif config.get('interval_period') == 'month':
+            query = query.values('widget_month', 'widget_year').order_by(
+                'widget_year', 'widget_month')
+        elif config.get('interval_period') == 'year':
+            query = query.values('widget_year').order_by('widget_year')
+
+        query = query.annotate(widget_count=Count('id'))
+
+        model_config = models_config.get_config(ModelClass)
+        only_count = config.get('field', '__count__') == '__count__'
+        if only_count:
+            label = model_config.get_verbose_name() + ' ' + str(_('Count'))
+        else:
+            query = query.annotate(widget_value=Sum(config['field']))
+            label = _('Sum of {objects} {field}'.format(
+                objects=model_config.get_verbose_name_plural(),
+                field=model_config.get_field(config['field']).verbose_name
+            ))
+
+        query = query[:30]
+
+        def row_to_date(row):
+            """Based on row generate a date"""
+            import datetime
+
+            if config.get('interval_period') == 'week':
+                return datetime.datetime.strptime('{}-W{}-1'.format(
+                    row.get('widget_year'),
+                    row.get('widget_week', 1) - 1,
+                ), "%Y-W%W-%w").strftime('%Y-%m-%d %H:%M:%S')
+
+            return datetime.datetime(
+                year=row.get('widget_year'),
+                month=row.get('widget_month', 1),
+                day=row.get('widget_day', 1),
+                hour=row.get('widget_hour', 0),
+                minute=row.get('widget_minute', 0)
+            ).strftime('%Y-%m-%d %H:%M:%S')
+
+        datasets = []
+        y_axes = [{
+            'id': 'y-axis-2',
+            'type': 'linear',
+            'position': 'right' if not only_count else 'left',
+            'gridLines': {
+                'drawOnChartArea': False,
+            },
+            'ticks': {
+                'suggestedMax': float(max([row['widget_count'] for row in query])) * (1.5 if not only_count else 1.10),
+                'suggestedMin': 0,
+            }
+        }]
+        if not only_count:
+            field_renderer = renderer.renderers.get(type(model_config.get_field(config['field'])), lambda x: str(x))
+            datasets.append({
+                'label': label,
+                'backgroundColor': self.get_color(config.get('color'), 'fill'),
+                'borderColor': self.get_color(config.get('color'), 'stroke'),
+                'pointBorderColor': self.get_color(config.get('color'), 'stroke'),
+                'pointBackgroundColor': self.get_color(config.get('color'), 'stroke'),
+                'fill': True,
+                'pointRadius': 4,
+                'data': [{
+                    'x': row_to_date(row),
+                    'y': row.get('widget_value'),
+                    'label': field_renderer(row.get('widget_value')),
+                } for row in query],
+                'yAxisID': 'y-axis-1',
+            })
+            y_axes.append({
+                'id': 'y-axis-1',
+                'type': 'linear',
+                'position': 'left',
+                'gridLines': {
+                    'drawOnChartArea': False,
+                },
+                'ticks': {
+                    'suggestedMax': float(max([row['widget_value'] for row in query])) * 1.10,
+                    'suggestedMin': 0,
+                }
+            })
+
+        datasets.append({
+            'label': str(_('Number of {objects}')).format(objects=model_config.get_verbose_name_plural()),
+            'backgroundColor': self.get_color(config.get('color'), 'fill') if only_count else 'rgba(211, 211, 211, 0.2)',
+            'borderColor': self.get_color(config.get('color'), 'stroke') if only_count else 'rgba(211, 211, 211, 1)',
+            'pointBorderColor': self.get_color(config.get('color'), 'stroke') if only_count else 'rgba(211, 211, 211, 1)',
+            'pointBackgroundColor': self.get_color(config.get('color'), 'stroke') if only_count else 'rgba(211, 211, 211, 1)',
+            'fill': True,
+            'pointRadius': 4,
+            'data': [row.get('widget_count') for row in query],
+            'yAxisID': 'y-axis-2',
+        })
+
+        return {
+            'scales': {
+                'xAxes': [{
+                    'type': 'time',
+                    'autoSkip': True,
+                    'distribution': 'linear',
+                    'time': {
+                        'unit': config.get('interval_period', 'day'),
+                        'stepSize': 1,
+                        'tooltipFormat': utils.datetime_format_to_momentjs(utils.get_datetime_input_format(
+                            date_only=config.get('interval_period') not in ['minute', 'hour']
+                        ))
+                    },
+                }],
+                'yAxes': y_axes,
+            },
+            'data': {
+                'labels': [row_to_date(row) for row in query],
+                'datasets': datasets,
+            }
+        }

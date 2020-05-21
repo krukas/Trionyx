@@ -633,3 +633,24 @@ function trionyxFormDepend(selector, dependencies) {
     }
     trionyxFormDependenciesChange();
 }
+
+
+/* Widget model form field */
+function widgetModelFormField(modelField, name, fields) {
+    var field = $('#widget-field-' + name);
+    var model = $(modelField)
+
+    function updateField() {
+        field.select2().empty();
+        field.select2({
+            width: '100%',
+            data: model.val() in fields ? fields[model.val()] : [],
+        });
+    }
+
+    updateField();
+
+    model.on('change', function () {
+        updateField();
+    });
+}

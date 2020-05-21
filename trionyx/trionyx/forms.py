@@ -517,3 +517,130 @@ class TotalSummaryWidgetForm(forms.Form):
             self.add_error(None, _('Field field is required'))
 
         return self.cleaned_data
+
+
+class GraphWidgetForm(forms.Form):
+    """Graph widget form"""
+
+    PERIOD_CHOICES = [
+        ('minute', _('Minutes')),
+        ('hour', _('Hours')),
+        ('day', _('Days')),
+        ('week', _('Weeks')),
+        ('month', _('Months')),
+        ('year', _('years')),
+    ]
+
+    icon = forms.ChoiceField(label=_('Icon'), choices=ICON_CHOICES)
+    source = forms.ChoiceField(label=_('Source'), choices=[], required=True)
+
+    model = forms.ChoiceField(label=_('Model'), choices=[], required=False)
+    field = forms.CharField(label=_('Field'), required=False)
+
+    interval_period = forms.ChoiceField(label=_('Interval period'), choices=PERIOD_CHOICES)
+    interval_field = forms.CharField(label=_('Interval field'), required=False)
+
+    filters = forms.CharField(label=_('Filters'), required=False)
+
+    def __init__(self, *args, **kwargs):
+        """Init form"""
+        super().__init__(*args, **kwargs)
+
+        from trionyx.widgets import widget_data, GraphWidget
+        self.fields['source'].choices = [
+            ('', '------'),
+            *[(code, data['name']) for code, data in widget_data.get_all_data(GraphWidget).items()],
+            ('__custom__', _('Custom'))
+        ]
+
+        content_type_map = ContentType.objects.get_for_models(*list(models_config.get_all_models(utils.get_current_request().user)))
+        interval_fields = {}
+        graph_fields = {}
+
+        for config in models_config.get_all_configs():
+            if config.model not in content_type_map:
+                continue
+
+            graph_fields[content_type_map[config.model].id] = [
+                {
+                    'id': '__count__',
+                    'text': str(_('Count records')),
+                },
+                *[{
+                    'id': field.name,
+                    'text': str(field.verbose_name)
+                } for field in config.get_fields() if config.get_field_type(field) in ['int', 'float']]
+            ]
+
+            interval_fields[content_type_map[config.model].id] = [
+                {
+                    'id': field.name,
+                    'text': str(field.verbose_name)
+                } for field in config.get_fields(True) if config.get_field_type(field) in ['date', 'datetime']
+            ]
+
+        self.fields['model'].choices = [
+            (content_type.id, model._meta.verbose_name.capitalize()) for model, content_type
+            in content_type_map.items()]
+
+        self.helper = FormHelper()
+        self.helper.layout = Layout(
+            'source',
+            Depend(
+                [('source', r'__custom__')],
+                'icon',
+                Div(
+                    Div(
+                        'model',
+                        css_class="col-md-6",
+                    ),
+                    Div(
+                        HtmlTemplate('widgets/forms/model_field.html', {
+                            'model_id': '#id_model',
+                            'label': _('Field'),
+                            'name': 'field',
+                            'fields': graph_fields,
+                            'value': self.initial.get('field'),
+                        }),
+                        css_class="col-md-6",
+                    ),
+                    css_class="row"
+                ),
+                Div(
+                    Div(
+                        HtmlTemplate('widgets/forms/model_field.html', {
+                            'model_id': '#id_model',
+                            'label': _('Interval field'),
+                            'name': 'interval_field',
+                            'fields': interval_fields,
+                            'value': self.initial.get('interval_field'),
+                        }),
+                        css_class="col-md-6",
+                    ),
+                    Div(
+                        'interval_period',
+                        css_class="col-md-6",
+                    ),
+                    css_class="row"
+                ),
+                Fieldset(
+                    _('Filters'),
+                    Filters('filters', content_type_input_id='id_model'),
+                ),
+                css_id='widget-custom-source'
+            )
+        )
+
+    def clean(self):
+        """Clean"""
+        super().clean()
+
+        if self.cleaned_data.get('source') != '__custom__':
+            from trionyx.widgets import widget_data, GraphWidget
+            data = widget_data.get_data(GraphWidget, self.cleaned_data.get('source'))
+            if data:
+                self.cleaned_data.update(data.get('options', {}))
+        elif not self.cleaned_data.get('field'):
+            self.add_error(None, _('Field field is required'))
+
+        return self.cleaned_data
