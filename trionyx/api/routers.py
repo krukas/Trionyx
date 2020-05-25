@@ -31,8 +31,28 @@ class AutoRouter(routers.DefaultRouter):
     def __init__(self):
         """Init class and find all model routes"""
         super(AutoRouter, self).__init__()
-        self.auto_regiser_models()
-        self.register_apps()
+        self.app_ready = False
+
+    @property
+    def urls(self):
+        """Get API urls"""
+        if not self.app_ready:
+            return []
+
+        if not hasattr(self, '_urls'):
+            self.auto_regiser_models()
+            self.register_apps()
+            self._urls = self.get_urls()
+
+        return self._urls
+
+    def __len__(self):
+        """Get length of urls"""
+        return len(self.urls)
+
+    def __getitem__(self, index):
+        """Get url item"""
+        return self.urls[index]
 
     def register_apps(self):
         """Register all API views from apps that are exported to routes.py"""
@@ -92,21 +112,20 @@ class AutoRouter(routers.DefaultRouter):
             class Meta:
                 model = None
                 fields = None
+                read_only_fields = None
 
         fields = []
         if config.api_fields:
             fields = config.api_fields
         else:
-            forms = [
-                form_register.get_create_form(model),
-                form_register.get_edit_form(model)
-            ]
-            for form in forms:
+            for form in form_register.get_all_forms(model):
                 fields.extend([name for name in form.base_fields])
 
-        fields = list({'id', 'created_at', 'updated_at', 'verbose_name', *fields})
         model_fields = [field.name for field in config.get_fields(True, True)]
-        MetaModelSerializer.Meta.fields = [field for field in fields if field in model_fields]
+        MetaModelSerializer.Meta.fields = [field for field in model_fields]
+        MetaModelSerializer.Meta.read_only_fields = list({'id', 'created_at', 'updated_at', 'verbose_name', *[
+            field for field in model_fields if field not in fields
+        ]})
 
         DynamicSerializer = type(
             '{}Serializer'.format(model.__name__),

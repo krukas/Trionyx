@@ -79,6 +79,10 @@ class Config(BaseConfig):
                 user=str(value)
             ))
 
+        # Enable api route generation
+        from trionyx.trionyx.urls import api_auto_router
+        api_auto_router.app_ready = True
+
     def auto_load_app_modules(self, modules: List[str]):
         """Auto load app modules"""
         for app in apps.get_app_configs():

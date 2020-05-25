@@ -15,8 +15,10 @@ from trionyx.api.routers import AutoRouter
 
 app_name = 'trionyx'
 
+api_auto_router = AutoRouter()
+
 urlpatterns = [
-    path('api/', include(AutoRouter().urls)),
+    path('api/', include(api_auto_router)),
 
     path('login/', views.LoginView.as_view(), name='login'),
     path('logout/', views.logout, name='logout'),
