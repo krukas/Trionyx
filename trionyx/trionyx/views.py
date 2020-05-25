@@ -324,26 +324,6 @@ class UserTasksJsend(JsendView):
 
     def handle_request(self, request):
         """Get user open tasks"""
-        tasks = []
-
-        tasks.extend([
-            task for task in Task.objects.filter(user=request.user, status=Task.SCHEDULED).order_by('-scheduled_at')
-        ])
-
-        tasks.extend([
-            task for task in Task.objects.filter(
-                user=request.user,
-                status__in=[Task.QUEUE, Task.LOCKED, Task.RUNNING]
-            ).order_by('-started_at')
-        ])
-
-        if len(tasks) < 10:
-            tasks.extend([
-                task for task in Task.objects.filter(
-                    user=request.user, status__in=[Task.COMPLETED, Task.FAILED]
-                ).order_by('-started_at')[: 10 - len(tasks)]
-            ])
-
         return [
             {
                 'id': task.id,
@@ -352,7 +332,7 @@ class UserTasksJsend(JsendView):
                 'description': task.description,
                 'progress': task.progress,
                 'url': task.get_absolute_url(),
-            } for task in tasks
+            } for task in Task.objects.filter(user=request.user).order_by('status', '-scheduled_at', '-started_at')[:5]
         ]
 
 
