@@ -11,6 +11,7 @@ from contextlib import contextmanager
 
 from celery import current_app
 from celery.app.control import Control
+from django.core.cache import cache
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.contrib.contenttypes import fields
 from django.utils import timezone
@@ -22,6 +23,7 @@ from django.template.loader import render_to_string
 from trionyx import models
 from trionyx.utils import get_current_request
 from trionyx.data import TIMEZONES
+from trionyx.trionyx import LOCAL_DATA
 
 
 # =============================================================================
@@ -151,14 +153,28 @@ class UserAttributeManager(models.Manager):
 
     def set_attribute(self, user, code, value):
         """Set attribute for user"""
+        setattr(LOCAL_DATA, 'trionyx_user_attributes', None)
+        cache.delete(f'user-attributes-{user.id}')
+
         self.update_or_create(user=user, code=code, defaults={'value': value})
 
     def get_attribute(self, user, code, default=None):
         """Get attribute for user"""
-        try:
-            return self.get(user=user, code=code).value
-        except models.ObjectDoesNotExist:
-            return default
+        cache_key = f'user-attributes-{user.id}'
+        attributes = getattr(LOCAL_DATA, 'trionyx_user_attributes', None)
+
+        if attributes is None:
+            attributes = cache.get(cache_key)
+
+        if attributes is None:
+            attributes = {
+                attribute.code: attribute.value for attribute in self.filter(user=user)
+            }
+            cache.set(cache_key, attributes, timeout=60 * 60 * 24)
+
+        setattr(LOCAL_DATA, 'trionyx_user_attributes', attributes)
+
+        return attributes.get(code, default)
 
 
 class UserAttribute(models.Model):
