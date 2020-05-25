@@ -21,11 +21,15 @@ from trionyx import __version__
 
 def offline_context():
     """Offline context used by compress"""
+    locale, *_ = utils.get_current_locale().split('_')
     context = {
         'STATIC_URL': settings.STATIC_URL,
         'tx_skin_css': 'css/skins/skin-{}.min.css'.format(settings.TX_THEME_COLOR),
         'apps_css_files': [],
         'apps_js_files': [],
+        'offline_summernote_language_js': 'plugins/summernote/lang/summernote-{}-{}.min.js'.format(
+            locale, locale.upper()
+        ) if locale != 'en' else '',
     }
     for app in apps.get_app_configs():
         context['apps_css_files'].extend(getattr(app, 'css_files', []))
@@ -97,7 +101,9 @@ def trionyx(request):
         'date_input_format': utils.datetime_format_to_momentjs(utils.get_datetime_input_format(date_only=True)),
         'current_locale': utils.get_current_locale(),
         'summernote_language': '{}-{}'.format(locale, locale.upper()),
-        'summernote_language_js': 'plugins/summernote/lang/summernote-{}-{}.min.js'.format(locale, locale.upper()),
+        'summernote_language_js': 'plugins/summernote/lang/summernote-{}-{}.min.js'.format(
+            locale, locale.upper()
+        ) if locale != 'en' and utils.get_current_language() != settings.LANGUAGE_CODE else '',
 
         **offline_context()[0]
     }

@@ -145,6 +145,10 @@
     <script src="{% static "plugins/datetimepicker/js/bootstrap-datetimepicker.min.js" %}"></script>
     <script src="{% static "plugins/summernote/summernote.min.js" %}"></script>
 
+    {% if offline_summernote_language_js %}
+        <script src="{% static offline_summernote_language_js %}"></script>
+    {% endif %}
+
     <script src="{% static "js/adminlte.min.js" %}"></script>
     {% if DEBUG %}
         <script src="{% static "js/vue.dev.js" %}"></script>
@@ -169,7 +173,7 @@
 
 {% endcompress %}
 
-{% if current_locale != 'en_US' %}
+{% if summernote_language_js %}
     <script src="{% static summernote_language_js %}"></script>
 {% endif %}
 
