@@ -21,6 +21,7 @@
         <link rel="stylesheet" type="text/css" href="{% static "plugins/summernote/summernote.min.css" %}">
 
         <link rel="stylesheet" type="text/css" href="{% static "css/AdminLTE.min.css" %}">
+        <link rel="stylesheet" type="text/css" href="{% static tx_skin_css %}">
         <link rel="stylesheet" type="text/css" href="{% static "css/trionyx.css" %}">
 
         {% for css_file in apps_css_files %}
@@ -30,8 +31,6 @@
         {% block extra_css %}{% endblock %}
 
     {% endcompress %}
-
-    <link rel="stylesheet" type="text/css" href="{% static tx_skin_css %}">
 
     {% block extra_head %}{% endblock %}
     <script>
