@@ -150,7 +150,7 @@ class ExtendedDjangoModelPermissions(DjangoModelPermissions):
     }
 
 
-def router(prefix, viewset, base_name):
+def router(prefix, viewset, basename):
     """
     Define an API route
 
@@ -162,5 +162,5 @@ def router(prefix, viewset, base_name):
     return {
         'prefix': prefix,
         'viewset': viewset,
-        'base_name': base_name
+        'basename': basename
     }
