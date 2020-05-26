@@ -167,23 +167,30 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
             return self.current_fields
 
         field_attribute = 'list_{}_{}_fields'.format(self.kwargs.get('app'), self.kwargs.get('model'))
-        current_fields = self.request.user.get_attribute(field_attribute, [])
+        self.current_fields = saved_current_fields = self.request.user.get_attribute(field_attribute, [])
+        all_fields = self.get_all_fields().keys()
         request_fields = self.request.POST.get('selected_fields', None)
 
-        if request_fields and ','.join(current_fields) != request_fields:
-            # TODO validate fields
-            current_fields = list(filter(lambda f: f != 'NR', request_fields.split(',')))
-            self.request.user.set_attribute(field_attribute, current_fields)
-        elif request_fields:
-            current_fields = request_fields.split(',')
+        if request_fields is not None:
+            request_fields = [field for field in request_fields.split(',') if field in all_fields]
 
-        if not current_fields:
+            # Update current fields if requested fields are different
+            self.current_fields = request_fields if self.current_fields != request_fields else self.current_fields
+
+        # If current fields is empty reset dot default fields
+        if not self.current_fields:
             config = self.get_model_config()
-            current_fields = config.list_default_fields if config.list_default_fields else ['id']
+            self.current_fields = config.list_default_fields if config.list_default_fields else ['id']
 
-        # TODO check if all fields are still valid, filter out invalid and save
-        self.current_fields = current_fields
-        return current_fields
+        # Validate if all fields are still valid
+        checked_fields = [field for field in self.current_fields if field in all_fields]
+        self.current_fields = checked_fields if self.current_fields != checked_fields else self.current_fields
+
+        # Save fields if changed
+        if self.current_fields != saved_current_fields:
+            self.request.user.set_attribute(field_attribute, self.current_fields)
+
+        return self.current_fields
 
     def get_paginator(self):
         """Get paginator"""
