@@ -49,7 +49,6 @@ def account_overview(obj):
                 ),
                 Column6(
                     Panel(
-                        # TODO Add token reset button
                         _('Settings'),
                         DescriptionList(
                             {
