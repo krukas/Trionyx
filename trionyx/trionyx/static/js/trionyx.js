@@ -51,20 +51,12 @@ function getDataOptions(node, validOptions) {
 $(function(){
     function fixHeader(transiton){
         var leftSize = '0px';
-
-        var open = $('body').hasClass('sidebar-open');
         var windowWidth = $( window ).width();
 
-        if($('body').hasClass('sidebar-expanded-on-hover')) {
-            leftSize = '230px';
-        } else if (windowWidth >= 768) {
+        if (windowWidth >= 768) {
             var collapsed = $('body').hasClass('sidebar-collapse');
             leftSize = collapsed ? '50px' : '230px';
-        } else {
-            var open = $('body').hasClass('sidebar-open');
-            leftSize = open ? '230px' : '0px';
         }
-
 
         $('.content-header-affix').css('left', leftSize);
     }
@@ -80,9 +72,6 @@ $(function(){
     });
     $(document).on('collapsed.pushMenu', function(e){
         setCookie('menu.state', 'collapsed');
-        fixHeader();
-    });
-    $(document).on('pushMenu.hover', function(e){
         fixHeader();
     });
 
