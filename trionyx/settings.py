@@ -273,6 +273,7 @@ CELERY_TASK_TIME_LIMIT = 3900
 # ==============================================================================
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
+        'trionyx.api.filters.QueryFilter',
         'trionyx.api.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
     ),
@@ -290,6 +291,7 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_PAGINATION_CLASS': 'trionyx.api.pagination.PageNumberPagination',
     'PAGE_SIZE': 25,
+    'ORDERING_PARAM': '_ordering',
 }
 
 # ==============================================================================

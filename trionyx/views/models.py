@@ -21,7 +21,6 @@ from django.views.generic import (
     CreateView as DjangoCreateView,
     DeleteView as DjangoDeleteView
 )
-from django.core.exceptions import PermissionDenied
 from django.http import Http404, StreamingHttpResponse
 from django.urls import reverse
 from django.core.paginator import Paginator
@@ -448,7 +447,6 @@ class DetailTabJsendView(ModelPermissionMixin, JsendView, ModelClassMixin):
     def handle_request(self, request, app, model, pk):
         """Render and return tab"""
         from trionyx.views import tabs
-        from trionyx.config import models_config
 
         tab_code = request.GET.get('tab')
         model_alias = request.GET.get('model_alias')
