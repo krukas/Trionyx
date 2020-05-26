@@ -40,6 +40,12 @@ DATABASES = {
     }
 }
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+   }
+}
+
 # Celery beat schedule
 from trionyx.utils import create_celerybeat_schedule
 CELERY_BEAT_SCHEDULE = create_celerybeat_schedule(INSTALLED_APPS)

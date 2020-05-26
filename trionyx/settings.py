@@ -172,9 +172,9 @@ AUTH_USER_MODEL = 'trionyx.User'
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 LOGIN_EXEMPT_URLS = [
-    'static',
-    'api',
-    'basic-auth',
+    '^static',
+    '^(api|openapi)',
+    '^basic-auth',
 ]
 """A list of urls that dont require a login"""
 
@@ -279,7 +279,6 @@ REST_FRAMEWORK = {
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',

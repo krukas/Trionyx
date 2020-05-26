@@ -183,7 +183,10 @@ class ModelConfig:
     """Default sort field for list view"""
 
     api_fields: Optional[List[str]] = None
-    """Fields used in API model serializer, fallback on fields used in create and edit forms"""
+    """Fields used in API POST/PUT/PATCH methods, fallback on fields used in create and edit forms"""
+
+    api_description: Optional[str] = None
+    """Description text that is shown in the API documentation"""
 
     api_disable: bool = False
     """Disable API for model"""

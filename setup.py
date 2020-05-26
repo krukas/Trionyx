@@ -36,6 +36,7 @@ setup(
         'jsonfield==3.1.0',
         'django-watson >= 1.5.0, < 1.6',
         'djangorestframework >= 3.11.0, < 3.12',
+        'uritemplate >= 3.0.1, < 3.1',
 
         'Babel >= 2.8.0, < 2.9',
 

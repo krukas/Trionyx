@@ -8,17 +8,34 @@ trionyx.trionyx.url
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path, include
+from django.views.generic import TemplateView
+from django.views.decorators.cache import cache_page
+from django.template.loader import render_to_string
+from rest_framework.schemas import get_schema_view
+from rest_framework.permissions import AllowAny
 
 from trionyx import views as core_views
 from trionyx.trionyx import views
-from trionyx.api.routers import AutoRouter
+from trionyx.api.routers import AutoRouter, APISchemaGenerator
 
 app_name = 'trionyx'
 
 api_auto_router = AutoRouter()
 
 urlpatterns = [
+    path('openapi', cache_page(60 * 60)(get_schema_view(
+        title=f'{settings.TX_APP_NAME} API',
+        description=render_to_string('trionyx/api/description.html') + '',
+        generator_class=APISchemaGenerator,
+        permission_classes=[AllowAny],
+    )), name='openapi-schema'),
+    path('api/', TemplateView.as_view(
+        template_name='trionyx/api/redoc.html',
+        extra_context={'schema_url': 'trionyx:openapi-schema'}
+    ), name='api-doc'),
+
     path('api/', include(api_auto_router)),
+
 
     path('login/', views.LoginView.as_view(), name='login'),
     path('logout/', views.logout, name='logout'),
