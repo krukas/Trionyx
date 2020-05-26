@@ -432,12 +432,6 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
         from trionyx.views import tabs
         return list(tabs.get_tabs(self.get_model_alias(), self.object))
 
-    def dispatch(self, request, *args, **kwargs):
-        """Validate if user can use view"""
-        if False:  # TODO do permission check based on Model
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
-
 
 class DetailTabJsendView(ModelPermissionMixin, JsendView, ModelClassMixin):
     """View for getting tab view with ajax"""
@@ -447,12 +441,11 @@ class DetailTabJsendView(ModelPermissionMixin, JsendView, ModelClassMixin):
     def handle_request(self, request, app, model, pk):
         """Render and return tab"""
         from trionyx.views import tabs
+        from trionyx.config import models_config
 
         tab_code = request.GET.get('tab')
         model_alias = request.GET.get('model_alias')
         model_alias = model_alias if model_alias else '{}.{}'.format(app, model)
-
-        # TODO permission check
 
         item = tabs.get_tab(model_alias, self.get_object(), tab_code)
 
