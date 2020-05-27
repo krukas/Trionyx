@@ -18,13 +18,15 @@ from trionyx.urls import model_url
 from trionyx.models import get_class
 from trionyx import __version__
 
+from trionyx.trionyx.conf import settings as tx_settings
+
 
 def offline_context():
     """Offline context used by compress"""
     locale, *_ = utils.get_current_locale().split('_')
     context = {
         'STATIC_URL': settings.STATIC_URL,
-        'tx_skin_css': 'css/skins/skin-{}.min.css'.format(settings.TX_THEME_COLOR),
+        'tx_offline_skin_css': 'css/skins/skin-{}.min.css'.format(settings.TX_THEME_COLOR),
         'apps_css_files': [],
         'apps_js_files': [],
         'offline_summernote_language_js': 'plugins/summernote/lang/summernote-{}-{}.min.js'.format(
@@ -49,7 +51,7 @@ def generate_base64_favicon():
         'red': (221, 75, 57),
         'black': (17, 17, 17),
     }
-    theme = settings.TX_THEME_COLOR.replace('-light', '')
+    theme = tx_settings.THEME_COLOR.replace('-light', '')
     color = skins.get(theme, (17, 17, 17))
 
     text = '{}{}'.format(
@@ -78,22 +80,25 @@ def trionyx(request):
     locale, *_ = utils.get_current_locale().split('_')
     return {
         'DEBUG': settings.DEBUG,
-        'TX_APP_NAME': settings.TX_APP_NAME,
-        'TX_LOGO_NAME_START': settings.TX_LOGO_NAME_START,
-        'TX_LOGO_NAME_END': settings.TX_LOGO_NAME_END,
-        'TX_LOGO_NAME_SMALL_START': settings.TX_LOGO_NAME_SMALL_START,
-        'TX_LOGO_NAME_SMALL_END': settings.TX_LOGO_NAME_SMALL_END,
-        'TX_THEME_COLOR': settings.TX_THEME_COLOR,
+        'TX_APP_NAME': tx_settings.APP_NAME,
+        'TX_LOGO_NAME_START': tx_settings.LOGO_NAME_START,
+        'TX_LOGO_NAME_END': tx_settings.LOGO_NAME_END,
+        'TX_LOGO_NAME_SMALL_START': tx_settings.LOGO_NAME_SMALL_START,
+        'TX_LOGO_NAME_SMALL_END': tx_settings.LOGO_NAME_SMALL_END,
+        'TX_THEME_COLOR': tx_settings.THEME_COLOR,
         'tx_base64_icon': tx_base64_icon,
         'tx_tasks_url': model_url(get_class('trionyx.Task'), 'list'),
         'tx_version': __version__,
         'tx_show_changelog': (
-            settings.TX_SHOW_CHANGELOG_NEW_VERSION
+            tx_settings.SHOW_CHANGELOG_NEW_VERSION
             and request.user.is_authenticated
             and request.user.get_attribute('trionyx_last_shown_version') != utils.get_app_version()),
 
         'trionyx_menu_items': app_menu.get_menu_items(request.user),
         'trionyx_menu_collapse': request.COOKIES.get('menu.state') == 'collapsed',
+        'tx_custom_skin_css': 'css/skins/skin-{}.min.css'.format(
+            tx_settings.THEME_COLOR
+        ) if settings.TX_THEME_COLOR != tx_settings.THEME_COLOR else '',
 
         'app_version': utils.get_app_version(),
 

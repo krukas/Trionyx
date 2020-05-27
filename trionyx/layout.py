@@ -53,6 +53,7 @@ from django.conf import settings
 from django.db.models import QuerySet
 
 from trionyx import utils
+from trionyx.trionyx.conf import settings as tx_settings
 
 register = template.Library()
 
@@ -1239,7 +1240,7 @@ class Chart(Component, ComponentFieldsMixin):
             },
         }
         self.color_order = ['blue', 'yellow', 'green', 'purple', 'red', 'black']
-        self.theme_color = settings.TX_THEME_COLOR.replace('-light', '')
+        self.theme_color = tx_settings.THEME_COLOR.replace('-light', '')
 
     def get_json_value(self, value):
         """Get json value"""

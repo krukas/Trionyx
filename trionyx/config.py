@@ -15,7 +15,7 @@ from django.urls import reverse
 from django.conf import settings
 from django.db.models import Field, Model
 from django.core.cache import cache
-from trionyx.utils import CacheLock
+from trionyx.utils import CacheLock, get_current_request
 from trionyx.signals import can_view, can_add, can_change, can_delete
 
 if TYPE_CHECKING:
@@ -52,7 +52,9 @@ class Variables:
         """Get value for given variable code"""
         from trionyx.trionyx import LOCAL_DATA
         from trionyx.trionyx.models import SystemVariable
-        variables = getattr(LOCAL_DATA, 'trionyx_variables', None)
+
+        # Only use LOCAL_DATA for request, to prevent no updates in Celery
+        variables = getattr(LOCAL_DATA, 'trionyx_variables', None) if get_current_request() else None
 
         if variables is None:
             variables = cache.get(self.cache_key)

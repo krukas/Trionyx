@@ -161,7 +161,9 @@ class UserAttributeManager(models.Manager):
     def get_attribute(self, user, code, default=None):
         """Get attribute for user"""
         cache_key = f'user-attributes-{user.id}'
-        attributes = getattr(LOCAL_DATA, 'trionyx_user_attributes', None)
+
+        # Only use LOCAL_DATA for request, to prevent no updates in Celery or different user attributes are used
+        attributes = getattr(LOCAL_DATA, 'trionyx_user_attributes', None) if get_current_request() else None
 
         if attributes is None:
             attributes = cache.get(cache_key)
