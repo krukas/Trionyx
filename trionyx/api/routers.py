@@ -12,8 +12,9 @@ from django.apps import apps
 from rest_framework import routers
 from rest_framework import serializers
 from rest_framework.permissions import DjangoModelPermissions
-from rest_framework.viewsets import ModelViewSet
+from rest_framework.viewsets import ModelViewSet, mixins, GenericViewSet
 from rest_framework.schemas.openapi import AutoSchema, SchemaGenerator, is_list_view
+from django.template.loader import render_to_string
 from django.utils.translation import ugettext_lazy as _
 
 from trionyx.config import models_config
@@ -105,6 +106,7 @@ class APIAutoSchema(AutoSchema):
         operation = super().get_operation(path, method)
         operation['summary'] = self._get_operation_summary(path, method)
         operation['tags'] = self.tags
+        operation['x-codeSamples'] = self._get_operation_code_samples(path, method)
         return operation
 
     def get_description(self, *args, **kwargs):
@@ -151,6 +153,37 @@ class APIAutoSchema(AutoSchema):
                     name = name[:-len(action)]
 
         return f'{action} {name}'
+
+    def _get_operation_code_samples(self, path, method):
+        """Get operation code samples"""
+        action = {
+            'GET': 'list',
+            'POST': 'create',
+            'PUT': 'update',
+            'PATCH': 'partial_update',
+            'DELETE': 'destroy',
+        }.get(method, None)
+
+        if action == 'list' and '{id}' in path:
+            action = 'retrieve'
+
+        if action not in ['list', 'retrieve', 'create', 'update', 'partial_update', 'destroy']:
+            return []
+
+        return [
+            {
+                "lang": "Python",
+                "source": render_to_string(f'trionyx/api/codesamples/python/{action}.py.tmpl', {
+                    'path': path,
+                }) + ''
+            },
+            {
+                "lang": "Javascript",
+                "source": render_to_string(f'trionyx/api/codesamples/js/{action}.js', {
+                    'path': path,
+                }) + ''
+            },
+        ]
 
 
 class AutoRouter(routers.DefaultRouter):
@@ -222,21 +255,26 @@ class AutoRouter(routers.DefaultRouter):
             basename = model._meta.object_name.lower()
             classname = model.__name__
             serializer = serializer_register.get(model)
+            serializer = serializer if serializer else self.generate_model_serializer(model, config)
+
+            if [name for name, field in serializer().get_fields().items() if not field.read_only]:
+                base_classes = (ModelViewSet,)
+            else:
+                base_classes = (
+                    mixins.RetrieveModelMixin, mixins.ListModelMixin, mixins.DestroyModelMixin, GenericViewSet
+                )
 
             DynamicViewSet = type(
                 classname,
-                (ModelViewSet,),
+                base_classes,
                 {}
             )
             DynamicViewSet.model = model
             DynamicViewSet.queryset = model.objects.get_queryset()
-            DynamicViewSet.serializer_class = serializer if serializer else self.generate_model_serializer(model, config)
+            DynamicViewSet.serializer_class = serializer
             DynamicViewSet.permission_classes = (ExtendedDjangoModelPermissions,)
             DynamicViewSet.ordering = ['pk']
             DynamicViewSet.schema = APIAutoSchema(tags=[config.get_verbose_name_plural()])
-
-            # TODO maybe add serializer switcher https://www.django-rest-framework.org/api-guide/generic-views/#get_serializer_classself
-            # So all API endpoint are read only but you can only see id and verbose name
 
             self.register(self.get_model_prefix(model), DynamicViewSet, basename)
 

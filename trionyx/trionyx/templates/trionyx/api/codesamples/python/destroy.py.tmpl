@@ -1,0 +1,11 @@
+import requests
+
+response = requests.delete(
+    url='{{ path }}',
+    headers={
+        'Authorization': 'Token <token>',
+    },
+)
+
+if response.status_code == 204:
+    print('success')
