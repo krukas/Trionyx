@@ -29,7 +29,7 @@ class ModelsTest(TestCase):
         )
 
     def assertHTMLEqual(self, html1, html2, msg=None):
-        return super().assertHTMLEqual(re.sub('\s+', ' ', html1), re.sub('\s+', ' ', html2), msg=msg)
+        return super().assertHTMLEqual(re.sub(r'\s+', ' ', html1), re.sub(r'\s+', ' ', html2), msg=msg)
 
     def test_layout_path(self):
         panel, parent = self.layout.find_component_by_path('row.column6[1].panel')
@@ -132,7 +132,7 @@ class ModelsTest(TestCase):
             }} }}); return false;">
             Trionyx
         </button>
-        """.format(id=self.user.id))
+        """.format(id=self.user.id)) # noqa E501
 
     def test_ordered_list(self):
         unordered = l.OrderedList(
