@@ -17,7 +17,6 @@ from rest_framework.permissions import AllowAny
 from trionyx import views as core_views
 from trionyx.trionyx import views
 from trionyx.api.routers import AutoRouter, APISchemaGenerator
-from trionyx.trionyx.conf import settings as tx_settings
 
 app_name = 'trionyx'
 
@@ -25,7 +24,6 @@ api_auto_router = AutoRouter()
 
 urlpatterns = [
     path('openapi', cache_page(60 * 60)(get_schema_view(
-        title=f'{tx_settings.APP_NAME} API',
         description=render_to_string('trionyx/api/description.html') + '',
         generator_class=APISchemaGenerator,
         permission_classes=[AllowAny],

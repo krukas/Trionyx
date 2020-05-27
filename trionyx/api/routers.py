@@ -19,10 +19,21 @@ from django.utils.translation import ugettext_lazy as _
 from trionyx.config import models_config
 from trionyx.forms import form_register
 from trionyx.api.serializers import serializer_register
+from trionyx.trionyx.conf import settings as tx_settings
 
 
 class APISchemaGenerator(SchemaGenerator):
     """Schema generator"""
+
+    @property
+    def title(self):
+        """Get API title"""
+        return f'{tx_settings.APP_NAME} API'
+
+    @title.setter
+    def title(self, value):
+        """Set API title"""
+        pass
 
     def get_schema(self, *args, **kwargs):
         """Extend schema"""
