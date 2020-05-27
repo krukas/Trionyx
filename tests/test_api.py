@@ -16,7 +16,7 @@ class ApiTest(TestCase):
         response = self.client.get('/api/')
 
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, 'trionyx/user')
+        self.assertContains(response, 'redoc')
 
     def test_api_create(self):
         response = self.api.post('/api/trionyx/user/', {
@@ -32,13 +32,13 @@ class ApiTest(TestCase):
 
     def test_api_list_search(self):
         response = self.client.get('/api/trionyx/user/', {
-            'search': 'info'
+            '_search': 'info'
         })
         self.assertEqual(response.json()['count'], 1)
 
     def test_api_list_search_empty(self):
         response = self.client.get('/api/trionyx/user/', {
-            'search': 'nothing'
+            '_search': 'nothing'
         })
         self.assertEqual(response.json()['count'], 0)
 

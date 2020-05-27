@@ -620,7 +620,6 @@ class MassUpdateView(ModelPermissionMixin, TemplateView, ModelClassMixin):
         form = self.get_form(self.request.POST)
 
         if not form.is_valid():
-            print(form.errors)
             context = self.get_context_data(**kwargs)
             context.update({
                 'model_name': self.get_model_config().get_verbose_name(),
