@@ -72,9 +72,15 @@
                 var compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
                 var newItem = $('<tr class="formset-item"></tr>').append(compiledTmpl);
 
-                /* Remove generated select2 html */
+                /* Remove generated select2 html and data attributes */
                 newItem.find('.select2').remove();
                 newItem.find('select').removeClass('select2-hidden-accessible');
+                newItem.find('select')
+                    .removeAttr('data-live-search')
+                    .removeAttr('data-select2-id')
+                    .removeAttr('aria-hidden')
+                    .removeAttr('tabindex');
+                newItem.find('select option').removeAttr('data-select2-id');
 
                 $(itemParentSelector).append(newItem);
 
