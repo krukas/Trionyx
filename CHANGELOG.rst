@@ -1,3 +1,10 @@
+[2.1.5] - 10-06-2020
+--------------------
+Fixed
+~~~~~
+- Fix select2 and datetimepicker in inlineform sets
+
+
 [2.1.4] - 20-05-2020
 --------------------
 Fixed
