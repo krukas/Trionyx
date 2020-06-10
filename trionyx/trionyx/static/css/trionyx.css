@@ -823,3 +823,7 @@ th:hover .dragtable-drag-handle {
     margin-top: 10px;
     margin-bottom: 5px;
 }
+
+.formset-items input {
+    position: relative;
+}
