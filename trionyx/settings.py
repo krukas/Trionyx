@@ -233,6 +233,17 @@ STATICFILES_FINDERS = [
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = True
 COMPRESS_OFFLINE_CONTEXT = 'trionyx.trionyx.context_processors.offline_context'
+COMPRESS_FILTERS = {
+    'css': [
+        'compressor.filters.css_default.CssAbsoluteFilter',
+        'compressor.filters.cssmin.rCSSMinFilter',
+    ],
+    'js': [
+        'compressor.filters.jsmin.JSMinFilter'
+    ],
+}
+
+COMPRESS_STORAGE = 'compressor.storage.GzipCompressorFileStorage'
 
 # ==============================================================================
 # Cache backend
