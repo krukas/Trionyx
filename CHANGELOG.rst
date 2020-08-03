@@ -1,5 +1,8 @@
-[DEVELOP] -
+[2.2.0] - 03-09-2020
 -----------
+
+**Compatibility breaking changes: Remove -custom for code url path**
+
 Added
 ~~~~~
 - Allow apps to add global css/js files
