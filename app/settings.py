@@ -47,6 +47,12 @@ DATABASES = get_env_var('DATABASES', {
     }
 })
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+   }
+}
+
 ALLOWED_HOSTS = []
 
 WATSON_POSTGRES_SEARCH_CONFIG = get_watson_search_config(LANGUAGE_CODE)

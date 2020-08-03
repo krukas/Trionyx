@@ -172,9 +172,9 @@ AUTH_USER_MODEL = 'trionyx.User'
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 LOGIN_EXEMPT_URLS = [
-    'static',
-    'api',
-    'basic-auth',
+    '^static',
+    '^(api|openapi)',
+    '^basic-auth',
 ]
 """A list of urls that dont require a login"""
 
@@ -232,6 +232,18 @@ STATICFILES_FINDERS = [
 
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = True
+COMPRESS_OFFLINE_CONTEXT = 'trionyx.trionyx.context_processors.offline_context'
+COMPRESS_FILTERS = {
+    'css': [
+        'compressor.filters.css_default.CssAbsoluteFilter',
+        'compressor.filters.cssmin.rCSSMinFilter',
+    ],
+    'js': [
+        'compressor.filters.jsmin.JSMinFilter'
+    ],
+}
+
+COMPRESS_STORAGE = 'compressor.storage.GzipCompressorFileStorage'
 
 # ==============================================================================
 # Cache backend
@@ -272,12 +284,12 @@ CELERY_TASK_TIME_LIMIT = 3900
 # ==============================================================================
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': (
+        'trionyx.api.filters.QueryFilter',
         'trionyx.api.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
     ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.BrowsableAPIRenderer',
     ),
     'DEFAULT_PERMISSION_CLASSES': (
         'rest_framework.permissions.IsAuthenticated',
@@ -285,10 +297,10 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'trionyx.api.pagination.PageNumberPagination',
     'PAGE_SIZE': 25,
+    'ORDERING_PARAM': '_ordering',
 }
 
 # ==============================================================================
@@ -326,6 +338,9 @@ TX_COMPANY_WEBSITE: str = ''
 
 TX_COMPANY_EMAIL: str = ''
 """Company email address"""
+
+TX_DISABLE_AUDITLOG = False
+"""Disable auditlog"""
 
 
 def TX_DEFAULT_DASHBOARD():
@@ -440,6 +455,9 @@ TX_CORE_MODEL_CONFIGS: Dict[str, Dict[str, Any]] = {
         'hide_permissions': True,
     },
     'trionyx.auditlogentry': {
+        'hide_permissions': True,
+    },
+    'trionyx.systemvariable': {
         'hide_permissions': True,
     },
     'sessions.session': {

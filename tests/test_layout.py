@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 
 from django.test import TestCase
@@ -8,6 +9,7 @@ from trionyx.trionyx.models import User
 
 class ModelsTest(TestCase):
     def setUp(self):
+        self.maxDiff = None
         self.user = User.objects.create(email="info@trionyx.com")
         self.layout = l.Layout(
             l.Row(
@@ -25,6 +27,9 @@ class ModelsTest(TestCase):
                 )
             )
         )
+
+    def assertHTMLEqual(self, html1, html2, msg=None):
+        return super().assertHTMLEqual(re.sub(r'\s+', ' ', html1), re.sub(r'\s+', ' ', html2), msg=msg)
 
     def test_layout_path(self):
         panel, parent = self.layout.find_component_by_path('row.column6[1].panel')
@@ -93,11 +98,11 @@ class ModelsTest(TestCase):
         """)
 
     def test_badge(self):
-        badge = l.Badge(html='test')
+        badge = l.Badge('test')
         badge.set_object(self.user)
         self.assertHTMLEqual(
             badge.render({}),
-            f"""<span class="badge bg-theme">test</span>""")
+            """<span class="badge bg-theme">test</span>""")
 
     def test_alert(self):
         self.assertHTMLEqual(l.Alert('trionyx', no_margin=True).render({}), """
@@ -119,7 +124,7 @@ class ModelsTest(TestCase):
         button = l.Button('Trionyx', dialog=True, dialog_reload_tab='general')
         button.set_object(self.user)
         self.assertHTMLEqual(button.render({}), """
-        <button class="btn btn-flat bg-theme" onClick="openDialog('/model/trionyx/user/{id}/', {{ callback:function(data, dialog){{
+        <button class="btn btn-flat bg-theme" onClick="openDialog('/dialog/model/trionyx/user/{id}/edit/', {{ callback:function(data, dialog){{
                 if (data.success) {{
                     dialog.close();
                     trionyx_reload_tab('general');
@@ -127,7 +132,7 @@ class ModelsTest(TestCase):
             }} }}); return false;">
             Trionyx
         </button>
-        """.format(id=self.user.id))
+        """.format(id=self.user.id)) # noqa E501
 
     def test_ordered_list(self):
         unordered = l.OrderedList(
@@ -184,13 +189,13 @@ class ModelsTest(TestCase):
             'label': 'Trionyx',
             'value': 'Test',
         }).render({}), """
-        <table class="table table-condensed">
+        <table class=" table table-condensed">
             <tbody>
                 <tr>
                     <th style="width: 150px;">
                         Trionyx:
                     </th>
-                    <td class="description-value">
+                    <td class=" description-value">
                         Test
                     </td>
                 </tr>

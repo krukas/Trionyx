@@ -53,6 +53,7 @@ from django.conf import settings
 from django.db.models import QuerySet
 
 from trionyx import utils
+from trionyx.trionyx.conf import settings as tx_settings
 
 register = template.Library()
 
@@ -233,7 +234,7 @@ class Layout:
             comp, parent = self.find_component_by_path(path)
 
         if not comp:
-            raise Exception('Could not add component: Unknown path {} or id {}'.format(path, id))
+            raise LookupError('Could not add component: Unknown path {} or id {}'.format(path, id))
 
         if append:
             if before:
@@ -256,7 +257,7 @@ class Layout:
         :return:
         """
         if not id and not path:
-            raise Exception('You must supply an id or path')
+            raise ValueError('You must supply an id or path')
 
         if id:
             comp, parent = self.find_component_by_id(id)
@@ -264,7 +265,7 @@ class Layout:
             comp, parent = self.find_component_by_path(path)
 
         if not comp:
-            raise Exception('Could not delete component: Unknown path {} or id {}'.format(path, id))
+            raise ValueError('Could not delete component: Unknown path {} or id {}'.format(path, id))
 
         if parent:
             parent.components.remove(comp)
@@ -292,6 +293,7 @@ class Component:
         self.components = list(filter(None, components))
         self.object = options.get('object', False)
         self.lock_object = options.get('lock_object', False)
+        self.should_render = options.get('should_render', lambda self: True)
         self.context = {}
         self.request = None
 
@@ -330,6 +332,9 @@ class Component:
 
     def render(self, context, request=None):
         """Render component"""
+        if not self.should_render(self):
+            return ''
+
         context['component'] = self
         self.context = context
         self.request = request
@@ -597,11 +602,11 @@ class ComponentFieldsMixin:
 class HtmlTemplate(Component):
     """HtmlTemplate render django html template"""
 
-    def __init__(self, template_name, context=None, css_files=None, js_files=None):
+    def __init__(self, template_name, context=None, css_files=None, js_files=None, **options):
         """Initialize HtmlTemplate"""
-        super().__init__()
+        super().__init__(**options)
         self.template_name = template_name
-        self.context = context
+        self.context = context if context else {}
         self.css_files = css_files if css_files else []
         self.js_files = js_files if js_files else []
 
@@ -681,34 +686,33 @@ class OnclickTag(HtmlTagWrapper):
         self.dialog_options = dialog_options if dialog_options else {}
         self.on_click = options.get('onClick', False)
         self.dialog_reload_layout = dialog_reload_layout
+        self.dialog_reload_tab = dialog_reload_tab
+        self.dialog_reload_sidebar = dialog_reload_sidebar
 
-        if dialog_reload_tab:
-            self.dialog_options['callback'] = """function(data, dialog){{
-                if (data.success) {{
-                    dialog.close();
-                    trionyx_reload_tab('{tab}');
-                }}
-            }}""".format(tab=dialog_reload_tab)
-        elif dialog_reload_sidebar:
-            self.dialog_options['callback'] = """function(data, dialog){
-                if (data.success) {
-                    dialog.close();
-                    reloadSidebar();
-                }
-            }"""
+        self.model_url = 'sidebar' if sidebar and not self.model_url else self.model_url
+        self.model_url = 'dialog-edit' if dialog and not self.model_url else self.model_url
 
     def updated(self):
         """Set onClick url based on object"""
+        reload_functions = ''
         if self.dialog_reload_layout:
-            self.dialog_options['callback'] = """function(data, dialog){{
-                        if (data.success) {{
-                            dialog.close();
-                            txUpdateLayout('{id}', '{component}');
-                        }}
-                    }}""".format(
+            reload_functions += "txUpdateLayout('{id}', '{component}');".format(
                 id=self.layout_id,
                 component=self.dialog_reload_layout if isinstance(self.dialog_reload_layout, str) else ''
             )
+        if self.dialog_reload_tab:
+            dialog_reload_tab = self.dialog_reload_tab if isinstance(self.dialog_reload_tab, list) else [self.dialog_reload_tab]
+            reload_functions += ''.join([f"trionyx_reload_tab('{tab}');" for tab in dialog_reload_tab])
+        if self.dialog_reload_sidebar:
+            reload_functions += "reloadSidebar();"
+
+        if reload_functions:
+            self.dialog_options['callback'] = f"""function(data, dialog){{
+                        if (data.success) {{
+                            dialog.close();
+                            {reload_functions}
+                        }}
+                    }}"""
 
         if not self.on_click:
             from trionyx.urls import model_url
@@ -746,6 +750,28 @@ class Html(HtmlTagWrapper):
         """Init Html"""
         super().__init__(**kwargs)
         self.html = html
+
+
+class Field(Html):
+    """Render single field from object"""
+
+    def __init__(self, field, renderer=None, format=None, **options):
+        """Init Field"""
+        super().__init__(**options)
+        self.field = field
+        self.renderer = renderer
+        self.format = format if format else '{0}'
+
+    def updated(self):
+        """Update html"""
+        from trionyx.renderer import renderer
+
+        if self.renderer:
+            value = self.renderer(getattr(self.object, self.field), data_object=self.object)
+        else:
+            value = renderer.render_field(self.object, self.field)
+
+        self.html = self.format.format(value)
 
 
 class Img(Html):
@@ -787,7 +813,8 @@ class OnclickLink(OnclickTag):
 
     def __init__(self, label, **options):
         """Init OnclickLink"""
-        super().__init__(Html(label), **options)
+        label = label if isinstance(label, Component) else Html(label)
+        super().__init__(label, **options)
 
 
 # =============================================================================
@@ -890,22 +917,17 @@ class Column12(Column):
 # =============================================================================
 # Bootstrap elements
 # =============================================================================
-class Badge(Html):
+class Badge(HtmlTagWrapper):
     """Bootstrap badge"""
 
     tag = 'span'
     valid_attr = ['class']
     color_class = 'badge bg-{color}'
 
-    def __init__(self, field=None, html=None, **kwargs):
+    def __init__(self, value, **kwargs):
         """Init badge"""
-        self.field = field
-        super().__init__(html, **kwargs)
-
-    def updated(self):
-        """Set HTML with rendered field"""
-        from trionyx.renderer import renderer
-        self.html = renderer.render_field(self.object, self.field) if self.field else self.html
+        value = value if isinstance(value, Component) else Html(value)
+        super().__init__(value, **kwargs)
 
 
 class Alert(Html):
@@ -1111,7 +1133,7 @@ class Table(Component, ComponentFieldsMixin):
 
     template_name = 'trionyx/components/table.html'
 
-    def __init__(self, objects, *fields, css_class='table',
+    def __init__(self, objects, *fields, css_class='table', header=True,
                  condensed=True, hover=False, striped=False, bordered=False, **options):
         """Init Table"""
         footer = options.pop('footer', None)
@@ -1127,6 +1149,7 @@ class Table(Component, ComponentFieldsMixin):
         """Can be string with field name relation, Queryset or list"""
 
         self.fields = fields
+        self.header = header
 
         self.footer_objects = footer[0] if footer else None
         """Can be string with field name relation, Queryset or list"""
@@ -1217,7 +1240,7 @@ class Chart(Component, ComponentFieldsMixin):
             },
         }
         self.color_order = ['blue', 'yellow', 'green', 'purple', 'red', 'black']
-        self.theme_color = settings.TX_THEME_COLOR.replace('-light', '')
+        self.theme_color = tx_settings.THEME_COLOR.replace('-light', '')
 
     def get_json_value(self, value):
         """Get json value"""

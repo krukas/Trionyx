@@ -23,7 +23,7 @@ class SerializerRegister:
         model_name = self.get_model_alias(serializer.Meta.model)
 
         if model_name in self.serializers:
-            raise Exception("Serializer {} already registered for model {}".format(serializer, model_name))
+            raise ValueError("Serializer {} already registered for model {}".format(serializer, model_name))
 
         self.serializers[model_name] = serializer
         return serializer

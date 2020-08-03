@@ -11,6 +11,7 @@ from contextlib import contextmanager
 
 from celery import current_app
 from celery.app.control import Control
+from django.core.cache import cache
 from django.contrib.auth.models import BaseUserManager, AbstractBaseUser, PermissionsMixin
 from django.contrib.contenttypes import fields
 from django.utils import timezone
@@ -22,6 +23,7 @@ from django.template.loader import render_to_string
 from trionyx import models
 from trionyx.utils import get_current_request
 from trionyx.data import TIMEZONES
+from trionyx.trionyx import LOCAL_DATA
 
 
 # =============================================================================
@@ -124,7 +126,7 @@ class User(models.BaseModel, AbstractBaseUser, PermissionsMixin):
     def send_email(self, subject, body='', html_template=None, template_context=None, files=None):
         """Send email to user"""
         if not body and not html_template:
-            raise Exception('You must supply a body or/and html_template')
+            raise ValueError('You must supply a body or/and html_template')
 
         with self.locale_override():
             message = EmailMultiAlternatives(
@@ -151,20 +153,36 @@ class UserAttributeManager(models.Manager):
 
     def set_attribute(self, user, code, value):
         """Set attribute for user"""
+        setattr(LOCAL_DATA, 'trionyx_user_attributes', None)
+        cache.delete(f'user-attributes-{user.id}')
+
         self.update_or_create(user=user, code=code, defaults={'value': value})
 
     def get_attribute(self, user, code, default=None):
         """Get attribute for user"""
-        try:
-            return self.get(user=user, code=code).value
-        except models.ObjectDoesNotExist:
-            return default
+        cache_key = f'user-attributes-{user.id}'
+
+        # Only use LOCAL_DATA for request, to prevent no updates in Celery or different user attributes are used
+        attributes = getattr(LOCAL_DATA, 'trionyx_user_attributes', None) if get_current_request() else None
+
+        if attributes is None:
+            attributes = cache.get(cache_key)
+
+        if attributes is None:
+            attributes = {
+                attribute.code: attribute.value for attribute in self.filter(user=user)
+            }
+            cache.set(cache_key, attributes, timeout=60 * 60 * 24)
+
+        setattr(LOCAL_DATA, 'trionyx_user_attributes', attributes)
+
+        return attributes.get(code, default)
 
 
 class UserAttribute(models.Model):
     """User attribute to store system values for user"""
 
-    user = models.ForeignKey(User, models.CASCADE, related_name='attributes')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.CASCADE, related_name='attributes')
     code = models.CharField(max_length=128, null=False)
     value = models.JSONField()
 
@@ -294,7 +312,7 @@ class LogEntry(models.Model):
     log = models.ForeignKey(Log, models.CASCADE, related_name='entries')
     log_time = models.DateTimeField(_('Log time'))
 
-    user = models.ForeignKey(User, models.SET_NULL, null=True, blank=True, verbose_name=_('User'))
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.SET_NULL, null=True, blank=True, verbose_name=_('User'))
     path = models.TextField(_('Path'), default='')
     user_agent = models.TextField(_('User agent'), default='')
 
@@ -323,7 +341,7 @@ class AuditLogEntry(models.BaseModel):
     content_object = fields.GenericForeignKey('content_type', 'object_id')
     object_verbose_name = models.TextField(default='', blank=True)
 
-    user = models.ForeignKey(User, models.SET_NULL, blank=True, null=True, related_name='+')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, models.SET_NULL, blank=True, null=True, related_name='+')
     action = models.IntegerField(choices=action_choices)
     changes = models.JSONField()
 
@@ -371,7 +389,7 @@ class Task(models.BaseModel):
     result = models.TextField(_('Result'), blank=True, default='')
 
     user = models.ForeignKey(
-        User, models.SET_NULL, blank=True, null=True,
+        settings.AUTH_USER_MODEL, models.SET_NULL, blank=True, null=True,
         verbose_name=_('Started by'))
     object_type = models.ForeignKey(
         'contenttypes.ContentType',

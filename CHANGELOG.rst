@@ -1,3 +1,46 @@
+[2.2.0] - 03-09-2020
+-----------
+
+**Compatibility breaking changes: Remove -custom for code url path**
+
+Added
+~~~~~
+- Allow apps to add global css/js files
+- Add Field component
+- Add option to hide table header
+- Add options to disable auditlog
+- App settings can be overridden with system variables
+- Add config to disable viewing of model
+- Add option should_render to components
+- New projects will print emails to console in development
+- Add options to set custom create/edit permission on form
+- Add permission to dashboard widgets and widget data
+- Add celery command for development with auto reload on file change
+- Add ImageField renderer
+- Add foreign field renderer that renders object with `a` tag
+- Add Json field renderer
+- Add action column to list view with actions view,edit and delete (remove row click)
+- Add graph dashboard widget + improve widget options
+
+Changed
+~~~~~~~
+- Make raised Exceptions more explicit
+- Update models to use settings.AUTH_USER_MODEL and in code to get_user_model()
+- Remove -custom for code url path
+- Allow for muliple dialog reload options
+- Change select_related to prefetch_related to prevent join errors on not null fields
+- Do model clean on objects for MassUpdate
+- Several small Improvement
+- Add no_link options to renderers with an `a` tag, for list view its won't render value in `a` tag
+- Close list fields popover on outside click
+- Change many to many field renderer to use `a` tags
+
+Fixed
+~~~~~~~
+- Form Datetimepicker format is not set in __init__
+- Summernote popovers remain on page if dialog was closed
+
+
 [2.1.3] - 08-04-2020
 --------------------
 Added

@@ -15,6 +15,8 @@ class PageNumberPagination(RestPageNumberPagination):
     """Api Pagination class"""
 
     max_page_size = 1000
+    page_query_param = '_page'
+    page_size_query_param = '_page_size'
 
     def get_paginated_response(self, data):
         """Get paginated response, added extra fields"""

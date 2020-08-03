@@ -127,6 +127,8 @@ class DateTimePicker(Field):
         """Init DateTimePicker"""
         if not self.format:
             self.format = get_datetime_input_format()
+        if 'format' in kwargs:
+            self.format = kwargs.get('format')
 
         if not self.locale:
             self.locale = get_current_locale()
@@ -198,7 +200,7 @@ class Filters:
         self.content_type_input_id = content_type_input_id
 
         if not model and not content_type_input_id:
-            raise Exception('A model or content_type_input_id must be supplied')
+            raise ValueError('A model or content_type_input_id must be supplied')
 
     def render(self, form, form_style, context, **kwargs):
         """Render template"""

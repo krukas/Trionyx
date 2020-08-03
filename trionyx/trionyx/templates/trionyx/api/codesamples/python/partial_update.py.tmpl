@@ -1,0 +1,14 @@
+import requests
+
+response = requests.patch(
+    url='{{ path }}',
+    headers={
+        'Authorization': 'Token <token>',
+    },
+    json={
+        # item data
+    }
+)
+
+if response.status_code == 200:
+    print(response.json())

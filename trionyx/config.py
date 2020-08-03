@@ -15,7 +15,7 @@ from django.urls import reverse
 from django.conf import settings
 from django.db.models import Field, Model
 from django.core.cache import cache
-from trionyx.utils import CacheLock
+from trionyx.utils import CacheLock, get_current_request
 from trionyx.signals import can_view, can_add, can_change, can_delete
 
 if TYPE_CHECKING:
@@ -31,10 +31,16 @@ class AppSettings():
 
     def __init__(self, prefix, app_settings):
         """Init settings"""
-        for key, value in app_settings.items():
-            setattr(self, key.upper(), getattr(
-                settings, f'{prefix}_{key}'.upper(), value
-            ))
+        self.__prefix = prefix
+        self.__settings = {
+            key.upper(): getattr(settings, f'{prefix}_{key}'.upper(), value)
+            for key, value in app_settings.items()
+        }
+
+    def __getattr__(self, name):
+        """Get setting"""
+        key = name.upper()
+        return variables.get(f'{self.__prefix}_{key}', self.__settings.get(key))
 
 
 class Variables:
@@ -46,7 +52,9 @@ class Variables:
         """Get value for given variable code"""
         from trionyx.trionyx import LOCAL_DATA
         from trionyx.trionyx.models import SystemVariable
-        variables = getattr(LOCAL_DATA, 'trionyx_variables', None)
+
+        # Only use LOCAL_DATA for request, to prevent no updates in Celery
+        variables = getattr(LOCAL_DATA, 'trionyx_variables', None) if get_current_request() else None
 
         if variables is None:
             variables = cache.get(self.cache_key)
@@ -170,14 +178,17 @@ class ModelConfig:
     list_default_fields: Optional[List[str]] = None
     """Array of fields that default is used in form list"""
 
-    list_select_related: Optional[List[str]] = None
-    """Array of fields to add foreign-key relationships to query, use this for relations that are used in search or renderer"""
+    list_prefetch_related: Optional[List[str]] = None
+    """Array of fields to prefetch for query, use this for relations that are used in search or renderer"""
 
     list_default_sort: str = '-pk'
     """Default sort field for list view"""
 
     api_fields: Optional[List[str]] = None
-    """Fields used in API model serializer, fallback on fields used in create and edit forms"""
+    """Fields used in API POST/PUT/PATCH methods, fallback on fields used in create and edit forms"""
+
+    api_description: Optional[str] = None
+    """Description text that is shown in the API documentation"""
 
     api_disable: bool = False
     """Disable API for model"""
@@ -222,6 +233,9 @@ class ModelConfig:
 
     display_delete_button: bool = True
     """Display delete button for this model"""
+
+    disable_view: bool = False
+    """Disable view for this model"""
 
     disable_add: bool = False
     """Disable add for this model"""
@@ -303,7 +317,7 @@ class ModelConfig:
 
         mapping = {
             'view': {
-                'disabled': False,
+                'disabled': self.disable_view,
                 'signal': can_view,
             },
             'add': {
@@ -393,7 +407,7 @@ class ModelConfig:
                     config = {'field': field_config}
 
                 if 'field' not in config:
-                    raise Exception("Field config is missing field: {}".format(config))
+                    raise ValueError("Field config is missing field: {}".format(config))
 
                 field_model_config = self
                 field_parts = config['field'].split('__')

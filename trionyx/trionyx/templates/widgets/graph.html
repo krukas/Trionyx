@@ -1,0 +1,88 @@
+{% load static %}
+<script src="{% static 'plugins/chartjs/Chart.min.js' %}" ></script>
+<link rel="stylesheet" type="text/css" href="{% static "plugins/chartjs/Chart.min.css" %}">
+
+<script type="text/x-template" id="widget-graph">
+    <div :class="widgetClass + ' boxx'" style="height: 100%">
+        <div class="box-header with-border">
+          <i :class="widget.config.icon"></i> <h3 class="box-title">[[widget.config.title]]</h3>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <canvas v-bind:id="'graph-' + widget.i" style="width: 100% !important;height: 100% !important;"></canvas>
+        </div>
+      </div>
+</script>
+
+<script>
+    Vue.component('widget-graph', {
+        mixins: [TxWidgetMixin],
+        template: '#widget-graph',
+        data: function () {
+            return {
+                chart: false,
+            }
+        },
+        watch: {
+            data: function (value) {
+                if (!this.chart) {
+                    var canvas = $('#graph-' + this.widget.i);
+                    var gridItem = canvas.closest('.vue-grid-item');
+
+                    var h = gridItem.height() - gridItem.find('.box-header').height() - 25;
+                    gridItem.find('.box-body').css('height', h + 'px');
+
+                    this.chart = new Chart(canvas, {
+                        type: 'line',
+                        data: value.data,
+                        options: {
+                            maintainAspectRatio: false,
+                            scales: value.scales,
+                            hover: {
+					            mode: 'nearest',
+					            intersect: true
+				            },
+                            tooltips: {
+                                mode: 'index',
+					            intersect: false,
+                                callbacks: {
+                                    label: function (item, data) {
+                                        var itemData = data.datasets[item.datasetIndex].data[item.index];
+                                        if (typeof itemData === 'object' && 'label' in itemData) {
+                                            return itemData.label;
+                                        }
+
+                                        return itemData;
+                                    }
+                                }
+                            }
+                         }
+                    });
+                    this.chart.options.animation.duration = 0;
+                } else {
+                    this.chart.data = value.data;
+                    this.chart.update();
+                }
+            }
+        },
+        methods: {
+            configChange: function(code, value) {
+                if (code === 'color') {
+                    this.load();
+                }
+            },
+            resized: function () {
+                if (this.chart) {
+                    var canvas = $('#graph-' + this.widget.i);
+                    var gridItem = canvas.closest('.vue-grid-item');
+
+                    var h = gridItem.height() - gridItem.find('.box-header').height() - 25;
+                    gridItem.find('.box-body').css('height', h + 'px');
+
+                    this.chart.options.animation.duration = 0;
+                    this.chart.update();
+                }
+            },
+        },
+    });
+</script>

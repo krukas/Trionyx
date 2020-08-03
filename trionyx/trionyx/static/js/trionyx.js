@@ -1,10 +1,12 @@
 function trionyxInitialize() {
     $('.select').select2({
+        width: '100%',
         escapeMarkup: function(markup) {
             return markup;
         }
     });
     $('.selectmultiple').select2({
+        width: '100%',
         escapeMarkup: function(markup) {
             return markup;
         }
@@ -49,20 +51,12 @@ function getDataOptions(node, validOptions) {
 $(function(){
     function fixHeader(transiton){
         var leftSize = '0px';
-
-        var open = $('body').hasClass('sidebar-open');
         var windowWidth = $( window ).width();
 
-        if($('body').hasClass('sidebar-expanded-on-hover')) {
-            leftSize = '230px';
-        } else if (windowWidth >= 768) {
+        if (windowWidth >= 768) {
             var collapsed = $('body').hasClass('sidebar-collapse');
             leftSize = collapsed ? '50px' : '230px';
-        } else {
-            var open = $('body').hasClass('sidebar-open');
-            leftSize = open ? '230px' : '0px';
         }
-
 
         $('.content-header-affix').css('left', leftSize);
     }
@@ -78,9 +72,6 @@ $(function(){
     });
     $(document).on('collapsed.pushMenu', function(e){
         setCookie('menu.state', 'collapsed');
-        fixHeader();
-    });
-    $(document).on('pushMenu.hover', function(e){
         fixHeader();
     });
 
@@ -361,6 +352,8 @@ function TrionyxDialog(url, options) {
         data.url = 'url' in data ? data.url : '';
         data.close = 'close' in data ? data.close : false;
 
+        // Make sure that any popovers made by summernote are removed
+        dialog.find('.summernote').summernote('destroy');
 
         if(data.close){
             dialog.modal('hide');
@@ -466,7 +459,6 @@ function openSidebar(url) {
 
     $.get(url, function(response){
         if (response.status !== 'success') {
-            alert('Sidebar error');
             return;
         }
 
@@ -490,7 +482,12 @@ function openSidebar(url) {
            }
            button.on('click', function () {
                if (action.dialog) {
-                   var options = action.dialog_options;
+                   var options = typeof action.dialog_options !== 'undefined' ? action.dialog_options : {};
+
+                   if ('callback' in options) {
+                       options.callback = new Function('data', 'dialog', options.callback);
+                   }
+
                    if (action.reload) {
                        options.callback = function (data, dialog) {
                            if (data.success) {
@@ -624,4 +621,25 @@ function trionyxFormDepend(selector, dependencies) {
         });
     }
     trionyxFormDependenciesChange();
+}
+
+
+/* Widget model form field */
+function widgetModelFormField(modelField, name, fields) {
+    var field = $('#widget-field-' + name);
+    var model = $(modelField)
+
+    function updateField() {
+        field.select2().empty();
+        field.select2({
+            width: '100%',
+            data: model.val() in fields ? fields[model.val()] : [],
+        });
+    }
+
+    updateField();
+
+    model.on('change', function () {
+        updateField();
+    });
 }

@@ -205,7 +205,8 @@ class FormRegister:
 
     def register(
         self, code: Optional[str] = None, model_alias: Optional[str] = None,
-        default_create: Optional[bool] = False, default_edit: Optional[bool] = False, minimal: Optional[bool] = False
+        default_create: Optional[bool] = False, default_edit: Optional[bool] = False, minimal: Optional[bool] = False,
+        create_permission: Optional[str] = None, edit_permission: Optional[str] = None
     ):
         """Register form for given model_alias,
         if no model_alias is given the Meta.model is used to generate the model alias.
@@ -233,13 +234,15 @@ class FormRegister:
             model_name = self.get_model_alias(model_alias if model_alias else form.Meta.model, False)
 
             if form_code in self.forms[model_name]:
-                raise Exception("Form {} already registered for model {}".format(code, model_name))
+                raise ValueError("Form {} already registered for model {}".format(code, model_name))
 
             self.forms[model_name][form_code] = {
                 'form': form,
                 'default_create': default_create,
                 'default_edit': default_edit,
                 'minimal': minimal,
+                'create_permission': create_permission,
+                'edit_permission': edit_permission,
             }
             return form
 
@@ -253,6 +256,14 @@ class FormRegister:
                 models_config.get_model_name(models_config.get_config(model_alias).model)
             return models_config.get_model_name(model_alias)
         return model_alias
+
+    def get_create_permission(self, model, code=None):
+        """Get create permission for form"""
+        return self.forms.get(self.get_model_alias(model), {}).get(code, {}).get('create_permission')
+
+    def get_edit_permission(self, model, code=None):
+        """Get edit permission for form"""
+        return self.forms.get(self.get_model_alias(model), {}).get(code, {}).get('edit_permission')
 
     def get_form(self, model, code):
         """Get form based on code"""

@@ -1,0 +1,14 @@
+{% load trionyx %}
+{% load i18n %}
+
+<div class="form-group">
+    <label for="id_all" class="control-label">{{ label }}</label>
+    <div class="controls ">
+        <select name="{{ name }}" id="widget-field-{{ name }}" class="form-control"></select>
+    </div>
+</div>
+
+<script>
+    widgetModelFormField('{{ model_id }}', '{{ name }}', {{ fields|jsonify }});
+    $('#widget-field-' + '{{ name }}').val('{{ value }}').trigger('change');
+</script>

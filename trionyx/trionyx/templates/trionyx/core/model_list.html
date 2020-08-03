@@ -69,10 +69,6 @@
         .model-list > thead > tr > th,
         .model-list > tbody > tr > td {
             white-space: nowrap;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            -webkit-user-select: none;
-            user-select: none;
         }
         .model-list > thead > tr > th:last-child {
             width: 100%;
@@ -195,6 +191,7 @@
                                 <span class="dragtable-drag-handle"></span>
                             </th>
                         {% endif %}
+                        <th data-header="--actions--">{% trans 'Actions' %}</th>
                         <th class="dragtable-drag-boundary dragtable-no-drag" style="width: 10px" data-header="NR">#<span class="dragtable-drag-handle"></span></th>
                         <th v-for="header in headers" v-on:click="clickSort(header.field)" v-bind:data-header="header.field">
                             [[ header.label ]]
@@ -220,14 +217,32 @@
                                 />
                             </td>
                         {% endif %}
-                        <td v-for="column in item.row_data" v-html="column" v-on:click="clickItem(item, $event)" v-on:click.middle="clickItem(item, $event)"/>
+                        <td>
+                            <div class="btn-group" style="display: flex">
+                                <a v-bind:href="item.url"  class="btn btn-default btn-flat btn-xs">{% trans 'View' %}</a>
+                                {% if delete_permission or change_permission %}
+                                    <button type="button" class="btn btn-default btn-flat dropdown-toggle btn-xs" data-toggle="dropdown">
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu" role="menu">
+                                        {% if change_permission %}
+                                            <li><a v-bind:href="item.edit_url">{% trans 'Edit' %}</a></li>
+                                        {% endif %}
+                                        {% if change_permission %}
+                                            <li><a class="text-danger" v-bind:href="item.delete_url">{% trans 'Delete' %}</a></li>
+                                        {% endif %}
+                                  </ul>
+                                {% endif %}
+                            </div>
+                        </td>
+                        <td v-for="column in item.row_data" v-html="column"/>
                     </tr>
                 </tbody>
             </table>
         </div>
 
         <div id="fields-popover-content" class="hidden">
-            <div style="max-height: 250px; overflow-y: scroll">
+            <div style="max-height: 250px; overflow-y: scroll" class="popover-fields-content">
                 <div class="col-md-12">
                     <input id="fields-popover-search" placeholder="{% trans "search" %}" class="form-control">
                 </div>
@@ -265,6 +280,7 @@
     <script src="{% static "js/jquery.dragtable.js" %}"></script>
 
     <script type="text/javascript">
+
     function TrionyxList(config){
         return new Vue({
             el: '#app-model-list',
@@ -404,13 +420,6 @@
                     }
                     this.load();
                 },
-                clickItem: function(item, event) {
-                    if (event.button === 1 || (event.ctrlKey && event.button === 0)) {
-                        window.open(item.url, '_blank');
-                    } else {
-                        window.location.href = item.url;
-                    }
-                },
                 clickRemoveFilter: function(filter){
                     if (this.activeFilters.indexOf(filter) !== -1) {
                         this.activeFilters.splice(this.activeFilters.indexOf(filter), 1);
@@ -542,6 +551,23 @@
 
             mounted(){
                 var self = this;
+
+                // Fix dropdown not visible for bottom items
+                $('.table-responsive').on('show.bs.dropdown', function () {
+                    $('.table-responsive').css( "overflow", "inherit" );
+                }).on('hide.bs.dropdown', function () {
+                    $('.table-responsive').css( "overflow", "auto" );
+                });
+
+                // Fix popover not closing on outside click
+                $(document).on('click', function (e) {
+                    if ($(e.target).closest('.popover').has('.popover-fields-content').length === 0 && $(e.target).closest('#fields-popover').length === 0) {
+                        // Fixes issue where after closing, takes 2 clicks to re-open
+                        (($('#fields-popover').popover('hide').data('bs.popover')||{}).inState||{}).click = false
+                    }
+                });
+
+                // Init popover
                 $('#fields-popover').popover({
                     html: true,
                     content: function(){
@@ -623,15 +649,18 @@
                             if (changed_fields.includes('NR')) {
                                 changed_fields.shift();
                             }
+                            if (changed_fields.includes('NR')) {
+                                changed_fields.shift();
+                            }
                             self.load(false, changed_fields);
                         }
                     }
                 });
 
                 // Update DragTable
-                var currentFields = config.massPermission ? ['--checkbox--', 'NR'] : ['NR'];
+                var currentFields = config.massPermission ? ['--checkbox--', '--actions--', 'NR'] : ['--actions--', 'NR'];
                 $.each(self.currentFields, function(index, value){
-                    if (value !== 'NR' || value !== '--checkbox--') {
+                    if (value !== 'NR' || value !== '--checkbox--' || value !== '--actions--') {
                         currentFields.push(value);
                     }
                 });

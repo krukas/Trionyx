@@ -21,7 +21,6 @@ from django.views.generic import (
     CreateView as DjangoCreateView,
     DeleteView as DjangoDeleteView
 )
-from django.core.exceptions import PermissionDenied
 from django.http import Http404, StreamingHttpResponse
 from django.urls import reverse
 from django.core.paginator import Paginator
@@ -167,23 +166,30 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
             return self.current_fields
 
         field_attribute = 'list_{}_{}_fields'.format(self.kwargs.get('app'), self.kwargs.get('model'))
-        current_fields = self.request.user.get_attribute(field_attribute, [])
+        self.current_fields = saved_current_fields = self.request.user.get_attribute(field_attribute, [])
+        all_fields = self.get_all_fields().keys()
         request_fields = self.request.POST.get('selected_fields', None)
 
-        if request_fields and ','.join(current_fields) != request_fields:
-            # TODO validate fields
-            current_fields = list(filter(lambda f: f != 'NR', request_fields.split(',')))
-            self.request.user.set_attribute(field_attribute, current_fields)
-        elif request_fields:
-            current_fields = request_fields.split(',')
+        if request_fields is not None:
+            request_fields = [field for field in request_fields.split(',') if field in all_fields]
 
-        if not current_fields:
+            # Update current fields if requested fields are different
+            self.current_fields = request_fields if self.current_fields != request_fields else self.current_fields
+
+        # If current fields is empty reset dot default fields
+        if not self.current_fields:
             config = self.get_model_config()
-            current_fields = config.list_default_fields if config.list_default_fields else ['id']
+            self.current_fields = config.list_default_fields if config.list_default_fields else ['id']
 
-        # TODO check if all fields are still valid, filter out invalid and save
-        self.current_fields = current_fields
-        return current_fields
+        # Validate if all fields are still valid
+        checked_fields = [field for field in self.current_fields if field in all_fields]
+        self.current_fields = checked_fields if self.current_fields != checked_fields else self.current_fields
+
+        # Save fields if changed
+        if self.current_fields != saved_current_fields:
+            self.request.user.set_attribute(field_attribute, self.current_fields)
+
+        return self.current_fields
 
     def get_paginator(self):
         """Get paginator"""
@@ -195,16 +201,16 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
         query = filter_queryset_with_user_filters(query, self.get_filters(), self.request)
 
         fields = self.get_all_fields()
-        select_related = self.get_model_config().list_select_related if self.get_model_config().list_select_related else []
+        prefetch_related = self.get_model_config().list_prefetch_related if self.get_model_config().list_prefetch_related else []
         for field in self.get_current_fields():
             field_parts = field.split('__')
             if len(field_parts) > 1:
-                select_related.append('__'.join(field_parts[:-1]))
+                prefetch_related.append('__'.join(field_parts[:-1]))
             elif fields[field]['type'] == 'related':
-                select_related.append(field)
+                prefetch_related.append(field)
 
-        if select_related:
-            query = query.select_related(*set(select_related))
+        if prefetch_related:
+            query = query.prefetch_related(*set(prefetch_related))
 
         return query.order_by(self.get_sort())
 
@@ -250,6 +256,7 @@ class ListJsendView(ModelPermissionMixin, JsendView, ModelListMixin):
 
     def get_items(self, paginator, current_page):
         """Get list items for current page"""
+        from trionyx.urls import model_url
         fields = self.get_model_config().get_list_fields()
 
         page = paginator.page(current_page)
@@ -259,8 +266,10 @@ class ListJsendView(ModelPermissionMixin, JsendView, ModelListMixin):
             items.append({
                 'id': item.id,
                 'url': self.get_model_config().get_absolute_url(item),
+                'edit_url': model_url(item, 'edit'),
+                'delete_url': model_url(item, 'delete'),
                 'row_data': [
-                    fields[field]['renderer'](item, field)
+                    fields[field]['renderer'](item, field, no_link=True)
                     for field in self.get_current_fields()
                 ]
             })
@@ -429,12 +438,6 @@ class DetailTabView(ModelPermissionMixin, DetailView, ModelClassMixin):
         from trionyx.views import tabs
         return list(tabs.get_tabs(self.get_model_alias(), self.object))
 
-    def dispatch(self, request, *args, **kwargs):
-        """Validate if user can use view"""
-        if False:  # TODO do permission check based on Model
-            raise PermissionDenied
-        return super().dispatch(request, *args, **kwargs)
-
 
 class DetailTabJsendView(ModelPermissionMixin, JsendView, ModelClassMixin):
     """View for getting tab view with ajax"""
@@ -448,8 +451,6 @@ class DetailTabJsendView(ModelPermissionMixin, JsendView, ModelClassMixin):
         tab_code = request.GET.get('tab')
         model_alias = request.GET.get('model_alias')
         model_alias = model_alias if model_alias else '{}.{}'.format(app, model)
-
-        # TODO permission check
 
         item = tabs.get_tab(model_alias, self.get_object(), tab_code)
 
@@ -528,6 +529,12 @@ class UpdateView(ModelPermissionMixin, DjangoUpdateView, ModelClassMixin):
 
     cancel_url: str = ''
     """Url code for cancel button, when not set object.get_absolute_url is used"""
+
+    @property
+    def permission(self):
+        """Permission for view"""
+        from trionyx.forms import form_register
+        return form_register.get_edit_permission(self.get_model_class(), self.kwargs.get('code')) or super().permission
 
     @property
     def success_url(self):
@@ -609,6 +616,12 @@ class CreateView(ModelPermissionMixin, DjangoCreateView, ModelClassMixin):
 
     cancel_url = None
     """Url code for cancel button, when not set model list view is used"""
+
+    @property
+    def permission(self):
+        """Permission for view"""
+        from trionyx.forms import form_register
+        return form_register.get_create_permission(self.get_model_class(), self.kwargs.get('code')) or super().permission
 
     @property
     def success_url(self):

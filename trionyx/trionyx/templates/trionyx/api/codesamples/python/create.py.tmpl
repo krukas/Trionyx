@@ -1,0 +1,14 @@
+import requests
+
+response = requests.post(
+    url='{{ path }}',
+    headers={
+        'Authorization': 'Token <token>',
+    },
+    json={
+        # item data
+    }
+)
+
+if response.status_code == 201:
+    print(response.json())

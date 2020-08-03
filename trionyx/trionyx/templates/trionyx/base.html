@@ -7,7 +7,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
-    <link rel="icon" type="image/png" href="{% static 'img/favicon.png' %}" />
+    <link href="data:image/x-icon;base64,{{ tx_base64_icon|safe }}" rel="icon" type="image/x-icon">
 
     <title>{% block title %}{% endblock %}{% block title_suffix %} | {{ TX_APP_NAME }}{% endblock %}</title>
 
@@ -21,13 +21,20 @@
         <link rel="stylesheet" type="text/css" href="{% static "plugins/summernote/summernote.min.css" %}">
 
         <link rel="stylesheet" type="text/css" href="{% static "css/AdminLTE.min.css" %}">
+        <link rel="stylesheet" type="text/css" href="{% static tx_offline_skin_css %}">
         <link rel="stylesheet" type="text/css" href="{% static "css/trionyx.css" %}">
+
+        {% for css_file in apps_css_files %}
+            <link rel="stylesheet" type="text/css" href="{% static css_file %}">
+        {% endfor %}
 
         {% block extra_css %}{% endblock %}
 
     {% endcompress %}
 
-    <link rel="stylesheet" type="text/css" href="{% static tx_skin_css %}">
+    {% if tx_custom_skin_css %}
+        <link rel="stylesheet" type="text/css" href="{% static tx_custom_skin_css %}">
+    {% endif %}
 
     {% block extra_head %}{% endblock %}
     <script>
@@ -135,12 +142,15 @@
     <script src="{% static "js/jquery.min.js" %}"></script>
     <script src="{% static "js/bootstrap.min.js" %}"></script>
     <script src="{% static "js/jquery.slimscroll.min.js" %}"></script>
-    <script src="{% static "js/fastclick.js" %}"></script>
     <script src="{% static "js/moment.min.js" %}"></script>
 
     <script src="{% static "plugins/select2/js/select2.min.js" %}"></script>
     <script src="{% static "plugins/datetimepicker/js/bootstrap-datetimepicker.min.js" %}"></script>
     <script src="{% static "plugins/summernote/summernote.min.js" %}"></script>
+
+    {% if offline_summernote_language_js %}
+        <script src="{% static offline_summernote_language_js %}"></script>
+    {% endif %}
 
     <script src="{% static "js/adminlte.min.js" %}"></script>
     {% if DEBUG %}
@@ -149,6 +159,10 @@
         <script src="{% static "js/vue.min.js" %}"></script>
     {% endif %}
     <script src="{% static "js/trionyx.js" %}"></script>
+
+    {% for js_file in apps_js_files %}
+            <script src="{% static js_file %}"></script>
+    {% endfor %}
 
     <script>
         $(document).ready(function () {
@@ -162,7 +176,7 @@
 
 {% endcompress %}
 
-{% if current_locale != 'en_US' %}
+{% if summernote_language_js %}
     <script src="{% static summernote_language_js %}"></script>
 {% endif %}
 
@@ -172,6 +186,8 @@
     window.trionyx_translations = {
         close: '{% trans 'Close' %}',
     }
+
+    moment.locale('{{ current_locale }}');
 
     {% if tx_show_changelog %}
         openDialog('{% url 'trionyx:changelog' %}?show=1', {size: 'large'});

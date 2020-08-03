@@ -60,7 +60,7 @@ run:
 celery:
 	@( \
 		. env/bin/activate; \
-		celery worker -A app.celery -B -l info; \
+		$(PY) manage.py celery app.celery \
 	)
 
 

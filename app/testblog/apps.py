@@ -32,7 +32,7 @@ class BlogConfig(BaseConfig):
         list_fields = [
             {
                 'field': 'name',
-                'renderer': lambda model, field: model.name.upper()
+                'renderer': lambda model, field, **options: model.name.upper()
             }
         ]
 

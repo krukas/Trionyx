@@ -73,13 +73,5 @@
             field.prop("disabled", !checkbox.is(':checked'));
             field.prop("readonly", !checkbox.is(':checked'));
         }
-
-        $('#trionyx-mass-update-form input').each(function(index, input){
-            var field = $(input);
-
-
-
-            console.log(field.attr('name'), field.is(':disabled'), field.attr('readonly') === "readonly");
-        })
     </script>
 {% endblock %}

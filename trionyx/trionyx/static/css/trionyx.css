@@ -11,6 +11,18 @@ body {
     margin-bottom: 0;
 }
 
+.no-wrap {
+    white-space: nowrap;
+}
+
+.pre {
+    white-space: pre;
+}
+
+.sidebar-expanded-on-hover .content-header-affix {
+    left: 230px !important;
+}
+
 /*****************************************************************************/
 /* Theme colors*/
 /*****************************************************************************/
@@ -341,6 +353,22 @@ dl {
     margin: 3px;
 }
 
+.avatar-xs {
+    height: 16px;
+    width: 16px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin: 3px;
+}
+
+.image-field {
+    height: 18px;
+    width: 18px;
+    object-fit: cover;
+    border-radius: 3px;
+    margin: 0;
+}
+
 /*****************************************************************************/
 /* Box colors */
 
@@ -503,10 +531,6 @@ dl {
 
 #app-model-list thead tr {
     border-top: 2px solid #f4f4f4;
-}
-
-#app-model-list tr {
-    cursor: pointer;
 }
 
 #app-model-list tbody tr:hover {
@@ -768,6 +792,7 @@ table .dragtable-col-placeholder:first {
 
 th:hover .dragtable-drag-handle {
     display: inline;
+    cursor: pointer;
 }
 
 .description-value .form-control {
@@ -822,4 +847,8 @@ th:hover .dragtable-drag-handle {
     font-size: 18px;
     margin-top: 10px;
     margin-bottom: 5px;
+}
+
+.formset-items input {
+    position: relative;
 }

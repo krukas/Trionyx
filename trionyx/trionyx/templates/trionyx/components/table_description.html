@@ -1,9 +1,9 @@
-<table class="table table-condensed" {% if component.css_id %}id="{{ component.css_id }}"{% endif %}>
+<table class="table table-condensed {{ component.css_class }}" {% if component.css_id %}id="{{ component.css_id }}"{% endif %}>
     <tbody>
         {% for field in component.get_rendered_object %}
             <tr>
                 <th style="width: {{ field.width }};">{{ field.label }}:</th>
-                <td class="description-value">{{ field.value|safe }}</td>
+                <td class="description-value {{ field.class }}">{{ field.value|safe }}</td>
             </tr>
         {% endfor %}
   </tbody>

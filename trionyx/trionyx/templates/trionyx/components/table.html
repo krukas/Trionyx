@@ -1,14 +1,16 @@
 <div class="table-responsive">
     <table class="{{ component.css_class }}" {% if component.css_id %}id="{{ component.css_id }}"{% endif %}>
-        <thead>
-            <tr>
-                {% for field in component.get_fields %}
-                    <th {% if field.width %}style="width: {{ field.width }};"{% endif %}>
-                        {{ field.label }}
-                    </th>
-                {% endfor %}
-            </tr>
-        </thead>
+        {% if component.header %}
+            <thead>
+                <tr>
+                    {% for field in component.get_fields %}
+                        <th {% if field.width %}style="width: {{ field.width }};"{% endif %}>
+                            {{ field.label }}
+                        </th>
+                    {% endfor %}
+                </tr>
+            </thead>
+        {% endif %}
         <tbody>
             {% for row in component.get_rendered_objects %}
                 <tr>

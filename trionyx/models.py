@@ -126,7 +126,7 @@ class BaseModel(Model):  # noqa F405
         })
 
 
-def filter_queryset_with_user_filters(queryset, filters, request=None):
+def filter_queryset_with_user_filters(queryset, filters, request=None, raise_exception=False):
     """Apply user provided filters on queryset"""
     config = models_config.get_config(queryset.model)
 
@@ -172,7 +172,10 @@ def filter_queryset_with_user_filters(queryset, filters, request=None):
                 queryset = queryset.filter(**{'{}__gt'.format(filter['field']): filter['value']})
             elif filter['operator'] == '>=':
                 queryset = queryset.filter(**{'{}__gte'.format(filter['field']): filter['value']})
-        except Exception:
+        except Exception as e:
+            if raise_exception:
+                raise e
+
             if request:
                 messages.add_message(request, messages.ERROR, "Could not apply filter ({} {} {})".format(
                     filter['field'],

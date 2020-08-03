@@ -49,7 +49,6 @@ def account_overview(obj):
                 ),
                 Column6(
                     Panel(
-                        # TODO Add token reset button
                         _('Settings'),
                         DescriptionList(
                             {
@@ -63,7 +62,7 @@ def account_overview(obj):
                                     Html(token.key),
                                     OnclickLink(
                                         _('Reset'),
-                                        model_url='dialog-edit-custom',
+                                        model_url='dialog-edit',
                                         model_code='reset-api-token',
                                         dialog=True,
                                         dialog_reload_layout=True,
@@ -123,7 +122,7 @@ def trionyx_user(obj):
                                 Html(token.key),
                                 OnclickLink(
                                     _('Reset'),
-                                    model_url='dialog-edit-custom',
+                                    model_url='dialog-edit',
                                     model_code='reset-api-token',
                                     dialog=True,
                                     dialog_reload_layout=True,
@@ -242,7 +241,7 @@ def task(obj):
                             'field': 'execution_time',
                             'renderer': lambda value, **options: str(timezone.timedelta(seconds=value)),
                         },
-                        'result',
+                        'result=class:pre',
                     )
                 )
             ),

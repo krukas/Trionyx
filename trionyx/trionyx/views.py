@@ -27,6 +27,7 @@ from django.contrib.staticfiles.templatetags.staticfiles import static
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
 from django.forms.widgets import SelectMultiple
+from django.contrib.auth import get_user_model
 
 from trionyx.models import get_class
 from trionyx.views import UpdateView, DetailTabView, DialogView, JsendView
@@ -39,7 +40,7 @@ from trionyx.forms import form_register, modelform_factory, ModelAjaxChoiceField
 from trionyx.models import filter_queryset_with_user_filters
 from trionyx.trionyx.tasks import MassUpdateTask
 
-User = get_class('trionyx.User')
+User = get_user_model()
 Task = get_class('trionyx.Task')
 
 logger = logging.getLogger(__name__)
@@ -323,26 +324,6 @@ class UserTasksJsend(JsendView):
 
     def handle_request(self, request):
         """Get user open tasks"""
-        tasks = []
-
-        tasks.extend([
-            task for task in Task.objects.filter(user=request.user, status=Task.SCHEDULED).order_by('-scheduled_at')
-        ])
-
-        tasks.extend([
-            task for task in Task.objects.filter(
-                user=request.user,
-                status__in=[Task.QUEUE, Task.LOCKED, Task.RUNNING]
-            ).order_by('-started_at')
-        ])
-
-        if len(tasks) < 10:
-            tasks.extend([
-                task for task in Task.objects.filter(
-                    user=request.user, status__in=[Task.COMPLETED, Task.FAILED]
-                ).order_by('-started_at')[: 10 - len(tasks)]
-            ])
-
         return [
             {
                 'id': task.id,
@@ -351,7 +332,7 @@ class UserTasksJsend(JsendView):
                 'description': task.description,
                 'progress': task.progress,
                 'url': task.get_absolute_url(),
-            } for task in tasks
+            } for task in Task.objects.filter(user=request.user).order_by('status', '-scheduled_at', '-started_at')[:5]
         ]
 
 
@@ -395,7 +376,7 @@ class ChangelogDialog(DialogView):
 class SidebarJsend(JsendView):
     """Model sidebar view"""
 
-    def handle_request(self, request, app, model, pk, code):
+    def handle_request(self, request, app, model, pk, code=None):
         """Return given sidebar"""
         from trionyx.views import sidebars
         config = models_config.get_config(f'{app}.{model}')
@@ -437,7 +418,10 @@ class DashboardView(TemplateView):
                 'config_fields': widget().config_fields,
                 'default_w': widget.default_width,
                 'default_h': widget.default_height,
-            } for index, widget in widgets.items()],
+                'fixed_w': widget.fixed_width,
+                'fixed_h': widget.fixed_height,
+                'is_resizable': widget.is_resizable,
+            } for index, widget in widgets.items() if widget.is_visible(self.request)],
             'dashboard': dashboard,
         })
         return context
@@ -451,9 +435,12 @@ class WidgetDataJsendView(JsendView):
         data = json.loads(request.body.decode('utf-8'))
 
         if data['code'] not in widgets:
-            raise Exception('Widget does not exists')
+            raise LookupError('Widget does not exists')
 
         widget = widgets.get(data['code'])()
+
+        if not widget.is_visible(self.request):
+            raise LookupError('Widget data is not available')
 
         return widget.get_data(request, data.get('config', {}))
 
@@ -466,7 +453,7 @@ class SaveDashboardJsendView(JsendView):
         dashboard = json.loads(request.body.decode('utf-8'))
 
         if not isinstance(dashboard, list):
-            raise Exception('Expect dashboard to be a list')
+            raise TypeError('Expect dashboard to be a list')
 
         request.user.set_attribute('tx_dashboard', dashboard)
 
@@ -700,6 +687,7 @@ class MassUpdateView(ModelPermissionMixin, TemplateView, ModelClassMixin):
             fields = [f.name for f in model_config.get_fields()]
 
         FormClass = modelform_factory(self.get_model_class(), fields=sorted(list(set(fields))))
+        FormClass._post_clean = lambda self: None
         form = FormClass(data)
 
         # Disable fields that are not checked for change

@@ -16,10 +16,6 @@ class ModelConfigTestCase(TestCase):
         self.assertEqual(variables.get('new_variable'), 1337)  # warm up local cache
         self.assertEqual(SystemVariable.objects.filter(code='new_variable').count(), 1)
 
-        # Test if cache version works
-        SystemVariable.objects.all().delete()
-        self.assertEqual(variables.get('new_variable'), 1337)
-
     def test_variable_increment(self):
         with variables.get_increment('increment', start=10):
             pass

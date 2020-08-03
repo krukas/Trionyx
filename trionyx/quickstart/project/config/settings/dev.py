@@ -15,6 +15,7 @@ MIDDLEWARE += (
     'debug_toolbar.middleware.DebugToolbarMiddleware',
 )
 
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 COMPRESS_ENABLED = False
 
@@ -33,6 +34,12 @@ DATABASES = {
         # Set to empty string for default. Not used with sqlite3.
         "PORT": "",
     }
+}
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.dummy.DummyCache',
+   }
 }
 
 LOGGING = {
