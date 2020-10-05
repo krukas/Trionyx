@@ -28,14 +28,13 @@ setup(
     keywords = ['Django', 'Trionyx', 'framework', 'admin', 'data', 'processes', 'application', 'stack'],
     python_requires='~=3.6',
     install_requires=[
-        "Django >= 2.2.0, < 2.3",
+        "Django >= 3.1.0, < 3.2",
 
         # Django apps
         'django-crispy-forms >= 1.9.1, < 1.10',
         'django_compressor >= 2.4.0, < 2.5',
-        'jsonfield==3.1.0',
         'django-watson >= 1.5.0, < 1.6',
-        'djangorestframework >= 3.11.0, < 3.12',
+        'djangorestframework >= 3.12.0, < 3.13',
         'uritemplate >= 3.0.1, < 3.1',
 
         'Babel >= 2.8.0, < 2.9',

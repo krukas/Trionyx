@@ -21,7 +21,7 @@ from trionyx.menu import app_menu
 from trionyx.trionyx.search import auto_register_search_models
 from trionyx.log import enable_db_logger
 from django.utils.translation import ugettext_lazy as _
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
 
 from .renderers import render_level, render_progress, render_status
 

@@ -13,7 +13,7 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.utils import timezone
 from django.http.request import HttpRequest
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
 from django.contrib.contenttypes.models import ContentType
 from django.forms import Form
 from trionyx.trionyx.models import AuditLogEntry

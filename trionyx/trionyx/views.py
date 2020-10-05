@@ -23,7 +23,7 @@ from watson import search as watson
 from django.contrib.contenttypes.models import ContentType
 from django.views.generic import TemplateView
 from django.conf import settings
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
 from django.forms.widgets import SelectMultiple

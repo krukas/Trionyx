@@ -80,6 +80,7 @@ class User(models.BaseModel, AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(_('First name'), max_length=64, blank=True, default='')
     last_name = models.CharField(_('Last name'), max_length=64, blank=True, default='')
     is_active = models.BooleanField(_('Active'), default=True)
+    is_admin = models.BooleanField(_('Is admin'), default=True)
     date_joined = models.DateTimeField(_('Date joined'), default=timezone.now)
     last_online = models.DateTimeField(_('Last online'), blank=True, null=True)
     avatar = models.ImageField(_('Avatar'), blank=True, upload_to='avatars/', default='')

@@ -11,7 +11,6 @@ from functools import reduce
 
 from django.conf import settings
 from django.db.models import *  # noqa F403
-from jsonfield import JSONField  # type: ignore # noqa F401
 from django.urls import reverse
 
 from django.contrib import messages
