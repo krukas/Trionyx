@@ -1031,6 +1031,12 @@ class Panel(Component):
         super().__init__(*components, **options)
         self.title = title
 
+    def set_object(self, *args, **kwargs):
+        super().set_object(*args, **kwargs)
+
+        if self.title and isinstance(self.title, Component):
+            self.title.set_object(*args, *kwargs)
+
 
 class DescriptionList(Component, ComponentFieldsMixin):
     """
