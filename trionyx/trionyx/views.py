@@ -156,13 +156,24 @@ def create_permission_jstree(selected=None, disabled=False):
         if model_config.hide_permissions:
             continue
 
-        if model_config.disable_add and permission.codename == 'add_{}'.format(model_config.model_name):
+        if permission.codename == 'view_{}'.format(model_config.model_name) and (
+            model_config.disable_view or model_config.admin_view_only
+        ):
             continue
 
-        if model_config.disable_change and permission.codename == 'change_{}'.format(model_config.model_name):
+        if permission.codename == 'add_{}'.format(model_config.model_name) and (
+            model_config.disable_add or model_config.admin_add_only
+        ):
             continue
 
-        if model_config.disable_delete and permission.codename == 'delete_{}'.format(model_config.model_name):
+        if permission.codename == 'change_{}'.format(model_config.model_name) and (
+            model_config.disable_change or model_config.admin_change_only
+        ):
+            continue
+
+        if permission.codename == 'delete_{}'.format(model_config.model_name) and (
+            model_config.disable_delete or model_config.admin_delete_only
+        ):
             continue
 
         parent = ['jstree']

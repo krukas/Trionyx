@@ -1032,6 +1032,7 @@ class Panel(Component):
         self.title = title
 
     def set_object(self, *args, **kwargs):
+        """Set object on component"""
         super().set_object(*args, **kwargs)
 
         if self.title and isinstance(self.title, Component):

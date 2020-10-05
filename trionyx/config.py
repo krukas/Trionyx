@@ -15,8 +15,9 @@ from django.urls import reverse
 from django.conf import settings
 from django.db.models import Field, Model
 from django.core.cache import cache
-from trionyx.utils import CacheLock, get_current_request
+from trionyx.utils import CacheLock, get_current_user
 from trionyx.signals import can_view, can_add, can_change, can_delete
+from trionyx import utils
 
 if TYPE_CHECKING:
     from trionyx.trionyx.models import User  # noqa F401
@@ -50,11 +51,9 @@ class Variables:
 
     def get(self, code, default=None):
         """Get value for given variable code"""
-        from trionyx.trionyx import LOCAL_DATA
         from trionyx.trionyx.models import SystemVariable
 
-        # Only use LOCAL_DATA for request, to prevent no updates in Celery
-        variables = getattr(LOCAL_DATA, 'trionyx_variables', None) if get_current_request() else None
+        variables = utils.get_local_data('trionyx_variables')
 
         if variables is None:
             variables = cache.get(self.cache_key)
@@ -65,20 +64,19 @@ class Variables:
             }
             cache.set(self.cache_key, variables, timeout=60 * 60 * 24)
 
-        setattr(LOCAL_DATA, 'trionyx_variables', variables)
+        utils.set_local_data('trionyx_variables', variables)
 
         return variables.get(code, default)
 
     def set(self, code, value):
         """Set new value for given variable code"""
-        from trionyx.trionyx import LOCAL_DATA
         from trionyx.trionyx.models import SystemVariable
         with CacheLock('variables-set', code):
             SystemVariable.objects.update_or_create(code=code, defaults={
                 'value': value,
             })
 
-        setattr(LOCAL_DATA, 'trionyx_variables', None)
+        utils.set_local_data('trionyx_variables', None)
         cache.delete(self.cache_key)
 
     @contextlib.contextmanager
@@ -246,6 +244,18 @@ class ModelConfig:
     disable_delete: bool = False
     """Disable delete for this model"""
 
+    admin_view_only: bool = False
+    """Only admins can view this model"""
+
+    admin_add_only: bool = False
+    """Only admins can add this model"""
+
+    admin_change_only: bool = False
+    """Only admins can change this model"""
+
+    admin_delete_only: bool = False
+    """Only admins can delete this model"""
+
     auditlog_disable: bool = False
     """Disable auditlog for this model"""
 
@@ -314,29 +324,38 @@ class ModelConfig:
     def has_permission(self, action, obj=None, user=None):
         """Check if action can be performed on object"""
         assert action in ['view', 'add', 'change', 'delete']
+        if not user:
+            user = get_current_user()
 
         mapping = {
             'view': {
                 'disabled': self.disable_view,
                 'signal': can_view,
+                'admin': self.admin_view_only,
             },
             'add': {
                 'disabled': self.disable_add,
                 'signal': can_add,
+                'admin': self.admin_add_only,
             },
             'change': {
                 'disabled': self.disable_change,
                 'signal': can_change,
+                'admin': self.admin_change_only,
             },
             'delete': {
                 'disabled': self.disable_delete,
                 'signal': can_delete,
+                'admin': self.admin_delete_only,
             }
         }
 
         # First check if its disabled in config
         if mapping[action]['disabled']:
             return False
+
+        if mapping[action]['admin']:
+            return user and user.is_superuser
 
         has_permission = True
 

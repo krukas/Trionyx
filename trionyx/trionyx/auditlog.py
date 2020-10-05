@@ -15,7 +15,7 @@ from django.utils.translation import ugettext_lazy as _
 from trionyx import models
 from trionyx.config import models_config
 from trionyx.trionyx.models import AuditLogEntry
-from trionyx.utils import get_current_request
+from trionyx.utils import get_current_user
 from trionyx.trionyx.layouts import auditlog as auditlog_layout
 from trionyx.views import tabs
 from trionyx.renderer import renderer
@@ -81,7 +81,7 @@ def create_log(instance, changes, action):
         object_verbose_name=str(instance),
         action=action,
         changes=changes,
-        user=get_current_request().user if get_current_request() and not get_current_request().user.is_anonymous else None
+        user=get_current_user() if get_current_user() and not get_current_user().is_anonymous else None
     )
 
 

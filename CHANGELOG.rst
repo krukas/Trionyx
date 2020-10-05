@@ -1,9 +1,18 @@
 [DEVELOP] -
 -----------
 
+**Compatibility breaking changes: Upgrade to Django 3.2 and reset DB migrations for JSONField**
+
+Added
+~~~~~
+- Add option to make model view/add/change/delete admin only
+
 Changed
 ~~~~~~~
 - Panel component title attribute now accepts component
+- Add helper functions to get/set local data
+- Add helper function get_current_user and make get_current_user available in tasks if a user started the task
+- Celery hooks are auto loaded from settings
 
 
 [2.2.0] - 03-09-2020

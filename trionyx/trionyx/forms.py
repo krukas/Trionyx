@@ -312,7 +312,7 @@ class UserResetApiToken(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         """Init"""
         super().__init__(*args, **kwargs)
-        if utils.get_current_request().user.id == self.instance.id:
+        if utils.get_current_user().id == self.instance.id:
             text = _('Are you sure you want to invalidate your current API key and generate a new one?')
         else:
             text = _('Are you sure you want to invalidate the API key and generate a new one for {user}?'.format(
@@ -436,7 +436,7 @@ class TotalSummaryWidgetForm(forms.Form):
         ]
 
         # TODO Change this to use ajax
-        content_type_map = ContentType.objects.get_for_models(*list(models_config.get_all_models(utils.get_current_request().user)))
+        content_type_map = ContentType.objects.get_for_models(*list(models_config.get_all_models(utils.get_current_user())))
         period_fields = {}
         summary_fields = {}
 
@@ -553,7 +553,7 @@ class GraphWidgetForm(forms.Form):
             ('__custom__', _('Custom'))
         ]
 
-        content_type_map = ContentType.objects.get_for_models(*list(models_config.get_all_models(utils.get_current_request().user)))
+        content_type_map = ContentType.objects.get_for_models(*list(models_config.get_all_models(utils.get_current_user())))
         interval_fields = {}
         graph_fields = {}
 

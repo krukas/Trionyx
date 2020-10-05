@@ -13,7 +13,7 @@ from django.conf import settings
 from django.utils import timezone
 from django.utils import translation
 
-from trionyx.trionyx import LOCAL_DATA
+from trionyx import utils
 
 EXEMPT_URLS = [
     compile(reverse(settings.LOGIN_URL).lstrip('/')),
@@ -56,25 +56,25 @@ class GlobalRequestMiddleware:
 
     def __call__(self, request):
         """Store request in local data"""
-        LOCAL_DATA.request = request
+        utils.set_local_data('request', request)
 
         def streaming_content_wrapper(content):
             try:
                 for chunk in content:
                     yield chunk
             finally:
-                del LOCAL_DATA.request
+                utils.clear_local_data()
 
         try:
             response = self.get_response(request)
         except Exception as e:
-            del LOCAL_DATA.request
+            utils.clear_local_data()
             raise e
 
         if response.streaming:
             response.streaming_content = streaming_content_wrapper(response.streaming_content)
         else:
-            del LOCAL_DATA.request
+            utils.clear_local_data()
 
         return response
 

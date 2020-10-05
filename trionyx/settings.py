@@ -17,6 +17,9 @@ from typing import Dict, Any, Optional, List
 from django.core.exceptions import ImproperlyConfigured
 from kombu import Queue, Exchange
 
+# Load celery signals
+import trionyx.celery  # noqa
+
 
 def gettext_noop(s):
     """Return same string, Dummy function to find translatable strings with makemessages"""
@@ -467,6 +470,9 @@ TX_CORE_MODEL_CONFIGS: Dict[str, Dict[str, Any]] = {
         'hide_permissions': True,
     },
     'authtoken.token': {
+        'hide_permissions': True,
+    },
+    'authtoken.tokenproxy': {
         'hide_permissions': True,
     },
     'auth.permission': {

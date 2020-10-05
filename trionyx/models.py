@@ -99,7 +99,7 @@ class BaseModel(Model):  # noqa F405
 
         try:
             if not self.pk and not self.created_by:
-                self.created_by = utils.get_current_request().user
+                self.created_by = utils.get_current_user()
         except Exception:
             pass
 
