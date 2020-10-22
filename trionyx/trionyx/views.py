@@ -322,7 +322,7 @@ class FilterFieldsJsendView(JsendView):
                     'name': name,
                     'label': str(field['label']),
                     'type': field['type'],
-                    'choices': field['choices'],
+                    'choices': field['choices'] if field['choices'] else [],
                     'choices_url': field.get('choices_url', None)
                 }
                 for name, field in config.get_list_fields().items()

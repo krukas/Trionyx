@@ -24,9 +24,9 @@
 
 {% block header_buttons %}
     {% if cancel_url %}
-        <a href="{% url cancel_url %}" class="btn btn-flat bg-theme">{% trans "Cancel" %}</a>
+        <a href="{% url cancel_url %}" class="btn btn-flat btn-default">{% trans "Cancel" %}</a>
     {% else %}
-        <a href="{{ object_url }}" class="btn btn-flat bg-theme">{% trans "Cancel" %}</a>
+        <a href="{{ object_url }}" class="btn btn-flat btn-default">{% trans "Cancel" %}</a>
     {% endif %}
     <input type="submit" value="{% if submit_value %}{{ submit_value }}{% else %}{% trans "Delete" %}{% endif %}" class="btn btn-flat btn-danger"/>
 {% endblock %}

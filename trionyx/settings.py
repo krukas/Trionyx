@@ -100,6 +100,9 @@ INSTALLED_APPS = [
     'compressor',
 ]
 
+
+FILE_UPLOAD_PERMISSIONS = 0o755
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
@@ -344,6 +347,9 @@ TX_COMPANY_EMAIL: str = ''
 
 TX_DISABLE_AUDITLOG = False
 """Disable auditlog"""
+
+TX_DISABLE_API = False
+"""Diable API"""
 
 
 def TX_DEFAULT_DASHBOARD():

@@ -181,7 +181,7 @@ def set_local_data(code, value):
     """Set local process data"""
     trionyx_data = getattr(LOCAL_DATA, 'trionyx_data', {})
     trionyx_data[code] = value
-    LOCAL_DATA.trionyx_data = trionyx_data
+    setattr(LOCAL_DATA, 'trionyx_data', trionyx_data)
 
 
 def get_local_data(code, default=None):

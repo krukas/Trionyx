@@ -277,6 +277,10 @@ class TotalSummaryWidget(BaseWidget):
         if not ModelClass:
             return ''
 
+        model_config = models_config.get_config(ModelClass)
+        if not model_config.has_permission('view'):
+            return '-'
+
         query = ModelClass.objects.get_queryset()
 
         if config.get('filters'):

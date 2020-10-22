@@ -173,7 +173,8 @@ class UserAttributeManager(models.Manager):
             }
             cache.set(cache_key, attributes, timeout=60 * 60 * 24)
 
-        utils.set_local_data('trionyx_user_attributes', attributes)
+        if utils.get_local_data('trionyx_user_attributes') is None:
+            utils.set_local_data('trionyx_user_attributes', attributes)
 
         return attributes.get(code, default)
 

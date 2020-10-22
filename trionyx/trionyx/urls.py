@@ -22,7 +22,7 @@ app_name = 'trionyx'
 
 api_auto_router = AutoRouter()
 
-urlpatterns = [
+api_patterns = [
     path('openapi', cache_page(60 * 60)(get_schema_view(
         description=render_to_string('trionyx/api/description.html') + '',
         generator_class=APISchemaGenerator,
@@ -34,7 +34,11 @@ urlpatterns = [
     ), name='api-doc'),
 
     path('api/', include(api_auto_router)),
+] if not settings.TX_DISABLE_API else []
 
+
+urlpatterns = [
+    *api_patterns,
 
     path('login/', views.LoginView.as_view(), name='login'),
     path('logout/', views.logout, name='logout'),

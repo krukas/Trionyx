@@ -525,7 +525,7 @@ class ModelConfig:
             if 'show' in button and not button['show'](obj, context):
                 continue
 
-            button_type = button.get('type', 'bg-theme')
+            button_type = button.get('type', 'btn-default')
             dialog_options = button.get('dialog_options', {})
             yield {
                 'label': button['label'](obj, context) if callable(button['label']) else button['label'],
