@@ -14,6 +14,7 @@ from django.apps import apps, AppConfig
 from django.urls import reverse
 from django.conf import settings
 from django.db.models import Field, Model
+from django.db.utils import OperationalError
 from django.core.cache import cache
 from trionyx.utils import CacheLock, get_current_user
 from trionyx.signals import can_view, can_add, can_change, can_delete
@@ -41,7 +42,10 @@ class AppSettings():
     def __getattr__(self, name):
         """Get setting"""
         key = name.upper()
-        return variables.get(f'{self.__prefix}_{key}', self.__settings.get(key))
+        try:
+            return variables.get(f'{self.__prefix}_{key}', self.__settings.get(key))
+        except OperationalError:  # Variables table does not yet exists
+            return self.__settings.get(key)
 
 
 class Variables:
