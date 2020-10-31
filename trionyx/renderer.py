@@ -102,7 +102,7 @@ def image_field_renderer(value, **options):
 
 def foreign_field_renderer(value, **options):
     """Render foreign field"""
-    if options.get('no_html', False) or options.get('no_link', False):
+    if options.get('no_html', False) or options.get('no_link', False) or not hasattr(value, 'get_absolute_url'):
         return str(value) if value else ''
 
     return '<a href="{url}">{value}</a>'.format(url=value.get_absolute_url(), value=value) if value else ''

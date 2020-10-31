@@ -654,7 +654,7 @@ class HtmlTagWrapper(Component):
             self.attr['id'] = self.css_id
 
         for key, value in kwargs.items():
-            if key in self.valid_attr:
+            if key in self.valid_attr or key == 'class':
                 self.attr[key] = value
 
     def get_attr_text(self):
@@ -754,6 +754,8 @@ class Html(HtmlTagWrapper):
 
 class Field(Html):
     """Render single field from object"""
+
+    tag = 'span'
 
     def __init__(self, field, renderer=None, format=None, **options):
         """Init Field"""

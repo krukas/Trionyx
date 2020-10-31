@@ -135,7 +135,7 @@ class BaseTask(celery.Task, metaclass=TaskMetaClass):
     def add_output(self, output):
         """Add task process output"""
         logger.info('TASK OUTPUT: {output}'.format(output=output))
-        self.__task.progress_output.append(output)
+        self.__task.progress_output.append(str(output))
         self.__task.save()
 
     def get_user(self):

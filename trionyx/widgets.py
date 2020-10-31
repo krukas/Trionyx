@@ -319,7 +319,7 @@ class TotalSummaryWidget(BaseWidget):
             return renderer.render_field(ModelClass(**{config['field']: result['sum']}), config['field'])
 
 
-@register_data(TotalSummaryWidget, 'online_users_today', _('Unique users today'), icon='fa fa-user', color='purple')
+@register_data(TotalSummaryWidget, 'online_users_today', _('Unique users today'), icon='fa fa-user', color='purple', permission='trionyx.view_user')
 def total_online_users(config):
     """Get total online users"""
     return get_user_model().objects.filter(
