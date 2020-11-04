@@ -59,13 +59,13 @@ def media_nginx_accel(request, path):
     """
     Location /protected/ {
         internal;
-        alias <complete path to project root dir>;
+        alias <complete path to media dir>;
     }
 
     """
     response = HttpResponse(status=200)
     response['Content-Type'] = ''
-    response['X-Accel-Redirect'] = '/protected' + request.path
+    response['X-Accel-Redirect'] = '/protected/' + path
     return response
 
 
