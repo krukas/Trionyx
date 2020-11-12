@@ -268,7 +268,7 @@ CORS_ORIGIN_WHITELIST = [
 # ==============================================================================
 # Celery
 # ==============================================================================
-CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+CELERY_BROKER_URL = get_env_var('CELERY_BROKER_URL', 'amqp://guest:guest@localhost:5672//')
 
 CELERY_ACCEPT_CONTENT = ['pickle']
 CELERY_TASK_SERIALIZER = 'pickle'
