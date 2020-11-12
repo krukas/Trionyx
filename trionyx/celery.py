@@ -5,10 +5,13 @@ trionyx.celery
 :copyright: 2020 by Maikel Martens
 :license: GPLv3
 """
+import logging
 from django.contrib.auth import get_user_model
 from celery.signals import after_setup_logger, before_task_publish, task_prerun, task_postrun
 from trionyx.log import enable_db_logger
 from trionyx import utils
+
+logger = logging.getLogger(__name__)
 
 
 @after_setup_logger.connect
@@ -38,7 +41,9 @@ def set_user(task_id, task, *args, **kwargs):
 
     if user_id:
         try:
-            utils.set_local_data('user', User.objects.get(id=user_id))
+            user = User.objects.get(id=user_id)
+            utils.set_local_data('user', user)
+            logger.debug(f'set user: {user}')
         except User.DoesNotExist:
             pass
 
