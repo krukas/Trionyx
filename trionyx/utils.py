@@ -94,7 +94,7 @@ def create_celerybeat_schedule(apps: List[str]) -> dict:
                 options['queue'] = 'cron'
                 schedule['options'] = options
 
-                beat_schedule[name] = schedule
+            beat_schedule[name] = schedule
 
     return beat_schedule
 
