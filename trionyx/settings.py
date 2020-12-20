@@ -495,3 +495,6 @@ TX_CHANGELOG_HASHTAG_URL: Optional[str] = None
 
 TX_SHOW_CHANGELOG_NEW_VERSION = True
 """Show changelog dialog with new version"""
+
+TX_SHOW_FOOTER: bool = True
+"""Show footer"""
