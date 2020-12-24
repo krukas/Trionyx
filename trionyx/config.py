@@ -186,6 +186,9 @@ class ModelConfig:
     list_default_sort: str = '-pk'
     """Default sort field for list view"""
 
+    list_update_queryset = None
+    """Function to update queryset"""
+
     api_fields: Optional[List[str]] = None
     """Fields used in API POST/PUT/PATCH methods, fallback on fields used in create and edit forms"""
 
@@ -281,7 +284,7 @@ class ModelConfig:
             for key, value in MetaConfig.__dict__.items():
                 if key.startswith('_'):
                     continue
-                setattr(self, key, value)
+                setattr(self, key, getattr(MetaConfig, key))
 
     def __setattr__(self, name, value):
         """Add attribute to changed list"""
