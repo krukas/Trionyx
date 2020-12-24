@@ -181,7 +181,8 @@ class LayoutDialog(DialogView):
         from trionyx.views import layouts
         try:
             content = layouts.get_layout(self.kwargs.get('code'), self.object).render(self.request)
-        except Exception:
+        except Exception as e:
+            logger.exception(e)
             content = _('Layout does not exists')
 
         return {
