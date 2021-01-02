@@ -1,6 +1,17 @@
 {% load crispy_forms_tags i18n %}
 
 {% if inline_form.empty_form %}
+
+    {% if inline_form.non_form_errors %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for error in inline_form.non_form_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
     <table class="table inline-form-table" id="formset-{{ inline_form_prefix }}">
         {{ inline_form.management_form|crispy }}
         <thead>

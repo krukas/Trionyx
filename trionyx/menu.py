@@ -217,6 +217,12 @@ class MenuItem:
                 return True
         return False
 
+    def pretty_print(self, depth=0):
+        """Pretty print item"""
+        print(depth * ' ', f'- {self.name} ({self.path})')
+        for child in self.childs:
+            child.pretty_print(depth+1)
+
 
 app_menu = Menu()
 add_menu_item = app_menu.add_item
