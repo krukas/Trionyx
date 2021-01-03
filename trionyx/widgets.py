@@ -427,21 +427,21 @@ class GraphWidget(BaseWidget):
 
         if config.get('interval_period') == 'minute':
             query = query.values('widget_minute', 'widget_hour', 'widget_day', 'widget_month', 'widget_year').order_by(
-                'widget_year', 'widget_month', 'widget_day', 'widget_hour', 'widget_minute')
+                '-widget_year', '-widget_month', '-widget_day', '-widget_hour', '-widget_minute')
         elif config.get('interval_period') == 'hour':
             query = query.values('widget_hour', 'widget_day', 'widget_month', 'widget_year').order_by(
-                'widget_year', 'widget_month', 'widget_day', 'widget_hour')
+                '-widget_year', '-widget_month', '-widget_day', '-widget_hour')
         elif config.get('interval_period') == 'day':
             query = query.values('widget_day', 'widget_month', 'widget_year').order_by(
-                'widget_year', 'widget_month', 'widget_day')
+                '-widget_year', '-widget_month', '-widget_day')
         elif config.get('interval_period') == 'week':
             query = query.values('widget_week', 'widget_year').order_by(
-                'widget_year', 'widget_week')
+                '-widget_year', '-widget_week')
         elif config.get('interval_period') == 'month':
             query = query.values('widget_month', 'widget_year').order_by(
-                'widget_year', 'widget_month')
+                '-widget_year', '-widget_month')
         elif config.get('interval_period') == 'year':
-            query = query.values('widget_year').order_by('widget_year')
+            query = query.values('widget_year').order_by('-widget_year')
 
         query = query.annotate(widget_count=Count('id'))
 
@@ -456,7 +456,10 @@ class GraphWidget(BaseWidget):
                 field=model_config.get_field(config['field']).verbose_name
             ))
 
-        query = query[:30]
+        query = list(reversed(query[:30]))
+
+        if not query:
+            return False
 
         def row_to_date(row):
             """Based on row generate a date"""

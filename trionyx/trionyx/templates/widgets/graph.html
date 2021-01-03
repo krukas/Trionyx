@@ -25,6 +25,9 @@
         },
         watch: {
             data: function (value) {
+                if (!value) {
+                    return;
+                }
                 if (!this.chart) {
                     var canvas = $('#graph-' + this.widget.i);
                     var gridItem = canvas.closest('.vue-grid-item');
