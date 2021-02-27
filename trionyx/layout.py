@@ -721,7 +721,7 @@ class OnclickTag(HtmlTagWrapper):
                 view_name=self.model_url,
                 code=self.model_code,
                 params=self.model_params
-            ) if self.model_url else self.url
+            ) if not self.url else self.url
 
             if not url and hasattr(self.object, 'get_absolute_url'):
                 url = self.object.get_absolute_url()
