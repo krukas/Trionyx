@@ -43,7 +43,7 @@ setup(
         'celery >= 4.4.0, < 4.5',
 
         'Pillow>=5.0.0',
-        'PyYAML==5.3.1',
+        'PyYAML==5.4',
         'docutils>=0.14',
     ],
     extras_require={
