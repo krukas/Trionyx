@@ -1,11 +1,15 @@
-[DEVELOP] -
------------
+[3.0.0] - 08-05-2021
+--------------------
 
 **Compatibility breaking changes: Upgrade to Django 3.2 and reset DB migrations for JSONField**
 
 Added
 ~~~~~
 - Add option to make model view/add/change/delete admin only
+- Make CELERY_BROKER_URL set by env
+- Add vuex.js
+- Add option to hide footer
+- Add settings to always filter list queryset
 
 Changed
 ~~~~~~~
@@ -13,7 +17,18 @@ Changed
 - Add helper functions to get/set local data
 - Add helper function get_current_user and make get_current_user available in tasks if a user started the task
 - Celery hooks are auto loaded from settings
+- Remove /media/ from xsendfile
+- Search by field label name
+- Inline show non field errors
+- Allow model_url to have an empty viewname
 
+Fixed
+~~~~~
+- AppSettings crashes on migrate because variable table does not yet exists
+- Fix ProgrammingError: relation "django_cache" does not exist
+- Fix verbose name not saved
+- Graph widget only first 30 records instead of lasts 30 records
+- Button dialog custom url error
 
 [2.2.0] - 03-09-2020
 --------------------
