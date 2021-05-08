@@ -15,10 +15,10 @@ from django.conf.urls.static import static
 from django.urls import path, reverse, NoReverseMatch
 
 
-def model_url(model, view_name, code=None, params=None):
+def model_url(model, view_name=None, code=None, params=None):
     """Shortcut function for getting model url"""
     from trionyx.config import models_config
-    view_name = 'trionyx:model-{}'.format(view_name)
+    view_name = 'trionyx:model-{}'.format(view_name if view_name else 'view')
     config = models_config.get_config(model)
     kwargs = {
         'app': config.app_label,
