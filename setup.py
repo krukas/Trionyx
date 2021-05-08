@@ -28,22 +28,22 @@ setup(
     keywords = ['Django', 'Trionyx', 'framework', 'admin', 'data', 'processes', 'application', 'stack'],
     python_requires='~=3.6',
     install_requires=[
-        "Django >= 3.1.0, < 3.2",
+        "Django >= 3.2.0, < 3.3",
 
         # Django apps
-        'django-crispy-forms >= 1.9.1, < 1.10',
+        'django-crispy-forms >= 1.11.2, < 1.12',
         'django_compressor >= 2.4.0, < 2.5',
         'django-watson >= 1.5.0, < 1.6',
         'djangorestframework >= 3.12.0, < 3.13',
         'uritemplate >= 3.0.1, < 3.1',
 
-        'Babel >= 2.8.0, < 2.9',
+        'Babel >= 2.9.0, < 2.10',
 
         'celery >= 4.4.0, < 4.5',
 
         'Pillow>=5.0.0',
-        'PyYAML==5.3.1',
-        'docutils>=0.14',
+        'PyYAML==5.4.1',
+        'docutils>=0.14, < 0.17',
     ],
     extras_require={
         'dev': [
@@ -54,8 +54,8 @@ setup(
             'coverage',
             'flake8',
             'pydocstyle',
-            'mypy==0.780',
-            'django-stubs >= 1.6.0, < 1.7.0',
+            'mypy==0.812',
+            'django-stubs >= 1.8.0, < 1.9.0',
             'ipython',
             'Sphinx',
             'sphinx_rtd_theme',
