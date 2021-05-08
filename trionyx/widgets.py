@@ -458,9 +458,9 @@ class GraphWidget(BaseWidget):
                 field=model_config.get_field(config['field']).verbose_name
             ))
 
-        query = list(reversed(query[:30]))
+        results = list(reversed(query[:30]))
 
-        if not query:
+        if not results:
             return False
 
         def row_to_date(row):
@@ -490,7 +490,7 @@ class GraphWidget(BaseWidget):
                 'drawOnChartArea': False,
             },
             'ticks': {
-                'suggestedMax': float(max([row['widget_count'] for row in query])) * (1.5 if not only_count else 1.10),
+                'suggestedMax': float(max([row['widget_count'] for row in results])) * (1.5 if not only_count else 1.10),
                 'suggestedMin': 0,
             }
         }]
@@ -508,7 +508,7 @@ class GraphWidget(BaseWidget):
                     'x': row_to_date(row),
                     'y': row.get('widget_value'),
                     'label': field_renderer(row.get('widget_value')),
-                } for row in query],
+                } for row in results],
                 'yAxisID': 'y-axis-1',
             })
             y_axes.append({
@@ -519,7 +519,7 @@ class GraphWidget(BaseWidget):
                     'drawOnChartArea': False,
                 },
                 'ticks': {
-                    'suggestedMax': float(max([row['widget_value'] for row in query])) * 1.10,
+                    'suggestedMax': float(max([row['widget_value'] for row in results])) * 1.10,
                     'suggestedMin': 0,
                 }
             })
@@ -532,7 +532,7 @@ class GraphWidget(BaseWidget):
             'pointBackgroundColor': self.get_color(config.get('color'), 'stroke') if only_count else 'rgba(211, 211, 211, 1)',
             'fill': True,
             'pointRadius': 4,
-            'data': [row.get('widget_count') for row in query],
+            'data': [row.get('widget_count') for row in results],
             'yAxisID': 'y-axis-2',
         })
 
@@ -553,7 +553,7 @@ class GraphWidget(BaseWidget):
                 'yAxes': y_axes,
             },
             'data': {
-                'labels': [row_to_date(row) for row in query],
+                'labels': [row_to_date(row) for row in results],
                 'datasets': datasets,
             }
         }

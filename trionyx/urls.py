@@ -7,12 +7,13 @@ trionyx.urls
 """
 import importlib
 import inspect
-from pkg_resources import iter_entry_points
-from django.conf import settings
+
 from django.apps import apps
+from django.conf import settings
 from django.conf.urls import include
 from django.conf.urls.static import static
 from django.urls import path, reverse, NoReverseMatch
+from pkg_resources import iter_entry_points
 
 
 def model_url(model, view_name=None, code=None, params=None):
@@ -53,7 +54,7 @@ for entry_point in iter_entry_points(group='trionyx.app', name=None):
         )
 
 if settings.DEBUG:
-    urlpatterns += static(
+    urlpatterns += static(  # type: ignore
         settings.STATIC_URL, document_root=settings.STATIC_ROOT
     )
 
