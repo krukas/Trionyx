@@ -221,7 +221,7 @@ class MenuItem:
         """Pretty print item"""
         print(depth * ' ', f'- {self.name} ({self.path})')
         for child in self.childs:
-            child.pretty_print(depth+1)
+            child.pretty_print(depth + 1)
 
 
 app_menu = Menu()
