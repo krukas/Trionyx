@@ -51,14 +51,12 @@ class ModelAjaxChoiceField(ModelChoiceField):
 
     def lazy_choices(self):
         """Lazy choices, is used to get active choices"""
-        from trionyx.trionyx import LOCAL_DATA
-        value = getattr(LOCAL_DATA, f'choices-{self.field_id}', None)
+        value = utils.get_local_data(f'choices-{self.field_id}')
         return self.queryset.filter(id=value).values_list('id', 'verbose_name') if value else []
 
     def prepare_value(self, value):
         """Prepare value and store value in local data"""
-        from trionyx.trionyx import LOCAL_DATA
-        setattr(LOCAL_DATA, f'choices-{self.field_id}', value)
+        utils.set_local_data(f'choices-{self.field_id}', value)
         return super().prepare_value(value)
 
     def widget_attrs(self, widget):
@@ -89,14 +87,12 @@ class ModelAjaxMultipleChoiceField(ModelMultipleChoiceField):
 
     def lazy_choices(self):
         """Get active choices"""
-        from trionyx.trionyx import LOCAL_DATA
-        values = getattr(LOCAL_DATA, f'choices-{self.field_id}', None)
+        values = utils.get_local_data(f'choices-{self.field_id}')
         return [(v.id, v.verbose_name) for v in values] if values else []
 
     def prepare_value(self, value):
         """Prepare value"""
-        from trionyx.trionyx import LOCAL_DATA
-        setattr(LOCAL_DATA, f'choices-{self.field_id}', value)
+        utils.set_local_data(f'choices-{self.field_id}', value)
         return super().prepare_value(value)
 
     def widget_attrs(self, widget):

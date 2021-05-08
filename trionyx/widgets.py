@@ -13,7 +13,7 @@ from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.utils import timezone
 from django.http.request import HttpRequest
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
 from django.contrib.contenttypes.models import ContentType
 from django.forms import Form
 from trionyx.trionyx.models import AuditLogEntry
@@ -277,6 +277,10 @@ class TotalSummaryWidget(BaseWidget):
         if not ModelClass:
             return ''
 
+        model_config = models_config.get_config(ModelClass)
+        if not model_config.has_permission('view'):
+            return '-'
+
         query = ModelClass.objects.get_queryset()
 
         if config.get('filters'):
@@ -315,7 +319,9 @@ class TotalSummaryWidget(BaseWidget):
             return renderer.render_field(ModelClass(**{config['field']: result['sum']}), config['field'])
 
 
-@register_data(TotalSummaryWidget, 'online_users_today', _('Unique users today'), icon='fa fa-user', color='purple')
+@register_data(
+    TotalSummaryWidget, 'online_users_today', _('Unique users today'),
+    icon='fa fa-user', color='purple', permission='trionyx.view_user')
 def total_online_users(config):
     """Get total online users"""
     return get_user_model().objects.filter(
@@ -423,21 +429,21 @@ class GraphWidget(BaseWidget):
 
         if config.get('interval_period') == 'minute':
             query = query.values('widget_minute', 'widget_hour', 'widget_day', 'widget_month', 'widget_year').order_by(
-                'widget_year', 'widget_month', 'widget_day', 'widget_hour', 'widget_minute')
+                '-widget_year', '-widget_month', '-widget_day', '-widget_hour', '-widget_minute')
         elif config.get('interval_period') == 'hour':
             query = query.values('widget_hour', 'widget_day', 'widget_month', 'widget_year').order_by(
-                'widget_year', 'widget_month', 'widget_day', 'widget_hour')
+                '-widget_year', '-widget_month', '-widget_day', '-widget_hour')
         elif config.get('interval_period') == 'day':
             query = query.values('widget_day', 'widget_month', 'widget_year').order_by(
-                'widget_year', 'widget_month', 'widget_day')
+                '-widget_year', '-widget_month', '-widget_day')
         elif config.get('interval_period') == 'week':
             query = query.values('widget_week', 'widget_year').order_by(
-                'widget_year', 'widget_week')
+                '-widget_year', '-widget_week')
         elif config.get('interval_period') == 'month':
             query = query.values('widget_month', 'widget_year').order_by(
-                'widget_year', 'widget_month')
+                '-widget_year', '-widget_month')
         elif config.get('interval_period') == 'year':
-            query = query.values('widget_year').order_by('widget_year')
+            query = query.values('widget_year').order_by('-widget_year')
 
         query = query.annotate(widget_count=Count('id'))
 
@@ -452,7 +458,10 @@ class GraphWidget(BaseWidget):
                 field=model_config.get_field(config['field']).verbose_name
             ))
 
-        query = query[:30]
+        results = list(reversed(query[:30]))
+
+        if not results:
+            return False
 
         def row_to_date(row):
             """Based on row generate a date"""
@@ -481,7 +490,7 @@ class GraphWidget(BaseWidget):
                 'drawOnChartArea': False,
             },
             'ticks': {
-                'suggestedMax': float(max([row['widget_count'] for row in query])) * (1.5 if not only_count else 1.10),
+                'suggestedMax': float(max([row['widget_count'] for row in results])) * (1.5 if not only_count else 1.10),
                 'suggestedMin': 0,
             }
         }]
@@ -499,7 +508,7 @@ class GraphWidget(BaseWidget):
                     'x': row_to_date(row),
                     'y': row.get('widget_value'),
                     'label': field_renderer(row.get('widget_value')),
-                } for row in query],
+                } for row in results],
                 'yAxisID': 'y-axis-1',
             })
             y_axes.append({
@@ -510,7 +519,7 @@ class GraphWidget(BaseWidget):
                     'drawOnChartArea': False,
                 },
                 'ticks': {
-                    'suggestedMax': float(max([row['widget_value'] for row in query])) * 1.10,
+                    'suggestedMax': float(max([row['widget_value'] for row in results])) * 1.10,
                     'suggestedMin': 0,
                 }
             })
@@ -523,7 +532,7 @@ class GraphWidget(BaseWidget):
             'pointBackgroundColor': self.get_color(config.get('color'), 'stroke') if only_count else 'rgba(211, 211, 211, 1)',
             'fill': True,
             'pointRadius': 4,
-            'data': [row.get('widget_count') for row in query],
+            'data': [row.get('widget_count') for row in results],
             'yAxisID': 'y-axis-2',
         })
 
@@ -544,7 +553,7 @@ class GraphWidget(BaseWidget):
                 'yAxes': y_axes,
             },
             'data': {
-                'labels': [row_to_date(row) for row in query],
+                'labels': [row_to_date(row) for row in results],
                 'datasets': datasets,
             }
         }

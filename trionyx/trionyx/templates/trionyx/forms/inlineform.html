@@ -1,6 +1,16 @@
 {% load crispy_forms_tags i18n %}
-
 {% if inline_form.empty_form %}
+
+    {% if inline_form.non_form_errors %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for error in inline_form.non_form_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
     <table class="table inline-form-table" id="formset-{{ inline_form_prefix }}">
         {{ inline_form.management_form|crispy }}
         <thead>
@@ -13,7 +23,7 @@
 
         <tbody class="formset-items">
             {% for form in inline_form.forms %}
-                <tr class="formset-item">
+                <tr class="formset-item {% if form.non_field_errors %}border-danger{% endif %}">
                     {% for field in form.visible_fields %}
                     <td>
                         {% if forloop.first %}
@@ -27,10 +37,16 @@
                         {% else %}
                             {{ field|as_crispy_field }}
                         {% endif %}
-
                     </td>
                     {% endfor %}
                 </tr>
+                {% if form.non_field_errors %}
+                    <tr class="bg-danger text-danger">
+                        <td colspan="9999">
+                            {{ form.non_field_errors }}
+                        </td>
+                    </tr>
+                {% endif %}
             {% endfor %}
             <tr class="template" style="display: none">
                 {% for field in inline_form.empty_form.visible_fields %}

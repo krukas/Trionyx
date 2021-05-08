@@ -14,6 +14,7 @@ from django.db.models.query import QuerySet
 from django.utils.safestring import mark_safe
 
 from trionyx.renderer import price_value_renderer
+from trionyx.layout import Component
 
 register = template.Library()
 
@@ -45,6 +46,12 @@ def model_url(model, view_name, code=None):
     """Short cut for generating model urls"""
     from trionyx.urls import model_url
     return model_url(model, view_name, code)
+
+
+@register.filter
+def is_component(value):
+    """Check if value is component"""
+    return isinstance(value, Component)
 
 
 @register.filter

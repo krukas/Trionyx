@@ -197,7 +197,12 @@ class ModelListMixin(ModelClassMixin, SessionValueMixin):
 
     def get_queryset(self):
         """Get qeuryset for model"""
+        config = self.get_model_config()
         query = self.search_queryset()
+
+        if config.list_update_queryset:
+            query = config.list_update_queryset(query)
+
         query = filter_queryset_with_user_filters(query, self.get_filters(), self.request)
 
         fields = self.get_all_fields()

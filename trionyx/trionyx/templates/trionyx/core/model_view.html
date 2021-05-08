@@ -6,16 +6,16 @@
 
 {% block header_buttons %}
     {% if back_url %}
-        <a href="{{ back_url }}" class="btn btn-flat bg-theme">{% trans "Back" %}</a>
+        <a href="{{ back_url }}" class="btn btn-flat btn-default">{% trans "Back" %}</a>
     {% endif %}
 
     <span id="trionyx-model-header-buttons"></span>
 
     {% if delete_url and delete_permission and model_config.display_delete_button %}
-        <a href="{{ delete_url }}" class="btn btn-flat bg-theme">{% trans "Delete" %}</a>
+        <a href="{{ delete_url }}" class="btn btn-flat btn-default">{% trans "Delete" %}</a>
     {% endif %}
     {% if edit_url and change_permission and model_config.display_change_button %}
-        <a href="{{ edit_url }}" class="btn btn-flat bg-theme">{% trans "Edit" %}</a>
+        <a href="{{ edit_url }}" class="btn btn-flat btn-default">{% trans "Edit" %}</a>
     {% endif %}
 
 {% endblock %}

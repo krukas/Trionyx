@@ -23,7 +23,7 @@ from watson import search as watson
 from django.contrib.contenttypes.models import ContentType
 from django.views.generic import TemplateView
 from django.conf import settings
-from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.templatetags.static import static
 from django.utils.translation import ugettext_lazy as _
 from django.contrib import messages
 from django.forms.widgets import SelectMultiple
@@ -59,13 +59,13 @@ def media_nginx_accel(request, path):
     """
     Location /protected/ {
         internal;
-        alias <complete path to project root dir>;
+        alias <complete path to media dir>;
     }
 
     """
     response = HttpResponse(status=200)
     response['Content-Type'] = ''
-    response['X-Accel-Redirect'] = '/protected' + request.path
+    response['X-Accel-Redirect'] = '/protected/' + path
     return response
 
 
@@ -156,13 +156,24 @@ def create_permission_jstree(selected=None, disabled=False):
         if model_config.hide_permissions:
             continue
 
-        if model_config.disable_add and permission.codename == 'add_{}'.format(model_config.model_name):
+        if permission.codename == 'view_{}'.format(model_config.model_name) and (
+            model_config.disable_view or model_config.admin_view_only
+        ):
             continue
 
-        if model_config.disable_change and permission.codename == 'change_{}'.format(model_config.model_name):
+        if permission.codename == 'add_{}'.format(model_config.model_name) and (
+            model_config.disable_add or model_config.admin_add_only
+        ):
             continue
 
-        if model_config.disable_delete and permission.codename == 'delete_{}'.format(model_config.model_name):
+        if permission.codename == 'change_{}'.format(model_config.model_name) and (
+            model_config.disable_change or model_config.admin_change_only
+        ):
+            continue
+
+        if permission.codename == 'delete_{}'.format(model_config.model_name) and (
+            model_config.disable_delete or model_config.admin_delete_only
+        ):
             continue
 
         parent = ['jstree']
@@ -311,7 +322,7 @@ class FilterFieldsJsendView(JsendView):
                     'name': name,
                     'label': str(field['label']),
                     'type': field['type'],
-                    'choices': field['choices'],
+                    'choices': field['choices'] if field['choices'] else [],
                     'choices_url': field.get('choices_url', None)
                 }
                 for name, field in config.get_list_fields().items()

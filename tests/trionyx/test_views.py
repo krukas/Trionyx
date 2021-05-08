@@ -16,7 +16,7 @@ class ModelsTest(TestCase):
     def test_protected_media(self):
         response = self.client.get('/media/somefile/')
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.get('X-Accel-Redirect'), '/protected/media/somefile/')
+        self.assertEqual(response.get('X-Accel-Redirect'), '/protected/somefile/')
 
     def test_protected_media_not_loggedin(self):
         self.client.logout()

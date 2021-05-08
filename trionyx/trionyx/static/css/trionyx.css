@@ -23,6 +23,18 @@ body {
     left: 230px !important;
 }
 
+.float-left {
+    float: left;
+}
+
+.float-right {
+    float: right;
+}
+
+.border-danger {
+    border: 1px solid #dd4b39;
+}
+
 /*****************************************************************************/
 /* Theme colors*/
 /*****************************************************************************/
@@ -278,7 +290,7 @@ body {
 .skin-black-light .box.box-solid.box-theme > .box-header,
 .skin-black-light .progress-bar-theme
 {
-    background-color: #111111 !important;
+    background-color: #444444 !important;
     color: #ffffff !important;
 }
 
@@ -297,7 +309,7 @@ body {
 .skin-black-light .box-theme,
 .skin-black-light .form-control:focus
 {
-    border-color: #111111 !important;
+    border-color: #444444 !important;
 }
 
 .skin-black .text-theme,
@@ -305,7 +317,7 @@ body {
 .skin-black-light .text-theme,
 .skin-black-light .bootstrap-datetimepicker-widget a
 {
-    color: #111111 !important;
+    color: #444444 !important;
 }
 
 

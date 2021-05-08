@@ -17,7 +17,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.utils.translation import ugettext_lazy as _
 
 from trionyx.models import get_class
-from trionyx.utils import CacheLock, get_current_request
+from trionyx.utils import CacheLock, get_current_user
 
 Task = get_class('trionyx.Task')
 
@@ -107,8 +107,8 @@ class BaseTask(celery.Task, metaclass=TaskMetaClass):
         countdown = self.default_countdown if eta is None else None
         model = object if object else model
 
-        if not user and get_current_request() and get_current_request().user.is_authenticated:
-            user = get_current_request().user
+        if not user and get_current_user() and get_current_user().is_authenticated:
+            user = get_current_user()
 
         Task.objects.create(
             celery_task_id=task_id,
@@ -135,7 +135,7 @@ class BaseTask(celery.Task, metaclass=TaskMetaClass):
     def add_output(self, output):
         """Add task process output"""
         logger.info('TASK OUTPUT: {output}'.format(output=output))
-        self.__task.progress_output.append(output)
+        self.__task.progress_output.append(str(output))
         self.__task.save()
 
     def get_user(self):

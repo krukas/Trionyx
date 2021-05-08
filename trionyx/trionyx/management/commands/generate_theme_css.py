@@ -21,7 +21,7 @@ class Command(BaseCommand):
             'green': '#00a65a',
             'purple': '#605ca8',
             'red': '#dd4b39',
-            'black': '#111111',
+            'black': '#444444',
         }
 
         css_color_selectors = {

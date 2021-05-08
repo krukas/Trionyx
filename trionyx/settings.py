@@ -17,6 +17,9 @@ from typing import Dict, Any, Optional, List
 from django.core.exceptions import ImproperlyConfigured
 from kombu import Queue, Exchange
 
+# Load celery signals
+import trionyx.celery  # noqa
+
 
 def gettext_noop(s):
     """Return same string, Dummy function to find translatable strings with makemessages"""
@@ -97,6 +100,9 @@ INSTALLED_APPS = [
     'compressor',
 ]
 
+
+FILE_UPLOAD_PERMISSIONS = 0o755
+
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
@@ -150,6 +156,8 @@ DATABASES = get_env_var('DATABASES', {
         'NAME': 'development.sqlite3',
     }
 })
+
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
 
 # ==============================================================================
 # Email
@@ -233,6 +241,7 @@ STATICFILES_FINDERS = [
 COMPRESS_ENABLED = True
 COMPRESS_OFFLINE = True
 COMPRESS_OFFLINE_CONTEXT = 'trionyx.trionyx.context_processors.offline_context'
+COMPRESS_CSS_HASHING_METHOD = 'content'
 COMPRESS_FILTERS = {
     'css': [
         'compressor.filters.css_default.CssAbsoluteFilter',
@@ -262,7 +271,7 @@ CORS_ORIGIN_WHITELIST = [
 # ==============================================================================
 # Celery
 # ==============================================================================
-CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+CELERY_BROKER_URL = get_env_var('CELERY_BROKER_URL', 'amqp://guest:guest@localhost:5672//')
 
 CELERY_ACCEPT_CONTENT = ['pickle']
 CELERY_TASK_SERIALIZER = 'pickle'
@@ -341,6 +350,9 @@ TX_COMPANY_EMAIL: str = ''
 
 TX_DISABLE_AUDITLOG = False
 """Disable auditlog"""
+
+TX_DISABLE_API = False
+"""Diable API"""
 
 
 def TX_DEFAULT_DASHBOARD():
@@ -469,6 +481,9 @@ TX_CORE_MODEL_CONFIGS: Dict[str, Dict[str, Any]] = {
     'authtoken.token': {
         'hide_permissions': True,
     },
+    'authtoken.tokenproxy': {
+        'hide_permissions': True,
+    },
     'auth.permission': {
         'hide_permissions': True,
     },
@@ -482,3 +497,6 @@ TX_CHANGELOG_HASHTAG_URL: Optional[str] = None
 
 TX_SHOW_CHANGELOG_NEW_VERSION = True
 """Show changelog dialog with new version"""
+
+TX_SHOW_FOOTER: bool = True
+"""Show footer"""

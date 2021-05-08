@@ -654,7 +654,7 @@ class HtmlTagWrapper(Component):
             self.attr['id'] = self.css_id
 
         for key, value in kwargs.items():
-            if key in self.valid_attr:
+            if key in self.valid_attr or key == 'class':
                 self.attr[key] = value
 
     def get_attr_text(self):
@@ -721,7 +721,7 @@ class OnclickTag(HtmlTagWrapper):
                 view_name=self.model_url,
                 code=self.model_code,
                 params=self.model_params
-            ) if self.model_url else self.url
+            ) if not self.url else self.url
 
             if not url and hasattr(self.object, 'get_absolute_url'):
                 url = self.object.get_absolute_url()
@@ -754,6 +754,8 @@ class Html(HtmlTagWrapper):
 
 class Field(Html):
     """Render single field from object"""
+
+    tag = 'span'
 
     def __init__(self, field, renderer=None, format=None, **options):
         """Init Field"""
@@ -1030,6 +1032,13 @@ class Panel(Component):
         """Init Panel"""
         super().__init__(*components, **options)
         self.title = title
+
+    def set_object(self, *args, **kwargs):
+        """Set object on component"""
+        super().set_object(*args, **kwargs)
+
+        if self.title and isinstance(self.title, Component):
+            self.title.set_object(*args, *kwargs)
 
 
 class DescriptionList(Component, ComponentFieldsMixin):

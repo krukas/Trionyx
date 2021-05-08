@@ -11,6 +11,7 @@ import random
 import string
 import importlib
 import hashlib
+import threading
 from functools import reduce
 from typing import List, Any, Optional
 
@@ -20,6 +21,10 @@ from django.utils import formats
 from django.core.cache import cache
 
 logger = logging.getLogger(__name__)
+
+
+LOCAL_DATA = threading.local()
+"""Data storage for current request thread"""
 
 
 class CacheLock:
@@ -89,7 +94,7 @@ def create_celerybeat_schedule(apps: List[str]) -> dict:
                 options['queue'] = 'cron'
                 schedule['options'] = options
 
-                beat_schedule[name] = schedule
+            beat_schedule[name] = schedule
 
     return beat_schedule
 
@@ -172,10 +177,35 @@ def datetime_format_to_django_template(format):
     return reduce(lambda value, key: value.replace(key, mapping[key]), mapping.keys(), format)
 
 
+def set_local_data(code, value):
+    """Set local process data"""
+    trionyx_data = getattr(LOCAL_DATA, 'trionyx_data', {})
+    trionyx_data[code] = value
+    setattr(LOCAL_DATA, 'trionyx_data', trionyx_data)
+
+
+def get_local_data(code, default=None):
+    """Get local process data"""
+    trionyx_data = getattr(LOCAL_DATA, 'trionyx_data', {})
+    return trionyx_data.get(code, default)
+
+
+def clear_local_data():
+    """Clear all local data"""
+    LOCAL_DATA.trionyx_data = {}
+
+
 def get_current_request():
     """Get current request object"""
-    from trionyx.trionyx import LOCAL_DATA
-    return getattr(LOCAL_DATA, 'request', None)
+    return get_local_data('request')
+
+
+def get_current_user():
+    """Get current user"""
+    if get_current_request() and get_current_request().user:
+        return get_current_request().user
+
+    return get_local_data('user')
 
 
 def get_app_version():

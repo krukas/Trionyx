@@ -23,7 +23,7 @@ from django.template.loader import render_to_string
 from trionyx import models
 from trionyx.utils import get_current_request
 from trionyx.data import TIMEZONES
-from trionyx.trionyx import LOCAL_DATA
+from trionyx import utils
 
 
 # =============================================================================
@@ -153,7 +153,7 @@ class UserAttributeManager(models.Manager):
 
     def set_attribute(self, user, code, value):
         """Set attribute for user"""
-        setattr(LOCAL_DATA, 'trionyx_user_attributes', None)
+        utils.set_local_data('trionyx_user_attributes', None)
         cache.delete(f'user-attributes-{user.id}')
 
         self.update_or_create(user=user, code=code, defaults={'value': value})
@@ -162,8 +162,7 @@ class UserAttributeManager(models.Manager):
         """Get attribute for user"""
         cache_key = f'user-attributes-{user.id}'
 
-        # Only use LOCAL_DATA for request, to prevent no updates in Celery or different user attributes are used
-        attributes = getattr(LOCAL_DATA, 'trionyx_user_attributes', None) if get_current_request() else None
+        attributes = utils.get_local_data('trionyx_user_attributes')
 
         if attributes is None:
             attributes = cache.get(cache_key)
@@ -174,7 +173,8 @@ class UserAttributeManager(models.Manager):
             }
             cache.set(cache_key, attributes, timeout=60 * 60 * 24)
 
-        setattr(LOCAL_DATA, 'trionyx_user_attributes', attributes)
+        if utils.get_local_data('trionyx_user_attributes') is None:
+            utils.set_local_data('trionyx_user_attributes', attributes)
 
         return attributes.get(code, default)
 

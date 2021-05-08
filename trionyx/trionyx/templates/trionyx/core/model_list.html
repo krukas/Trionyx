@@ -12,7 +12,7 @@
     {% include 'trionyx/base/model_header_buttons.html' %}
 
     {% if create_permission and model_config.display_add_button %}
-        <a href="{{ create_url }}" class="btn btn-flat bg-theme">{% trans "Create" %}</a>
+        <a href="{{ create_url }}" class="btn btn-flat btn-default">{% trans "Create" %}</a>
     {% endif %}
 {% endblock %}
 
@@ -248,7 +248,7 @@
                 </div>
                 <div v-for="field in fields" class="col-md-6">
                     <label>
-                        <input v-bind:name="field.name" type="checkbox">
+                        <input v-bind:name="field.name" type="checkbox" :data-value="field.label">
                         [[field.label]]
                     </label>
                 </div>
@@ -579,8 +579,9 @@
                             var search = $(this).val().toLowerCase();
                            content.find('input:checkbox').each(function () {
                                var field = $(this).attr('name').toLowerCase();
+                               var label = $(this).attr('data-value').toLowerCase();
                                var parent = $(this).parent().parent();
-                               if (field.indexOf(search) !== -1){
+                               if (field.indexOf(search) !== -1 || label.indexOf(search) !== -1){
                                    $(parent).removeClass('hidden');
                                } else {
                                    $(parent).addClass('hidden');

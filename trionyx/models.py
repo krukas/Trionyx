@@ -11,7 +11,6 @@ from functools import reduce
 
 from django.conf import settings
 from django.db.models import *  # noqa F403
-from jsonfield import JSONField  # type: ignore # noqa F401
 from django.urls import reverse
 
 from django.contrib import messages
@@ -91,20 +90,22 @@ class BaseModel(Model):  # noqa F405
         """Give verbose name of object"""
         return self.verbose_name if self.verbose_name else self.generate_verbose_name()
 
-    def save(self, *args, **kwargs):
+    def save(self, *args, update_fields=None, **kwargs):
         """Save model"""
         try:
             self.verbose_name = self.generate_verbose_name()
+            if update_fields:
+                update_fields.append('verbose_name')
         except Exception:
             pass
 
         try:
             if not self.pk and not self.created_by:
-                self.created_by = utils.get_current_request().user
+                self.created_by = utils.get_current_user()
         except Exception:
             pass
 
-        return super().save(*args, **kwargs)
+        return super().save(*args, update_fields=update_fields, **kwargs)
 
     def generate_verbose_name(self):
         """Generate verbose name"""
